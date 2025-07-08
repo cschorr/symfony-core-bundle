@@ -17,33 +17,24 @@ class AbstractEntity implements \Stringable
 {
     use UuidTrait;
     use BoolActiveTrait;
-
     use BlameableEntity;
     use SoftDeleteableEntity;
     use TimestampableEntity;
-
     use StringNotesTrait;
 
-    ##[Gedmo\SortablePosition]
-    ##[ORM\Column(name: 'position', type: 'integer')]
-    #private int $sorting;
+    public function __construct()
+    {
+        // Set default timestamps since Gedmo might not be fully configured
+        if (!$this->createdAt) {
+            $this->createdAt = new \DateTime();
+        }
+        if (!$this->updatedAt) {
+            $this->updatedAt = new \DateTime();
+        }
+    }
 
     public function __toString(): string
     {
         return '';
     }
-
-    /*
-    public function getSorting(): int
-    {
-        return $this->sorting;
-    }
-
-    public function setSorting(int $sorting): static
-    {
-        $this->sorting = $sorting;
-
-        return $this;
-    }
-    */
 }

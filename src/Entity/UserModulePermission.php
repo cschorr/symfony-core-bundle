@@ -7,15 +7,15 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserModulePermissionRepository::class)]
 #[ORM\Table(name: 'user_module_permission')]
-#[ORM\UniqueConstraint(name: 'UNIQ_USER_MODULE', fields: ['user_id', 'module_id'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_USER_MODULE', fields: ['user', 'module'])]
 class UserModulePermission extends AbstractEntity
 {
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'modulePermissions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'user_id', nullable: false)]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Module::class, inversedBy: 'userPermissions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'module_id', nullable: false)]
     private ?Module $module = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
@@ -26,7 +26,6 @@ class UserModulePermission extends AbstractEntity
 
     public function __construct()
     {
-        // Initialize with default values
         $this->canRead = false;
         $this->canWrite = false;
     }
