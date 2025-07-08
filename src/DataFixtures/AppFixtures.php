@@ -37,14 +37,12 @@ class AppFixtures extends Fixture
             $user->setEmail($userData['email']);
             $user->setPassword($this->hasher->hashPassword($user, $userData['password']));
             $user->setRoles($userData['roles']);
-            $user->setCreatedAt(new \DateTime());
-            $user->setUpdatedAt(new \DateTime());
             $user->setActive(true);
             $user->setNotes('This is a default user.');
 
             $manager->persist($user);
         }
-        $manager->flush();        
+        $manager->flush();
     }
 
     public function createModuleFixtures(ObjectManager $manager): void
