@@ -266,38 +266,54 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         $entityName = (new \ReflectionClass($entity))->getShortName();
         $formData = $request->request->all()[$entityName] ?? [];
 
-        // Clear existing permissions
-        foreach ($entity->getModulePermissions() as $permission) {
-            $this->entityManager->remove($permission);
-        }
-        $entity->getModulePermissions()->clear();
-
         // Get all modules
         $modules = $this->entityManager->getRepository(Module::class)->findAll();
+        
+        // Get existing permissions indexed by module ID
+        $existingPermissions = [];
+        foreach ($entity->getModulePermissions() as $permission) {
+            $moduleId = (string) $permission->getModule()->getId();
+            $existingPermissions[$moduleId] = $permission;
+        }
 
         // Process each module's permissions
         foreach ($modules as $module) {
-            $readKey = 'module_' . (string) $module->getId() . '_read';
-            $writeKey = 'module_' . (string) $module->getId() . '_write';
+            $moduleId = (string) $module->getId();
+            $readKey = 'module_' . $moduleId . '_read';
+            $writeKey = 'module_' . $moduleId . '_write';
             
             $canRead = isset($formData[$readKey]) && $formData[$readKey] === '1';
             $canWrite = isset($formData[$writeKey]) && $formData[$writeKey] === '1';
 
-            // Only create permission if at least one permission is granted
-            if ($canRead || $canWrite) {
-                $permission = new \App\Entity\UserModulePermission();
-                $permission->setUser($entity);
-                $permission->setModule($module);
-                $permission->setCanRead($canRead);
-                $permission->setCanWrite($canWrite);
+            if (isset($existingPermissions[$moduleId])) {
+                // Update existing permission
+                $permission = $existingPermissions[$moduleId];
                 
-                $this->entityManager->persist($permission);
-                $entity->addModulePermission($permission);
+                if ($canRead || $canWrite) {
+                    // Update the permission
+                    $permission->setCanRead($canRead);
+                    $permission->setCanWrite($canWrite);
+                } else {
+                    // Remove permission if no access is granted
+                    $this->entityManager->remove($permission);
+                    $entity->removeModulePermission($permission);
+                }
+            } else {
+                // Create new permission only if at least one permission is granted
+                if ($canRead || $canWrite) {
+                    $permission = new \App\Entity\UserModulePermission();
+                    $permission->setUser($entity);
+                    $permission->setModule($module);
+                    $permission->setCanRead($canRead);
+                    $permission->setCanWrite($canWrite);
+                    
+                    $this->entityManager->persist($permission);
+                    $entity->addModulePermission($permission);
+                }
             }
         }
         
-        // Flush to save the permissions
-        $this->entityManager->flush();
+        // Don't flush here - let the parent method handle the flush
     }
 
     /**
@@ -305,11 +321,23 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        // First persist the main entity
-        parent::persistEntity($entityManager, $entityInstance);
+        // Start a transaction to ensure atomicity
+        $this->entityManager->beginTransaction();
         
-        // Then handle the permissions after the main entity is persisted
-        $this->handleModulePermissions($entityInstance);
+        try {
+            // First persist the main entity
+            parent::persistEntity($entityManager, $entityInstance);
+            
+            // Then handle the permissions after the main entity is persisted
+            $this->handleModulePermissions($entityInstance);
+            
+            // Commit the transaction
+            $this->entityManager->commit();
+        } catch (\Exception $e) {
+            // Rollback on error
+            $this->entityManager->rollback();
+            throw $e;
+        }
     }
 
     /**
@@ -317,10 +345,22 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        // Handle permissions first for updates
-        $this->handleModulePermissions($entityInstance);
+        // Start a transaction to ensure atomicity
+        $this->entityManager->beginTransaction();
         
-        // Then update the main entity
-        parent::updateEntity($entityManager, $entityInstance);
+        try {
+            // Handle permissions first for updates
+            $this->handleModulePermissions($entityInstance);
+            
+            // Then update the main entity
+            parent::updateEntity($entityManager, $entityInstance);
+            
+            // Commit the transaction
+            $this->entityManager->commit();
+        } catch (\Exception $e) {
+            // Rollback on error
+            $this->entityManager->rollback();
+            throw $e;
+        }
     }
 }

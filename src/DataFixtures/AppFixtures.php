@@ -39,8 +39,6 @@ class AppFixtures extends Fixture
             $user->setEmail($userData['email']);
             $user->setPassword($this->hasher->hashPassword($user, $userData['password']));
             $user->setRoles($userData['roles']);
-            $user->setCreatedAt(new \DateTime());
-            $user->setUpdatedAt(new \DateTime());
             $user->setActive(true);
             $user->setNotes('This is a default user.');
 
@@ -60,13 +58,10 @@ class AppFixtures extends Fixture
         ];
 
         // Create and persist module entities here
-        // Example:
         foreach ($modules as $moduleData) {
             $module = new Module();
             $module->setName($moduleData['name']);
             $module->setText($moduleData['text']);
-            $module->setCreatedAt(new \DateTime());
-            $module->setUpdatedAt(new \DateTime());
             $manager->persist($module);
         }
         $manager->flush();
@@ -82,65 +77,32 @@ class AppFixtures extends Fixture
         $companyModule = $manager->getRepository(Module::class)->findOneBy(['name' => 'Unternehmen']);
         $moduleModule = $manager->getRepository(Module::class)->findOneBy(['name' => 'Module']);
 
-        if ($adminUser && $userModule) {
-            // Admin has full access to user module
-            $permission = new UserModulePermission();
-            $permission->setUser($adminUser);
-            $permission->setModule($userModule);
-            $permission->setCanRead(true);
-            $permission->setCanWrite(true);
-            $permission->setCreatedAt(new \DateTime());
-            $permission->setUpdatedAt(new \DateTime());
-            $manager->persist($permission);
-        }
+        // Helper function to create permission if it doesn't exist
+        $createPermissionIfNotExists = function($user, $module, $canRead, $canWrite) use ($manager) {
+            if (!$user || !$module) return;
+            
+            // Check if permission already exists
+            $existingPermission = $manager->getRepository(UserModulePermission::class)
+                ->findOneBy(['user' => $user, 'module' => $module]);
+            
+            if (!$existingPermission) {
+                $permission = new UserModulePermission();
+                $permission->setUser($user);
+                $permission->setModule($module);
+                $permission->setCanRead($canRead);
+                $permission->setCanWrite($canWrite);
+                $manager->persist($permission);
+            }
+        };
 
-        if ($adminUser && $companyModule) {
-            // Admin has full access to company module
-            $permission = new UserModulePermission();
-            $permission->setUser($adminUser);
-            $permission->setModule($companyModule);
-            $permission->setCanRead(true);
-            $permission->setCanWrite(true);
-            $permission->setCreatedAt(new \DateTime());
-            $permission->setUpdatedAt(new \DateTime());
-            $manager->persist($permission);
-        }
+        // Admin has full access to all modules
+        $createPermissionIfNotExists($adminUser, $userModule, true, true);
+        $createPermissionIfNotExists($adminUser, $companyModule, true, true);
+        $createPermissionIfNotExists($adminUser, $moduleModule, true, true);
 
-        if ($adminUser && $moduleModule) {
-            // Admin has full access to module module
-            $permission = new UserModulePermission();
-            $permission->setUser($adminUser);
-            $permission->setModule($moduleModule);
-            $permission->setCanRead(true);
-            $permission->setCanWrite(true);
-            $permission->setCreatedAt(new \DateTime());
-            $permission->setUpdatedAt(new \DateTime());
-            $manager->persist($permission);
-        }
-
-        if ($demoUser && $userModule) {
-            // Demo user has read-only access to user module
-            $permission = new UserModulePermission();
-            $permission->setUser($demoUser);
-            $permission->setModule($userModule);
-            $permission->setCanRead(true);
-            $permission->setCanWrite(false);
-            $permission->setCreatedAt(new \DateTime());
-            $permission->setUpdatedAt(new \DateTime());
-            $manager->persist($permission);
-        }
-
-        if ($demoUser && $companyModule) {
-            // Demo user has read and write access to company module
-            $permission = new UserModulePermission();
-            $permission->setUser($demoUser);
-            $permission->setModule($companyModule);
-            $permission->setCanRead(true);
-            $permission->setCanWrite(true);
-            $permission->setCreatedAt(new \DateTime());
-            $permission->setUpdatedAt(new \DateTime());
-            $manager->persist($permission);
-        }
+        // Demo user permissions
+        $createPermissionIfNotExists($demoUser, $userModule, true, false); // Read-only access to user module
+        $createPermissionIfNotExists($demoUser, $companyModule, true, true); // Full access to company module
 
         $manager->flush();
     }
