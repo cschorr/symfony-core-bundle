@@ -44,14 +44,15 @@ class AppFixtures extends Fixture
 
             $manager->persist($user);
         }
+        $manager->flush();        
     }
 
     public function createModuleFixtures(ObjectManager $manager): void
     {
         $modules = [
             // Add your module data here
-            ['name' => 'Benutzer', 'description' => 'Benutzerverwaltung'],
-            ['name' => 'Unternehmen', 'description' => 'Kunden, Lieferanten, Partner etc.'],
+            ['name' => 'Benutzer', 'text' => 'Benutzerverwaltung'],
+            ['name' => 'Unternehmen', 'text' => 'Kunden, Lieferanten, Partner etc.'],
         ];
 
         // Create and persist module entities here
@@ -59,8 +60,9 @@ class AppFixtures extends Fixture
         foreach ($modules as $moduleData) {
             $module = new Module();
             $module->setName($moduleData['name']);
-            $module->setDescription($moduleData['description']);
-            // Set other properties as needed
+            $module->setText($moduleData['text']);
+            $module->setCreatedAt(new \DateTime());
+            $module->setUpdatedAt(new \DateTime());
             $manager->persist($module);
         }
         $manager->flush();
