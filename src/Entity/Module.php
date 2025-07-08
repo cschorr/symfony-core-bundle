@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use App\Entity\Traits\Single\StringNameTrait;
-use App\Repository\AddressRepository;
+use App\Entity\Traits\Single\StringTextTrait;
+use App\Repository\ModuleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: AddressRepository::class)]
-class Address extends AbstractEntity
+#[ORM\Entity(repositoryClass: ModuleRepository::class)]
+class Module extends AbstractEntity
 {
     use StringNameTrait;
+    use StringTextTrait;
 }
