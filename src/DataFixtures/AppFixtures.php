@@ -51,10 +51,12 @@ class AppFixtures extends Fixture
 
     public function createModuleFixtures(ObjectManager $manager): void
     {
+        // each module representing one entity
         $modules = [
             // Add your module data here
             ['name' => 'Benutzer', 'text' => 'Benutzerverwaltung'],
             ['name' => 'Unternehmen', 'text' => 'Kunden, Lieferanten, Partner etc.'],
+            ['name' => 'Module', 'text' => 'System modules and configuration'],
         ];
 
         // Create and persist module entities here
