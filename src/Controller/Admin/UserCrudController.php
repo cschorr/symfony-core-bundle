@@ -5,7 +5,6 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Entity\Module;
 use App\Entity\UserModulePermission;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -20,12 +19,14 @@ use Twig\Environment;
 
 class UserCrudController extends AbstractCrudController
 {
-    private EntityManagerInterface $entityManager;
     private Environment $twig;
 
-    public function __construct(EntityManagerInterface $entityManager, Environment $twig)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        EntityManagerInterface $entityManager, 
+        \App\Repository\UserModulePermissionRepository $permissionRepository,
+        Environment $twig
+    ) {
+        parent::__construct($entityManager, $permissionRepository);
         $this->twig = $twig;
     }
 
@@ -34,30 +35,26 @@ class UserCrudController extends AbstractCrudController
         return User::class;
     }
 
+    protected function getModuleName(): string
+    {
+        return 'Benutzer';
+    }
+
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud
+        return parent::configureCrud($crud)
             ->setPageTitle('edit', 'Edit User')
             ->overrideTemplate('crud/edit', 'admin/user_edit.html.twig');
     }
 
-    private function getUserModule(): Module
-    {
-        $module = $this->entityManager->getRepository(Module::class)->findOneBy(['name' => 'Benutzer']);
-        if (!$module) {
-            throw new \RuntimeException('Module "Benutzer" not found. Please run fixtures.');
-        }
-        return $module;
-    }
-
     public function configureFields(string $pageName): iterable
     {
-        // Check if user has read access to Benutzer module
-        $this->denyAccessUnlessGranted('read', $this->getUserModule());
-        
         $fields = [
             IdField::new('id')->hideOnForm(),
         ];
+
+        // Debug: Let's see what page we're on
+        dump("Page: " . $pageName); // Uncomment this line to debug
 
         // Add module permissions section for edit/new pages
         if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
@@ -76,9 +73,13 @@ class UserCrudController extends AbstractCrudController
             $fields[] = AssociationField::new('company');
             $fields[] = AssociationField::new('projects');
 
-            // Module Permissions Tab
+            // Module Permissions Tab - Always show for edit/new pages
             $fields[] = FormField::addTab('Module Permissions');
             $fields[] = FormField::addFieldset('Select permissions for each module:');
+            
+            // Debug: Let's see if we get here
+            dump("Adding permission fields"); // Uncomment this line to debug
+            
             $permissionFields = $this->createModulePermissionsField($pageName);
             $fields = array_merge($fields, $permissionFields);
         } else {
@@ -189,22 +190,14 @@ class UserCrudController extends AbstractCrudController
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $this->denyAccessUnlessGranted('write', $this->getUserModule());
         $this->handleModulePermissions($entityManager, $entityInstance);
         parent::persistEntity($entityManager, $entityInstance);
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $this->denyAccessUnlessGranted('write', $this->getUserModule());
         $this->handleModulePermissions($entityManager, $entityInstance);
         parent::updateEntity($entityManager, $entityInstance);
-    }
-
-    public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void
-    {
-        $this->denyAccessUnlessGranted('delete', $this->getUserModule());
-        parent::deleteEntity($entityManager, $entityInstance);
     }
 
     private function handleModulePermissions(EntityManagerInterface $entityManager, User $user): void
