@@ -23,6 +23,7 @@ class CompanyGroup extends AbstractEntity
 
     public function __construct()
     {
+        parent::__construct();
         $this->companies = new ArrayCollection();
     }
 

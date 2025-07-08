@@ -26,6 +26,7 @@ class UserModulePermission extends AbstractEntity
 
     public function __construct()
     {
+        parent::__construct(); // Call parent constructor to set timestamps
         $this->canRead = false;
         $this->canWrite = false;
     }

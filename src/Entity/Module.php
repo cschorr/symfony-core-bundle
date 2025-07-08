@@ -23,6 +23,7 @@ class Module extends AbstractEntity
 
     public function __construct()
     {
+        parent::__construct();
         $this->userPermissions = new ArrayCollection();
     }
 

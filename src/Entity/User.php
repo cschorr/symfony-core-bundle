@@ -46,6 +46,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     public function __construct()
     {
+        parent::__construct();
         $this->projects = new ArrayCollection();
         $this->modulePermissions = new ArrayCollection();
     }
