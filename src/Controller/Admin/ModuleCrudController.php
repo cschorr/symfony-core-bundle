@@ -108,7 +108,7 @@ class ModuleCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm(),
+            IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name')
                 ->setHelp('Unique name for the module (used for permission checking)'),
             TextareaField::new('text')

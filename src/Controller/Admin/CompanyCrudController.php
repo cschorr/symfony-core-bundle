@@ -99,7 +99,7 @@ class CompanyCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm(),
+            IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
             TextField::new('nameExtension')->setLabel('Description'),
             AssociationField::new('companyGroup')->setLabel('Company Group'),
