@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Single\StringCodeTrait;
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Repository\CompanyGroupRepository;

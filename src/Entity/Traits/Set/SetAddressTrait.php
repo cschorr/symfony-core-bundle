@@ -15,7 +15,7 @@ trait SetAddressTrait
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $city = null;
 
-    #[ORM\Column(length: 2, nullable: true)] # TODO: not nullable?
+    #[ORM\Column(length: 2, nullable: true)]
     private ?string $countryCode = null;
 
     public function getStreet(): ?string

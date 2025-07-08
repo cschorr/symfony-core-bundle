@@ -14,8 +14,10 @@ trait StringNameExtensionTrait
         return $this->nameExtension;
     }
 
-    public function setNameExtension(string $nameExtension): void
+    public function setNameExtension(string $nameExtension): static
     {
         $this->nameExtension = $nameExtension;
+
+        return $this;
     }
 }
