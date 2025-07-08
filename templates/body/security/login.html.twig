@@ -2,37 +2,119 @@
 
 {% block title %}Log in!{% endblock %}
 
+{% set class_body = 'd-flex align-items-center py-4 bg-body-tertiary' %}
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
 
-        {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+<style>
+    html,
+    body {
+    height: 100%;
+    }
+
+    .form-signin {
+    max-width: 40rem;
+    /*padding: 1rem; */
+    border: 1rem solid white;
+    }
+
+    .form-signin .form-floating:focus-within {
+    z-index: 2;
+    }
+
+    .form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    }
+
+    .form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    }
+</style>
+
+{#
+<div class="container clear-fix border border-5">
+    <div class="row">
+        <div class="col-6">
+            <img src="{{ image_placeholder_portrait }}" alt="Placeholder image" class="img-fluid" style="max-height:400px">
+        </div>
+        <div class="col-6">
+            <img src="{{ image_placeholder_portrait }}" alt="Placeholder image" class="img-fluid" style="max-height:400px">
+        </div>
+    </div>
+</div>
+
+<br>
+#}
+
+<div class="form-signin w-100 m-auto bg-white rounded">
+    <div class="row">
+        <div class="col" style="min-height:420px">
+            <img src="{{ image_placeholder_portrait }}" alt="Placeholder image" class="img-fluid">
+        </div>
+        <div class="col">
+            <div class="h-100 w-75 d-flex flex-column justify-content-center">
+
+                {# form #}
+                <form method="post">
+                    {% if error %}
+                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+            
+                    {% if app.user %}
+                        <div class="mb-3">
+                            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                        </div>
+                    {% endif %}
+            
+                    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+
+                    <label for="username">Email</label>
+                    <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
+                    <label for="password">Password</label>
+                    <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+            
+                    <input type="hidden" name="_csrf_token"
+                        value="{{ csrf_token('authenticate') }}"
+                    >
+            
+                    {#
+                        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                        See https://symfony.com/doc/current/security/remember_me.html
+            
+                        <div class="checkbox mb-3">
+                            <input type="checkbox" name="_remember_me" id="_remember_me">
+                            <label for="_remember_me">Remember me</label>
+                        </div>
+                    #}
+            
+                    <button class="btn btn-lg btn-primary" type="submit">
+                        Sign in
+                    </button>
+                </form>
+
+                <br>
+                <small>
+                    <i>
+                        USER: demo@example.com<br>
+                        KEY: pass_1234
+                    </i>
+                </small>
+
+
             </div>
-        {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+        
+        </div>
 
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
+    </div>
 
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
-            </div>
-        #}
+    <div class="text-center mt-2">
+        supported by <a href="https://c3net.de" target="_blank">c3:net</a>
+    </div>
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
-    </form>
+</div>
+
 {% endblock %}
