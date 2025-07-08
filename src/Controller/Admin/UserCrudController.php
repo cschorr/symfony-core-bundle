@@ -143,7 +143,7 @@ class UserCrudController extends AbstractCrudController
                 ->allowMultipleChoices()
                 ->renderExpanded(false);
             $fields[] = BooleanField::new('active');
-            $fields[] = TextareaField::new('notes');
+            #$fields[] = TextareaField::new('notes');
             $fields[] = AssociationField::new('company');
             $fields[] = AssociationField::new('projects')->hideOnForm();
             
