@@ -10,9 +10,17 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ModuleCrudController extends AbstractCrudController
 {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        \App\Repository\UserModulePermissionRepository $permissionRepository
+    ) {
+        parent::__construct($entityManager, $permissionRepository);
+    }
+
     public static function getEntityFqcn(): string
     {
         return Module::class;
@@ -20,7 +28,7 @@ class ModuleCrudController extends AbstractCrudController
 
     protected function getModuleName(): string
     {
-        return 'Module'; // Use Module for managing modules themselves
+        return 'Module';
     }
 
     public function configureCrud(Crud $crud): Crud

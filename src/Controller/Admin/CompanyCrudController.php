@@ -7,9 +7,17 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use Doctrine\ORM\EntityManagerInterface;
 
 class CompanyCrudController extends AbstractCrudController
 {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        \App\Repository\UserModulePermissionRepository $permissionRepository
+    ) {
+        parent::__construct($entityManager, $permissionRepository);
+    }
+
     public static function getEntityFqcn(): string
     {
         return Company::class;
@@ -17,7 +25,7 @@ class CompanyCrudController extends AbstractCrudController
 
     protected function getModuleName(): string
     {
-        return 'Unternehmen'; // Adjust this to match your module name in the database
+        return 'Unternehmen';
     }
 
     public function configureFields(string $pageName): iterable

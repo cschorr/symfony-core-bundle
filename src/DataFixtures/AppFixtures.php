@@ -80,6 +80,7 @@ class AppFixtures extends Fixture
         
         $userModule = $manager->getRepository(Module::class)->findOneBy(['name' => 'Benutzer']);
         $companyModule = $manager->getRepository(Module::class)->findOneBy(['name' => 'Unternehmen']);
+        $moduleModule = $manager->getRepository(Module::class)->findOneBy(['name' => 'Module']);
 
         if ($adminUser && $userModule) {
             // Admin has full access to user module
@@ -98,6 +99,18 @@ class AppFixtures extends Fixture
             $permission = new UserModulePermission();
             $permission->setUser($adminUser);
             $permission->setModule($companyModule);
+            $permission->setCanRead(true);
+            $permission->setCanWrite(true);
+            $permission->setCreatedAt(new \DateTime());
+            $permission->setUpdatedAt(new \DateTime());
+            $manager->persist($permission);
+        }
+
+        if ($adminUser && $moduleModule) {
+            // Admin has full access to module module
+            $permission = new UserModulePermission();
+            $permission->setUser($adminUser);
+            $permission->setModule($moduleModule);
             $permission->setCanRead(true);
             $permission->setCanWrite(true);
             $permission->setCreatedAt(new \DateTime());
