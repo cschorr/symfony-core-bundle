@@ -23,8 +23,15 @@ class AppFixtures extends Fixture
         $user->setEmail('admin@example.com');
         $user->setPassword($this->hasher->hashPassword($user, 'pass_1234'));
         $user->setRoles(['ROLE_ADMIN']);
-        $manager->persist($user);
 
+        //TODO: discuss $now = new \DateTimeImmutable();
+        $now = new \DateTime();
+        $user->setCreatedAt($now);
+        $user->setUpdatedAt($now);
+        $user->setActive(true);
+        $user->setNotes('This is the default admin user.');
+
+        $manager->persist($user);
         $manager->flush();
     }
 }
