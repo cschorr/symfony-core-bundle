@@ -12,6 +12,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -37,11 +42,70 @@ class UserCrudController extends AbstractCrudController
         return true;
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        // Check permissions using isGranted with the specific module
+        if (!$this->isGranted('read', $this->getModule())) {
+            $actions
+                ->disable(Action::INDEX)
+                ->disable(Action::DETAIL);
+        }
+
+        if (!$this->isGranted('write', $this->getModule())) {
+            $actions
+                ->disable(Action::NEW)
+                ->disable(Action::EDIT)
+                ->disable(Action::DELETE)
+                ->disable(Action::BATCH_DELETE);
+        }
+
+        return $actions;
+    }
+
+    public function index(AdminContext $context)
+    {
+        if (!$this->isGranted('read', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need read permission for the User module.');
+        }
+        return parent::index($context);
+    }
+
+    public function detail(AdminContext $context)
+    {
+        if (!$this->isGranted('read', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need read permission for the User module.');
+        }
+        return parent::detail($context);
+    }
+
+    public function new(AdminContext $context)
+    {
+        if (!$this->isGranted('write', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need write permission for the User module.');
+        }
+        return parent::new($context);
+    }
+
+    public function edit(AdminContext $context)
+    {
+        if (!$this->isGranted('write', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need write permission for the User module.');
+        }
+        return parent::edit($context);
+    }
+
+    public function delete(AdminContext $context)
+    {
+        if (!$this->isGranted('write', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need write permission for the User module.');
+        }
+        return parent::delete($context);
+    }
+
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->setPageTitle('edit', 'Edit User')
-            ->overrideTemplate('crud/edit', 'admin/user_edit.html.twig');
+            ->setPageTitle('edit', 'Edit User');
     }
 
     public function configureFields(string $pageName): iterable
