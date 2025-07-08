@@ -102,6 +102,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.1",
+        "jawira/doctrine-diagram-bundle": "^1.0",
         "phpunit/phpunit": "^12.2",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
