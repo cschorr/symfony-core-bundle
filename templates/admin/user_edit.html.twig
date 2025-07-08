@@ -1,0 +1,20 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    
+    {% if user_permissions_data is defined %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var permissions = {{ user_permissions_data|json_encode|raw }};
+            
+            for (var fieldName in permissions) {
+                var checkbox = document.querySelector('input[name="User[' + fieldName + ']"]');
+                if (checkbox) {
+                    checkbox.checked = permissions[fieldName];
+                }
+            }
+        });
+    </script>
+    {% endif %}
+{% endblock %}
