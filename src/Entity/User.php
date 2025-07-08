@@ -38,9 +38,16 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\ManyToOne(inversedBy: 'employees')]
     private ?Company $company = null;
 
+    /**
+     * @var Collection<int, UserModulePermission>
+     */
+    #[ORM\OneToMany(targetEntity: UserModulePermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private Collection $modulePermissions;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
+        $this->modulePermissions = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -158,5 +165,91 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->company = $company;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, UserModulePermission>
+     */
+    public function getModulePermissions(): Collection
+    {
+        return $this->modulePermissions;
+    }
+
+    public function addModulePermission(UserModulePermission $modulePermission): static
+    {
+        if (!$this->modulePermissions->contains($modulePermission)) {
+            $this->modulePermissions->add($modulePermission);
+            $modulePermission->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModulePermission(UserModulePermission $modulePermission): static
+    {
+        if ($this->modulePermissions->removeElement($modulePermission)) {
+            // set the owning side to null (unless already changed)
+            if ($modulePermission->getUser() === $this) {
+                $modulePermission->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if user has read access to a module
+     */
+    public function hasReadAccessToModule(Module $module): bool
+    {
+        foreach ($this->modulePermissions as $permission) {
+            if ($permission->getModule() === $module && $permission->canRead()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if user has write access to a module
+     */
+    public function hasWriteAccessToModule(Module $module): bool
+    {
+        foreach ($this->modulePermissions as $permission) {
+            if ($permission->getModule() === $module && $permission->canWrite()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get all modules user has read access to
+     * @return Module[]
+     */
+    public function getReadableModules(): array
+    {
+        $modules = [];
+        foreach ($this->modulePermissions as $permission) {
+            if ($permission->canRead()) {
+                $modules[] = $permission->getModule();
+            }
+        }
+        return $modules;
+    }
+
+    /**
+     * Get all modules user has write access to
+     * @return Module[]
+     */
+    public function getWritableModules(): array
+    {
+        $modules = [];
+        foreach ($this->modulePermissions as $permission) {
+            if ($permission->canWrite()) {
+                $modules[] = $permission->getModule();
+            }
+        }
+        return $modules;
     }
 }
