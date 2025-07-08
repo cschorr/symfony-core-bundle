@@ -1,0 +1,2 @@
+- we are using "ddev" in dev environment
+- always use "bin/kickstart.sh" to rebuild my database during the current project phase
