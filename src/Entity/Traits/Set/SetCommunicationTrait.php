@@ -20,9 +20,11 @@ trait SetCommunicationTrait
         return $this->phone;
     }
 
-    public function setPhone(?string $phone): void
+    public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
     }
 
     public function getCell(): ?string
@@ -30,9 +32,11 @@ trait SetCommunicationTrait
         return $this->cell;
     }
 
-    public function setCell(?string $cell): void
+    public function setCell(?string $cell): static
     {
         $this->cell = $cell;
+
+        return $this;
     }
 
     public function getUrl(): ?string
@@ -40,9 +44,11 @@ trait SetCommunicationTrait
         return $this->url;
     }
 
-    public function setUrl(?string $url): void
+    public function setUrl(?string $url): static
     {
         $this->url = $url;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -50,9 +56,11 @@ trait SetCommunicationTrait
         return $this->email;
     }
 
-    public function setEmail(?string $email): void
+    public function setEmail(?string $email): static
     {
         $this->email = $email;
+
+        return $this;
     }
 
     #[ORM\Column(length: 255, nullable: true)]

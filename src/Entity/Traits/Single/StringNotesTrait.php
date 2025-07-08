@@ -14,7 +14,7 @@ trait StringNotesTrait
         return $this->notes;
     }
 
-    public function setNotes(?string $notes): self
+    public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
 
