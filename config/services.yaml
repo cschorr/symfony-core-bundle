@@ -18,3 +18,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+twig:
+    globals:
+        image_placeholder: 'https://picsum.photos/1920/1080?random=9'
+        image_placeholder_portrait: 'https://picsum.photos/1080/1520?random=9'
