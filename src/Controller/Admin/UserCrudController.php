@@ -42,12 +42,16 @@ class UserCrudController extends AbstractCrudController
         return true;
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return parent::configureCrud($crud)
+            ->setPageTitle('edit', 'Edit User')
+            ->showEntityActionsInlined(false); // Show actions as dropdown menu
+    }
+
     public function configureActions(Actions $actions): Actions
     {
-        // Add show action to the index page
-        $actions->add(Crud::PAGE_INDEX, Action::DETAIL);
-        
-        // Check permissions using isGranted with the specific module
+        // Check permissions and disable actions accordingly
         if (!$this->isGranted('read', $this->getModule())) {
             $actions
                 ->disable(Action::INDEX)
@@ -103,12 +107,6 @@ class UserCrudController extends AbstractCrudController
             throw new AccessDeniedException('Access denied. You need write permission for the User module.');
         }
         return parent::delete($context);
-    }
-
-    public function configureCrud(Crud $crud): Crud
-    {
-        return parent::configureCrud($crud)
-            ->setPageTitle('edit', 'Edit User');
     }
 
     public function configureFields(string $pageName): iterable

@@ -3,13 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class CompanyCrudController extends AbstractCrudController
@@ -36,9 +37,15 @@ class CompanyCrudController extends AbstractCrudController
         return false;
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return parent::configureCrud($crud)
+            ->showEntityActionsInlined(false); // Show actions as dropdown menu
+    }
+
     public function configureActions(Actions $actions): Actions
     {
-        // Check permissions using isGranted with the specific module
+        // Check permissions and disable actions accordingly
         if (!$this->isGranted('read', $this->getModule())) {
             $actions
                 ->disable(Action::INDEX)
