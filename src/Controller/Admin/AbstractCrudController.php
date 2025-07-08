@@ -315,4 +315,166 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         // Common logic before deleting entities
         // Override in concrete controllers for specific behavior
     }
+
+    /**
+     * Check if this controller manages user permissions
+     * Override this method to return true for entities that should have permission management
+     */
+    protected function hasPermissionManagement(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Get the entity class name for permission management
+     * Override this if the entity class name differs from the expected pattern
+     */
+    protected function getPermissionEntityClass(): string
+    {
+        return static::getEntityFqcn();
+    }
+
+    /**
+     * Create module permission fields for entities that support permission management
+     */
+    protected function createModulePermissionFields(): array
+    {
+        if (!$this->hasPermissionManagement()) {
+            return [];
+        }
+
+        $modules = $this->entityManager->getRepository(Module::class)->findAll();
+        $fields = [];
+        
+        foreach ($modules as $module) {
+            // Read permission field
+            $readField = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $module->getId() . '_read')
+                ->setLabel($module->getName() . ' - Read')
+                ->setFormTypeOption('mapped', false);
+                
+            // Write permission field
+            $writeField = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $module->getId() . '_write')
+                ->setLabel($module->getName() . ' - Write')
+                ->setFormTypeOption('mapped', false);
+                
+            $fields[] = $readField;
+            $fields[] = $writeField;
+        }
+        
+        return $fields;
+    }
+
+    /**
+     * Add permission tab to form fields for entities that support permission management
+     */
+    protected function addPermissionTabToFields(array $fields): array
+    {
+        if (!$this->hasPermissionManagement()) {
+            return $fields;
+        }
+
+        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addTab('Module Permissions');
+        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addFieldset('Select permissions for each module:');
+        
+        $permissionFields = $this->createModulePermissionFields();
+        return array_merge($fields, $permissionFields);
+    }
+
+    /**
+     * Add permission summary field for index pages
+     */
+    protected function addPermissionSummaryField(array $fields): array
+    {
+        if (!$this->hasPermissionManagement()) {
+            return $fields;
+        }
+
+        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField::new('modulePermissions')
+            ->setLabel('Module Permissions')
+            ->formatValue(function ($value, $entity) {
+                if (!$entity || !method_exists($entity, 'getModulePermissions') || 
+                    !$entity->getModulePermissions() || $entity->getModulePermissions()->isEmpty()) {
+                    return 'No permissions';
+                }
+                
+                $permissions = [];
+                foreach ($entity->getModulePermissions() as $permission) {
+                    $module = $permission->getModule() ? $permission->getModule()->getName() : 'Unknown';
+                    $access = [];
+                    if ($permission->canRead()) $access[] = 'R';
+                    if ($permission->canWrite()) $access[] = 'W';
+                    $permissions[] = $module . ' (' . implode(',', $access) . ')';
+                }
+                
+                return implode(', ', $permissions);
+            });
+
+        return $fields;
+    }
+
+    /**
+     * Handle module permissions for entities that support it
+     */
+    protected function handleModulePermissions($entity): void
+    {
+        if (!$this->hasPermissionManagement() || !method_exists($entity, 'getModulePermissions')) {
+            return;
+        }
+
+        $request = $this->getContext()->getRequest();
+        $entityName = (new \ReflectionClass($entity))->getShortName();
+        $formData = $request->request->all()[$entityName] ?? [];
+
+        // Clear existing permissions
+        foreach ($entity->getModulePermissions() as $permission) {
+            $this->entityManager->remove($permission);
+        }
+        $entity->getModulePermissions()->clear();
+
+        // Get all modules
+        $modules = $this->entityManager->getRepository(Module::class)->findAll();
+
+        // Process each module's permissions
+        foreach ($modules as $module) {
+            $readKey = 'module_' . $module->getId() . '_read';
+            $writeKey = 'module_' . $module->getId() . '_write';
+            
+            $canRead = isset($formData[$readKey]) && $formData[$readKey] === '1';
+            $canWrite = isset($formData[$writeKey]) && $formData[$writeKey] === '1';
+
+            // Only create permission if at least one permission is granted
+            if ($canRead || $canWrite) {
+                $permission = new \App\Entity\UserModulePermission();
+                $permission->setUser($entity);
+                $permission->setModule($module);
+                $permission->setCanRead($canRead);
+                $permission->setCanWrite($canWrite);
+                $permission->setCreatedAt(new \DateTime());
+                $permission->setUpdatedAt(new \DateTime());
+                
+                $this->entityManager->persist($permission);
+                $entity->addModulePermission($permission);
+            }
+        }
+    }
+
+    /**
+     * Override persistEntity to handle permissions
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $this->beforePersist($entityInstance);
+        $this->handleModulePermissions($entityInstance);
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+
+    /**
+     * Override updateEntity to handle permissions
+     */
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $this->beforeUpdate($entityInstance);
+        $this->handleModulePermissions($entityInstance);
+        parent::updateEntity($entityManager, $entityInstance);
+    }
 }

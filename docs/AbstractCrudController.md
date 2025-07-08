@@ -12,6 +12,65 @@ The `AbstractCrudController` provides centralized functionality for all EasyAdmi
 4. **Common CRUD Operations**: Standardized create, read, update, delete operations
 5. **Helper Methods**: Utility methods for common tasks and entity management
 
+## Permission Management
+
+### Adding Permission Management to Controllers
+
+For entities that need permission management (like User entities), the abstract controller provides built-in support:
+
+```php
+class UserCrudController extends AbstractCrudController
+{
+    protected function getModuleName(): string
+    {
+        return 'Benutzer';
+    }
+
+    protected function hasPermissionManagement(): bool
+    {
+        return true; // Enable permission management
+    }
+
+    public function configureFields(string $pageName): iterable
+    {
+        $fields = [
+            IdField::new('id')->hideOnForm(),
+            EmailField::new('email'),
+            // ... other fields
+        ];
+
+        if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
+            // Add your regular fields here
+            
+            // Add permission tab automatically
+            $fields = $this->addPermissionTabToFields($fields);
+        } else {
+            // For index page, add permission summary
+            $fields = $this->addPermissionSummaryField($fields);
+        }
+
+        return $fields;
+    }
+}
+```
+
+### Requirements for Permission Management
+
+For an entity to support permission management, it needs:
+
+1. **Module Permission Relationship**: The entity must have a relationship to `UserModulePermission`
+2. **Required Methods**: `getModulePermissions()`, `addModulePermission()`, and `getModulePermissions()->clear()`
+3. **Permission Entity**: The permission entity should have `setUser()`, `setModule()`, `setCanRead()`, `setCanWrite()`, etc.
+
+### Permission Management Methods
+
+The abstract controller provides these methods:
+
+- `hasPermissionManagement()`: Override to return `true` for entities with permissions
+- `addPermissionTabToFields($fields)`: Adds permission tab to form fields
+- `addPermissionSummaryField($fields)`: Adds permission summary for index pages
+- `handleModulePermissions($entity)`: Automatically handles permission saving
+
 ## Basic Usage
 
 ### 1. Extend AbstractCrudController
