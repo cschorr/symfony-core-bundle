@@ -44,6 +44,9 @@ class UserCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        // Add show action to the index page
+        $actions->add(Crud::PAGE_INDEX, Action::DETAIL);
+        
         // Check permissions using isGranted with the specific module
         if (!$this->isGranted('read', $this->getModule())) {
             $actions
@@ -111,7 +114,7 @@ class UserCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         $fields = [
-            IdField::new('id')->hideOnForm(),
+            IdField::new('id')->hideOnForm()->hideOnIndex(),
         ];
 
         if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
@@ -132,8 +135,25 @@ class UserCrudController extends AbstractCrudController
 
             // Add permission tab (handled by abstract controller)
             $fields = $this->addPermissionTabToFields($fields);
+        } elseif ($pageName === Crud::PAGE_DETAIL) {
+            // For detail page, show all fields including notes
+            $fields[] = EmailField::new('email');
+            $fields[] = ChoiceField::new('roles')
+                ->setChoices([
+                    'User' => 'ROLE_USER',
+                    'Admin' => 'ROLE_ADMIN',
+                ])
+                ->allowMultipleChoices()
+                ->renderExpanded(false);
+            $fields[] = BooleanField::new('active');
+            $fields[] = TextareaField::new('notes');
+            $fields[] = AssociationField::new('company');
+            $fields[] = AssociationField::new('projects');
+            
+            // Add permission summary (handled by abstract controller)
+            $fields = $this->addPermissionSummaryField($fields);
         } else {
-            // For index page, show all fields without tabs
+            // For index page, show all fields without tabs and hide notes
             $fields[] = EmailField::new('email');
             $fields[] = ChoiceField::new('roles')
                 ->setChoices([
@@ -145,7 +165,6 @@ class UserCrudController extends AbstractCrudController
             $fields[] = BooleanField::new('active');
             #$fields[] = TextareaField::new('notes');
             $fields[] = AssociationField::new('company');
-            $fields[] = AssociationField::new('projects')->hideOnForm();
             
             // Add permission summary (handled by abstract controller)
             $fields = $this->addPermissionSummaryField($fields);

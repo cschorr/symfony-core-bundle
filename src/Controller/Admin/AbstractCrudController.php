@@ -52,44 +52,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Check if current user has permission for the given action
-     */
-    protected function hasPermission(string $permission): bool
-    {
-        // Admin users have all permissions
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        try {
-            return $this->isGranted($permission, $this->getModule());
-        } catch (\Exception $e) {
-            // If module doesn't exist, only admins can access
-            return false;
-        }
-    }
-
-    /**
-     * Check permission and throw exception if not granted
-     */
-    protected function checkPermission(string $permission): void
-    {
-        // Admin users bypass all permission checks
-        if ($this->isAdmin()) {
-            return;
-        }
-
-        if (!$this->hasPermission($permission)) {
-            throw new AccessDeniedException(
-                sprintf('Access denied. You need "%s" permission for module "%s".', 
-                    $permission, 
-                    $this->getModuleName()
-                )
-            );
-        }
-    }
-
-    /**
      * Check if current user is admin
      */
     protected function isAdmin(): bool
@@ -178,48 +140,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         }
         
         return $this->getModuleName();
-    }
-
-    /**
-     * Get current user with proper type checking
-     */
-    protected function getCurrentUser(): ?User
-    {
-        $user = $this->getUser();
-        return $user instanceof User ? $user : null;
-    }
-
-    /**
-     * Helper method to create permission-aware association fields
-     * This can be used by concrete controllers to show only accessible related entities
-     */
-    protected function getAccessibleModules(): array
-    {
-        $user = $this->getCurrentUser();
-        if (!$user) {
-            return [];
-        }
-
-        // Admin users see all modules
-        if ($this->isAdmin()) {
-            return $this->entityManager->getRepository(Module::class)->findAll();
-        }
-
-        // Regular users see only modules they have read access to
-        return $this->permissionRepository->findModulesWithReadAccess($user);
-    }
-
-    /**
-     * Helper method for common field configurations
-     * Returns basic fields that most entities will have
-     */
-    protected function getCommonFields(): array
-    {
-        return [
-            'id' => ['type' => 'id', 'hideOnForm' => true],
-            'createdAt' => ['type' => 'datetime', 'hideOnForm' => true, 'hideOnIndex' => true],
-            'updatedAt' => ['type' => 'datetime', 'hideOnForm' => true, 'hideOnIndex' => true],
-        ];
     }
 
     /**
