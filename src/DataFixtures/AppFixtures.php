@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
+use App\Entity\Module;
 use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -19,19 +20,49 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $user = new User();
-        $user->setEmail('admin@example.com');
-        $user->setPassword($this->hasher->hashPassword($user, 'pass_1234'));
-        $user->setRoles(['ROLE_ADMIN']);
+        // load entities
+        $this->createModuleFixtures($manager);
+        $this->createUserFixtures($manager);
+    }
 
-        //TODO: discuss $now = new \DateTimeImmutable();
-        $now = new \DateTime();
-        $user->setCreatedAt($now);
-        $user->setUpdatedAt($now);
-        $user->setActive(true);
-        $user->setNotes('This is the default admin user.');
+    public function createUserFixtures(ObjectManager $manager): void
+    {
+        $users = [
+            ['email' => 'admin@example.com', 'password' => 'pass_1234', 'roles' => ['ROLE_ADMIN']],
+            ['email' => 'demo@example.com', 'password' => 'pass_1234', 'roles' => ['ROLE_USER']],
+        ];
 
-        $manager->persist($user);
+        foreach ($users as $userData) {
+            $user = new User();
+            $user->setEmail($userData['email']);
+            $user->setPassword($this->hasher->hashPassword($user, $userData['password']));
+            $user->setRoles($userData['roles']);
+            $user->setCreatedAt(new \DateTime());
+            $user->setUpdatedAt(new \DateTime());
+            $user->setActive(true);
+            $user->setNotes('This is a default user.');
+
+            $manager->persist($user);
+        }
+    }
+
+    public function createModuleFixtures(ObjectManager $manager): void
+    {
+        $modules = [
+            // Add your module data here
+            ['name' => 'Benutzer', 'description' => 'Benutzerverwaltung'],
+            ['name' => 'Unternehmen', 'description' => 'Kunden, Lieferanten, Partner etc.'],
+        ];
+
+        // Create and persist module entities here
+        // Example:
+        foreach ($modules as $moduleData) {
+            $module = new Module();
+            $module->setName($moduleData['name']);
+            $module->setDescription($moduleData['description']);
+            // Set other properties as needed
+            $manager->persist($module);
+        }
         $manager->flush();
     }
 }
