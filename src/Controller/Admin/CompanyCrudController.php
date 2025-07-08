@@ -109,16 +109,16 @@ class CompanyCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
             TextField::new('nameExtension')->setLabel('Description'),
-            AssociationField::new('companyGroup')->setLabel('Company Group'),
-            TextField::new('street'),
-            TextField::new('zip'),
-            TextField::new('city'),
+            #AssociationField::new('companyGroup')->setLabel('Company Group'),
+            #TextField::new('street'),
+            #TextField::new('zip'),
+            #TextField::new('city'),
             TextField::new('countryCode')->setLabel('Country Code'),
-            TextField::new('phone'),
-            TextField::new('cell')->setLabel('Mobile'),
+            #TextField::new('phone'),
+            #TextField::new('cell')->setLabel('Mobile'),
             TextField::new('url')->setLabel('Website'),
             AssociationField::new('employees')->setLabel('Employees'),
-            AssociationField::new('projects'),
+            #AssociationField::new('projects'),
         ];
     }
 }

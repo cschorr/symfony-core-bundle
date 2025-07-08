@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 trait StringNameExtensionTrait
 {
     #[ORM\Column(length: 255)]
-    private string $nameExtension;
+    private string $nameExtension = '';
 
     public function getNameExtension(): string
     {
