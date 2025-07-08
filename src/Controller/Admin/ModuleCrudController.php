@@ -37,12 +37,16 @@ class ModuleCrudController extends AbstractCrudController
     {
         return parent::configureCrud($crud)
             ->setPageTitle('index', 'System Modules')
+            ->setPageTitle('detail', fn ($entity) => sprintf('Module: %s', $entity->getName()))
             ->setPageTitle('new', 'Create System Module')
             ->setHelp('index', 'Manage system modules and their permissions.');
     }
 
     public function configureActions(Actions $actions): Actions
     {
+        // Add show action to the index page
+        $actions->add(Crud::PAGE_INDEX, Action::DETAIL);
+        
         // Check permissions using isGranted with the specific module
         if (!$this->isGranted('read', $this->getModule())) {
             $actions
@@ -121,6 +125,29 @@ class ModuleCrudController extends AbstractCrudController
                     $count = $entity->getUserPermissions()->count();
                     return sprintf('%d permission(s) assigned', $count);
                 }),
+            AssociationField::new('userPermissions', 'Permission Details')
+                ->hideOnForm()
+                ->hideOnIndex()
+                ->formatValue(function ($value, $entity) {
+                    if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
+                        return 'No permissions assigned';
+                    }
+                    
+                    $permissions = [];
+                    foreach ($entity->getUserPermissions() as $permission) {
+                        $user = $permission->getUser();
+                        $userEmail = $user ? $user->getEmail() : 'Unknown User';
+                        $access = [];
+                        if ($permission->canRead()) $access[] = 'Read';
+                        if ($permission->canWrite()) $access[] = 'Write';
+                        $accessString = implode(', ', $access);
+                        
+                        $permissions[] = sprintf('%s: %s', $userEmail, $accessString);
+                    }
+                    
+                    return implode('<br>', $permissions);
+                })
+                ->renderAsHtml(),
         ];
     }
 
