@@ -327,8 +327,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                     $permissions[] = $module . ' (' . implode(',', $access) . ')';
                 }
                 
-                return implode(', ', $permissions);
-            });
+                return implode('<br>', $permissions);
+            })
+            ->renderAsHtml();
 
         return $fields;
     }
