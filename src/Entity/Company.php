@@ -41,6 +41,11 @@ class Company extends AbstractEntity
         $this->employees = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return $this->getName() ?? 'Unnamed Company';
+    }
+
     public function getCompanyGroup(): ?CompanyGroup
     {
         return $this->companyGroup;
