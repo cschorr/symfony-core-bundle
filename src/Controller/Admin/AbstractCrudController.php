@@ -71,8 +71,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->setPageTitle('new', sprintf('Create %s', $this->getModuleName()))
             ->setPageTitle('edit', fn ($entity) => sprintf('Edit %s', $this->getEntityLabel($entity)))
             ->setDefaultSort(['id' => 'DESC'])
-            ->setPaginatorPageSize(25)
-            ->showEntityActionsInlined();
+            ->setPaginatorPageSize(25);
     }
 
     /**
@@ -291,13 +290,14 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                 $permission->setModule($module);
                 $permission->setCanRead($canRead);
                 $permission->setCanWrite($canWrite);
-                $permission->setCreatedAt(new \DateTime());
-                $permission->setUpdatedAt(new \DateTime());
                 
                 $this->entityManager->persist($permission);
                 $entity->addModulePermission($permission);
             }
         }
+        
+        // Flush to save the permissions
+        $this->entityManager->flush();
     }
 
     /**
@@ -305,8 +305,11 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $this->handleModulePermissions($entityInstance);
+        // First persist the main entity
         parent::persistEntity($entityManager, $entityInstance);
+        
+        // Then handle the permissions after the main entity is persisted
+        $this->handleModulePermissions($entityInstance);
     }
 
     /**
@@ -314,7 +317,10 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
+        // Handle permissions first for updates
         $this->handleModulePermissions($entityInstance);
+        
+        // Then update the main entity
         parent::updateEntity($entityManager, $entityInstance);
     }
 }
