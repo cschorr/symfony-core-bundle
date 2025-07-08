@@ -11,6 +11,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ModuleCrudController extends AbstractCrudController
 {
@@ -41,10 +43,14 @@ class ModuleCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $actions = parent::configureActions($actions);
-        
-        // Only admins should be able to create/edit/delete modules
-        if (!$this->isAdmin()) {
+        // Check permissions using isGranted with the specific module
+        if (!$this->isGranted('read', $this->getModule())) {
+            $actions
+                ->disable(Action::INDEX)
+                ->disable(Action::DETAIL);
+        }
+
+        if (!$this->isGranted('write', $this->getModule())) {
             $actions
                 ->disable(Action::NEW)
                 ->disable(Action::EDIT)
@@ -53,6 +59,46 @@ class ModuleCrudController extends AbstractCrudController
         }
 
         return $actions;
+    }
+
+    public function index(AdminContext $context)
+    {
+        if (!$this->isGranted('read', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need read permission for the Module module.');
+        }
+        return parent::index($context);
+    }
+
+    public function detail(AdminContext $context)
+    {
+        if (!$this->isGranted('read', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need read permission for the Module module.');
+        }
+        return parent::detail($context);
+    }
+
+    public function new(AdminContext $context)
+    {
+        if (!$this->isGranted('write', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need write permission for the Module module.');
+        }
+        return parent::new($context);
+    }
+
+    public function edit(AdminContext $context)
+    {
+        if (!$this->isGranted('write', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need write permission for the Module module.');
+        }
+        return parent::edit($context);
+    }
+
+    public function delete(AdminContext $context)
+    {
+        if (!$this->isGranted('write', $this->getModule())) {
+            throw new AccessDeniedException('Access denied. You need write permission for the Module module.');
+        }
+        return parent::delete($context);
     }
 
     public function configureFields(string $pageName): iterable

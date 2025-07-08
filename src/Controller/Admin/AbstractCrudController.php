@@ -12,7 +12,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController as EasyAdminAbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
-use EasyCorp\Bundle\EasyAdminBundle\Exception\ForbiddenActionException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -116,79 +115,43 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 
     /**
      * Configure actions based on permissions
+     * Concrete controllers should override this to add permission checks using isGranted()
      */
     public function configureActions(Actions $actions): Actions
     {
-        // Check read permission for index and detail actions
-        if (!$this->hasPermission('read')) {
-            $actions
-                ->disable(Action::INDEX)
-                ->disable(Action::DETAIL);
-        }
-
-        // Check write permission for create, edit, and delete actions
-        if (!$this->hasPermission('write')) {
-            $actions
-                ->disable(Action::NEW)
-                ->disable(Action::EDIT)
-                ->disable(Action::DELETE)
-                ->disable(Action::BATCH_DELETE);
-        }
-
         return $actions;
     }
 
     /**
-     * Override index to check read permission
+     * Base CRUD methods - concrete controllers should override and add permission checks
      */
     public function index(AdminContext $context)
     {
-        $this->checkPermission('read');
         return parent::index($context);
     }
 
-    /**
-     * Override detail to check read permission
-     */
     public function detail(AdminContext $context)
     {
-        $this->checkPermission('read');
         return parent::detail($context);
     }
 
-    /**
-     * Override new to check write permission
-     */
     public function new(AdminContext $context)
     {
-        $this->checkPermission('write');
         return parent::new($context);
     }
 
-    /**
-     * Override edit to check write permission
-     */
     public function edit(AdminContext $context)
     {
-        $this->checkPermission('write');
         return parent::edit($context);
     }
 
-    /**
-     * Override delete to check write permission
-     */
     public function delete(AdminContext $context)
     {
-        $this->checkPermission('write');
         return parent::delete($context);
     }
 
-    /**
-     * Override batch delete to check write permission
-     */
     public function batchDelete(AdminContext $context, BatchActionDto $batchActionDto): Response
     {
-        $this->checkPermission('write');
         return parent::batchDelete($context, $batchActionDto);
     }
 
@@ -247,33 +210,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Helper method to check if entity creation is allowed
-     * Can be overridden for custom business logic
-     */
-    protected function canCreateEntity(): bool
-    {
-        return $this->hasPermission('write');
-    }
-
-    /**
-     * Helper method to check if entity editing is allowed
-     * Can be overridden for custom business logic
-     */
-    protected function canEditEntity($entity): bool
-    {
-        return $this->hasPermission('write');
-    }
-
-    /**
-     * Helper method to check if entity deletion is allowed
-     * Can be overridden for custom business logic
-     */
-    protected function canDeleteEntity($entity): bool
-    {
-        return $this->hasPermission('write');
-    }
-
-    /**
      * Helper method for common field configurations
      * Returns basic fields that most entities will have
      */
@@ -287,51 +223,14 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Helper method to handle common pre-persist operations
-     * Can be overridden by concrete controllers
-     */
-    protected function beforePersist($entity): void
-    {
-        // Common logic before persisting entities
-        // Override in concrete controllers for specific behavior
-    }
-
-    /**
-     * Helper method to handle common pre-update operations
-     * Can be overridden by concrete controllers
-     */
-    protected function beforeUpdate($entity): void
-    {
-        // Common logic before updating entities
-        // Override in concrete controllers for specific behavior
-    }
-
-    /**
-     * Helper method to handle common pre-delete operations
-     * Can be overridden by concrete controllers
-     */
-    protected function beforeDelete($entity): void
-    {
-        // Common logic before deleting entities
-        // Override in concrete controllers for specific behavior
-    }
-
-    /**
-     * Check if this controller manages user permissions
-     * Override this method to return true for entities that should have permission management
+     * Check if this controller should show the user permission management UI
+     * This controls whether permission checkboxes and tabs are shown in forms.
+     * Override this method to return true for entities that should have permission management UI (like User).
+     * Note: Permission checking for CRUD operations is handled by individual controllers using isGranted().
      */
     protected function hasPermissionManagement(): bool
     {
         return false;
-    }
-
-    /**
-     * Get the entity class name for permission management
-     * Override this if the entity class name differs from the expected pattern
-     */
-    protected function getPermissionEntityClass(): string
-    {
-        return static::getEntityFqcn();
     }
 
     /**
@@ -346,16 +245,38 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         $modules = $this->entityManager->getRepository(Module::class)->findAll();
         $fields = [];
         
+        // Get the current entity to populate existing values
+        $entity = $this->getContext()->getEntity()->getInstance();
+        $existingPermissions = [];
+        
+        if ($entity && method_exists($entity, 'getModulePermissions')) {
+            $permissions = $entity->getModulePermissions();
+            
+            foreach ($permissions as $permission) {
+                $moduleId = (string) $permission->getModule()->getId();
+                $existingPermissions[$moduleId] = [
+                    'read' => $permission->canRead(),
+                    'write' => $permission->canWrite()
+                ];
+            }
+        }
+        
         foreach ($modules as $module) {
+            $moduleId = (string) $module->getId();
+            $hasReadPermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['read'];
+            $hasWritePermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['write'];
+            
             // Read permission field
-            $readField = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $module->getId() . '_read')
+            $readField = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $moduleId . '_read')
                 ->setLabel($module->getName() . ' - Read')
-                ->setFormTypeOption('mapped', false);
+                ->setFormTypeOption('mapped', false)
+                ->setFormTypeOption('data', $hasReadPermission);
                 
             // Write permission field
-            $writeField = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $module->getId() . '_write')
+            $writeField = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $moduleId . '_write')
                 ->setLabel($module->getName() . ' - Write')
-                ->setFormTypeOption('mapped', false);
+                ->setFormTypeOption('mapped', false)
+                ->setFormTypeOption('data', $hasWritePermission);
                 
             $fields[] = $readField;
             $fields[] = $writeField;
@@ -436,8 +357,8 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 
         // Process each module's permissions
         foreach ($modules as $module) {
-            $readKey = 'module_' . $module->getId() . '_read';
-            $writeKey = 'module_' . $module->getId() . '_write';
+            $readKey = 'module_' . (string) $module->getId() . '_read';
+            $writeKey = 'module_' . (string) $module->getId() . '_write';
             
             $canRead = isset($formData[$readKey]) && $formData[$readKey] === '1';
             $canWrite = isset($formData[$writeKey]) && $formData[$writeKey] === '1';
@@ -459,21 +380,19 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Override persistEntity to handle permissions
+     * Override to handle permissions on entity creation
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $this->beforePersist($entityInstance);
         $this->handleModulePermissions($entityInstance);
         parent::persistEntity($entityManager, $entityInstance);
     }
 
     /**
-     * Override updateEntity to handle permissions
+     * Override to handle permissions on entity update
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $this->beforeUpdate($entityInstance);
         $this->handleModulePermissions($entityInstance);
         parent::updateEntity($entityManager, $entityInstance);
     }

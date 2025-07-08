@@ -23,13 +23,15 @@ class UserModulePermissionRepository extends ServiceEntityRepository
      */
     public function findByUserAndModule(User $user, Module $module): ?UserModulePermission
     {
-        return $this->createQueryBuilder('ump')
-            ->andWhere('ump.user = :user')
-            ->andWhere('ump.module = :module')
-            ->setParameter('user', $user)
-            ->setParameter('module', $module)
-            ->getQuery()
-            ->getOneOrNullResult();
+        // Workaround: Use entity relationships instead of queries
+        // This works around a potential issue with UUID v7 parameter binding
+        foreach ($user->getModulePermissions() as $permission) {
+            if ($permission->getModule()->getId()->equals($module->getId())) {
+                return $permission;
+            }
+        }
+        
+        return null;
     }
 
     /**
