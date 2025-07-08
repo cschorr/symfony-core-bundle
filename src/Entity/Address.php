@@ -2,13 +2,11 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
-#[ApiResource]
 class Address extends AbstractEntity
 {
     use StringNameTrait;
