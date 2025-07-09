@@ -62,7 +62,7 @@ class NavigationService
     public function getAllActiveModules(): array
     {
         return $this->entityManager->getRepository(Module::class)
-            ->findBy(['active' => true], ['name' => 'ASC']);
+            ->findBy(['active' => true], ['id' => 'ASC']);
     }
 
     /**
