@@ -52,22 +52,22 @@
 <div class="form-signin w-100 m-auto bg-white rounded">
     <!-- Language Switcher -->
     <div class="position-absolute top-0 end-0 m-3">
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                {{ available_locales[current_locale] ?? current_locale|upper }}
-            </button>
-            <ul class="dropdown-menu">
+        <form method="get" action="{{ path('app_login_locale', {'_locale': 'en'}) }}" id="locale-form">
+            <select name="_locale" class="form-select form-select-sm" style="width: auto;" onchange="changeLocale(this.value)">
                 {% for locale, display_name in available_locales %}
-                    <li>
-                        <a class="dropdown-item{% if locale == current_locale %} active{% endif %}" 
-                           href="{{ path('app_login_locale', {'_locale': locale}) }}">
-                            {{ display_name }}
-                        </a>
-                    </li>
+                    <option value="{{ locale }}"{% if locale == current_locale %} selected{% endif %}>
+                        {{ display_name }}
+                    </option>
                 {% endfor %}
-            </ul>
-        </div>
+            </select>
+        </form>
     </div>
+
+    <script>
+        function changeLocale(locale) {
+            window.location.href = '{{ path('app_login_locale', {'_locale': 'LOCALE_PLACEHOLDER'}) }}'.replace('LOCALE_PLACEHOLDER', locale);
+        }
+    </script>
 
     <div class="row">
         <div class="col" style="min-height:420px">

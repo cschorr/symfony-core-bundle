@@ -1,140 +1,67 @@
 # English translations for the application
-# Basic UI elements
-Dashboard: Dashboard
-Home: Home
-Login: Login
-Logout: Logout
-Welcome: Welcome
-Search: Search
-Filter: Filter
-Save: Save
-Cancel: Cancel
-Delete: Delete
-Edit: Edit
-Create: Create
-Show: Show
-Back: Back
-Yes: Yes
-No: No
 
-# Form elements
-Name: Name
-Description: Description
-Email: Email
-Password: Password
-Phone: Phone
-Address: Address
-City: City
-Country: Country
-Website: Website
-Active: Active
+# Authentication/Login
+Login: "Login"
+"Please sign in": "Please sign in"
+Email: "Email"
+Password: "Password"
+"Sign in": "Sign in"
+"You are logged in as": "You are logged in as"
+Logout: "Logout"
+"Demo Credentials": "Demo Credentials"
+"Admin User": "Admin User"
+"Regular User": "Regular User"
+"supported by": "supported by"
+"Placeholder image": "Placeholder image"
 
-# CRUD operations
-New: New
-Add: Add
-Update: Update
-Remove: Remove
-View: View
-List: List
-Details: Details
-Management: Management
+# Entity Names
+Company: "Company"
+CompanyGroup: "Company Group"
+Module: "Module"
+User: "User"
 
-# Entity names
-User: User
-Users: Users
-Company: Company
-Companies: Companies
-Module: Module
-Modules: Modules
-Group: Group
-Groups: Groups
-CompanyGroup: Company Group
-CompanyGroups: Company Groups
-Roles: Roles
+# General UI
+Dashboard: "Dashboard"
+Description: "Description"
+"Country Code": "Country Code"
+Website: "Website"
+Employees: "Employees"
+Create: "Create"
+Edit: "Edit"
+Delete: "Delete"
+Show: "Show"
+"View %s": "View %s"
+"Edit %s": "Edit %s"
+"Create %s": "Create %s"
 
-# Management pages
-'%s Management': '%s Management'
-'Create %s': 'Create %s'
-'View %s': 'View %s'
-'Edit %s': 'Edit %s'
-
-# Field labels
-'Company Group': Company Group
-'Country Code': Country Code
-Employees: Employees
-'User Permissions': User Permissions
-'Module Permissions': Module Permissions
-'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 permission assigned|]1,Inf[ %count% permissions assigned'
-Mobile: Mobile
-Street: Street
-ZIP: ZIP
+# Module Management
+"System Modules": "System Modules"
+"Create System Module": "Create System Module"
+"Manage system modules and their permissions.": "Manage system modules and their permissions."
+"Display name for the module": "Display name for the module"
+"Unique code that matches the entity name (e.g., User, Company, Module)": "Unique code that matches the entity name (e.g., User, Company, Module)"
+"e.g., User, Company, Module": "e.g., User, Company, Module"
+"Optional description of what this module manages": "Optional description of what this module manages"
 
 # Permissions
-Permissions: Permissions
-Read: Read
-Write: Write
-Access: Access
-Permission: Permission
-'No permissions': No permissions
-'Unknown': Unknown
+"User Permissions": "User Permissions"
+"Module Permissions": "Module Permissions"
+"No permissions": "No permissions"
+"No permissions assigned": "No permissions assigned"
+"%d permission(s) assigned": "%d permission(s) assigned"
+"Permission Details": "Permission Details"
+"Unknown User": "Unknown User"
+Read: "Read"
+Write: "Write"
+"Access denied. You need read permission for the %module% module.": "Access denied. You need read permission for the %module% module."
+"Access denied. You need write permission for the %module% module.": "Access denied. You need write permission for the %module% module."
 
-# Status messages
-Created successfully: Created successfully
-Updated successfully: Updated successfully
-Deleted successfully: Deleted successfully
-Error occurred: An error occurred
-Invalid data: Invalid data
-Access denied: Access denied
-'Access denied. You need read permission for the %module% module.': 'Access denied. You need read permission for the %module% module.'
-'Access denied. You need write permission for the %module% module.': 'Access denied. You need write permission for the %module% module.'
+# User Management
+"Edit User": "Edit User"
+"User Information": "User Information"
+Roles: "Roles"
+Admin: "Admin"
+Management: "Management"
 
-# Common phrases
-Please sign in: Please sign in
-Remember me: Remember me
-Forgot password: Forgot password
-Required field: Required field
-Optional: Optional
-Select an option: Select an option
-No results found: No results found
-
-# Module-specific translations
-'Manage system modules and their permissions.': Manage system modules and their permissions.
-'Display name for the module': Display name for the module
-'Unique code that matches the entity name (e.g., User, Company, Module)': Unique code that matches the entity name (e.g., User, Company, Module)
-'e.g., User, Company, Module': e.g., User, Company, Module
-'Optional description of what this module manages': Optional description of what this module manages
-'No permissions assigned': No permissions assigned
-'%d permission(s) assigned': '%d permission(s) assigned'
-'Permission Details': Permission Details
-'Unknown User': Unknown User
-'User Information': User Information
-'Admin': Admin
-
-# Navigation
-Previous: Previous
-Next: Next
-First: First
-Last: Last
-Page: Page
-Items per page: Items per page
-
-# Admin page titles
-'System Modules': System Modules
-'Create System Module': Create System Module
-'Edit User': Edit User
-
-# User role choices
-'ROLE_SUPER_ADMIN': Super Administrator
-'ROLE_ADMIN': Administrator
-'ROLE_USER': User
-
-# Permission fields
-'Read Permission': Read Permission
-'Write Permission': Write Permission
-'You are logged in as': You are logged in as
-'Demo Credentials': Demo Credentials
-'Admin User': Admin User
-'Regular User': Regular User
-'Placeholder image': Placeholder image
-'supported by': supported by
-
+# Pluralization
+"{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned"

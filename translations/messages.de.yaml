@@ -1,146 +1,67 @@
 # German translations for the application
-# Basic UI elements
-Dashboard: Dashboard
-Home: Startseite
-Login: Anmelden
-Logout: Abmelden
-Welcome: Willkommen
-Search: Suchen
-Filter: Filter
-Save: Speichern
-Cancel: Abbrechen
-Delete: Löschen
-Edit: Bearbeiten
-Create: Erstellen
-Show: Anzeigen
-Back: Zurück
-Yes: Ja
-No: Nein
 
-# Form elements
-Name: Name
-Description: Beschreibung
-Email: E-Mail
-Password: Passwort
-Phone: Telefon
-Address: Adresse
-City: Stadt
-Country: Land
-Website: Webseite
-Active: Aktiv
+# Authentication/Login
+Login: "Anmeldung"
+"Please sign in": "Bitte melden Sie sich an"
+Email: "E-Mail"
+Password: "Passwort"
+"Sign in": "Anmelden"
+"You are logged in as": "Sie sind angemeldet als"
+Logout: "Abmelden"
+"Demo Credentials": "Demo-Anmeldedaten"
+"Admin User": "Administrator"
+"Regular User": "Normaler Benutzer"
+"supported by": "unterstützt von"
+"Placeholder image": "Platzhalter-Bild"
 
-# CRUD operations
-New: Neu
-Add: Hinzufügen
-Update: Aktualisieren
-Remove: Entfernen
-View: Ansehen
-List: Liste
-Details: Details
-Management: Verwaltung
+# Entity Names
+Company: "Unternehmen"
+CompanyGroup: "Unternehmensgruppe"
+Module: "Modul"
+User: "Benutzer"
 
-# Entity names
-User: Benutzer
-Users: Benutzer
-Company: Unternehmen
-Companies: Unternehmen
-Module: Modul
-Modules: Module
-Group: Gruppe
-Groups: Gruppen
-CompanyGroup: Unternehmensgruppe
-CompanyGroups: Unternehmensgruppen
-Roles: Rollen
+# General UI
+Dashboard: "Dashboard"
+Description: "Beschreibung"
+"Country Code": "Ländercode"
+Website: "Website"
+Employees: "Mitarbeiter"
+Create: "Erstellen"
+Edit: "Bearbeiten"
+Delete: "Löschen"
+Show: "Anzeigen"
+"View %s": "%s anzeigen"
+"Edit %s": "%s bearbeiten"
+"Create %s": "%s erstellen"
 
-# Management pages
-'%s Management': '%s Verwaltung'
-'Create %s': '%s erstellen'
-'View %s': '%s anzeigen'
-'Edit %s': '%s bearbeiten'
-
-# Field labels
-'Company Group': Unternehmensgruppe
-'Country Code': Ländercode
-Employees: Mitarbeiter
-'User Permissions': Benutzerberechtigungen
-'Module Permissions': Modulberechtigungen
-Mobile: Mobil
-Street: Straße
-ZIP: PLZ
+# Module Management
+"System Modules": "System-Module"
+"Create System Module": "System-Modul erstellen"
+"Manage system modules and their permissions.": "System-Module und deren Berechtigungen verwalten."
+"Display name for the module": "Anzeigename für das Modul"
+"Unique code that matches the entity name (e.g., User, Company, Module)": "Eindeutiger Code, der dem Entitätsnamen entspricht (z.B. User, Company, Module)"
+"e.g., User, Company, Module": "z.B. User, Company, Module"
+"Optional description of what this module manages": "Optionale Beschreibung dessen, was dieses Modul verwaltet"
 
 # Permissions
-Permissions: Berechtigungen
-Read: Lesen
-Write: Schreiben
-Access: Zugriff
-Permission: Berechtigung
-'No permissions': Keine Berechtigungen
-'Unknown': Unbekannt
+"User Permissions": "Benutzerberechtigungen"
+"Module Permissions": "Modul-Berechtigungen"
+"No permissions": "Keine Berechtigungen"
+"No permissions assigned": "Keine Berechtigungen zugewiesen"
+"%d permission(s) assigned": "%d Berechtigung(en) zugewiesen"
+"Permission Details": "Berechtigungsdetails"
+"Unknown User": "Unbekannter Benutzer"
+Read: "Lesen"
+Write: "Schreiben"
+"Access denied. You need read permission for the %module% module.": "Zugriff verweigert. Sie benötigen Leseberechtigung für das %module%-Modul."
+"Access denied. You need write permission for the %module% module.": "Zugriff verweigert. Sie benötigen Schreibberechtigung für das %module%-Modul."
 
-# Status messages
-Created successfully: Erfolgreich erstellt
-Updated successfully: Erfolgreich aktualisiert
-Deleted successfully: Erfolgreich gelöscht
-Error occurred: Ein Fehler ist aufgetreten
-Invalid data: Ungültige Daten
-Access denied: Zugriff verweigert
-'Access denied. You need read permission for the %module% module.': 'Zugriff verweigert. Sie benötigen Leseberechtigung für das %module%-Modul.'
-'Access denied. You need write permission for the %module% module.': 'Zugriff verweigert. Sie benötigen Schreibberechtigung für das %module%-Modul.'
+# User Management
+"Edit User": "Benutzer bearbeiten"
+"User Information": "Benutzerinformationen"
+Roles: "Rollen"
+Admin: "Administrator"
+Management: "Verwaltung"
 
-# Common phrases
-Please sign in: Bitte melden Sie sich an
-Remember me: Angemeldet bleiben
-Forgot password: Passwort vergessen
-Required field: Pflichtfeld
-Optional: Optional
-Select an option: Option auswählen
-No results found: Keine Ergebnisse gefunden
-
-# Module-specific translations
-'Manage system modules and their permissions.': Systemmodule und deren Berechtigungen verwalten.
-'Display name for the module': Anzeigename für das Modul
-'Unique code that matches the entity name (e.g., User, Company, Module)': Eindeutiger Code, der dem Entitätsnamen entspricht (z.B. User, Company, Module)
-'e.g., User, Company, Module': z.B. User, Company, Module
-'Optional description of what this module manages': Optionale Beschreibung, was dieses Modul verwaltet
-'No permissions assigned': Keine Berechtigungen zugewiesen
-'%d permission(s) assigned': '%d Berechtigung(en) zugewiesen'
-'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 Berechtigung zugewiesen|]1,Inf[ %count% Berechtigungen zugewiesen'
-'Permission Details': Berechtigungsdetails
-'Unknown User': Unbekannter Benutzer
-'User Information': Benutzerinformationen
-'Admin': Administrator
-
-# Navigation
-Previous: Vorherige
-Next: Nächste
-First: Erste
-Last: Letzte
-Page: Seite
-Items per page: Elemente pro Seite
-
-# Admin page titles
-'System Modules': Systemmodule
-'Create System Module': Systemmodul erstellen
-'Edit User': Benutzer bearbeiten
-
-# User role choices
-'ROLE_SUPER_ADMIN': Super-Administrator
-'ROLE_ADMIN': Administrator
-'ROLE_USER': Benutzer
-
-# Permission fields
-'Read Permission': Leseberechtigung
-'You are logged in as': Sie sind angemeldet als
-'Demo Credentials': Demo-Zugangsdaten
-'Admin User': Administrator
-'Regular User': Normaler Benutzer
-'Placeholder image': Platzhalterbild
-'supported by': unterstützt von
-
-
-# Login page translations
-'Demo Credentials': Demo-Zugangsdaten
-'Admin User': Administrator
-'Regular User': Normaler Benutzer
-'Placeholder image': Platzhalterbild
-'supported by': unterstützt von
+# Pluralization
+"{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 Berechtigung zugewiesen|]1,Inf[ %count% Berechtigungen zugewiesen"

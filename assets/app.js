@@ -9,5 +9,7 @@ import './styles/app.css';
 
 // custom: import bs5 css
 import 'bootstrap/dist/css/bootstrap.min.css';
+// custom: import bootstrap JS for dropdown functionality
+import 'bootstrap';
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

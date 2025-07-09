@@ -1,141 +1,67 @@
 # French translations for the application
-# Basic UI elements
-Dashboard: Tableau de bord
-Home: Accueil
-Login: Connexion
-Logout: Déconnexion
-Welcome: Bienvenue
-Search: Rechercher
-Filter: Filtrer
-Save: Enregistrer
-Cancel: Annuler
-Delete: Supprimer
-Edit: Modifier
-Create: Créer
-Show: Afficher
-Back: Retour
-Yes: Oui
-No: Non
 
-# Form elements
-Name: Nom
-Description: Description
-Email: Email
-Password: Mot de passe
-Phone: Téléphone
-Address: Adresse
-City: Ville
-Country: Pays
-Website: Site web
-Active: Actif
+# Authentication/Login
+Login: "Connexion"
+"Please sign in": "Veuillez vous connecter"
+Email: "E-mail"
+Password: "Mot de passe"
+"Sign in": "Se connecter"
+"You are logged in as": "Vous êtes connecté en tant que"
+Logout: "Se déconnecter"
+"Demo Credentials": "Identifiants de démonstration"
+"Admin User": "Utilisateur administrateur"
+"Regular User": "Utilisateur régulier"
+"supported by": "pris en charge par"
+"Placeholder image": "Image de remplacement"
 
-# CRUD operations
-New: Nouveau
-Add: Ajouter
-Update: Mettre à jour
-Remove: Supprimer
-View: Voir
-List: Liste
-Details: Détails
-Management: Gestion
+# Entity Names
+Company: "Entreprise"
+CompanyGroup: "Groupe d'entreprises"
+Module: "Module"
+User: "Utilisateur"
 
-# Entity names
-User: Utilisateur
-Users: Utilisateurs
-Company: Entreprise
-Companies: Entreprises
-Module: Module
-Modules: Modules
-Group: Groupe
-Groups: Groupes
-CompanyGroup: Groupe d'entreprises
-CompanyGroups: Groupes d'entreprises
-Roles: Rôles
+# General UI
+Dashboard: "Tableau de bord"
+Description: "Description"
+"Country Code": "Code pays"
+Website: "Site web"
+Employees: "Employés"
+Create: "Créer"
+Edit: "Modifier"
+Delete: "Supprimer"
+Show: "Afficher"
+"View %s": "Voir %s"
+"Edit %s": "Modifier %s"
+"Create %s": "Créer %s"
 
-# Management pages
-'%s Management': 'Gestion %s'
-'Create %s': 'Créer %s'
-'View %s': 'Voir %s'
-'Edit %s': 'Modifier %s'
-
-# Field labels
-'Company Group': Groupe d'entreprises
-'Country Code': Code pays
-Employees: Employés
-'User Permissions': Permissions utilisateur
-'Module Permissions': Permissions de module
-'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 permission attribuée|]1,Inf[ %count% permissions attribuées'
-Mobile: Mobile
-Street: Rue
-ZIP: Code postal
+# Module Management
+"System Modules": "Modules système"
+"Create System Module": "Créer un module système"
+"Manage system modules and their permissions.": "Gérer les modules système et leurs permissions."
+"Display name for the module": "Nom d'affichage du module"
+"Unique code that matches the entity name (e.g., User, Company, Module)": "Code unique qui correspond au nom de l'entité (ex. User, Company, Module)"
+"e.g., User, Company, Module": "ex. User, Company, Module"
+"Optional description of what this module manages": "Description optionnelle de ce que gère ce module"
 
 # Permissions
-Permissions: Permissions
-Read: Lire
-Write: Écrire
-Access: Accès
-Permission: Permission
-'No permissions': Aucune permission
-'Unknown': Inconnu
+"User Permissions": "Permissions utilisateur"
+"Module Permissions": "Permissions du module"
+"No permissions": "Aucune permission"
+"No permissions assigned": "Aucune permission assignée"
+"%d permission(s) assigned": "%d permission(s) assignée(s)"
+"Permission Details": "Détails des permissions"
+"Unknown User": "Utilisateur inconnu"
+Read: "Lire"
+Write: "Écrire"
+"Access denied. You need read permission for the %module% module.": "Accès refusé. Vous avez besoin de la permission de lecture pour le module %module%."
+"Access denied. You need write permission for the %module% module.": "Accès refusé. Vous avez besoin de la permission d'écriture pour le module %module%."
 
-# Status messages
-Created successfully: Créé avec succès
-Updated successfully: Mis à jour avec succès
-Deleted successfully: Supprimé avec succès
-Error occurred: Une erreur s'est produite
-Invalid data: Données invalides
-Access denied: Accès refusé
-'Access denied. You need read permission for the %module% module.': "Accès refusé. Vous avez besoin de la permission de lecture pour le module %module%."
-'Access denied. You need write permission for the %module% module.': "Accès refusé. Vous avez besoin de la permission d'écriture pour le module %module%."
+# User Management
+"Edit User": "Modifier l'utilisateur"
+"User Information": "Informations utilisateur"
+Roles: "Rôles"
+Admin: "Administrateur"
+Management: "Gestion"
 
-# Common phrases
-Please sign in: Veuillez vous connecter
-Remember me: Se souvenir de moi
-Forgot password: Mot de passe oublié
-Required field: Champ obligatoire
-Optional: Optionnel
-Select an option: Sélectionner une option
-No results found: Aucun résultat trouvé
-
-# Module-specific translations
-'Manage system modules and their permissions.': Gérer les modules système et leurs permissions.
-'Display name for the module': Nom d'affichage du module
-'Unique code that matches the entity name (e.g., User, Company, Module)': "Code unique qui correspond au nom de l'entité (ex: User, Company, Module)"
-'e.g., User, Company, Module': "ex: User, Company, Module"
-'Optional description of what this module manages': Description optionnelle de ce que gère ce module
-'No permissions assigned': Aucune permission assignée
-'%d permission(s) assigned': '%d permission(s) assignée(s)'
-'Permission Details': Détails des permissions
-'Unknown User': Utilisateur inconnu
-'User Information': Informations utilisateur
-'Admin': Administrateur
-
-# Navigation
-Previous: Précédent
-Next: Suivant
-First: Premier
-Last: Dernier
-Page: Page
-Items per page: Éléments par page
-
-# Admin page titles
-'System Modules': Modules système
-'Create System Module': Créer un module système
-'Edit User': Modifier l'utilisateur
-
-# User role choices
-'ROLE_SUPER_ADMIN': Super Administrateur
-'ROLE_ADMIN': Administrateur
-'ROLE_USER': Utilisateur
-
-# Permission fields
-'Read Permission': Permission de lecture
-'Write Permission': Permission d'écriture
-
-
-'You are logged in as': Vous êtes connecté en tant que
-'Demo Credentials': Identifiants de démo
-'Admin User': Utilisateur administrateur
-'Regular User': Utilisateur normal
-'Placeholder image': Image de placeholder
-'supported by': soutenu par
+# Pluralization
+"{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 permission assignée|]1,Inf[ %count% permissions assignées"
