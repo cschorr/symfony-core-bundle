@@ -28,6 +28,11 @@ class ModuleCrudController extends AbstractCrudController
         return Module::class;
     }
 
+    protected function getModuleCode(): string
+    {
+        return 'Module';
+    }
+
     protected function getModuleName(): string
     {
         return 'Module';
@@ -108,7 +113,10 @@ class ModuleCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name')
-                ->setHelp('Unique name for the module (used for permission checking)'),
+                ->setHelp('Display name for the module'),
+            TextField::new('code')
+                ->setHelp('Unique code that matches the entity name (e.g., User, Company, Module)')
+                ->setFormTypeOption('attr', ['placeholder' => 'e.g., User, Company, Module']),
             TextareaField::new('text')
                 ->setLabel('Description')
                 ->setHelp('Optional description of what this module manages'),

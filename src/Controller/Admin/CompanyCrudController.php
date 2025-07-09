@@ -27,6 +27,11 @@ class CompanyCrudController extends AbstractCrudController
         return Company::class;
     }
 
+    protected function getModuleCode(): string
+    {
+        return 'Company';
+    }
+
     protected function getModuleName(): string
     {
         return 'Unternehmen';

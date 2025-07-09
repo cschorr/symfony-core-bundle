@@ -52,15 +52,17 @@ class AppFixtures extends Fixture
         // each module representing one entity
         $modules = [
             // Add your module data here
-            ['name' => 'Benutzer', 'text' => 'Benutzerverwaltung'],
-            ['name' => 'Unternehmen', 'text' => 'Kunden, Lieferanten, Partner etc.'],
-            ['name' => 'Module', 'text' => 'System modules and configuration'],
+            ['name' => 'Benutzer', 'code' => 'User', 'text' => 'Benutzerverwaltung'],
+            ['name' => 'Unternehmen', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.'],
+            ['name' => 'Module', 'code' => 'Module', 'text' => 'System modules and configuration'],
+            ['name' => 'Unternehmensgruppen', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen'],
         ];
 
         // Create and persist module entities here
         foreach ($modules as $moduleData) {
             $module = new Module();
             $module->setName($moduleData['name']);
+            $module->setCode($moduleData['code']);
             $module->setText($moduleData['text']);
             $manager->persist($module);
         }
@@ -73,9 +75,10 @@ class AppFixtures extends Fixture
         $adminUser = $manager->getRepository(User::class)->findOneBy(['email' => 'admin@example.com']);
         $demoUser = $manager->getRepository(User::class)->findOneBy(['email' => 'demo@example.com']);
         
-        $userModule = $manager->getRepository(Module::class)->findOneBy(['name' => 'Benutzer']);
-        $companyModule = $manager->getRepository(Module::class)->findOneBy(['name' => 'Unternehmen']);
-        $moduleModule = $manager->getRepository(Module::class)->findOneBy(['name' => 'Module']);
+        $userModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'User']);
+        $companyModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'Company']);
+        $moduleModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'Module']);
+        $companyGroupModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'CompanyGroup']);
 
         // Helper function to create permission if it doesn't exist
         $createPermissionIfNotExists = function($user, $module, $canRead, $canWrite) use ($manager) {
@@ -99,6 +102,7 @@ class AppFixtures extends Fixture
         $createPermissionIfNotExists($adminUser, $userModule, true, true);
         $createPermissionIfNotExists($adminUser, $companyModule, true, true);
         $createPermissionIfNotExists($adminUser, $moduleModule, true, true);
+        $createPermissionIfNotExists($adminUser, $companyGroupModule, true, true);
 
         // Demo user permissions
         $createPermissionIfNotExists($demoUser, $userModule, true, false); // Read-only access to user module
