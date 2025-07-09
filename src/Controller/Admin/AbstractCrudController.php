@@ -9,11 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController as EasyAdminAbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 {
@@ -57,15 +53,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Check if current user is admin
-     */
-    protected function isAdmin(): bool
-    {
-        $user = $this->getUser();
-        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
-    }
-
-    /**
      * Configure CRUD with permission-based actions
      */
     public function configureCrud(Crud $crud): Crud
@@ -82,93 +69,36 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 
     /**
      * Configure actions based on permissions
-     * Concrete controllers should override this to add permission checks using isGranted()
      */
     public function configureActions(Actions $actions): Actions
     {
-        // Add the detail action to index page first, then update existing actions
-        $actions
+        return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
-                return $action->setLabel('Show')->setIcon('fa fa-eye');
-            })
-            ->update(Crud::PAGE_INDEX, Action::EDIT, function (Action $action) {
-                return $action->setLabel('Edit')->setIcon('fa fa-edit');
-            })
-            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
-                return $action->setLabel('Delete')->setIcon('fa fa-trash');
-            })
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action) => $action->setLabel('Show')->setIcon('fa fa-eye'))
+            ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action) => $action->setLabel('Edit')->setIcon('fa fa-edit'))
+            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->setLabel('Delete')->setIcon('fa fa-trash'))
             ->setPermission(Action::DETAIL, 'ROLE_USER')
             ->setPermission(Action::NEW, 'ROLE_USER')
             ->setPermission(Action::EDIT, 'ROLE_USER')
             ->setPermission(Action::DELETE, 'ROLE_USER');
-        
-        return $actions;
-    }
-
-    /**
-     * Base CRUD methods - concrete controllers should override and add permission checks
-     */
-    public function index(AdminContext $context)
-    {
-        return parent::index($context);
-    }
-
-    public function detail(AdminContext $context)
-    {
-        return parent::detail($context);
-    }
-
-    public function new(AdminContext $context)
-    {
-        return parent::new($context);
-    }
-
-    public function edit(AdminContext $context)
-    {
-        return parent::edit($context);
-    }
-
-    public function delete(AdminContext $context)
-    {
-        return parent::delete($context);
-    }
-
-    public function batchDelete(AdminContext $context, BatchActionDto $batchActionDto): Response
-    {
-        return parent::batchDelete($context, $batchActionDto);
     }
 
     /**
      * Get a human-readable label for an entity
-     * Can be overridden by concrete controllers
      */
     protected function getEntityLabel($entity): string
     {
-        if (method_exists($entity, '__toString')) {
-            return (string) $entity;
-        }
-        
-        if (method_exists($entity, 'getName')) {
-            return $entity->getName();
-        }
-        
-        if (method_exists($entity, 'getTitle')) {
-            return $entity->getTitle();
-        }
-        
-        if (method_exists($entity, 'getId')) {
-            return sprintf('%s #%s', $this->getModuleName(), $entity->getId());
-        }
-        
-        return $this->getModuleName();
+        return match (true) {
+            method_exists($entity, '__toString') => (string) $entity,
+            method_exists($entity, 'getName') => $entity->getName(),
+            method_exists($entity, 'getTitle') => $entity->getTitle(),
+            method_exists($entity, 'getId') => sprintf('%s #%s', $this->getModuleName(), $entity->getId()),
+            default => $this->getModuleName()
+        };
     }
 
     /**
      * Check if this controller should show the user permission management UI
-     * This controls whether permission checkboxes and tabs are shown in forms.
-     * Override this method to return true for entities that should have permission management UI (like User).
-     * Note: Permission checking for CRUD operations is handled by individual controllers using isGranted().
      */
     protected function hasPermissionManagement(): bool
     {
@@ -209,19 +139,16 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             $hasWritePermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['write'];
             
             // Read permission field
-            $readField = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $moduleId . '_read')
+            $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $moduleId . '_read')
                 ->setLabel($module->getName() . ' - Read')
                 ->setFormTypeOption('mapped', false)
                 ->setFormTypeOption('data', $hasReadPermission);
                 
             // Write permission field
-            $writeField = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $moduleId . '_write')
+            $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $moduleId . '_write')
                 ->setLabel($module->getName() . ' - Write')
                 ->setFormTypeOption('mapped', false)
                 ->setFormTypeOption('data', $hasWritePermission);
-                
-            $fields[] = $readField;
-            $fields[] = $writeField;
         }
         
         return $fields;
