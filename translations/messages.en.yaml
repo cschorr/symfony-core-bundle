@@ -63,5 +63,13 @@ Roles: "Roles"
 Admin: "Admin"
 Management: "Management"
 
+# Duplication
+Duplicate: "Duplicate"
+"Duplicate this record": "Duplicate this record"
+"Entity duplicated successfully": "Entity duplicated successfully"
+"Error duplicating entity: ": "Error duplicating entity: "
+"Form pre-filled with duplicated values. Click \"Save\" to create the new record.": "Form pre-filled with duplicated values. Click \"Save\" to create the new record."
+Copy: "Copy"
+
 # Pluralization
 "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned"
