@@ -123,10 +123,8 @@ class ModuleCrudController extends AbstractCrudController
                 ->renderAsHtml(),
         ];
 
-        // Add active field for index page
-        if ($pageName === Crud::PAGE_INDEX) {
-            $fields = $this->addActiveField($fields, $pageName);
-        }
+        // Add active field to all pages
+        $fields = $this->addActiveField($fields, $pageName);
 
         return $fields;
     }

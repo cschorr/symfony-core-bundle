@@ -130,12 +130,8 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     protected function addActiveField(array $fields, string $pageName = Crud::PAGE_INDEX): array
     {
-        if ($pageName === Crud::PAGE_INDEX) {
-            $fields[] = BooleanField::new('active', $this->translator->trans('Active'))
-                ->onlyOnIndex();
-        } else {
-            $fields[] = BooleanField::new('active', $this->translator->trans('Active'));
-        }
+        // Active field should be available on both index and form pages for toggle to work
+        $fields[] = BooleanField::new('active', $this->translator->trans('Active'));
         
         return $fields;
     }
