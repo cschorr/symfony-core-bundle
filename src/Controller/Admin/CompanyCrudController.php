@@ -6,11 +6,13 @@ use App\Entity\Company;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -72,7 +74,7 @@ class CompanyCrudController extends AbstractCrudController
         return $actions;
     }
 
-    public function index(AdminContext $context)
+    public function index(AdminContext $context): KeyValueStore|Response
     {
         if (!$this->isGranted('read', $this->getModule())) {
             throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
@@ -80,7 +82,7 @@ class CompanyCrudController extends AbstractCrudController
         return parent::index($context);
     }
 
-    public function detail(AdminContext $context)
+    public function detail(AdminContext $context): KeyValueStore|Response
     {
         if (!$this->isGranted('read', $this->getModule())) {
             throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
@@ -88,7 +90,7 @@ class CompanyCrudController extends AbstractCrudController
         return parent::detail($context);
     }
 
-    public function new(AdminContext $context)
+    public function new(AdminContext $context): KeyValueStore|Response
     {
         if (!$this->isGranted('write', $this->getModule())) {
             throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
@@ -96,7 +98,7 @@ class CompanyCrudController extends AbstractCrudController
         return parent::new($context);
     }
 
-    public function edit(AdminContext $context)
+    public function edit(AdminContext $context): KeyValueStore|Response
     {
         if (!$this->isGranted('write', $this->getModule())) {
             throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
@@ -104,7 +106,7 @@ class CompanyCrudController extends AbstractCrudController
         return parent::edit($context);
     }
 
-    public function delete(AdminContext $context)
+    public function delete(AdminContext $context): KeyValueStore|Response
     {
         if (!$this->isGranted('write', $this->getModule())) {
             throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
