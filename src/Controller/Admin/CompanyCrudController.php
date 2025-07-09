@@ -65,12 +65,6 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     #[IsGranted('write', subject: 'Company')]
-    public function new(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Company = 'Company'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
-    {
-        return parent::new($context);
-    }
-
-    #[IsGranted('write', subject: 'Company')]
     public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Company = 'Company'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::edit($context);
