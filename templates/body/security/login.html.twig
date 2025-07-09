@@ -71,6 +71,37 @@
 #}
 
 <div class="d-flex flex-column align-items-center">
+    <!-- Demo Credentials - Temporary Block -->
+    <div class="alert alert-info shadow-sm mb-4 border-0" style="max-width: 40rem; backdrop-filter: blur(10px); background: rgba(13, 110, 253, 0.1);">
+        <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-key-fill text-info me-2"></i>
+            <strong class="text-info">{{ 'Demo Credentials'|trans }}</strong>
+            <span class="badge bg-warning text-dark ms-auto small">{{ 'Temporary'|trans }}</span>
+        </div>
+        <div class="small">
+            <div class="row g-2">
+                <div class="col-sm-6">
+                    <div class="p-2 bg-white bg-opacity-75 rounded">
+                        <div class="fw-bold text-success small">{{ 'Admin User'|trans }}</div>
+                        <code class="text-dark small">admin@example.com</code>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-2 bg-white bg-opacity-75 rounded">
+                        <div class="fw-bold text-info small">{{ 'Regular User'|trans }}</div>
+                        <code class="text-dark small">demo@example.com</code>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="p-2 bg-white bg-opacity-75 rounded text-center">
+                        <div class="fw-bold text-secondary small">{{ 'Password'|trans }}</div>
+                        <code class="text-dark">pass_1234</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="form-signin w-100 m-auto bg-white rounded">
         <!-- Language Switcher -->
         <div class="position-absolute top-0 end-0 m-3">
@@ -135,27 +166,6 @@
                         </button>
                     </form>
 
-                    <div class="demo-credentials mt-4">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-info-circle-fill text-primary me-2"></i>
-                            <strong class="text-primary">{{ 'Demo Credentials'|trans }}</strong>
-                        </div>
-                        <div class="small text-muted">
-                            <div class="mb-1">
-                                <span class="badge bg-success me-2">{{ 'Admin User'|trans }}</span>
-                                <code class="text-dark">admin@example.com</code>
-                            </div>
-                            <div class="mb-1">
-                                <span class="badge bg-info me-2">{{ 'Regular User'|trans }}</span>
-                                <code class="text-dark">demo@example.com</code>
-                            </div>
-                            <div>
-                                <span class="badge bg-secondary me-2">{{ 'Password'|trans }}</span>
-                                <code class="text-dark">pass_1234</code>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -167,7 +177,7 @@
 
     <!-- c3net Logo UNDERNEATH the existing card -->
     <div class="text-center mt-4">
-        <svg width="122" height="21" viewBox="0 0 122 21" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" style="max-height: 80px; width: auto;">
+        <svg width="122" height="21" viewBox="0 0 122 21" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" style="max-height: 100px; width: auto; transform: scale(1.25);">
             <clipPath id="a">
                 <path d="M0 0h121.78v20.93H0z"/>
             </clipPath>
