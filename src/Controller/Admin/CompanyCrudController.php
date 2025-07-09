@@ -75,7 +75,7 @@ class CompanyCrudController extends AbstractCrudController
     public function index(AdminContext $context)
     {
         if (!$this->isGranted('read', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need read permission for the Company module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
         }
         return parent::index($context);
     }
@@ -83,7 +83,7 @@ class CompanyCrudController extends AbstractCrudController
     public function detail(AdminContext $context)
     {
         if (!$this->isGranted('read', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need read permission for the Company module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
         }
         return parent::detail($context);
     }
@@ -91,7 +91,7 @@ class CompanyCrudController extends AbstractCrudController
     public function new(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the Company module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
         }
         return parent::new($context);
     }
@@ -99,7 +99,7 @@ class CompanyCrudController extends AbstractCrudController
     public function edit(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the Company module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
         }
         return parent::edit($context);
     }
@@ -107,7 +107,7 @@ class CompanyCrudController extends AbstractCrudController
     public function delete(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the Company module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Company')]));
         }
         return parent::delete($context);
     }
@@ -118,16 +118,9 @@ class CompanyCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
             TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
-            #AssociationField::new('companyGroup')->setLabel($this->translator->trans('Company Group')),
-            #TextField::new('street'),
-            #TextField::new('zip'),
-            #TextField::new('city'),
             TextField::new('countryCode')->setLabel($this->translator->trans('Country Code')),
-            #TextField::new('phone'),
-            #TextField::new('cell')->setLabel($this->translator->trans('Mobile')),
             TextField::new('url')->setLabel($this->translator->trans('Website')),
             AssociationField::new('employees')->setLabel($this->translator->trans('Employees')),
-            #AssociationField::new('projects'),
         ];
     }
 }

@@ -72,6 +72,8 @@ Read: Lesen
 Write: Schreiben
 Access: Zugriff
 Permission: Berechtigung
+'No permissions': Keine Berechtigungen
+'Unknown': Unbekannt
 
 # Status messages
 Created successfully: Erfolgreich erstellt
@@ -80,6 +82,8 @@ Deleted successfully: Erfolgreich gelöscht
 Error occurred: Ein Fehler ist aufgetreten
 Invalid data: Ungültige Daten
 Access denied: Zugriff verweigert
+'Access denied. You need read permission for the %module% module.': 'Zugriff verweigert. Sie benötigen Leseberechtigung für das %module%-Modul.'
+'Access denied. You need write permission for the %module% module.': 'Zugriff verweigert. Sie benötigen Schreibberechtigung für das %module%-Modul.'
 
 # Common phrases
 Please sign in: Bitte melden Sie sich an
@@ -91,9 +95,17 @@ Select an option: Option auswählen
 No results found: Keine Ergebnisse gefunden
 
 # Module-specific translations
-'System Modules': System Module
-'Create System Module': System-Modul erstellen
 'Manage system modules and their permissions.': Systemmodule und deren Berechtigungen verwalten.
+'Display name for the module': Anzeigename für das Modul
+'Unique code that matches the entity name (e.g., User, Company, Module)': Eindeutiger Code, der dem Entitätsnamen entspricht (z.B. User, Company, Module)
+'e.g., User, Company, Module': z.B. User, Company, Module
+'Optional description of what this module manages': Optionale Beschreibung, was dieses Modul verwaltet
+'No permissions assigned': Keine Berechtigungen zugewiesen
+'%d permission(s) assigned': '%d Berechtigung(en) zugewiesen'
+'Permission Details': Berechtigungsdetails
+'Unknown User': Unbekannter Benutzer
+'User Information': Benutzerinformationen
+'Admin': Administrator
 
 # Navigation
 Previous: Vorherige
@@ -103,8 +115,16 @@ Last: Letzte
 Page: Seite
 Items per page: Elemente pro Seite
 
-# Dates and time
-Date: Datum
-Time: Zeit
-Created at: Erstellt am
-Updated at: Aktualisiert am
+# Admin page titles
+'System Modules': Systemmodule
+'Create System Module': Systemmodul erstellen
+'Edit User': Benutzer bearbeiten
+
+# User role choices
+'ROLE_SUPER_ADMIN': Super-Administrator
+'ROLE_ADMIN': Administrator
+'ROLE_USER': Benutzer
+
+# Permission fields
+'Read Permission': Leseberechtigung
+'Write Permission': Schreibberechtigung

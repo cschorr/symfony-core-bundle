@@ -52,7 +52,7 @@ class UserCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->setPageTitle('edit', 'Edit User');
+            ->setPageTitle('edit', $this->translator->trans('Edit User'));
     }
 
     public function configureActions(Actions $actions): Actions
@@ -81,7 +81,7 @@ class UserCrudController extends AbstractCrudController
     public function index(AdminContext $context)
     {
         if (!$this->isGranted('read', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need read permission for the User module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('User')]));
         }
         return parent::index($context);
     }
@@ -89,7 +89,7 @@ class UserCrudController extends AbstractCrudController
     public function detail(AdminContext $context)
     {
         if (!$this->isGranted('read', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need read permission for the User module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('User')]));
         }
         return parent::detail($context);
     }
@@ -97,7 +97,7 @@ class UserCrudController extends AbstractCrudController
     public function new(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the User module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('User')]));
         }
         return parent::new($context);
     }
@@ -105,7 +105,7 @@ class UserCrudController extends AbstractCrudController
     public function edit(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the User module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('User')]));
         }
         return parent::edit($context);
     }
@@ -113,7 +113,7 @@ class UserCrudController extends AbstractCrudController
     public function delete(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the User module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('User')]));
         }
         return parent::delete($context);
     }
@@ -126,12 +126,12 @@ class UserCrudController extends AbstractCrudController
 
         if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
             // User Information Tab
-            $fields[] = FormField::addTab('User Information');
+            $fields[] = FormField::addTab($this->translator->trans('User Information'));
             $fields[] = EmailField::new('email');
             $fields[] = ChoiceField::new('roles')
                 ->setChoices([
-                    'User' => 'ROLE_USER',
-                    'Admin' => 'ROLE_ADMIN',
+                    $this->translator->trans('User') => 'ROLE_USER',
+                    $this->translator->trans('Admin') => 'ROLE_ADMIN',
                 ])
                 ->allowMultipleChoices()
                 ->renderExpanded(false);
@@ -147,8 +147,8 @@ class UserCrudController extends AbstractCrudController
             $fields[] = EmailField::new('email');
             $fields[] = ChoiceField::new('roles')
                 ->setChoices([
-                    'User' => 'ROLE_USER',
-                    'Admin' => 'ROLE_ADMIN',
+                    $this->translator->trans('User') => 'ROLE_USER',
+                    $this->translator->trans('Admin') => 'ROLE_ADMIN',
                 ])
                 ->allowMultipleChoices()
                 ->renderExpanded(false);
@@ -164,8 +164,8 @@ class UserCrudController extends AbstractCrudController
             $fields[] = EmailField::new('email');
             $fields[] = ChoiceField::new('roles')
                 ->setChoices([
-                    'User' => 'ROLE_USER',
-                    'Admin' => 'ROLE_ADMIN',
+                    $this->translator->trans('User') => 'ROLE_USER',
+                    $this->translator->trans('Admin') => 'ROLE_ADMIN',
                 ])
                 ->allowMultipleChoices()
                 ->renderExpanded(false);

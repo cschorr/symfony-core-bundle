@@ -220,7 +220,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             return $fields;
         }
 
-        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addTab('Module Permissions');
+        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addTab($this->translator->trans('Module Permissions'));
         
         $permissionFields = $this->createModulePermissionFields();
         return array_merge($fields, $permissionFields);
@@ -240,12 +240,12 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->formatValue(function ($value, $entity) {
                 if (!$entity || !method_exists($entity, 'getModulePermissions') || 
                     !$entity->getModulePermissions() || $entity->getModulePermissions()->isEmpty()) {
-                    return '<div style="text-align: right;">No permissions</div>';
+                    return '<div style="text-align: right;">' . $this->translator->trans('No permissions') . '</div>';
                 }
                 
                 $permissions = [];
                 foreach ($entity->getModulePermissions() as $permission) {
-                    $module = $permission->getModule() ? $permission->getModule()->getName() : 'Unknown';
+                    $module = $permission->getModule() ? $permission->getModule()->getName() : $this->translator->trans('Unknown');
                     $access = [];
                     if ($permission->canRead()) $access[] = 'R';
                     if ($permission->canWrite()) $access[] = 'W';
