@@ -14,7 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ModuleCrudController extends AbstractCrudController
@@ -74,43 +74,33 @@ class ModuleCrudController extends AbstractCrudController
         return $actions;
     }
 
-    public function index(AdminContext $context): KeyValueStore|Response
+    #[IsGranted('read', subject: 'moduleCode')]
+    public function index(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
     {
-        if (!$this->isGranted('read', $this->getModule())) {
-            throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
-        }
         return parent::index($context);
     }
 
-    public function detail(AdminContext $context): KeyValueStore|Response
+    #[IsGranted('read', subject: 'moduleCode')]
+    public function detail(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
     {
-        if (!$this->isGranted('read', $this->getModule())) {
-            throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
-        }
         return parent::detail($context);
     }
 
-    public function new(AdminContext $context): KeyValueStore|Response
+    #[IsGranted('write', subject: 'moduleCode')]
+    public function new(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
     {
-        if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
-        }
         return parent::new($context);
     }
 
-    public function edit(AdminContext $context): KeyValueStore|Response
+    #[IsGranted('write', subject: 'moduleCode')]
+    public function edit(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
     {
-        if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
-        }
         return parent::edit($context);
     }
 
-    public function delete(AdminContext $context): KeyValueStore|Response
+    #[IsGranted('write', subject: 'moduleCode')]
+    public function delete(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
     {
-        if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
-        }
         return parent::delete($context);
     }
 
