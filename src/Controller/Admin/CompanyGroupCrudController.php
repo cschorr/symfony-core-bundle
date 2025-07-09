@@ -78,7 +78,7 @@ class CompanyGroupCrudController extends AbstractCrudController
 
         // Add active field for index page
         if ($pageName === Crud::PAGE_INDEX) {
-            $fields = $this->addActiveField($fields);
+            $fields = $this->addActiveField($fields, $pageName);
         }
 
         return $fields;

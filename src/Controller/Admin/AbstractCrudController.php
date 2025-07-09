@@ -126,12 +126,16 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Add active field to index pages with EasyAdmin's native boolean display
+     * Add active field to pages with EasyAdmin's native boolean display
      */
-    protected function addActiveField(array $fields): array
+    protected function addActiveField(array $fields, string $pageName = Crud::PAGE_INDEX): array
     {
-        $fields[] = BooleanField::new('active', $this->translator->trans('Active'))
-            ->onlyOnIndex();
+        if ($pageName === Crud::PAGE_INDEX) {
+            $fields[] = BooleanField::new('active', $this->translator->trans('Active'))
+                ->onlyOnIndex();
+        } else {
+            $fields[] = BooleanField::new('active', $this->translator->trans('Active'));
+        }
         
         return $fields;
     }
