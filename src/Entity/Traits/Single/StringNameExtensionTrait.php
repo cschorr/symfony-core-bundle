@@ -6,15 +6,15 @@ use Doctrine\ORM\Mapping as ORM;
 
 trait StringNameExtensionTrait
 {
-    #[ORM\Column(length: 255)]
-    private string $nameExtension = '';
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $nameExtension = null;
 
-    public function getNameExtension(): string
+    public function getNameExtension(): ?string
     {
         return $this->nameExtension;
     }
 
-    public function setNameExtension(string $nameExtension): static
+    public function setNameExtension(?string $nameExtension): static
     {
         $this->nameExtension = $nameExtension;
 
