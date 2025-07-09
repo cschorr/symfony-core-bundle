@@ -7,7 +7,7 @@ parameters:
     - se
     - zh_TW
     - it
-  app.locales.pattern: de|en|fr|nl|se|zh_TW|it
+    - es
 services:
   _defaults:
     autowire: true
