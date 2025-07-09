@@ -1,0 +1,85 @@
+# EasyAdmin specific Traditional Chinese translations
+# Page titles
+list.page_title: '%entity_label_plural% 列表'
+show.page_title: '顯示 %entity_label%'
+edit.page_title: '編輯 %entity_label%'
+new.page_title: '建立新的 %entity_label%'
+
+# Actions
+action.new: 新增
+action.show: 顯示
+action.edit: 編輯
+action.delete: 刪除
+action.search: 搜尋
+action.detail: 詳細資料
+action.save_and_continue: 儲存並繼續編輯
+action.save_and_return: 儲存並返回
+
+# Labels
+label.save: 儲存
+label.cancel: 取消
+label.delete: 刪除
+label.edit: 編輯
+label.show: 顯示
+label.search: 搜尋
+label.filters: 篩選
+
+# Batch actions
+batch_action_modal.title: '您即將編輯 %num_items% 個項目'
+batch_action_modal.content: '此操作無法復原。'
+batch_action_modal.action: 執行操作
+
+# Delete modal
+delete_modal.title: 刪除項目
+delete_modal.content: '您確定要刪除此項目嗎？'
+
+# Pagination
+paginator.first: 第一個
+paginator.previous: 上一個
+paginator.next: 下一個
+paginator.last: 最後一個
+paginator.counter: '%start%-%end% / %results%'
+paginator.results: '{0} 無結果|{1} 1 個結果|]1,Inf] %count% 個結果'
+
+# Filters
+filter.title: 篩選
+filter.button.clear: 清除篩選
+filter.button.apply: 套用篩選
+filter.label.true: 是
+filter.label.false: 否
+filter.label.is_equal_to: 等於
+filter.label.is_not_equal_to: 不等於
+filter.label.is_greater_than: 大於
+filter.label.is_greater_than_or_equal_to: 大於或等於
+filter.label.is_less_than: 小於
+filter.label.is_less_than_or_equal_to: 小於或等於
+filter.label.is_between: 介於
+filter.label.contains: 包含
+filter.label.not_contains: 不包含
+filter.label.starts_with: 開始於
+filter.label.ends_with: 結束於
+filter.label.exactly: 完全相符
+filter.label.not_exactly: 不完全相符
+filter.label.is_same: 相同於
+filter.label.is_not_same: 不相同於
+filter.label.is_after: 晚於
+filter.label.is_after_or_same: 晚於或相同於
+filter.label.is_before: 早於
+filter.label.is_before_or_same: 早於或相同於
+
+# Form field types
+field.text: 文字
+field.email: 電子郵件
+field.integer: 整數
+field.number: 數字
+field.password: 密碼
+field.percent: 百分比
+field.textarea: 文字區域
+field.datetime: 日期時間
+field.date: 日期
+field.time: 時間
+field.choice: 選擇
+field.boolean: 是/否
+field.association: 關聯
+field.file: 檔案
+field.image: 圖片

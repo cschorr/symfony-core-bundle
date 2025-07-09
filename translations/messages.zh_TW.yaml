@@ -1,0 +1,132 @@
+# Traditional Chinese translations for the application
+# Basic UI elements
+Dashboard: 儀表板
+Home: 首頁
+Login: 登入
+Logout: 登出
+Welcome: 歡迎
+Search: 搜尋
+Filter: 篩選
+Save: 儲存
+Cancel: 取消
+Delete: 刪除
+Edit: 編輯
+Create: 建立
+Show: 顯示
+Back: 返回
+Yes: 是
+No: 否
+
+# Form elements
+Name: 名稱
+Description: 描述
+Email: 電子郵件
+Password: 密碼
+Phone: 電話
+Address: 地址
+City: 城市
+Country: 國家
+Website: 網站
+Active: 啟用
+
+# CRUD operations
+New: 新增
+Add: 新增
+Update: 更新
+Remove: 移除
+View: 檢視
+List: 列表
+Details: 詳細資料
+Management: 管理
+
+# Entity names
+User: 使用者
+Users: 使用者
+Company: 公司
+Companies: 公司
+Module: 模組
+Modules: 模組
+Group: 群組
+Groups: 群組
+CompanyGroup: 公司群組
+CompanyGroups: 公司群組
+Roles: 角色
+
+# Management pages
+'%s Management': '%s 管理'
+'Create %s': '建立 %s'
+'View %s': '檢視 %s'
+'Edit %s': '編輯 %s'
+
+# Field labels
+'Company Group': 公司群組
+'Country Code': 國家代碼
+Employees: 員工
+'User Permissions': 使用者權限
+'Module Permissions': 模組權限
+Mobile: 手機
+Street: 街道
+ZIP: 郵遞區號
+
+# Permissions
+Permissions: 權限
+Read: 讀取
+Write: 寫入
+Access: 存取
+Permission: 權限
+'No permissions': 無權限
+'Unknown': 未知
+
+# Status messages
+Created successfully: 建立成功
+Updated successfully: 更新成功
+Deleted successfully: 刪除成功
+Error occurred: 發生錯誤
+Invalid data: 無效資料
+Access denied: 拒絕存取
+'Access denied. You need read permission for the %module% module.': '拒絕存取。您需要 %module% 模組的讀取權限。'
+'Access denied. You need write permission for the %module% module.': '拒絕存取。您需要 %module% 模組的寫入權限。'
+
+# Common phrases
+Please sign in: 請登入
+Remember me: 記住我
+Forgot password: 忘記密碼
+Required field: 必填欄位
+Optional: 選填
+Select an option: 選擇選項
+No results found: 未找到結果
+
+# Module-specific translations
+'Manage system modules and their permissions.': 管理系統模組及其權限。
+'Display name for the module': 模組的顯示名稱
+'Unique code that matches the entity name (e.g., User, Company, Module)': 與實體名稱相符的唯一代碼（例如：User、Company、Module）
+'e.g., User, Company, Module': 例如：User、Company、Module
+'Optional description of what this module manages': 此模組管理內容的選填描述
+'No permissions assigned': 未分配權限
+'%d permission(s) assigned': '已分配 %d 個權限'
+'Permission Details': 權限詳細資料
+'Unknown User': 未知使用者
+'User Information': 使用者資訊
+'Admin': 管理員
+
+# Navigation
+Previous: 上一個
+Next: 下一個
+First: 第一個
+Last: 最後一個
+Page: 頁面
+Items per page: 每頁項目數
+
+# Admin page titles
+'System Modules': 系統模組
+'Create System Module': 建立系統模組
+'Edit User': 編輯使用者
+
+# User role choices
+'ROLE_SUPER_ADMIN': 超級管理員
+'ROLE_ADMIN': 管理員
+'ROLE_USER': 使用者
+
+# Permission fields
+'Read Permission': 讀取權限
+'Write Permission': 寫入權限
