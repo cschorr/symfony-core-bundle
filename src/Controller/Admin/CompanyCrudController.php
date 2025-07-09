@@ -78,7 +78,7 @@ class CompanyCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
+        $fields = [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
             TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
@@ -97,6 +97,13 @@ class CompanyCrudController extends AbstractCrudController
                 ])
                 ->onlyOnForms(),
         ];
+
+        // Add active field for index page
+        if ($pageName === Crud::PAGE_INDEX) {
+            $fields = $this->addActiveField($fields);
+        }
+
+        return $fields;
     }
 
     /**

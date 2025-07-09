@@ -5,10 +5,11 @@ namespace App\Controller\Admin;
 use App\Entity\CompanyGroup;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -67,14 +68,19 @@ class CompanyGroupCrudController extends AbstractCrudController
         return parent::delete($context);
     }
 
-    /*
     public function configureFields(string $pageName): iterable
     {
-        return [
-            IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
+        $fields = [
+            IdField::new('id')->hideOnForm()->hideOnIndex(),
+            TextField::new('name'),
+            TextareaField::new('text')->setLabel($this->translator->trans('Description')),
         ];
+
+        // Add active field for index page
+        if ($pageName === Crud::PAGE_INDEX) {
+            $fields = $this->addActiveField($fields);
+        }
+
+        return $fields;
     }
-    */
 }
