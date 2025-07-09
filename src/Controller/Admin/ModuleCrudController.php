@@ -13,14 +13,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ModuleCrudController extends AbstractCrudController
 {
     public function __construct(
         EntityManagerInterface $entityManager,
-        \App\Repository\UserModulePermissionRepository $permissionRepository
+        \App\Repository\UserModulePermissionRepository $permissionRepository,
+        TranslatorInterface $translator
     ) {
-        parent::__construct($entityManager, $permissionRepository);
+        parent::__construct($entityManager, $permissionRepository, $translator);
     }
 
     public static function getEntityFqcn(): string
@@ -35,16 +37,16 @@ class ModuleCrudController extends AbstractCrudController
 
     protected function getModuleName(): string
     {
-        return 'Module';
+        return $this->translator->trans('Module');
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->setPageTitle('index', 'System Modules')
-            ->setPageTitle('detail', fn ($entity) => sprintf('Module: %s', $entity->getName()))
-            ->setPageTitle('new', 'Create System Module')
-            ->setHelp('index', 'Manage system modules and their permissions.');
+            ->setPageTitle('index', $this->translator->trans('System Modules'))
+            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Module'), $entity->getName()))
+            ->setPageTitle('new', $this->translator->trans('Create System Module'))
+            ->setHelp('index', $this->translator->trans('Manage system modules and their permissions.'));
     }
 
     public function configureActions(Actions $actions): Actions
@@ -115,39 +117,39 @@ class ModuleCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name')
-                ->setHelp('Display name for the module'),
+                ->setHelp($this->translator->trans('Display name for the module')),
             TextField::new('code')
-                ->setHelp('Unique code that matches the entity name (e.g., User, Company, Module)')
-                ->setFormTypeOption('attr', ['placeholder' => 'e.g., User, Company, Module']),
+                ->setHelp($this->translator->trans('Unique code that matches the entity name (e.g., User, Company, Module)'))
+                ->setFormTypeOption('attr', ['placeholder' => $this->translator->trans('e.g., User, Company, Module')]),
             TextareaField::new('text')
-                ->setLabel('Description')
-                ->setHelp('Optional description of what this module manages'),
+                ->setLabel($this->translator->trans('Description'))
+                ->setHelp($this->translator->trans('Optional description of what this module manages')),
             AssociationField::new('userPermissions')
-                ->setLabel('User Permissions')
+                ->setLabel($this->translator->trans('User Permissions'))
                 ->hideOnForm()
                 ->formatValue(function ($value, $entity) {
                     if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
-                        return 'No permissions assigned';
+                        return $this->translator->trans('No permissions assigned');
                     }
                     
                     $count = $entity->getUserPermissions()->count();
-                    return sprintf('%d permission(s) assigned', $count);
+                    return sprintf($this->translator->trans('%d permission(s) assigned'), $count);
                 }),
-            AssociationField::new('userPermissions', 'Permission Details')
+            AssociationField::new('userPermissions', $this->translator->trans('Permission Details'))
                 ->hideOnForm()
                 ->hideOnIndex()
                 ->formatValue(function ($value, $entity) {
                     if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
-                        return 'No permissions assigned';
+                        return $this->translator->trans('No permissions assigned');
                     }
                     
                     $permissions = [];
                     foreach ($entity->getUserPermissions() as $permission) {
                         $user = $permission->getUser();
-                        $userEmail = $user ? $user->getEmail() : 'Unknown User';
+                        $userEmail = $user ? $user->getEmail() : $this->translator->trans('Unknown User');
                         $access = [];
-                        if ($permission->canRead()) $access[] = 'Read';
-                        if ($permission->canWrite()) $access[] = 'Write';
+                        if ($permission->canRead()) $access[] = $this->translator->trans('Read');
+                        if ($permission->canWrite()) $access[] = $this->translator->trans('Write');
                         $accessString = implode(', ', $access);
                         
                         $permissions[] = sprintf('%s: %s', $userEmail, $accessString);
@@ -161,16 +163,19 @@ class ModuleCrudController extends AbstractCrudController
 
     protected function canCreateEntity(): bool
     {
-        return $this->isAdmin();
+        $user = $this->getUser();
+        return $user instanceof \App\Entity\User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     protected function canEditEntity($entity): bool
     {
-        return $this->isAdmin();
+        $user = $this->getUser();
+        return $user instanceof \App\Entity\User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     protected function canDeleteEntity($entity): bool
     {
-        return $this->isAdmin();
+        $user = $this->getUser();
+        return $user instanceof \App\Entity\User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 }

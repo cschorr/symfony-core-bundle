@@ -12,14 +12,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CompanyCrudController extends AbstractCrudController
 {
     public function __construct(
         EntityManagerInterface $entityManager,
-        \App\Repository\UserModulePermissionRepository $permissionRepository
+        \App\Repository\UserModulePermissionRepository $permissionRepository,
+        TranslatorInterface $translator
     ) {
-        parent::__construct($entityManager, $permissionRepository);
+        parent::__construct($entityManager, $permissionRepository, $translator);
     }
 
     public static function getEntityFqcn(): string
@@ -34,7 +36,7 @@ class CompanyCrudController extends AbstractCrudController
 
     protected function getModuleName(): string
     {
-        return 'Unternehmen';
+        return $this->translator->trans('Company');
     }
 
     protected function hasPermissionManagement(): bool
@@ -115,16 +117,16 @@ class CompanyCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
-            TextField::new('nameExtension')->setLabel('Description'),
-            #AssociationField::new('companyGroup')->setLabel('Company Group'),
+            TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
+            #AssociationField::new('companyGroup')->setLabel($this->translator->trans('Company Group')),
             #TextField::new('street'),
             #TextField::new('zip'),
             #TextField::new('city'),
-            TextField::new('countryCode')->setLabel('Country Code'),
+            TextField::new('countryCode')->setLabel($this->translator->trans('Country Code')),
             #TextField::new('phone'),
-            #TextField::new('cell')->setLabel('Mobile'),
-            TextField::new('url')->setLabel('Website'),
-            AssociationField::new('employees')->setLabel('Employees'),
+            #TextField::new('cell')->setLabel($this->translator->trans('Mobile')),
+            TextField::new('url')->setLabel($this->translator->trans('Website')),
+            AssociationField::new('employees')->setLabel($this->translator->trans('Employees')),
             #AssociationField::new('projects'),
         ];
     }

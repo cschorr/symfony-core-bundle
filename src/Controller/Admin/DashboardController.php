@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use App\Entity\Module;
 use App\Entity\User;
@@ -18,6 +19,9 @@ use App\Entity\CompanyGroup;
 #[Route('/admin/{_locale}', name: 'admin', requirements: ['_locale' => 'en|fr|de'])]
 class DashboardController extends AbstractDashboardController
 {
+    public function __construct(private TranslatorInterface $translator)
+    {
+    }
     #[Route('/admin', name: 'admin_default')]
     public function adminDefault(): Response
     {
@@ -58,10 +62,10 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Module', 'fas fa-list', Module::class);
-        yield MenuItem::linkToCrud('Benutzer', 'fas fa-list', User::class);
-        yield MenuItem::linkToCrud('Unternehmen', 'fas fa-building', Company::class);
-        yield MenuItem::linkToCrud('Unternehmensgruppen', 'fas fa-users', CompanyGroup::class);
+        yield MenuItem::linkToDashboard($this->translator->trans('Dashboard'), 'fa fa-home');
+        yield MenuItem::linkToCrud($this->translator->trans('Module'), 'fas fa-list', Module::class);
+        yield MenuItem::linkToCrud($this->translator->trans('User'), 'fas fa-list', User::class);
+        yield MenuItem::linkToCrud($this->translator->trans('Company'), 'fas fa-building', Company::class);
+        yield MenuItem::linkToCrud($this->translator->trans('CompanyGroup'), 'fas fa-users', CompanyGroup::class);
     }
 }

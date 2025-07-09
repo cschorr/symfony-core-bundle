@@ -17,14 +17,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserCrudController extends AbstractCrudController
 {
     public function __construct(
         EntityManagerInterface $entityManager, 
-        \App\Repository\UserModulePermissionRepository $permissionRepository
+        \App\Repository\UserModulePermissionRepository $permissionRepository,
+        TranslatorInterface $translator
     ) {
-        parent::__construct($entityManager, $permissionRepository);
+        parent::__construct($entityManager, $permissionRepository, $translator);
     }
 
     public static function getEntityFqcn(): string
@@ -39,7 +41,7 @@ class UserCrudController extends AbstractCrudController
 
     protected function getModuleName(): string
     {
-        return 'Benutzer';
+        return $this->translator->trans('User');
     }
 
     protected function hasPermissionManagement(): bool
