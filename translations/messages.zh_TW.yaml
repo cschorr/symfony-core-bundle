@@ -4,6 +4,8 @@ Dashboard: 儀表板
 Home: 首頁
 Login: 登入
 Logout: 登出
+Sign in: 登入
+Please sign in: 請登入
 Welcome: 歡迎
 Search: 搜尋
 Filter: 篩選
@@ -88,7 +90,6 @@ Access denied: 拒絕存取
 'Access denied. You need write permission for the %module% module.': '拒絕存取。您需要 %module% 模組的寫入權限。'
 
 # Common phrases
-Please sign in: 請登入
 Remember me: 記住我
 Forgot password: 忘記密碼
 Required field: 必填欄位
