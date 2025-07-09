@@ -11,10 +11,31 @@
     height: 100%;
     }
 
+    .bg-body-tertiary {
+        position: relative;
+    }
+
+    .bg-body-tertiary::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('{{ image_placeholder_portrait }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.5;
+        z-index: -1;
+    }
+
     .form-signin {
     max-width: 40rem;
     /*padding: 1rem; */
     border: 1rem solid white;
+    position: relative;
+    z-index: 1;
     }
 
     .form-signin .form-floating:focus-within {
@@ -114,15 +135,26 @@
                         </button>
                     </form>
 
-                    <br>
-                    <small>
-                        <i>
-                            {{ 'Demo Credentials'|trans }}:<br>
-                            {{ 'Admin User'|trans }}: admin@example.com<br>
-                            {{ 'Regular User'|trans }}: demo@example.com<br>
-                            {{ 'Password'|trans }}: pass_1234
-                        </i>
-                    </small>
+                    <div class="demo-credentials mt-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                            <strong class="text-primary">{{ 'Demo Credentials'|trans }}</strong>
+                        </div>
+                        <div class="small text-muted">
+                            <div class="mb-1">
+                                <span class="badge bg-success me-2">{{ 'Admin User'|trans }}</span>
+                                <code class="text-dark">admin@example.com</code>
+                            </div>
+                            <div class="mb-1">
+                                <span class="badge bg-info me-2">{{ 'Regular User'|trans }}</span>
+                                <code class="text-dark">demo@example.com</code>
+                            </div>
+                            <div>
+                                <span class="badge bg-secondary me-2">{{ 'Password'|trans }}</span>
+                                <code class="text-dark">pass_1234</code>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
             </div>
