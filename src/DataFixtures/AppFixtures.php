@@ -52,10 +52,10 @@ class AppFixtures extends Fixture
         // each module representing one entity
         $modules = [
             // Add your module data here
-            ['name' => 'Benutzer', 'code' => 'User', 'text' => 'Benutzerverwaltung'],
-            ['name' => 'Unternehmen', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.'],
-            ['name' => 'Module', 'code' => 'Module', 'text' => 'System modules and configuration'],
-            ['name' => 'Unternehmensgruppen', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen'],
+            ['name' => 'Benutzer', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
+            ['name' => 'Unternehmen', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
+            ['name' => 'Module', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
+            ['name' => 'Unternehmensgruppen', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
         ];
 
         // Create and persist module entities here
@@ -64,6 +64,7 @@ class AppFixtures extends Fixture
             $module->setName($moduleData['name']);
             $module->setCode($moduleData['code']);
             $module->setText($moduleData['text']);
+            $module->setIcon($moduleData['icon']);
             $manager->persist($module);
         }
         $manager->flush();

@@ -84,6 +84,10 @@ class ModuleCrudController extends AbstractCrudController
             TextField::new('code')
                 ->setHelp($this->translator->trans('Unique code that matches the entity name (e.g., User, Company, Module)'))
                 ->setFormTypeOption('attr', ['placeholder' => $this->translator->trans('e.g., User, Company, Module')]),
+            TextField::new('icon')
+                ->setLabel($this->translator->trans('Icon'))
+                ->setHelp($this->translator->trans('FontAwesome icon class (e.g., fas fa-users, fas fa-building)'))
+                ->setFormTypeOption('attr', ['placeholder' => $this->translator->trans('e.g., fas fa-users, fas fa-building')]),
             TextareaField::new('text')
                 ->setLabel($this->translator->trans('Description'))
                 ->setHelp($this->translator->trans('Optional description of what this module manages')),

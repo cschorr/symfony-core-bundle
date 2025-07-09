@@ -17,6 +17,9 @@ class Module extends AbstractEntity
     use StringTextTrait;
     use StringCodeTrait;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $icon = null;
+
     /**
      * @var Collection<int, UserModulePermission>
      */
@@ -118,5 +121,16 @@ class Module extends AbstractEntity
             }
         }
         return false;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): static
+    {
+        $this->icon = $icon;
+        return $this;
     }
 }
