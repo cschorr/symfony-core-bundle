@@ -90,13 +90,8 @@ class DuplicateService
             return true;
         }
         
-        // Skip associations that are inverse side of a bidirectional relationship
-        if ($metadata->hasAssociation($property)) {
-            $associationMapping = $metadata->getAssociationMapping($property);
-            if (isset($associationMapping['mappedBy'])) {
-                return true; // Skip inverse side
-            }
-        }
+        // For duplication, we want to keep associations to pre-fill forms
+        // So we don't skip associations like we would for normal entity operations
         
         return false;
     }
@@ -106,12 +101,17 @@ class DuplicateService
      */
     private function processDuplicatedValue($value, string $property, object $originalEntity)
     {
-        // Handle collections - we'll keep references to existing entities
+        // Handle collections - copy the existing entities (don't create empty collection)
         if ($value instanceof \Doctrine\Common\Collections\Collection) {
-            // For now, we'll create a new empty collection
-            // In the future, you might want to duplicate related entities too
-            $collectionClass = get_class($value);
-            return new $collectionClass();
+            // Create a new ArrayCollection and copy all entities from the original collection
+            $newCollection = new \Doctrine\Common\Collections\ArrayCollection();
+            
+            // Copy all entities from the original collection
+            foreach ($value as $entity) {
+                $newCollection->add($entity);
+            }
+            
+            return $newCollection;
         }
         
         // Handle date objects - create new instances

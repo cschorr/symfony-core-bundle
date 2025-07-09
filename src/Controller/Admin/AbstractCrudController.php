@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Module;
 use App\Entity\User;
 use App\Service\PermissionService;
+use App\Service\DuplicateService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -12,6 +13,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController as EasyAdminAbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,15 +24,21 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     protected EntityManagerInterface $entityManager;
     protected TranslatorInterface $translator;
     protected PermissionService $permissionService;
+    protected DuplicateService $duplicateService;
+    protected RequestStack $requestStack;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
-        PermissionService $permissionService
+        PermissionService $permissionService,
+        DuplicateService $duplicateService,
+        RequestStack $requestStack
     ) {
         $this->entityManager = $entityManager;
         $this->translator = $translator;
         $this->permissionService = $permissionService;
+        $this->duplicateService = $duplicateService;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -74,15 +83,27 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function configureActions(Actions $actions): Actions
     {
+        // Create the duplicate action
+        $duplicateAction = Action::new('duplicate', $this->translator->trans('Duplicate'))
+            ->setIcon('fa fa-copy')
+            ->linkToCrudAction('duplicateAction')
+            ->setHtmlAttributes([
+                'title' => $this->translator->trans('Duplicate this record'),
+                'data-bs-toggle' => 'tooltip'
+            ]);
+
         $actions = $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_INDEX, $duplicateAction)
+            ->add(Crud::PAGE_DETAIL, $duplicateAction)
             ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action) => $action->setLabel($this->translator->trans('Show'))->setIcon('fa fa-eye'))
             ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action) => $action->setLabel($this->translator->trans('Edit'))->setIcon('fa fa-edit'))
             ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->setLabel($this->translator->trans('Delete'))->setIcon('fa fa-trash'))
             ->setPermission(Action::DETAIL, 'ROLE_USER')
             ->setPermission(Action::NEW, 'ROLE_USER')
             ->setPermission(Action::EDIT, 'ROLE_USER')
-            ->setPermission(Action::DELETE, 'ROLE_USER');
+            ->setPermission(Action::DELETE, 'ROLE_USER')
+            ->setPermission('duplicate', 'ROLE_USER');
         
         // Check permissions and disable actions accordingly
         if (!$this->isGranted('read', $this->getModule())) {
@@ -96,7 +117,8 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                 ->disable(Action::NEW)
                 ->disable(Action::EDIT)
                 ->disable(Action::DELETE)
-                ->disable(Action::BATCH_DELETE);
+                ->disable(Action::BATCH_DELETE)
+                ->disable('duplicate');
         }
 
         return $actions;
@@ -192,5 +214,94 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             $entityInstance,
             $this->getContext()
         );
+    }
+
+    /**
+     * Duplicate action for entities with permission check
+     */
+    public function duplicateAction(AdminContext $context): Response
+    {
+        // Check permissions manually
+        if (!$this->isGranted('write', $this->getModule())) {
+            throw $this->createAccessDeniedException();
+        }
+        
+        $entity = $context->getEntity()->getInstance();
+        
+        try {
+            // Create a duplicate entity (but don't persist it)
+            $duplicatedEntity = $this->duplicateService->duplicate($entity);
+            
+            // Store only the basic scalar data in the session
+            $session = $this->requestStack->getSession();
+            $sessionKey = 'duplicated_entity_' . static::class;
+            
+            // Use a simpler approach - just store the entity ID and duplicate it fresh when needed
+            $entityData = [
+                'original_id' => $entity->getId(),
+                'entity_class' => get_class($entity)
+            ];
+            
+            $session->set($sessionKey, $entityData);
+            
+            // Add info message
+            $this->addFlash('info', $this->translator->trans('Form pre-filled with duplicated values. Click "Save" to create the new record.'));
+            
+            // Redirect to the new page with a duplicate parameter
+            $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
+            $url = $adminUrlGenerator
+                ->setController(static::class)
+                ->setAction(Action::NEW)
+                ->set('duplicate', '1')
+                ->generateUrl();
+            
+            return $this->redirect($url);
+            
+        } catch (\Exception $e) {
+            // Add error message
+            $this->addFlash('danger', $this->translator->trans('Error duplicating entity: ') . $e->getMessage());
+            
+            // Redirect back to the index page
+            $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
+            $url = $adminUrlGenerator
+                ->setController(static::class)
+                ->setAction(Action::INDEX)
+                ->generateUrl();
+            
+            return $this->redirect($url);
+        }
+    }
+
+    /**
+     * Override createEntity to handle pre-filled duplicated entities
+     */
+    public function createEntity(string $entityFqcn)
+    {
+        // Check if this is a duplicate request
+        $request = $this->requestStack->getCurrentRequest();
+        $isDuplicate = $request && $request->query->get('duplicate') === '1';
+        
+        if ($isDuplicate) {
+            $sessionKey = 'duplicated_entity_' . static::class;
+            $session = $this->requestStack->getSession();
+            $entityData = $session->get($sessionKey);
+            
+            if ($entityData && isset($entityData['original_id'], $entityData['entity_class'])) {
+                // Remove from session to prevent reuse
+                $session->remove($sessionKey);
+                
+                // Find the original entity by ID
+                $originalEntity = $this->entityManager->find($entityData['entity_class'], $entityData['original_id']);
+                
+                if ($originalEntity) {
+                    // Use DuplicateService to create a fresh duplicate
+                    $duplicatedEntity = $this->duplicateService->duplicate($originalEntity);
+                    return $duplicatedEntity;
+                }
+            }
+        }
+        
+        // Default behavior - create new entity
+        return new $entityFqcn();
     }
 }

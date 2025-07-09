@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Service\PermissionService;
+use App\Service\DuplicateService;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -18,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,9 +28,11 @@ class UserCrudController extends AbstractCrudController
     public function __construct(
         EntityManagerInterface $entityManager, 
         TranslatorInterface $translator,
-        PermissionService $permissionService
+        PermissionService $permissionService,
+        DuplicateService $duplicateService,
+        RequestStack $requestStack
     ) {
-        parent::__construct($entityManager, $translator, $permissionService);
+        parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
 
     public static function getEntityFqcn(): string
@@ -68,6 +72,32 @@ class UserCrudController extends AbstractCrudController
     public function new(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::new($context);
+    }
+
+    /**
+     * Override createEntity to provide duplicated entity when needed
+     */
+    public function createEntity(string $entityFqcn)
+    {
+        // Check if this is a duplicate request and we have a duplicated entity in the session
+        $request = $this->requestStack->getCurrentRequest();
+        $isDuplicate = $request && $request->query->get('duplicate') === '1';
+        
+        if ($isDuplicate) {
+            $sessionKey = 'duplicated_entity_' . static::class;
+            $session = $this->requestStack->getSession();
+            $duplicatedEntity = $session->get($sessionKey);
+            
+            if ($duplicatedEntity) {
+                // Remove from session to prevent reuse
+                $session->remove($sessionKey);
+                
+                return $duplicatedEntity;
+            }
+        }
+        
+        // Default behavior - create new entity
+        return new $entityFqcn();
     }
 
     #[IsGranted('write', subject: 'User')]
