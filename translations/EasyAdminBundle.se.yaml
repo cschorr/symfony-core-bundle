@@ -1,0 +1,61 @@
+# Swedish EasyAdmin translations
+action:
+  back_to_list: Tillbaka till lista
+  save_and_continue: Spara och fortsätt
+  save_and_return: Spara och tillbaka
+  save_and_add_another: Spara och lägg till ny
+  delete: Radera
+  edit: Redigera
+  show: Visa
+  search: Sök
+  cancel: Avbryt
+  close: Stäng
+  create: Skapa
+  save: Spara
+  update: Uppdatera
+
+page_title:
+  index: '%entity_label_plural% lista'
+  detail: '%entity_label%'
+  edit: 'Redigera %entity_label%'
+  new: 'Ny %entity_label%'
+  exception: Fel
+
+button:
+  save: Spara
+  save_and_continue: Spara och fortsätt
+  save_and_return: Spara och tillbaka
+  save_and_add_another: Spara och lägg till ny
+  delete: Radera
+  cancel: Avbryt
+  edit: Redigera
+  show: Visa
+
+batch_action_modal:
+  title: Redigera valda objekt
+  content: Är du säker på att du vill utföra denna åtgärd?
+  action: Utför
+
+delete_modal:
+  title: Radera objekt
+  content: Är du säker på att du vill radera detta objekt?
+
+filter:
+  title: Filter
+  button.clear: Rensa
+  button.apply: Tillämpa
+  label.is_equal_to: är lika med
+  label.is_not_equal_to: är inte lika med
+  label.is_greater_than: är större än
+  label.is_greater_than_or_equal_to: är större än eller lika med
+  label.is_less_than: är mindre än
+  label.is_less_than_or_equal_to: är mindre än eller lika med
+
+form:
+  are_you_sure: Är du säker?
+
+user:
+  logged_in_as: Inloggad som
+  unnamed: Namnlös
+  anonymous: Anonym
+  sign_out: Logga ut
