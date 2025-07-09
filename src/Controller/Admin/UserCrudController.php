@@ -123,11 +123,13 @@ class UserCrudController extends AbstractCrudController
                 ])
                 ->allowMultipleChoices()
                 ->renderExpanded(false);
-            $fields[] = BooleanField::new('active');
             $fields[] = TextareaField::new('notes');
             $fields[] = AssociationField::new('company')
                 ->autocomplete();
             $fields[] = AssociationField::new('projects');
+
+            // Add active field using the helper method
+            $fields = $this->addActiveField($fields, $pageName);
 
             // Add permission tab (handled by abstract controller)
             $fields = $this->addPermissionTabToFields($fields);
@@ -142,10 +144,12 @@ class UserCrudController extends AbstractCrudController
                 ])
                 ->allowMultipleChoices()
                 ->renderExpanded(false);
-            $fields[] = BooleanField::new('active');
             $fields[] = TextareaField::new('notes');
             $fields[] = AssociationField::new('company');
             $fields[] = AssociationField::new('projects');
+            
+            // Add active field using the helper method
+            $fields = $this->addActiveField($fields, $pageName);
             
             // Add permission summary (handled by abstract controller)
             $fields = $this->addPermissionSummaryField($fields);
@@ -162,11 +166,11 @@ class UserCrudController extends AbstractCrudController
                 ->renderExpanded(false);
             $fields[] = AssociationField::new('company');
             
-            // Add active field using the helper method
-            $fields = $this->addActiveField($fields);
-            
             // Add permission summary (handled by abstract controller)
             $fields = $this->addPermissionSummaryField($fields);
+            
+            // Add active field as the last field using the helper method
+            $fields = $this->addActiveField($fields, $pageName);
         }
 
         return $fields;
