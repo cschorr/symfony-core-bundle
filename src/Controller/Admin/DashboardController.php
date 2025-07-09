@@ -138,7 +138,7 @@ class DashboardController extends AbstractDashboardController
             if (isset($entityMapping[$moduleCode])) {
                 $entityClass = $entityMapping[$moduleCode];
                 $icon = $this->navigationService->getModuleIcon($module);
-                $label = $this->translator->trans($module->getName());
+                $label = $this->translator->trans($moduleCode);
                 
                 yield MenuItem::linkToCrud($label, $icon, $entityClass);
             }
