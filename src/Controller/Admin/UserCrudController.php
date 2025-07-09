@@ -102,7 +102,11 @@ class UserCrudController extends AbstractCrudController
                 ->renderExpanded(false);
             $fields[] = BooleanField::new('active');
             $fields[] = TextareaField::new('notes');
-            $fields[] = AssociationField::new('company');
+            $fields[] = AssociationField::new('company')
+                ->setFormTypeOptions([
+                    'by_reference' => false, // Important for bidirectional relationships
+                ])
+                ->autocomplete();
             $fields[] = AssociationField::new('projects');
 
             // Add permission tab (handled by abstract controller)
@@ -145,5 +149,39 @@ class UserCrudController extends AbstractCrudController
         }
 
         return $fields;
+    }
+
+    /**
+     * Override to handle bidirectional company relationship
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        /** @var User $entityInstance */
+        $this->syncCompanyRelationship($entityInstance);
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+
+    /**
+     * Override to handle bidirectional company relationship  
+     */
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        /** @var User $entityInstance */
+        $this->syncCompanyRelationship($entityInstance);
+        parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    /**
+     * Sync the bidirectional relationship between User and Company
+     */
+    private function syncCompanyRelationship(User $user): void
+    {
+        // If user has a company, make sure the company's employees collection includes this user
+        if ($user->getCompany()) {
+            $company = $user->getCompany();
+            if (!$company->getEmployees()->contains($user)) {
+                $company->addEmployee($user);
+            }
+        }
     }
 }
