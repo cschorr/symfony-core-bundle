@@ -1,0 +1,87 @@
+# German translations for the application
+# Basic UI elements
+Dashboard: Dashboard
+Home: Startseite
+Login: Anmelden
+Logout: Abmelden
+Welcome: Willkommen
+Search: Suchen
+Filter: Filter
+Save: Speichern
+Cancel: Abbrechen
+Delete: Löschen
+Edit: Bearbeiten
+Create: Erstellen
+Show: Anzeigen
+Back: Zurück
+Yes: Ja
+No: Nein
+
+# Form elements
+Name: Name
+Description: Beschreibung
+Email: E-Mail
+Password: Passwort
+Phone: Telefon
+Address: Adresse
+City: Stadt
+Country: Land
+Website: Webseite
+Active: Aktiv
+
+# CRUD operations
+New: Neu
+Add: Hinzufügen
+Update: Aktualisieren
+Remove: Entfernen
+View: Ansehen
+List: Liste
+Details: Details
+
+# Entity names
+User: Benutzer
+Users: Benutzer
+Company: Unternehmen
+Companies: Unternehmen
+Module: Modul
+Modules: Module
+Group: Gruppe
+Groups: Gruppen
+
+# Permissions
+Permissions: Berechtigungen
+Read: Lesen
+Write: Schreiben
+Access: Zugriff
+Permission: Berechtigung
+
+# Status messages
+Created successfully: Erfolgreich erstellt
+Updated successfully: Erfolgreich aktualisiert
+Deleted successfully: Erfolgreich gelöscht
+Error occurred: Ein Fehler ist aufgetreten
+Invalid data: Ungültige Daten
+Access denied: Zugriff verweigert
+
+# Common phrases
+Please sign in: Bitte melden Sie sich an
+Remember me: Angemeldet bleiben
+Forgot password: Passwort vergessen
+Required field: Pflichtfeld
+Optional: Optional
+Select an option: Option auswählen
+No results found: Keine Ergebnisse gefunden
+
+# Navigation
+Previous: Vorherige
+Next: Nächste
+First: Erste
+Last: Letzte
+Page: Seite
+Items per page: Elemente pro Seite
+
+# Dates and time
+Date: Datum
+Time: Zeit
+Created at: Erstellt am
+Updated at: Aktualisiert am
