@@ -53,7 +53,7 @@ class AppFixtures extends Fixture
     {
         // Modules in navigation order - they will be sorted by ID (UUID) in ascending order
         $modules = [
-            ['name' => 'Module', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
+            ['name' => 'Modules', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
             ['name' => 'Benutzer', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
             ['name' => 'Unternehmen', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
             ['name' => 'Unternehmensgruppen', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
@@ -118,7 +118,7 @@ class AppFixtures extends Fixture
         // Example company data
         $companies = [
             ['name' => 'Example Company', 'email' => 'info@example.com'],
-            ['name' => 'Demo Company', 'email' => 'info@demo.com'],
+            ['name' => 'Demo Client', 'email' => 'info@demo.com'],
         ];
 
         // Create and persist company entities here
