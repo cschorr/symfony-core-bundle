@@ -37,6 +37,7 @@ Remove: Supprimer
 View: Voir
 List: Liste
 Details: Détails
+Management: Gestion
 
 # Entity names
 User: Utilisateur
@@ -49,6 +50,7 @@ Group: Groupe
 Groups: Groupes
 CompanyGroup: Groupe d'entreprises
 CompanyGroups: Groupes d'entreprises
+Roles: Rôles
 
 # Management pages
 '%s Management': 'Gestion %s'

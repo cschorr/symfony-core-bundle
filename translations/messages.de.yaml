@@ -50,6 +50,7 @@ Group: Gruppe
 Groups: Gruppen
 CompanyGroup: Unternehmensgruppe
 CompanyGroups: Unternehmensgruppen
+Roles: Rollen
 
 # Management pages
 '%s Management': '%s Verwaltung'

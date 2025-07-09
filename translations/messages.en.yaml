@@ -37,6 +37,7 @@ Remove: Remove
 View: View
 List: List
 Details: Details
+Management: Management
 
 # Entity names
 User: User
@@ -49,6 +50,7 @@ Group: Group
 Groups: Groups
 CompanyGroup: Company Group
 CompanyGroups: Company Groups
+Roles: Roles
 
 # Management pages
 '%s Management': '%s Management'
