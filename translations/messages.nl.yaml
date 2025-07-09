@@ -1,6 +1,7 @@
 # Dutch translations
 Dashboard: Dashboard
 Module: Module
+Modules: Modules
 User: Gebruiker
 Company: Bedrijf
 CompanyGroup: Bedrijfsgroep
@@ -17,7 +18,6 @@ Postal Code: Postcode
 City: Stad
 Country: Land
 Company Group: Bedrijfsgroep
-Modules: Modules
 Permissions: Machtigingen
 Module Permissions: Module Machtigingen
 No permissions: Geen machtigingen

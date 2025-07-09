@@ -1,6 +1,7 @@
 # Italian translations
 Dashboard: Dashboard
 Module: Modulo
+Modules: Moduli
 User: Utente
 Company: Azienda
 CompanyGroup: Gruppo Aziendale
@@ -17,7 +18,6 @@ Postal Code: Codice Postale
 City: Città
 Country: Paese
 Company Group: Gruppo Aziendale
-Modules: Moduli
 Permissions: Permessi
 Module Permissions: Permessi Modulo
 No permissions: Nessun permesso

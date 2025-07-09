@@ -1,6 +1,7 @@
 # Swedish translations
 Dashboard: Dashboard
 Module: Modul
+Modules: Moduler
 User: Användare
 Company: Företag
 CompanyGroup: Företagsgrupp
@@ -17,7 +18,6 @@ Postal Code: Postnummer
 City: Stad
 Country: Land
 Company Group: Företagsgrupp
-Modules: Moduler
 Permissions: Behörigheter
 Module Permissions: Modulbehörigheter
 No permissions: Inga behörigheter

@@ -1,6 +1,7 @@
 # Spanish translations
 Dashboard: Panel de Control
 Module: Módulo
+Modules: Módulos
 User: Usuario
 Company: Empresa
 CompanyGroup: Grupo de Empresas
@@ -17,7 +18,6 @@ Postal Code: Código Postal
 City: Ciudad
 Country: País
 Company Group: Grupo de Empresas
-Modules: Módulos
 Permissions: Permisos
 Module Permissions: Permisos de Módulo
 No permissions: Sin permisos
