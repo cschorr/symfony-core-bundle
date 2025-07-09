@@ -9,7 +9,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController as EasyAdminAbstractCrudController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractCrudController extends EasyAdminAbstractCrudController
@@ -76,7 +80,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function configureActions(Actions $actions): Actions
     {
-        return $actions
+        $actions = $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action) => $action->setLabel($this->translator->trans('Show'))->setIcon('fa fa-eye'))
             ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action) => $action->setLabel($this->translator->trans('Edit'))->setIcon('fa fa-edit'))
@@ -85,6 +89,23 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->setPermission(Action::NEW, 'ROLE_USER')
             ->setPermission(Action::EDIT, 'ROLE_USER')
             ->setPermission(Action::DELETE, 'ROLE_USER');
+        
+        // Check permissions and disable actions accordingly
+        if (!$this->isGranted('read', $this->getModule())) {
+            $actions
+                ->disable(Action::INDEX)
+                ->disable(Action::DETAIL);
+        }
+
+        if (!$this->isGranted('write', $this->getModule())) {
+            $actions
+                ->disable(Action::NEW)
+                ->disable(Action::EDIT)
+                ->disable(Action::DELETE)
+                ->disable(Action::BATCH_DELETE);
+        }
+
+        return $actions;
     }
 
     /**

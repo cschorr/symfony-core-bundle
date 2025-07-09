@@ -51,55 +51,32 @@ class ModuleCrudController extends AbstractCrudController
             ->setHelp('index', $this->translator->trans('Manage system modules and their permissions.'));
     }
 
-    public function configureActions(Actions $actions): Actions
-    {
-        // Start with parent configuration
-        $actions = parent::configureActions($actions);
-        
-        // Check permissions and disable actions accordingly
-        if (!$this->isGranted('read', $this->getModule())) {
-            $actions
-                ->disable(Action::INDEX)
-                ->disable(Action::DETAIL);
-        }
-
-        if (!$this->isGranted('write', $this->getModule())) {
-            $actions
-                ->disable(Action::NEW)
-                ->disable(Action::EDIT)
-                ->disable(Action::DELETE)
-                ->disable(Action::BATCH_DELETE);
-        }
-
-        return $actions;
-    }
-
-    #[IsGranted('read', subject: 'moduleCode')]
-    public function index(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
+    #[IsGranted('read', subject: 'Module')]
+    public function index(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::index($context);
     }
 
-    #[IsGranted('read', subject: 'moduleCode')]
-    public function detail(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
+    #[IsGranted('read', subject: 'Module')]
+    public function detail(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
-    #[IsGranted('write', subject: 'moduleCode')]
-    public function new(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
+    #[IsGranted('write', subject: 'Module')]
+    public function new(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::new($context);
     }
 
-    #[IsGranted('write', subject: 'moduleCode')]
-    public function edit(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
+    #[IsGranted('write', subject: 'Module')]
+    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::edit($context);
     }
 
-    #[IsGranted('write', subject: 'moduleCode')]
-    public function delete(AdminContext $context, string $moduleCode = 'Module'): KeyValueStore|Response
+    #[IsGranted('write', subject: 'Module')]
+    public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::delete($context);
     }

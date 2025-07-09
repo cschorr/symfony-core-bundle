@@ -26,7 +26,7 @@ class ModuleVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        // Support both Module entities and module names (strings)
+        // Support both Module entities and module codes/names (strings)
         return in_array($attribute, [self::READ, self::WRITE, self::EDIT, self::DELETE])
             && ($subject instanceof Module || is_string($subject));
     }
@@ -48,9 +48,16 @@ class ModuleVoter extends Voter
         // Get the module
         $module = $subject;
         if (is_string($subject)) {
+            // First try to find by code, then by name for backward compatibility
             $module = $this->permissionRepository->getEntityManager()
                 ->getRepository(Module::class)
-                ->findOneBy(['name' => $subject]);
+                ->findOneBy(['code' => $subject]);
+            
+            if (!$module) {
+                $module = $this->permissionRepository->getEntityManager()
+                    ->getRepository(Module::class)
+                    ->findOneBy(['name' => $subject]);
+            }
         }
 
         if (!$module instanceof Module) {
