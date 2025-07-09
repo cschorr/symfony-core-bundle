@@ -2,21 +2,21 @@
 
 namespace App\Command;
 
+use App\Service\LocaleService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[AsCommand(
     name: 'app:locale:check',
-    description: 'Check locale configuration synchronization between services.yaml and EasyAdmin'
+    description: 'Check locale configuration synchronization'
 )]
 class LocaleCheckCommand extends Command
 {
     public function __construct(
-        private ParameterBagInterface $parameterBag
+        private LocaleService $localeService
     ) {
         parent::__construct();
     }
@@ -24,8 +24,8 @@ class LocaleCheckCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
-        $appLocales = $this->parameterBag->get('app.locales');
+        
+        $appLocales = $this->localeService->getSupportedLocales();
         
         $io->title('Locale Configuration Check');
         
@@ -34,7 +34,7 @@ class LocaleCheckCommand extends Command
         
         $io->section('EasyAdmin Locale Mapping');
         foreach ($appLocales as $locale) {
-            $displayName = $this->getLocaleDisplayName($locale);
+            $displayName = $this->localeService->getLocaleDisplayName($locale);
             $io->text("• <info>$locale</info> → $displayName");
         }
         
@@ -58,16 +58,5 @@ class LocaleCheckCommand extends Command
         $io->success('Locale configuration check completed!');
         
         return Command::SUCCESS;
-    }
-    
-    private function getLocaleDisplayName(string $locale): string
-    {
-        return match ($locale) {
-            'en' => '🇺🇸 English',
-            'fr' => '🇫🇷 Français',
-            'de' => '🇩🇪 Deutsch',
-            'zh_TW' => '🇹🇼 繁體中文',
-            default => strtoupper($locale)
-        };
     }
 }

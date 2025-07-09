@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use App\Service\LocaleService;
 
 use App\Entity\Module;
 use App\Entity\User;
@@ -17,12 +19,11 @@ use App\Entity\Company;
 use App\Entity\CompanyGroup;
 
 #[AdminDashboard(routePath: '/admin/{_locale}', routeName: 'admin')]
-#[Route('/admin/{_locale}', name: 'admin', requirements: ['_locale' => 'en|fr|de|zh_TW'])]
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private ParameterBagInterface $parameterBag
+        private LocaleService $localeService
     ) {
     }
 
@@ -33,6 +34,7 @@ class DashboardController extends AbstractDashboardController
         return $this->redirectToRoute('admin', ['_locale' => 'en']);
     }
 
+    #[Route('/admin/{_locale}', name: 'admin', requirements: ['_locale' => '%app.locales.pattern%'])]
     public function index(): Response
     {
         #return parent::index();
@@ -64,54 +66,44 @@ class DashboardController extends AbstractDashboardController
      * Locales are automatically synchronized with services.yaml app.locales parameter.
      * To add/remove locales:
      * 1. Update the app.locales parameter in config/services.yaml
-     * 2. Add corresponding display name in getLocaleDisplayName() method
-     * 3. Create translation files: messages.{locale}.yaml and EasyAdminBundle.{locale}.yaml
-     * 4. Clear cache: bin/console cache:clear
-     * 5. Check synchronization: bin/console app:locale:check
+     * 2. Run: bin/console app:locale:sync
+     * 3. Add corresponding display name in LocaleService::getLocaleDisplayName() method
+     * 4. Create translation files: messages.{locale}.yaml and EasyAdminBundle.{locale}.yaml
+     * 5. Clear cache: bin/console cache:clear
+     * 6. Check synchronization: bin/console app:locale:check
      */
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
             ->setTitle('kickstarter')
-            ->setLocales($this->getEasyAdminLocales());
+            ->setLocales($this->localeService->getEasyAdminLocales());
     }
 
     /**
      * Generate EasyAdmin locale configuration from services.yaml app.locales parameter
+     * @deprecated Use LocaleService::getEasyAdminLocales() instead
      */
     private function getEasyAdminLocales(): array
     {
-        $appLocales = $this->parameterBag->get('app.locales');
-        $localeMap = [];
-
-        foreach ($appLocales as $locale) {
-            $localeMap[$locale] = $this->getLocaleDisplayName($locale);
-        }
-
-        return $localeMap;
+        return $this->localeService->getEasyAdminLocales();
     }
 
     /**
      * Get display name and flag for locale
+     * @deprecated Use LocaleService::getLocaleDisplayName() instead
      */
     private function getLocaleDisplayName(string $locale): string
     {
-        return match ($locale) {
-            'en' => '🇺🇸 English',
-            'fr' => '🇫🇷 Français',
-            'de' => '🇩🇪 Deutsch',
-            'zh_TW' => '🇹🇼 繁體中文',
-            default => strtoupper($locale)
-        };
+        return $this->localeService->getLocaleDisplayName($locale);
     }
 
     /**
      * Get route requirements pattern for locales
+     * @deprecated Use LocaleService::getLocaleRoutePattern() instead
      */
     private function getLocaleRoutePattern(): string
     {
-        $appLocales = $this->parameterBag->get('app.locales');
-        return implode('|', $appLocales);
+        return $this->localeService->getLocaleRoutePattern();
     }
 
     public function configureMenuItems(): iterable
