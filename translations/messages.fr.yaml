@@ -64,6 +64,7 @@ Roles: Rôles
 Employees: Employés
 'User Permissions': Permissions utilisateur
 'Module Permissions': Permissions de module
+'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 permission attribuée|]1,Inf[ %count% permissions attribuées'
 Mobile: Mobile
 Street: Rue
 ZIP: Code postal

@@ -16,6 +16,9 @@ Country: Land
 Company Group: Företagsgrupp
 Modules: Moduler
 Permissions: Behörigheter
+Module Permissions: Modulbehörigheter
+No permissions: Inga behörigheter
+'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 behörighet tilldelad|]1,Inf[ %count% behörigheter tilldelade'
 Active: Aktiv
 Created At: Skapad
 Updated At: Uppdaterad

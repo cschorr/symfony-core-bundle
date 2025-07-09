@@ -16,6 +16,9 @@ Country: Land
 Company Group: Bedrijfsgroep
 Modules: Modules
 Permissions: Machtigingen
+Module Permissions: Module Machtigingen
+No permissions: Geen machtigingen
+'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 machtiging toegewezen|]1,Inf[ %count% machtigingen toegewezen'
 Active: Actief
 Created At: Gemaakt op
 Updated At: Bijgewerkt op

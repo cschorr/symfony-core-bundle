@@ -1,0 +1,31 @@
+# Spanish translations
+Dashboard: Panel de Control
+Module: Módulo
+User: Usuario
+Company: Empresa
+CompanyGroup: Grupo de Empresas
+Name: Nombre
+Email: Correo Electrónico
+Roles: Roles
+Description: Descripción
+Address: Dirección
+Street: Calle
+Postal Code: Código Postal
+City: Ciudad
+Country: País
+Company Group: Grupo de Empresas
+Modules: Módulos
+Permissions: Permisos
+Module Permissions: Permisos de Módulo
+No permissions: Sin permisos
+'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 permiso asignado|]1,Inf[ %count% permisos asignados'
+Active: Activo
+Created At: Creado el
+Updated At: Actualizado el
+ID: ID
+Save: Guardar
+Cancel: Cancelar
+Edit: Editar
+Delete: Eliminar
+Search: Buscar
+Actions: Acciones

@@ -243,16 +243,10 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                     return '<div style="text-align: right;">' . $this->translator->trans('No permissions') . '</div>';
                 }
                 
-                $permissions = [];
-                foreach ($entity->getModulePermissions() as $permission) {
-                    $module = $permission->getModule() ? $permission->getModule()->getName() : $this->translator->trans('Unknown');
-                    $access = [];
-                    if ($permission->canRead()) $access[] = 'R';
-                    if ($permission->canWrite()) $access[] = 'W';
-                    $permissions[] = $module . ' (' . implode(',', $access) . ')';
-                }
+                $count = $entity->getModulePermissions()->count();
+                $permissionText = $this->translator->trans('{1} 1 permission assigned|]1,Inf[ %count% permissions assigned', ['%count%' => $count]);
                 
-                return '<div style="text-align: right;">' . implode('<br>', $permissions) . '</div>';
+                return '<div style="text-align: right;">' . $permissionText . '</div>';
             })
             ->renderAsHtml()
             ->addCssClass('text-end'); // Bootstrap class for right alignment

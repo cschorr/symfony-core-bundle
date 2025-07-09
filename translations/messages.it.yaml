@@ -16,6 +16,9 @@ Country: Paese
 Company Group: Gruppo Aziendale
 Modules: Moduli
 Permissions: Permessi
+Module Permissions: Permessi Modulo
+No permissions: Nessun permesso
+'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 permesso assegnato|]1,Inf[ %count% permessi assegnati'
 Active: Attivo
 Created At: Creato il
 Updated At: Aggiornato il

@@ -104,6 +104,7 @@ No results found: Keine Ergebnisse gefunden
 'Optional description of what this module manages': Optionale Beschreibung, was dieses Modul verwaltet
 'No permissions assigned': Keine Berechtigungen zugewiesen
 '%d permission(s) assigned': '%d Berechtigung(en) zugewiesen'
+'{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 1 Berechtigung zugewiesen|]1,Inf[ %count% Berechtigungen zugewiesen'
 'Permission Details': Berechtigungsdetails
 'Unknown User': Unbekannter Benutzer
 'User Information': Benutzerinformationen
