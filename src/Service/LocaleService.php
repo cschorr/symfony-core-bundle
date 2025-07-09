@@ -54,6 +54,7 @@ class LocaleService
             'se' => '🇸🇪 Svenska',
             'zh_TW' => '🇹🇼 繁體中文',
             'it' => '🇮🇹 Italiano',
+            'es' => '🇪🇸 Español',
             default => strtoupper($locale)
         };
     }
