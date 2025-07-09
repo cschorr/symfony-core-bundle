@@ -1,0 +1,9 @@
+{% if value %}
+    <span class="badge badge-{{ field.customOptions.true_color ?? 'success' }}">
+        <i class="fas fa-check"></i> {{ field.customOptions.true_label ?? 'Yes' }}
+    </span>
+{% else %}
+    <span class="badge badge-{{ field.customOptions.false_color ?? 'danger' }}">
+        <i class="fas fa-times"></i> {{ field.customOptions.false_label ?? 'No' }}
+    </span>
+{% endif %}

@@ -160,8 +160,10 @@ class UserCrudController extends AbstractCrudController
                 ])
                 ->allowMultipleChoices()
                 ->renderExpanded(false);
-            $fields[] = BooleanField::new('active');
             $fields[] = AssociationField::new('company');
+            
+            // Add active field using the helper method
+            $fields = $this->addActiveField($fields);
             
             // Add permission summary (handled by abstract controller)
             $fields = $this->addPermissionSummaryField($fields);

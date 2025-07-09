@@ -77,7 +77,7 @@ class ModuleCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
+        $fields = [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name')
                 ->setHelp($this->translator->trans('Display name for the module')),
@@ -122,6 +122,13 @@ class ModuleCrudController extends AbstractCrudController
                 })
                 ->renderAsHtml(),
         ];
+
+        // Add active field for index page
+        if ($pageName === Crud::PAGE_INDEX) {
+            $fields = $this->addActiveField($fields);
+        }
+
+        return $fields;
     }
 
     protected function canCreateEntity(): bool

@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController as EasyAdminAbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -122,6 +123,17 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         }
 
         return $actions;
+    }
+
+    /**
+     * Add active field to index pages with EasyAdmin's native boolean display
+     */
+    protected function addActiveField(array $fields): array
+    {
+        $fields[] = BooleanField::new('active', $this->translator->trans('Active'))
+            ->onlyOnIndex();
+        
+        return $fields;
     }
 
     /**
