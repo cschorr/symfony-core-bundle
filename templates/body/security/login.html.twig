@@ -129,7 +129,7 @@
                 <div class="h-100 w-75 d-flex flex-column justify-content-center">
 
                     {# form #}
-                    <form method="post">
+                    <form method="post" action="{{ path('app_login', {'_locale': app.request.locale}) }}">
                         {% if error %}
                             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                         {% endif %}
@@ -169,15 +169,11 @@
                 </div>
             </div>
         </div>
-
-        <div class="text-center mt-2">
-            {{ 'supported by'|trans }} <a href="https://c3net.de" target="_blank">c3:net</a>
-        </div>
     </div>
 
     <!-- c3net Logo UNDERNEATH the existing card -->
     <div class="text-center mt-4">
-        <svg width="122" height="21" viewBox="0 0 122 21" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" style="max-height: 100px; width: auto; transform: scale(1.25);">
+        <svg width="122" height="21" viewBox="0 0 122 21" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" style="max-height: 100px; width: auto; transform: scale(1.33);">
             <clipPath id="a">
                 <path d="M0 0h121.78v20.93H0z"/>
             </clipPath>

@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\UserModulePermissionRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class ModuleVoter extends Voter
@@ -30,7 +31,7 @@ class ModuleVoter extends Voter
             && ($subject instanceof Module || is_string($subject));
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
         
