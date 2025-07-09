@@ -32,6 +32,11 @@ class UserCrudController extends AbstractCrudController
         return User::class;
     }
 
+    protected function getModuleCode(): string
+    {
+        return 'User';
+    }
+
     protected function getModuleName(): string
     {
         return 'Benutzer';

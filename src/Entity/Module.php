@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Entity\Traits\Single\StringTextTrait;
+use App\Entity\Traits\Single\StringCodeTrait;
 use App\Repository\ModuleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,6 +15,7 @@ class Module extends AbstractEntity
 {
     use StringNameTrait;
     use StringTextTrait;
+    use StringCodeTrait;
 
     /**
      * @var Collection<int, UserModulePermission>

@@ -29,6 +29,11 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
+     * Get the module code that corresponds to the entity name
+     */
+    abstract protected function getModuleCode(): string;
+    
+    /**
      * Get the module name associated with this CRUD controller
      * Must be implemented by each concrete controller
      */
@@ -40,11 +45,11 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     protected function getModule(): Module
     {
         $module = $this->entityManager->getRepository(Module::class)
-            ->findOneBy(['name' => $this->getModuleName()]);
+            ->findOneBy(['code' => $this->getModuleCode()]);
             
         if (!$module) {
             throw new \RuntimeException(
-                sprintf('Module "%s" not found. Please run fixtures.', $this->getModuleName())
+                sprintf('Module with code "%s" not found. Please run fixtures.', $this->getModuleCode())
             );
         }
         
