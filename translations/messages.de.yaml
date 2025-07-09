@@ -16,8 +16,8 @@ Logout: "Abmelden"
 
 # Entity Names
 Company: "Unternehmen"
-CompanyGroup: "Unternehmensgruppe"
-Module: "Modul"
+CompanyGroup: "Unternehmensgruppen"
+Module: "Module"
 Modules: "Module"
 User: "Benutzer"
 

@@ -15,11 +15,11 @@ Logout: "Logout"
 "Placeholder image": "Placeholder image"
 
 # Entity Names
-Company: "Company"
-CompanyGroup: "Company Group"
-Module: "Module"
+Company: "Companies"
+CompanyGroup: "Company Groups"
+Module: "Modules"
 Modules: "Modules"
-User: "User"
+User: "Users"
 
 # General UI
 Dashboard: "Dashboard"
