@@ -257,7 +257,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->formatValue(function ($value, $entity) {
                 if (!$entity || !method_exists($entity, 'getModulePermissions') || 
                     !$entity->getModulePermissions() || $entity->getModulePermissions()->isEmpty()) {
-                    return 'No permissions';
+                    return '<div style="text-align: right;">No permissions</div>';
                 }
                 
                 $permissions = [];
@@ -269,9 +269,10 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                     $permissions[] = $module . ' (' . implode(',', $access) . ')';
                 }
                 
-                return implode('<br>', $permissions);
+                return '<div style="text-align: right;">' . implode('<br>', $permissions) . '</div>';
             })
-            ->renderAsHtml();
+            ->renderAsHtml()
+            ->addCssClass('text-end'); // Bootstrap class for right alignment
 
         return $fields;
     }
