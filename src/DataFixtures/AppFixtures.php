@@ -8,6 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 use App\Entity\Module;
 use App\Entity\User;
 use App\Entity\UserModulePermission;
+use App\Entity\Company;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
@@ -25,6 +26,7 @@ class AppFixtures extends Fixture
         $this->createModuleFixtures($manager);
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
+        $this->createCompanyFixtures($manager);
     }
 
     public function createUserFixtures(ObjectManager $manager): void
@@ -108,6 +110,24 @@ class AppFixtures extends Fixture
         $createPermissionIfNotExists($demoUser, $userModule, true, false); // Read-only access to user module
         $createPermissionIfNotExists($demoUser, $companyModule, true, true); // Full access to company module
 
+        $manager->flush();
+    }
+
+    public function createCompanyFixtures(ObjectManager $manager): void
+    {
+        // Example company data
+        $companies = [
+            ['name' => 'Example Company', 'email' => 'info@example.com'],
+            ['name' => 'Demo Company', 'email' => 'info@demo.com'],
+        ];
+
+        // Create and persist company entities here
+        foreach ($companies as $companyData) {
+            $company = new Company();
+            $company->setName($companyData['name']);
+            $company->setEmail($companyData['email']);
+            $manager->persist($company);
+        }
         $manager->flush();
     }
 }
