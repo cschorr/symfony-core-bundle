@@ -135,3 +135,11 @@ Items per page: 每頁項目數
 # Permission count
 '{1} 1 permission assigned|]1,Inf[ %count% permissions assigned': '{1} 已分配 1 個權限|]1,Inf[ 已分配 %count% 個權限'
 
+# Login page translations
+'You are logged in as': 您已登入為
+'Demo Credentials': 示範憑證
+'Temporary': 臨時
+'Admin User': 管理員使用者
+'Regular User': 一般使用者
+'Placeholder image': 佔位圖像
+

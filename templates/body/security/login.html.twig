@@ -60,6 +60,13 @@
     z-index: 1;
     }
 
+    /* Add extra top padding to the card on mobile for locale switcher spacing */
+    @media (max-width: 767.98px) {
+      .form-signin {
+        padding-top: 3.5rem !important;
+      }
+    }
+
     .form-signin .form-floating:focus-within {
     z-index: 2;
     }
@@ -93,9 +100,9 @@
 #}
 
 <div class="d-flex flex-column align-items-center">
-    <div class="form-signin w-100 m-auto bg-white rounded">
+    <div class="form-signin w-100 m-auto bg-white rounded shadow-lg">
         <!-- Language Switcher -->
-        <div class="position-absolute top-0 end-0 m-3">
+        <div class="position-absolute top-0 end-0 m-3 mb-5 mb-md-3">
             <div class="d-flex align-items-center">
                 <i class="fas fa-globe text-muted me-2"></i>
                 <select class="form-select form-select-sm" style="width: auto;" onchange="changeLocale(this.value)">
@@ -116,11 +123,11 @@
         </script>
 
         <div class="row">
-            <div class="col" style="min-height:420px">
+            <div class="col d-none d-md-block" style="min-height:420px">
                 <img src="{{ image_placeholder_portrait }}" alt="{{ 'Placeholder image'|trans }}" class="img-fluid">
             </div>
             <div class="col">
-                <div class="h-100 w-75 d-flex flex-column justify-content-center">
+                <div class="h-100 w-100 d-flex flex-column justify-content-center p-4">
 
                     {# form #}
                     <form method="post" action="{{ path('app_login', {'_locale': app.request.locale}) }}">
@@ -165,7 +172,7 @@
         </div>
         
         <!-- Demo Credentials Section - Integrated within the same card -->
-        <div class="border-top pt-4 pb-2">
+        <div class="border-top pt-4 pb-2 d-none d-md-block">
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <div class="d-flex align-items-center">
                     <i class="bi bi-key-fill text-muted me-2"></i>
