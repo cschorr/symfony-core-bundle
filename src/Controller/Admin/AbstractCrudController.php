@@ -100,6 +100,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action) => $action->setLabel($this->translator->trans('Show'))->setIcon('fa fa-eye'))
             ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action) => $action->setLabel($this->translator->trans('Edit'))->setIcon('fa fa-edit'))
             ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->setLabel($this->translator->trans('Delete'))->setIcon('fa fa-trash'))
+            ->reorder(Crud::PAGE_INDEX, [Action::DETAIL, Action::EDIT, 'duplicate', Action::DELETE])
             ->setPermission(Action::DETAIL, 'ROLE_USER')
             ->setPermission(Action::NEW, 'ROLE_USER')
             ->setPermission(Action::EDIT, 'ROLE_USER')
@@ -454,12 +455,19 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     public function delete(AdminContext $context): KeyValueStore|Response
     {
         $entity = $context->getEntity()->getInstance();
+        $request = $this->requestStack->getCurrentRequest();
         
         // Check if entity can be deleted (implemented by child classes)
         if (method_exists($this, 'canDeleteEntity') && !call_user_func([$this, 'canDeleteEntity'], $entity)) {
             $this->addFlash('danger', $this->translator->trans('Cannot delete record. It has related records that prevent deletion.'));
             
-            // Redirect back to the detail page
+            // Redirect back to the referer page or fallback to detail page
+            $referer = $request->headers->get('referer');
+            if ($referer) {
+                return $this->redirect($referer);
+            }
+            
+            // Fallback to detail page if no referer
             $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
             $url = $adminUrlGenerator
                 ->setController(static::class)
@@ -476,7 +484,13 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             // Handle foreign key constraint violations
             $this->addFlash('danger', $this->translator->trans('Cannot delete record. It has related records that prevent deletion. Please remove all related records first.'));
             
-            // Redirect back to the detail page
+            // Redirect back to the referer page or fallback to detail page
+            $referer = $request->headers->get('referer');
+            if ($referer) {
+                return $this->redirect($referer);
+            }
+            
+            // Fallback to detail page if no referer
             $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
             $url = $adminUrlGenerator
                 ->setController(static::class)
