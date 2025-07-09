@@ -22,11 +22,10 @@ class ModuleCrudController extends AbstractCrudController
 {
     public function __construct(
         EntityManagerInterface $entityManager,
-        \App\Repository\UserModulePermissionRepository $permissionRepository,
         TranslatorInterface $translator,
         PermissionService $permissionService
     ) {
-        parent::__construct($entityManager, $permissionRepository, $translator, $permissionService);
+        parent::__construct($entityManager, $translator, $permissionService);
     }
 
     public static function getEntityFqcn(): string

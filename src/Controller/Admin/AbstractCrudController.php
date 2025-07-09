@@ -4,7 +4,6 @@ namespace App\Controller\Admin;
 
 use App\Entity\Module;
 use App\Entity\User;
-use App\Repository\UserModulePermissionRepository;
 use App\Service\PermissionService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -20,18 +19,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 {
     protected EntityManagerInterface $entityManager;
-    protected UserModulePermissionRepository $permissionRepository;
     protected TranslatorInterface $translator;
     protected PermissionService $permissionService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        UserModulePermissionRepository $permissionRepository,
         TranslatorInterface $translator,
         PermissionService $permissionService
     ) {
         $this->entityManager = $entityManager;
-        $this->permissionRepository = $permissionRepository;
         $this->translator = $translator;
         $this->permissionService = $permissionService;
     }
