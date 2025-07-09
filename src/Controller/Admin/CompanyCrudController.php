@@ -15,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -107,7 +108,20 @@ class CompanyCrudController extends AbstractCrudController
             TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
             TextField::new('countryCode')->setLabel($this->translator->trans('Country Code')),
             TextField::new('url')->setLabel($this->translator->trans('Website')),
-            AssociationField::new('employees')
+        ];
+
+        // Configure employees field differently for index vs forms
+        if ($pageName === Crud::PAGE_INDEX) {
+            $fields[] = AssociationField::new('employees')
+                ->setLabel($this->translator->trans('Employees'))
+                ->formatValue(function ($value, $entity) {
+                    if ($value instanceof Collection) {
+                        return $value->count() . ' ' . $this->translator->trans('Employees');
+                    }
+                    return '0 ' . $this->translator->trans('Employees');
+                });
+        } else {
+            $fields[] = AssociationField::new('employees')
                 ->setLabel($this->translator->trans('Employees'))
                 ->setRequired(false)
                 ->setFormTypeOptions([
@@ -117,9 +131,8 @@ class CompanyCrudController extends AbstractCrudController
                     'choice_label' => function (User $user) {
                         return $user->getEmail();
                     },
-                ])
-                ->onlyOnForms(),
-        ];
+                ]);
+        }
 
         // Add active field for index page
         if ($pageName === Crud::PAGE_INDEX) {
