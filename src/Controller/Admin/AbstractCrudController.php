@@ -115,7 +115,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         }
 
         $modules = $this->entityManager->getRepository(Module::class)->findAll();
-        $fields = [];
         
         // Get the current entity to populate existing values
         $entity = $this->getContext()->getEntity()->getInstance();
@@ -133,23 +132,79 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             }
         }
         
+        // Build the complete table HTML in one go
+        $tableHtml = '
+            <style>
+                .permissions-table {
+                    margin: 20px 0;
+                }
+                .permissions-table .form-check {
+                    margin: 0;
+                    display: flex;
+                    justify-content: center;
+                }
+                .permissions-table .form-check-input {
+                    margin: 0;
+                }
+                .permissions-table td {
+                    vertical-align: middle;
+                    padding: 12px 8px;
+                }
+                .permissions-table .module-name {
+                    font-weight: 500;
+                    color: #495057;
+                }
+            </style>
+            <div class="permissions-table">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 60%;">Module</th>
+                            <th style="width: 20%; text-align: center;">Read</th>
+                            <th style="width: 20%; text-align: center;">Write</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+        
+        // Add each module row
         foreach ($modules as $module) {
             $moduleId = (string) $module->getId();
             $hasReadPermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['read'];
             $hasWritePermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['write'];
             
-            // Read permission field
-            $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $moduleId . '_read')
-                ->setLabel($module->getName() . ' - Read')
-                ->setFormTypeOption('mapped', false)
-                ->setFormTypeOption('data', $hasReadPermission);
-                
-            // Write permission field
-            $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField::new('module_' . $moduleId . '_write')
-                ->setLabel($module->getName() . ' - Write')
-                ->setFormTypeOption('mapped', false)
-                ->setFormTypeOption('data', $hasWritePermission);
+            $readChecked = $hasReadPermission ? 'checked' : '';
+            $writeChecked = $hasWritePermission ? 'checked' : '';
+            
+            $tableHtml .= '
+                        <tr>
+                            <td class="module-name">' . htmlspecialchars($module->getName()) . '</td>
+                            <td class="text-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="User[module_' . $moduleId . '_read]" 
+                                           id="module_' . $moduleId . '_read" 
+                                           value="1" ' . $readChecked . '>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="User[module_' . $moduleId . '_write]" 
+                                           id="module_' . $moduleId . '_write" 
+                                           value="1" ' . $writeChecked . '>
+                                </div>
+                            </td>
+                        </tr>';
         }
+        
+        $tableHtml .= '
+                    </tbody>
+                </table>
+            </div>';
+        
+        // Create a single fieldset with all the HTML
+        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addFieldset($tableHtml)
+            ->setFormTypeOption('label_html', true);
         
         return $fields;
     }
@@ -164,7 +219,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         }
 
         $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addTab('Module Permissions');
-        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addFieldset('Select permissions for each module:');
         
         $permissionFields = $this->createModulePermissionFields();
         return array_merge($fields, $permissionFields);

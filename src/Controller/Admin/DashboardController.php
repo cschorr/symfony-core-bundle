@@ -7,15 +7,23 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 use App\Entity\Module;
 use App\Entity\User;
 use App\Entity\Company;
 use App\Entity\CompanyGroup;
 
-#[AdminDashboard(routePath: '/admin', routeName: 'admin')]
+#[AdminDashboard(routePath: '/admin/{_locale}', routeName: 'admin')]
+#[Route('/admin/{_locale}', name: 'admin', requirements: ['_locale' => 'en|fr|de'])]
 class DashboardController extends AbstractDashboardController
 {
+    #[Route('/admin', name: 'admin_default')]
+    public function adminDefault(): Response
+    {
+        // Redirect /admin to /admin/en (default locale)
+        return $this->redirectToRoute('admin', ['_locale' => 'en']);
+    }
     public function index(): Response
     {
         #return parent::index();
@@ -44,7 +52,8 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('kickstarter');
+            ->setTitle('kickstarter')
+            ->setLocales(['en' => '🇺🇸 English', 'fr' => '🇫🇷 Français', 'de' => '🇩🇪 Deutsch']);
     }
 
     public function configureMenuItems(): iterable
