@@ -39,9 +39,12 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     
     /**
      * Get the module name associated with this CRUD controller
-     * Must be implemented by each concrete controller
+     * Automatically translates the module code
      */
-    abstract protected function getModuleName(): string;
+    protected function getModuleName(): string
+    {
+        return $this->translator->trans($this->getModuleCode());
+    }
 
     /**
      * Get the module entity for permission checking

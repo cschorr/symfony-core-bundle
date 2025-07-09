@@ -37,11 +37,6 @@ class CompanyCrudController extends AbstractCrudController
         return 'Company';
     }
 
-    protected function getModuleName(): string
-    {
-        return $this->translator->trans('Company');
-    }
-
     protected function hasPermissionManagement(): bool
     {
         return false;

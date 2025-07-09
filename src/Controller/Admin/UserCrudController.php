@@ -41,11 +41,6 @@ class UserCrudController extends AbstractCrudController
         return 'User';
     }
 
-    protected function getModuleName(): string
-    {
-        return $this->translator->trans('User');
-    }
-
     protected function hasPermissionManagement(): bool
     {
         return true;
