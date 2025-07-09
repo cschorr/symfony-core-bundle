@@ -38,11 +38,6 @@ class ModuleCrudController extends AbstractCrudController
         return 'Module';
     }
 
-    protected function getModuleName(): string
-    {
-        return $this->translator->trans('Module');
-    }
-
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
