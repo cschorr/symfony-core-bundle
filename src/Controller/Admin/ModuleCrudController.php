@@ -44,12 +44,14 @@ class ModuleCrudController extends AbstractCrudController
             ->setPageTitle('index', 'System Modules')
             ->setPageTitle('detail', fn ($entity) => sprintf('Module: %s', $entity->getName()))
             ->setPageTitle('new', 'Create System Module')
-            ->setHelp('index', 'Manage system modules and their permissions.')
-            ->showEntityActionsInlined(false); // Show actions as dropdown menu
+            ->setHelp('index', 'Manage system modules and their permissions.');
     }
 
     public function configureActions(Actions $actions): Actions
     {
+        // Start with parent configuration
+        $actions = parent::configureActions($actions);
+        
         // Check permissions and disable actions accordingly
         if (!$this->isGranted('read', $this->getModule())) {
             $actions

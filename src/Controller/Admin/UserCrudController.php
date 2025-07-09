@@ -50,12 +50,14 @@ class UserCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->setPageTitle('edit', 'Edit User')
-            ->showEntityActionsInlined(false); // Show actions as dropdown menu
+            ->setPageTitle('edit', 'Edit User');
     }
 
     public function configureActions(Actions $actions): Actions
     {
+        // Start with parent configuration
+        $actions = parent::configureActions($actions);
+        
         // Check permissions and disable actions accordingly
         if (!$this->isGranted('read', $this->getModule())) {
             $actions
