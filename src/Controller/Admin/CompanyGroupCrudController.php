@@ -56,38 +56,6 @@ class CompanyGroupCrudController extends AbstractCrudController
     }
 
     #[IsGranted('write', subject: 'CompanyGroup')]
-    public function new(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $CompanyGroup = 'CompanyGroup'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
-    {
-        return parent::new($context);
-    }
-
-    /**
-     * Override createEntity to provide duplicated entity when needed
-     */
-    public function createEntity(string $entityFqcn)
-    {
-        // Check if this is a duplicate request and we have a duplicated entity in the session
-        $request = $this->requestStack->getCurrentRequest();
-        $isDuplicate = $request && $request->query->get('duplicate') === '1';
-        
-        if ($isDuplicate) {
-            $sessionKey = 'duplicated_entity_' . static::class;
-            $session = $this->requestStack->getSession();
-            $duplicatedEntity = $session->get($sessionKey);
-            
-            if ($duplicatedEntity) {
-                // Remove from session to prevent reuse
-                $session->remove($sessionKey);
-                
-                return $duplicatedEntity;
-            }
-        }
-        
-        // Default behavior - create new entity
-        return new $entityFqcn();
-    }
-
-    #[IsGranted('write', subject: 'CompanyGroup')]
     public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $CompanyGroup = 'CompanyGroup'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::edit($context);

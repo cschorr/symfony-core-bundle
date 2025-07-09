@@ -66,6 +66,11 @@ class DuplicateService
         // Handle special naming for duplicated entities
         $this->handleDuplicateNaming($duplicatedEntity, $entity);
         
+        // Ensure we return an object
+        if (!is_object($duplicatedEntity)) {
+            throw new \RuntimeException('DuplicateService failed to create object, got: ' . gettype($duplicatedEntity));
+        }
+        
         return $duplicatedEntity;
     }
 
@@ -90,8 +95,18 @@ class DuplicateService
             return true;
         }
         
-        // For duplication, we want to keep associations to pre-fill forms
-        // So we don't skip associations like we would for normal entity operations
+        // Skip certain relationship properties that could cause issues
+        // For example, skip inverse side of OneToMany relationships that might cause conflicts
+        if ($metadata->hasAssociation($property)) {
+            $associationMapping = $metadata->getAssociationMapping($property);
+            
+            // For OneToMany relationships, we might want to skip the inverse side
+            // to avoid issues with bidirectional relationships during duplication
+            if ($associationMapping['type'] === \Doctrine\ORM\Mapping\ClassMetadata::ONE_TO_MANY) {
+                // For now, we'll include OneToMany relationships but handle them carefully
+                // They will be processed by processDuplicatedValue
+            }
+        }
         
         return false;
     }
@@ -101,17 +116,28 @@ class DuplicateService
      */
     private function processDuplicatedValue($value, string $property, object $originalEntity)
     {
-        // Handle collections - copy the existing entities (don't create empty collection)
+        // Handle collections - for duplication, we usually want to preserve existing relationships
         if ($value instanceof \Doctrine\Common\Collections\Collection) {
-            // Create a new ArrayCollection and copy all entities from the original collection
+            // Create a new ArrayCollection
             $newCollection = new \Doctrine\Common\Collections\ArrayCollection();
             
-            // Copy all entities from the original collection
+            // For duplication, we want to preserve the relationships to existing entities
+            // However, we need to be careful about bidirectional relationships
             foreach ($value as $entity) {
-                $newCollection->add($entity);
+                if (is_object($entity)) {
+                    $managedEntity = $this->ensureManagedEntity($entity);
+                    if ($managedEntity) {
+                        $newCollection->add($managedEntity);
+                    }
+                }
             }
             
             return $newCollection;
+        }
+        
+        // Handle single entity relationships - ensure they are managed
+        if (is_object($value) && !$value instanceof \DateTimeInterface) {
+            return $this->ensureManagedEntity($value);
         }
         
         // Handle date objects - create new instances
@@ -119,12 +145,55 @@ class DuplicateService
             return clone $value;
         }
         
-        // Handle other objects - keep reference (don't deep clone)
-        if (is_object($value) && !$value instanceof \DateTimeInterface) {
-            return $value;
+        return $value;
+    }
+
+    /**
+     * Ensure an entity is managed by the EntityManager
+     */
+    private function ensureManagedEntity($entity)
+    {
+        if (!is_object($entity)) {
+            return $entity;
         }
         
-        return $value;
+        // If the entity is already managed, return it
+        if ($this->entityManager->contains($entity)) {
+            return $entity;
+        }
+        
+        try {
+            // Try to get the entity class and ID
+            $entityClass = get_class($entity);
+            
+            // Handle Doctrine proxies - get the real class name
+            if (strpos($entityClass, 'Proxies\\__CG__\\') === 0) {
+                $entityClass = substr($entityClass, strlen('Proxies\\__CG__\\'));
+            }
+            
+            // Get the metadata for the entity
+            $metadata = $this->entityManager->getClassMetadata($entityClass);
+            
+            // Try to get the identifier values
+            $identifier = $metadata->getIdentifierValues($entity);
+            
+            if (!empty($identifier)) {
+                // Find the managed entity by ID
+                $managedEntity = $this->entityManager->find($entityClass, $identifier);
+                if ($managedEntity) {
+                    return $managedEntity;
+                }
+            }
+            
+            // If we couldn't find a managed entity, return the original entity
+            // It's better to return the original than fail completely
+            return $entity;
+            
+        } catch (\Exception $e) {
+            // If anything fails, return the original entity
+            // This ensures we don't break the duplication process
+            return $entity;
+        }
     }
 
     /**

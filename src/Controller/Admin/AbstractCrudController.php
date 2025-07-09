@@ -244,9 +244,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             
             $session->set($sessionKey, $entityData);
             
-            // Add info message
-            $this->addFlash('info', $this->translator->trans('Form pre-filled with duplicated values. Click "Save" to create the new record.'));
-            
             // Redirect to the new page with a duplicate parameter
             $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
             $url = $adminUrlGenerator
@@ -273,7 +270,21 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Override createEntity to handle pre-filled duplicated entities
+     * Override edit action to handle entity associations
+     */
+    public function edit(AdminContext $context): KeyValueStore|Response
+    {
+        $entity = $context->getEntity()->getInstance();
+        
+        // Ensure all associations are properly managed to avoid proxy issues
+        $this->ensureEntityAssociationsAreManaged($entity);
+        
+        return parent::edit($context);
+    }
+
+    /**
+     * Override createEntity to handle duplicated entities
+     * This method is called by EasyAdmin when creating a new entity instance
      */
     public function createEntity(string $entityFqcn)
     {
@@ -294,14 +305,134 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                 $originalEntity = $this->entityManager->find($entityData['entity_class'], $entityData['original_id']);
                 
                 if ($originalEntity) {
-                    // Use DuplicateService to create a fresh duplicate
-                    $duplicatedEntity = $this->duplicateService->duplicate($originalEntity);
-                    return $duplicatedEntity;
+                    try {
+                        // Use DuplicateService to create a fresh duplicate
+                        $duplicatedEntity = $this->duplicateService->duplicate($originalEntity);
+                        
+                        // Make sure all associations are properly managed
+                        $this->ensureEntityAssociationsAreManaged($duplicatedEntity);
+                        
+                        $this->addFlash('success', $this->translator->trans('Form pre-filled with duplicated values. Click "Save" to create the new record.'));
+                        
+                        return $duplicatedEntity;
+                    } catch (\Exception $e) {
+                        $this->addFlash('danger', 'Error duplicating entity: ' . $e->getMessage());
+                    }
                 }
             }
         }
         
-        // Default behavior - create new entity
-        return new $entityFqcn();
+        // Fall back to the default behavior
+        return parent::createEntity($entityFqcn);
+    }
+    
+    /**
+     * Ensure all associations in the entity are managed by the EntityManager
+     */
+    private function ensureEntityAssociationsAreManaged(object $entity): void
+    {
+        try {
+            $entityClass = get_class($entity);
+            
+            // Handle Doctrine proxies - extract the real class name
+            if (strpos($entityClass, 'Proxies\\__CG__\\') === 0) {
+                $entityClass = substr($entityClass, strlen('Proxies\\__CG__\\'));
+            }
+            
+            $metadata = $this->entityManager->getClassMetadata($entityClass);
+            
+            foreach ($metadata->getAssociationMappings() as $fieldName => $mapping) {
+                if ($metadata->hasAssociation($fieldName)) {
+                    $value = $metadata->getFieldValue($entity, $fieldName);
+                    
+                    if ($value instanceof \Doctrine\Common\Collections\Collection) {
+                        // Handle collections - ensure all entities in the collection are managed
+                        $toRemove = [];
+                        $toAdd = [];
+                        
+                        foreach ($value as $relatedEntity) {
+                            if (is_object($relatedEntity) && !$this->entityManager->contains($relatedEntity)) {
+                                $managedEntity = $this->findManagedEntity($relatedEntity);
+                                if ($managedEntity && $managedEntity !== $relatedEntity) {
+                                    $toRemove[] = $relatedEntity;
+                                    $toAdd[] = $managedEntity;
+                                }
+                            }
+                        }
+                        
+                        // Apply changes outside the iteration to avoid modification during iteration
+                        foreach ($toRemove as $entityToRemove) {
+                            $value->removeElement($entityToRemove);
+                        }
+                        foreach ($toAdd as $entityToAdd) {
+                            $value->add($entityToAdd);
+                        }
+                        
+                    } elseif (is_object($value) && !$this->entityManager->contains($value)) {
+                        // Handle single associations - this is the key fix for the proxy issue
+                        $managedEntity = $this->findManagedEntity($value);
+                        if ($managedEntity) {
+                            $metadata->setFieldValue($entity, $fieldName, $managedEntity);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // If anything fails, don't break the application
+        }
+    }
+    
+    /**
+     * Find the managed version of an entity
+     */
+    private function findManagedEntity(object $entity): ?object
+    {
+        // If entity is already managed, return it
+        if ($this->entityManager->contains($entity)) {
+            return $entity;
+        }
+        
+        try {
+            $entityClass = get_class($entity);
+            
+            // Handle Doctrine proxies - extract the real class name
+            if (strpos($entityClass, 'Proxies\\__CG__\\') === 0) {
+                $entityClass = substr($entityClass, strlen('Proxies\\__CG__\\'));
+            }
+            
+            $metadata = $this->entityManager->getClassMetadata($entityClass);
+            $identifier = $metadata->getIdentifierValues($entity);
+            
+            if (!empty($identifier)) {
+                // Find the managed entity by ID
+                $managedEntity = $this->entityManager->find($entityClass, $identifier);
+                if ($managedEntity) {
+                    return $managedEntity;
+                }
+            }
+            
+            // If we can't find by ID, try to initialize the proxy if it's a proxy
+            if (method_exists($entity, '__isInitialized') && method_exists($entity, '__load')) {
+                if (!$entity->__isInitialized()) {
+                    $entity->__load();
+                }
+                // After loading, the entity might be managed now
+                if ($this->entityManager->contains($entity)) {
+                    return $entity;
+                }
+                // Try to find it again after loading
+                if (!empty($identifier)) {
+                    $managedEntity = $this->entityManager->find($entityClass, $identifier);
+                    if ($managedEntity) {
+                        return $managedEntity;
+                    }
+                }
+            }
+            
+        } catch (\Exception $e) {
+            // If anything fails, return null
+        }
+        
+        return null;
     }
 }

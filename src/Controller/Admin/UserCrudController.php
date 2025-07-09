@@ -3,30 +3,30 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\Company;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserCrudController extends AbstractCrudController
 {
     public function __construct(
-        EntityManagerInterface $entityManager, 
+        EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
         PermissionService $permissionService,
         DuplicateService $duplicateService,
@@ -52,8 +52,12 @@ class UserCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return parent::configureCrud($crud)
-            ->setPageTitle('edit', $this->translator->trans('Edit User'));
+        return parent::configureCrud($crud);
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return parent::configureActions($actions);
     }
 
     #[IsGranted('read', subject: 'User')]
@@ -69,40 +73,29 @@ class UserCrudController extends AbstractCrudController
     }
 
     #[IsGranted('write', subject: 'User')]
-    public function new(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
-        return parent::new($context);
-    }
-
-    /**
-     * Override createEntity to provide duplicated entity when needed
-     */
-    public function createEntity(string $entityFqcn)
-    {
-        // Check if this is a duplicate request and we have a duplicated entity in the session
-        $request = $this->requestStack->getCurrentRequest();
-        $isDuplicate = $request && $request->query->get('duplicate') === '1';
+        // Get the current user entity
+        $user = $context->getEntity()->getInstance();
         
-        if ($isDuplicate) {
-            $sessionKey = 'duplicated_entity_' . static::class;
-            $session = $this->requestStack->getSession();
-            $duplicatedEntity = $session->get($sessionKey);
+        // Refresh the entity from the database with all associations properly loaded
+        if ($user->getId()) {
+            $freshUser = $this->entityManager->getRepository(User::class)
+                ->createQueryBuilder('u')
+                ->leftJoin('u.company', 'c')
+                ->addSelect('c')
+                ->leftJoin('u.projects', 'p')
+                ->addSelect('p')
+                ->where('u.id = :id')
+                ->setParameter('id', $user->getId())
+                ->getQuery()
+                ->getOneOrNullResult();
             
-            if ($duplicatedEntity) {
-                // Remove from session to prevent reuse
-                $session->remove($sessionKey);
-                
-                return $duplicatedEntity;
+            if ($freshUser) {
+                $context->getEntity()->setInstance($freshUser);
             }
         }
         
-        // Default behavior - create new entity
-        return new $entityFqcn();
-    }
-
-    #[IsGranted('write', subject: 'User')]
-    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
-    {
         return parent::edit($context);
     }
 
@@ -133,9 +126,6 @@ class UserCrudController extends AbstractCrudController
             $fields[] = BooleanField::new('active');
             $fields[] = TextareaField::new('notes');
             $fields[] = AssociationField::new('company')
-                ->setFormTypeOptions([
-                    'by_reference' => false, // Important for bidirectional relationships
-                ])
                 ->autocomplete();
             $fields[] = AssociationField::new('projects');
 
@@ -171,7 +161,6 @@ class UserCrudController extends AbstractCrudController
                 ->allowMultipleChoices()
                 ->renderExpanded(false);
             $fields[] = BooleanField::new('active');
-            #$fields[] = TextareaField::new('notes');
             $fields[] = AssociationField::new('company');
             
             // Add permission summary (handled by abstract controller)
@@ -182,7 +171,7 @@ class UserCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to handle bidirectional company relationship
+     * Override to handle bidirectional relationship with Company
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
@@ -192,7 +181,7 @@ class UserCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to handle bidirectional company relationship  
+     * Override to handle bidirectional relationship with Company
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
@@ -206,12 +195,24 @@ class UserCrudController extends AbstractCrudController
      */
     private function syncCompanyRelationship(User $user): void
     {
-        // If user has a company, make sure the company's employees collection includes this user
-        if ($user->getCompany()) {
-            $company = $user->getCompany();
-            if (!$company->getEmployees()->contains($user)) {
-                $company->addEmployee($user);
+        // Get the current company
+        $currentCompany = $user->getCompany();
+        
+        // If user has an ID (not a new user), handle previous company relationship
+        if ($user->getId()) {
+            // Find the original user to see what company they were previously assigned to
+            $originalUser = $this->entityManager->getRepository(User::class)->find($user->getId());
+            $previousCompany = $originalUser?->getCompany();
+            
+            // If the company has changed, remove user from previous company
+            if ($previousCompany && $previousCompany !== $currentCompany) {
+                $previousCompany->removeEmployee($user);
             }
+        }
+        
+        // Add user to current company if set
+        if ($currentCompany && !$currentCompany->getEmployees()->contains($user)) {
+            $currentCompany->addEmployee($user);
         }
     }
 }
