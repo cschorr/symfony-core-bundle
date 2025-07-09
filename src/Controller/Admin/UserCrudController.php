@@ -147,6 +147,7 @@ class UserCrudController extends AbstractCrudController
             // For detail page, show all fields including notes
             $fields[] = EmailField::new('email');
             $fields[] = ChoiceField::new('roles')
+                ->setLabel($this->translator->trans('Roles'))
                 ->setChoices([
                     $this->translator->trans('User') => 'ROLE_USER',
                     $this->translator->trans('Admin') => 'ROLE_ADMIN',
@@ -164,6 +165,7 @@ class UserCrudController extends AbstractCrudController
             // For index page, show all fields without tabs and hide notes
             $fields[] = EmailField::new('email');
             $fields[] = ChoiceField::new('roles')
+                ->setLabel($this->translator->trans('Roles'))
                 ->setChoices([
                     $this->translator->trans('User') => 'ROLE_USER',
                     $this->translator->trans('Admin') => 'ROLE_ADMIN',
