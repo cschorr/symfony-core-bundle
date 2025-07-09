@@ -44,12 +44,14 @@ class CompanyCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return parent::configureCrud($crud)
-            ->showEntityActionsInlined(false); // Show actions as dropdown menu
+        return parent::configureCrud($crud);
     }
 
     public function configureActions(Actions $actions): Actions
     {
+        // Start with parent configuration
+        $actions = parent::configureActions($actions);
+        
         // Check permissions and disable actions accordingly
         if (!$this->isGranted('read', $this->getModule())) {
             $actions

@@ -76,7 +76,8 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->setPageTitle('new', sprintf('Create %s', $this->getModuleName()))
             ->setPageTitle('edit', fn ($entity) => sprintf('Edit %s', $this->getEntityLabel($entity)))
             ->setDefaultSort(['id' => 'DESC'])
-            ->setPaginatorPageSize(25);
+            ->setPaginatorPageSize(25)
+            ->showEntityActionsInlined(false); // Show actions as dropdown menu
     }
 
     /**
@@ -85,6 +86,23 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function configureActions(Actions $actions): Actions
     {
+        // Add the detail action to index page first, then update existing actions
+        $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
+                return $action->setLabel('Show')->setIcon('fa fa-eye');
+            })
+            ->update(Crud::PAGE_INDEX, Action::EDIT, function (Action $action) {
+                return $action->setLabel('Edit')->setIcon('fa fa-edit');
+            })
+            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+                return $action->setLabel('Delete')->setIcon('fa fa-trash');
+            })
+            ->setPermission(Action::DETAIL, 'ROLE_USER')
+            ->setPermission(Action::NEW, 'ROLE_USER')
+            ->setPermission(Action::EDIT, 'ROLE_USER')
+            ->setPermission(Action::DELETE, 'ROLE_USER');
+        
         return $actions;
     }
 
