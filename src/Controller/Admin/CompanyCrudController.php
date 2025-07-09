@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use App\Service\PermissionService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -21,9 +22,10 @@ class CompanyCrudController extends AbstractCrudController
     public function __construct(
         EntityManagerInterface $entityManager,
         \App\Repository\UserModulePermissionRepository $permissionRepository,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        PermissionService $permissionService
     ) {
-        parent::__construct($entityManager, $permissionRepository, $translator);
+        parent::__construct($entityManager, $permissionRepository, $translator, $permissionService);
     }
 
     public static function getEntityFqcn(): string

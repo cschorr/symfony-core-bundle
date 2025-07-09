@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Module;
 use App\Entity\User;
 use App\Repository\UserModulePermissionRepository;
+use App\Service\PermissionService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -21,15 +22,18 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     protected EntityManagerInterface $entityManager;
     protected UserModulePermissionRepository $permissionRepository;
     protected TranslatorInterface $translator;
+    protected PermissionService $permissionService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         UserModulePermissionRepository $permissionRepository,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        PermissionService $permissionService
     ) {
         $this->entityManager = $entityManager;
         $this->permissionRepository = $permissionRepository;
         $this->translator = $translator;
+        $this->permissionService = $permissionService;
     }
 
     /**
@@ -48,16 +52,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     protected function getModule(): Module
     {
-        $module = $this->entityManager->getRepository(Module::class)
-            ->findOneBy(['code' => $this->getModuleCode()]);
-            
-        if (!$module) {
-            throw new \RuntimeException(
-                sprintf('Module with code "%s" not found. Please run fixtures.', $this->getModuleCode())
-            );
-        }
-        
-        return $module;
+        return $this->permissionService->getModuleByCode($this->getModuleCode());
     }
 
     /**
@@ -139,99 +134,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             return [];
         }
 
-        $modules = $this->entityManager->getRepository(Module::class)->findAll();
-        
-        // Get the current entity to populate existing values
-        $entity = $this->getContext()->getEntity()->getInstance();
-        $existingPermissions = [];
-        
-        if ($entity && method_exists($entity, 'getModulePermissions')) {
-            $permissions = $entity->getModulePermissions();
-            
-            foreach ($permissions as $permission) {
-                $moduleId = (string) $permission->getModule()->getId();
-                $existingPermissions[$moduleId] = [
-                    'read' => $permission->canRead(),
-                    'write' => $permission->canWrite()
-                ];
-            }
-        }
-        
-        // Build the complete table HTML in one go
-        $tableHtml = '
-            <style>
-                .permissions-table {
-                    margin: 20px 0;
-                }
-                .permissions-table .form-check {
-                    margin: 0;
-                    display: flex;
-                    justify-content: center;
-                }
-                .permissions-table .form-check-input {
-                    margin: 0;
-                }
-                .permissions-table td {
-                    vertical-align: middle;
-                    padding: 12px 8px;
-                }
-                .permissions-table .module-name {
-                    font-weight: 500;
-                    color: #495057;
-                }
-            </style>
-            <div class="permissions-table">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 60%;">Module</th>
-                            <th style="width: 20%; text-align: center;">Read</th>
-                            <th style="width: 20%; text-align: center;">Write</th>
-                        </tr>
-                    </thead>
-                    <tbody>';
-        
-        // Add each module row
-        foreach ($modules as $module) {
-            $moduleId = (string) $module->getId();
-            $hasReadPermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['read'];
-            $hasWritePermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['write'];
-            
-            $readChecked = $hasReadPermission ? 'checked' : '';
-            $writeChecked = $hasWritePermission ? 'checked' : '';
-            
-            $tableHtml .= '
-                        <tr>
-                            <td class="module-name">' . htmlspecialchars($module->getName()) . '</td>
-                            <td class="text-center">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" 
-                                           name="User[module_' . $moduleId . '_read]" 
-                                           id="module_' . $moduleId . '_read" 
-                                           value="1" ' . $readChecked . '>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" 
-                                           name="User[module_' . $moduleId . '_write]" 
-                                           id="module_' . $moduleId . '_write" 
-                                           value="1" ' . $writeChecked . '>
-                                </div>
-                            </td>
-                        </tr>';
-        }
-        
-        $tableHtml .= '
-                    </tbody>
-                </table>
-            </div>';
-        
-        // Create a single fieldset with all the HTML
-        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addFieldset($tableHtml)
-            ->setFormTypeOption('label_html', true);
-        
-        return $fields;
+        return $this->permissionService->createModulePermissionFields($this->getContext());
     }
 
     /**
@@ -243,10 +146,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             return $fields;
         }
 
-        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\FormField::addTab($this->translator->trans('Module Permissions'));
-        
-        $permissionFields = $this->createModulePermissionFields();
-        return array_merge($fields, $permissionFields);
+        return $this->permissionService->addPermissionTabToFields($fields, $this->getContext());
     }
 
     /**
@@ -258,86 +158,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             return $fields;
         }
 
-        $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField::new('modulePermissions')
-            ->setLabel($this->translator->trans('Module Permissions'))
-            ->formatValue(function ($value, $entity) {
-                if (!$entity || !method_exists($entity, 'getModulePermissions') || 
-                    !$entity->getModulePermissions() || $entity->getModulePermissions()->isEmpty()) {
-                    return '<div style="text-align: right;">' . $this->translator->trans('No permissions') . '</div>';
-                }
-                
-                $count = $entity->getModulePermissions()->count();
-                $permissionText = $this->translator->trans('{1} 1 permission assigned|]1,Inf[ %count% permissions assigned', ['%count%' => $count]);
-                
-                return '<div style="text-align: right;">' . $permissionText . '</div>';
-            })
-            ->renderAsHtml()
-            ->addCssClass('text-end'); // Bootstrap class for right alignment
-
-        return $fields;
-    }
-
-    /**
-     * Handle module permissions for entities that support it
-     */
-    protected function handleModulePermissions($entity): void
-    {
-        if (!$this->hasPermissionManagement() || !method_exists($entity, 'getModulePermissions')) {
-            return;
-        }
-
-        $request = $this->getContext()->getRequest();
-        $entityName = (new \ReflectionClass($entity))->getShortName();
-        $formData = $request->request->all()[$entityName] ?? [];
-
-        // Get all modules
-        $modules = $this->entityManager->getRepository(Module::class)->findAll();
-        
-        // Get existing permissions indexed by module ID
-        $existingPermissions = [];
-        foreach ($entity->getModulePermissions() as $permission) {
-            $moduleId = (string) $permission->getModule()->getId();
-            $existingPermissions[$moduleId] = $permission;
-        }
-
-        // Process each module's permissions
-        foreach ($modules as $module) {
-            $moduleId = (string) $module->getId();
-            $readKey = 'module_' . $moduleId . '_read';
-            $writeKey = 'module_' . $moduleId . '_write';
-            
-            $canRead = isset($formData[$readKey]) && $formData[$readKey] === '1';
-            $canWrite = isset($formData[$writeKey]) && $formData[$writeKey] === '1';
-
-            if (isset($existingPermissions[$moduleId])) {
-                // Update existing permission
-                $permission = $existingPermissions[$moduleId];
-                
-                if ($canRead || $canWrite) {
-                    // Update the permission
-                    $permission->setCanRead($canRead);
-                    $permission->setCanWrite($canWrite);
-                } else {
-                    // Remove permission if no access is granted
-                    $this->entityManager->remove($permission);
-                    $entity->removeModulePermission($permission);
-                }
-            } else {
-                // Create new permission only if at least one permission is granted
-                if ($canRead || $canWrite) {
-                    $permission = new \App\Entity\UserModulePermission();
-                    $permission->setUser($entity);
-                    $permission->setModule($module);
-                    $permission->setCanRead($canRead);
-                    $permission->setCanWrite($canWrite);
-                    
-                    $this->entityManager->persist($permission);
-                    $entity->addModulePermission($permission);
-                }
-            }
-        }
-        
-        // Don't flush here - let the parent method handle the flush
+        return $this->permissionService->addPermissionSummaryField($fields);
     }
 
     /**
@@ -345,23 +166,16 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        // Start a transaction to ensure atomicity
-        $this->entityManager->beginTransaction();
-        
-        try {
-            // First persist the main entity
+        if (!$this->hasPermissionManagement()) {
             parent::persistEntity($entityManager, $entityInstance);
-            
-            // Then handle the permissions after the main entity is persisted
-            $this->handleModulePermissions($entityInstance);
-            
-            // Commit the transaction
-            $this->entityManager->commit();
-        } catch (\Exception $e) {
-            // Rollback on error
-            $this->entityManager->rollback();
-            throw $e;
+            return;
         }
+
+        $this->permissionService->persistEntityWithPermissions(
+            fn($entity) => parent::persistEntity($entityManager, $entity),
+            $entityInstance,
+            $this->getContext()
+        );
     }
 
     /**
@@ -369,22 +183,15 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        // Start a transaction to ensure atomicity
-        $this->entityManager->beginTransaction();
-        
-        try {
-            // Handle permissions first for updates
-            $this->handleModulePermissions($entityInstance);
-            
-            // Then update the main entity
+        if (!$this->hasPermissionManagement()) {
             parent::updateEntity($entityManager, $entityInstance);
-            
-            // Commit the transaction
-            $this->entityManager->commit();
-        } catch (\Exception $e) {
-            // Rollback on error
-            $this->entityManager->rollback();
-            throw $e;
+            return;
         }
+
+        $this->permissionService->updateEntityWithPermissions(
+            fn($entity) => parent::updateEntity($entityManager, $entity),
+            $entityInstance,
+            $this->getContext()
+        );
     }
 }

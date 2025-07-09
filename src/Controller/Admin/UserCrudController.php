@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Service\PermissionService;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -25,9 +26,10 @@ class UserCrudController extends AbstractCrudController
     public function __construct(
         EntityManagerInterface $entityManager, 
         \App\Repository\UserModulePermissionRepository $permissionRepository,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        PermissionService $permissionService
     ) {
-        parent::__construct($entityManager, $permissionRepository, $translator);
+        parent::__construct($entityManager, $permissionRepository, $translator, $permissionService);
     }
 
     public static function getEntityFqcn(): string
