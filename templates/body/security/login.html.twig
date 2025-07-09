@@ -2,7 +2,7 @@
 
 {% block title %}{{ 'Login'|trans }}{% endblock %}
 
-{% set class_body = 'd-flex align-items-center py-4 bg-body-tertiary' %}
+{% set class_body = 'd-flex flex-column align-items-center justify-content-center py-4 bg-body-tertiary' %}
 {% block body %}
 
 <style>
@@ -49,113 +49,110 @@
 <br>
 #}
 
-<div class="form-signin w-100 m-auto bg-white rounded">
-    <!-- Language Switcher -->
-    <div class="position-absolute top-0 end-0 m-3">
-        <select class="form-select form-select-sm" style="width: auto;" onchange="changeLocale(this.value)">
-            {% for locale, display_name in available_locales %}
-                <option value="{{ locale }}"{% if locale == current_locale %} selected{% endif %}>
-                    {{ display_name }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <script>
-        function changeLocale(locale) {
-            // Simple approach: just redirect to /login/locale
-            window.location.href = '/login/' + locale;
-        }
-    </script>
-
-    <div class="row">
-        <div class="col" style="min-height:420px">
-            <img src="{{ image_placeholder_portrait }}" alt="{{ 'Placeholder image'|trans }}" class="img-fluid">
+<div class="d-flex flex-column align-items-center">
+    <div class="form-signin w-100 m-auto bg-white rounded">
+        <!-- Language Switcher -->
+        <div class="position-absolute top-0 end-0 m-3">
+            <select class="form-select form-select-sm" style="width: auto;" onchange="changeLocale(this.value)">
+                {% for locale, display_name in available_locales %}
+                    <option value="{{ locale }}"{% if locale == current_locale %} selected{% endif %}>
+                        {{ display_name }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="col">
-            <div class="h-100 w-75 d-flex flex-column justify-content-center">
 
-                {# form #}
-                <form method="post">
-                    {% if error %}
-                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                    {% endif %}
-            
-                    {% if app.user %}
-                        <div class="mb-3">
-                            {{ 'You are logged in as'|trans }} {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">{{ 'Logout'|trans }}</a>
-                        </div>
-                    {% endif %}
-            
-                    <h1 class="h3 mb-3 font-weight-normal">{{ 'Please sign in'|trans }}</h1>
+        <script>
+            function changeLocale(locale) {
+                // Simple approach: just redirect to /login/locale
+                window.location.href = '/login/' + locale;
+            }
+        </script>
 
-                    <label for="username">{{ 'Email'|trans }}</label>
-                    <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-                    <label for="password">{{ 'Password'|trans }}</label>
-                    <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
-            
-                    <input type="hidden" name="_csrf_token"
-                        value="{{ csrf_token('authenticate') }}"
-                    >
-            
-                    {#
-                        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-                        See https://symfony.com/doc/current/security/remember_me.html
-            
-                        <div class="checkbox mb-3">
-                            <input type="checkbox" name="_remember_me" id="_remember_me">
-                            <label for="_remember_me">{{ 'Remember me'|trans }}</label>
-                        </div>
-                    #}
-            
-                    <button class="btn btn-lg btn-primary" type="submit">
-                        {{ 'Sign in'|trans }}
-                    </button>
-                </form>
-
-                <br>
-                <small>
-                    <i>
-                        {{ 'Demo Credentials'|trans }}:<br>
-                        {{ 'Admin User'|trans }}: admin@example.com<br>
-                        {{ 'Regular User'|trans }}: demo@example.com<br>
-                        {{ 'Password'|trans }}: pass_1234
-                    </i>
-                </small>
-
-
+        <div class="row">
+            <div class="col" style="min-height:420px">
+                <img src="{{ image_placeholder_portrait }}" alt="{{ 'Placeholder image'|trans }}" class="img-fluid">
             </div>
+            <div class="col">
+                <div class="h-100 w-75 d-flex flex-column justify-content-center">
 
-        
+                    {# form #}
+                    <form method="post">
+                        {% if error %}
+                            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                        {% endif %}
+                
+                        {% if app.user %}
+                            <div class="mb-3">
+                                {{ 'You are logged in as'|trans }} {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">{{ 'Logout'|trans }}</a>
+                            </div>
+                        {% endif %}
+                
+                        <h1 class="h3 mb-3 font-weight-normal">{{ 'Please sign in'|trans }}</h1>
+
+                        <label for="username">{{ 'Email'|trans }}</label>
+                        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
+                        <label for="password">{{ 'Password'|trans }}</label>
+                        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                
+                        <input type="hidden" name="_csrf_token"
+                            value="{{ csrf_token('authenticate') }}"
+                        >
+                
+                        {#
+                            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                            See https://symfony.com/doc/current/security/remember_me.html
+                
+                            <div class="checkbox mb-3">
+                                <input type="checkbox" name="_remember_me" id="_remember_me">
+                                <label for="_remember_me">{{ 'Remember me'|trans }}</label>
+                            </div>
+                        #}
+                
+                        <button class="btn btn-lg btn-primary" type="submit">
+                            {{ 'Sign in'|trans }}
+                        </button>
+                    </form>
+
+                    <br>
+                    <small>
+                        <i>
+                            {{ 'Demo Credentials'|trans }}:<br>
+                            {{ 'Admin User'|trans }}: admin@example.com<br>
+                            {{ 'Regular User'|trans }}: demo@example.com<br>
+                            {{ 'Password'|trans }}: pass_1234
+                        </i>
+                    </small>
+
+                </div>
+            </div>
         </div>
 
+        <div class="text-center mt-2">
+            {{ 'supported by'|trans }} <a href="https://c3net.de" target="_blank">c3:net</a>
+        </div>
     </div>
 
-    <div class="text-center mt-2">
-        {{ 'supported by'|trans }} <a href="https://c3net.de" target="_blank">c3:net</a>
-    </div>
-
-</div>
-
-<!-- c3net Logo underneath the card -->
-<div class="text-center mt-4">
-    <svg width="122" height="21" viewBox="0 0 122 21" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" style="max-height: 80px; width: auto;">
-        <clipPath id="a">
-            <path d="M0 0h121.78v20.93H0z"/>
-        </clipPath>
-        <g clip-path="url(#a)">
-            <path d="M121.78 17.085c0-2.123-1.72-3.845-3.844-3.845-1.11 0-2.11.476-2.81 1.228h-.004c-.938 1.08-2.317 1.763-3.86 1.763-1.54 0-2.92-.682-3.86-1.762h-.015c-.7-.752-1.697-1.228-2.808-1.228-2.126 0-3.847 1.722-3.847 3.845 0 2.125 1.72 3.846 3.846 3.846 1.063 0 2.016-.44 2.71-1.138h.064c.938-1.11 2.34-1.82 3.908-1.82 1.57 0 2.97.71 3.91 1.82h.05c.695.698 1.65 1.14 2.714 1.14 2.123 0 3.844-1.722 3.844-3.847M100.733 3.845c0-2.124 1.723-3.845 3.846-3.845 1.108 0 2.106.475 2.807 1.228h.004c.94 1.078 2.32 1.763 3.86 1.763 1.544 0 2.922-.684 3.86-1.762h.016C115.83.475 116.826 0 117.934 0c2.125 0 3.846 1.72 3.846 3.845 0 2.124-1.72 3.845-3.846 3.845-1.062 0-2.017-.44-2.71-1.14h-.063c-.94-1.11-2.34-1.818-3.91-1.818-1.568 0-2.97.708-3.908 1.82h-.052c-.694.7-1.65 1.138-2.71 1.138-2.124 0-3.847-1.72-3.847-3.845" fill="#0969ad" fill-rule="nonzero"/>
-            <path d="M94.348 10.557c0 2.124 1.723 3.846 3.844 3.846 1.11 0 2.107-.474 2.81-1.228h.004c.94-1.078 2.32-1.764 3.86-1.764 1.543 0 2.92.687 3.86 1.765h.015c.702.754 1.7 1.228 2.81 1.228 2.124 0 3.845-1.722 3.845-3.846s-1.72-3.846-3.846-3.846c-1.063 0-2.016.442-2.712 1.14h-.064c-.938 1.112-2.34 1.82-3.908 1.82-1.57 0-2.97-.708-3.91-1.82h-.05c-.695-.698-1.648-1.14-2.714-1.14-2.12 0-3.844 1.723-3.844 3.847M84.913 4.354V1.716c0-.282-.256-.487-.537-.487H71.67c-.28 0-.51.204-.51.486v2.638c0 .282.23.487.51.487h4.175v14.91c0 .28.232.51.513.51h3.356c.28 0 .513-.23.513-.51V4.84h4.15c.28 0 .536-.204.536-.486M69.083 19.62v-2.38c0-.283-.23-.513-.512-.513h-5.198c-1.205 0-1.64-.41-1.64-1.742V12.27h6.634c.283 0 .512-.23.512-.513V9.323c0-.28-.23-.512-.512-.512h-6.633V6.48c0-1.332.434-1.742 1.64-1.742h5.198c.284 0 .513-.23.513-.512V1.844c0-.333-.152-.46-.512-.513C67.676 1.204 66.396 1 63.63 1c-3.304 0-6.25.82-6.25 5.482v8.505c0 4.662 2.92 5.507 6.224 5.507 2.766 0 4.073-.205 4.97-.332.36-.052.51-.205.51-.54m-15.213.13V8.324c0-5.942-2.948-7.326-7.916-7.326-1.307 0-4.227.23-5.585.436-1 .154-1.307.435-1.307 1.588V19.75c0 .28.205.51.486.51h3.406c.282 0 .488-.23.488-.51V4.918c.794-.103 1.946-.154 2.996-.154 2.1 0 3.05.692 3.05 3.56V19.75c0 .28.177.51.46.51h3.43c.283 0 .49-.23.49-.51" fill="#181716" fill-rule="nonzero"/>
-            <clipPath id="b">
-                <path d="M.01 0h121.77v20.93H.01z"/>
+    <!-- c3net Logo UNDERNEATH the existing card -->
+    <div class="text-center mt-4">
+        <svg width="122" height="21" viewBox="0 0 122 21" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" style="max-height: 80px; width: auto;">
+            <clipPath id="a">
+                <path d="M0 0h121.78v20.93H0z"/>
             </clipPath>
-            <g clip-path="url(#b)" fill-rule="nonzero">
-                <path d="M27.51 14.83v-.46c0-1.666-.87-3.1-2.28-3.843 1.36-.77 2.28-2.434 2.28-3.92V6.25c0-3.844-2.51-5.252-6.686-5.252-1.998 0-3.892.384-5.224.794-.256.077-.513.23-.513.486v2.05c0 .28.204.46.462.46h.05c1.947-.18 3.253-.307 5.046-.307 1.998 0 2.536.77 2.536 1.922v.36c0 1.127-.512 2.23-2.177 2.23H16.6c-.283 0-.488.202-.488.485v2.176c0 .282.205.514.487.514h4.507c1.665 0 2.075 1.05 2.075 2.203v.46c0 1.41-.717 2.177-2.536 2.177-1.383 0-3.304-.076-5.097-.23h-.054c-.256 0-.46.18-.46.46v2.05c0 .257.23.41.487.487 1.332.41 3.303.717 5.3.717 3.973 0 6.688-1.74 6.688-5.66" fill="#0969ad"/>
-                <path d="M11.962 19.467v-2.485c0-.307-.154-.512-.487-.512H11.4c-.975.077-2.384.205-3.793.205-1.767 0-3.176-.922-3.176-4.328v-3.23c0-3.406 1.41-4.328 3.177-4.328 1.41 0 2.818.127 3.792.204h.075c.333 0 .487-.205.487-.512V1.997c0-.36-.205-.46-.563-.563-.54-.18-2.025-.436-3.818-.436C3.688.998 0 3.022 0 9.118v3.23c0 6.095 3.688 8.143 7.582 8.143 1.793 0 3.28-.254 3.817-.434.357-.102.562-.23.562-.59" fill="#181716"/>
+            <g clip-path="url(#a)">
+                <path d="M121.78 17.085c0-2.123-1.72-3.845-3.844-3.845-1.11 0-2.11.476-2.81 1.228h-.004c-.938 1.08-2.317 1.763-3.86 1.763-1.54 0-2.92-.682-3.86-1.762h-.015c-.7-.752-1.697-1.228-2.808-1.228-2.126 0-3.847 1.722-3.847 3.845 0 2.125 1.72 3.846 3.846 3.846 1.063 0 2.016-.44 2.71-1.138h.064c.938-1.11 2.34-1.82 3.908-1.82 1.57 0 2.97.71 3.91 1.82h.05c.695.698 1.65 1.14 2.714 1.14 2.123 0 3.844-1.722 3.844-3.847M100.733 3.845c0-2.124 1.723-3.845 3.846-3.845 1.108 0 2.106.475 2.807 1.228h.004c.94 1.078 2.32 1.763 3.86 1.763 1.544 0 2.922-.684 3.86-1.762h.016C115.83.475 116.826 0 117.934 0c2.125 0 3.846 1.72 3.846 3.845 0 2.124-1.72 3.845-3.846 3.845-1.062 0-2.017-.44-2.71-1.14h-.063c-.94-1.11-2.34-1.818-3.91-1.818-1.568 0-2.97.708-3.908 1.82h-.052c-.694.7-1.65 1.138-2.71 1.138-2.124 0-3.847-1.72-3.847-3.845" fill="#0969ad" fill-rule="nonzero"/>
+                <path d="M94.348 10.557c0 2.124 1.723 3.846 3.844 3.846 1.11 0 2.107-.474 2.81-1.228h.004c.94-1.078 2.32-1.764 3.86-1.764 1.543 0 2.92.687 3.86 1.765h.015c.702.754 1.7 1.228 2.81 1.228 2.124 0 3.845-1.722 3.845-3.846s-1.72-3.846-3.846-3.846c-1.063 0-2.016.442-2.712 1.14h-.064c-.938 1.112-2.34 1.82-3.908 1.82-1.57 0-2.97-.708-3.91-1.82h-.05c-.695-.698-1.648-1.14-2.714-1.14-2.12 0-3.844 1.723-3.844 3.847M84.913 4.354V1.716c0-.282-.256-.487-.537-.487H71.67c-.28 0-.51.204-.51.486v2.638c0 .282.23.487.51.487h4.175v14.91c0 .28.232.51.513.51h3.356c.28 0 .513-.23.513-.51V4.84h4.15c.28 0 .536-.204.536-.486M69.083 19.62v-2.38c0-.283-.23-.513-.512-.513h-5.198c-1.205 0-1.64-.41-1.64-1.742V12.27h6.634c.283 0 .512-.23.512-.513V9.323c0-.28-.23-.512-.512-.512h-6.633V6.48c0-1.332.434-1.742 1.64-1.742h5.198c.284 0 .513-.23.513-.512V1.844c0-.333-.152-.46-.512-.513C67.676 1.204 66.396 1 63.63 1c-3.304 0-6.25.82-6.25 5.482v8.505c0 4.662 2.92 5.507 6.224 5.507 2.766 0 4.073-.205 4.97-.332.36-.052.51-.205.51-.54m-15.213.13V8.324c0-5.942-2.948-7.326-7.916-7.326-1.307 0-4.227.23-5.585.436-1 .154-1.307.435-1.307 1.588V19.75c0 .28.205.51.486.51h3.406c.282 0 .488-.23.488-.51V4.918c.794-.103 1.946-.154 2.996-.154 2.1 0 3.05.692 3.05 3.56V19.75c0 .28.177.51.46.51h3.43c.283 0 .49-.23.49-.51" fill="#181716" fill-rule="nonzero"/>
+                <clipPath id="b">
+                    <path d="M.01 0h121.77v20.93H.01z"/>
+                </clipPath>
+                <g clip-path="url(#b)" fill-rule="nonzero">
+                    <path d="M27.51 14.83v-.46c0-1.666-.87-3.1-2.28-3.843 1.36-.77 2.28-2.434 2.28-3.92V6.25c0-3.844-2.51-5.252-6.686-5.252-1.998 0-3.892.384-5.224.794-.256.077-.513.23-.513.486v2.05c0 .28.204.46.462.46h.05c1.947-.18 3.253-.307 5.046-.307 1.998 0 2.536.77 2.536 1.922v.36c0 1.127-.512 2.23-2.177 2.23H16.6c-.283 0-.488.202-.488.485v2.176c0 .282.205.514.487.514h4.507c1.665 0 2.075 1.05 2.075 2.203v.46c0 1.41-.717 2.177-2.536 2.177-1.383 0-3.304-.076-5.097-.23h-.054c-.256 0-.46.18-.46.46v2.05c0 .257.23.41.487.487 1.332.41 3.303.717 5.3.717 3.973 0 6.688-1.74 6.688-5.66" fill="#0969ad"/>
+                    <path d="M11.962 19.467v-2.485c0-.307-.154-.512-.487-.512H11.4c-.975.077-2.384.205-3.793.205-1.767 0-3.176-.922-3.176-4.328v-3.23c0-3.406 1.41-4.328 3.177-4.328 1.41 0 2.818.127 3.792.204h.075c.333 0 .487-.205.487-.512V1.997c0-.36-.205-.46-.563-.563-.54-.18-2.025-.436-3.818-.436C3.688.998 0 3.022 0 9.118v3.23c0 6.095 3.688 8.143 7.582 8.143 1.793 0 3.28-.254 3.817-.434.357-.102.562-.23.562-.59" fill="#181716"/>
+                </g>
             </g>
-        </g>
-        <path d="M34.652 8.313v-2.52c0-.22-.18-.4-.4-.4h-2.34c-.22 0-.42.18-.42.4v2.52c0 .22.2.38.42.38h2.34c.22 0 .4-.16.4-.38zm0 7.64v-2.52c0-.22-.18-.38-.4-.38h-2.34c-.22 0-.42.16-.42.38v2.52c0 .22.2.4.42.4h2.34c.22 0 .4-.18.4-.4z" fill-rule="nonzero"/>
-    </svg>
+            <path d="M34.652 8.313v-2.52c0-.22-.18-.4-.4-.4h-2.34c-.22 0-.42.18-.42.4v2.52c0 .22.2.38.42.38h2.34c.22 0 .4-.16.4-.38zm0 7.64v-2.52c0-.22-.18-.38-.4-.38h-2.34c-.22 0-.42.16-.42.38v2.52c0 .22.2.4.42.4h2.34c.22 0 .4-.18.4-.4z" fill-rule="nonzero"/>
+        </svg>
+    </div>
 </div>
 
 {% endblock %}
