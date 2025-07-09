@@ -29,7 +29,7 @@ class ModuleRepository extends ServiceEntityRepository
                 INNER JOIN user_module_permission ump ON m.id = ump.module_id 
                 WHERE ump.user_id = UNHEX(:userIdHex) 
                 AND (ump.can_read = 1 OR ump.can_write = 1) 
-                ORDER BY m.name ASC';
+                ORDER BY m.id ASC';
         
         $connection = $this->getEntityManager()->getConnection();
         $stmt = $connection->prepare($sql);
@@ -67,7 +67,7 @@ class ModuleRepository extends ServiceEntityRepository
             ->andWhere('ump.user = :user')
             ->andWhere('ump.canRead = true')
             ->setParameter('user', $user)
-            ->orderBy('m.name', 'ASC')
+            ->orderBy('m.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -83,7 +83,7 @@ class ModuleRepository extends ServiceEntityRepository
             ->andWhere('ump.user = :user')
             ->andWhere('ump.canWrite = true')
             ->setParameter('user', $user)
-            ->orderBy('m.name', 'ASC')
+            ->orderBy('m.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -97,7 +97,7 @@ class ModuleRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('m')
             ->leftJoin('m.userPermissions', 'ump')
             ->andWhere('ump.id IS NULL')
-            ->orderBy('m.name', 'ASC')
+            ->orderBy('m.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -114,7 +114,7 @@ class ModuleRepository extends ServiceEntityRepository
             ->andWhere('ump.canRead = true')
             ->andWhere('m.active = true')
             ->setParameter('user', $user)
-            ->orderBy('m.name', 'ASC')
+            ->orderBy('m.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -132,7 +132,7 @@ class ModuleRepository extends ServiceEntityRepository
                 WHERE ump.user_id = UNHEX(:userIdHex) 
                 AND (ump.can_read = 1 OR ump.can_write = 1) 
                 AND m.active = 1 
-                ORDER BY m.name ASC';
+                ORDER BY m.id ASC';
         
         $connection = $this->getEntityManager()->getConnection();
         $stmt = $connection->prepare($sql);
@@ -172,7 +172,7 @@ class ModuleRepository extends ServiceEntityRepository
                 WHERE ump.user_id = UNHEX(:userIdHex) 
                 AND (ump.can_read = 1 OR ump.can_write = 1) 
                 AND m.active = 1 
-                ORDER BY m.name ASC';
+                ORDER BY m.id ASC';
         
         $connection = $this->getEntityManager()->getConnection();
         $stmt = $connection->prepare($sql);

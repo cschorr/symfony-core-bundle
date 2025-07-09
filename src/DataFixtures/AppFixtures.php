@@ -49,12 +49,11 @@ class AppFixtures extends Fixture
 
     public function createModuleFixtures(ObjectManager $manager): void
     {
-        // each module representing one entity
+        // Modules in navigation order - they will be sorted by ID (UUID) in ascending order
         $modules = [
-            // Add your module data here
+            ['name' => 'Module', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
             ['name' => 'Benutzer', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
             ['name' => 'Unternehmen', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
-            ['name' => 'Module', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
             ['name' => 'Unternehmensgruppen', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
         ];
 
