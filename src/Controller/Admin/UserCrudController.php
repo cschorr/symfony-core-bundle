@@ -129,6 +129,7 @@ class UserCrudController extends AbstractCrudController
             $fields[] = FormField::addTab($this->translator->trans('User Information'));
             $fields[] = EmailField::new('email');
             $fields[] = ChoiceField::new('roles')
+                ->setLabel($this->translator->trans('Roles'))
                 ->setChoices([
                     $this->translator->trans('User') => 'ROLE_USER',
                     $this->translator->trans('Admin') => 'ROLE_ADMIN',

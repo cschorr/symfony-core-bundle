@@ -62,9 +62,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPageTitle('index', $this->translator->trans('%s Management', [$this->translator->trans($this->getModuleName())]))
+            ->setPageTitle('index', sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Management')))
             ->setPageTitle('detail', fn ($entity) => $this->translator->trans('View %s', [$this->getEntityLabel($entity)]))
-            ->setPageTitle('new', $this->translator->trans('Create %s', [$this->translator->trans($this->getModuleName())]))
+            ->setPageTitle('new', sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Create')))
             ->setPageTitle('edit', fn ($entity) => $this->translator->trans('Edit %s', [$this->getEntityLabel($entity)]))
             ->setDefaultSort(['id' => 'DESC'])
             ->setPaginatorPageSize(25)
