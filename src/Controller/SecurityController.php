@@ -19,8 +19,14 @@ class SecurityController extends AbstractController
 
     #[Route(path: '/login', name: 'app_login')]
     #[Route(path: '/login/{_locale}', name: 'app_login_locale', requirements: ['_locale' => '%app.locales.pattern%'])]
-    public function login(AuthenticationUtils $authenticationUtils, string $_locale = 'en'): Response
+    public function login(AuthenticationUtils $authenticationUtils, string $_locale = null): Response
     {
+        // Use default locale if none provided
+        if ($_locale === null) {
+            $supportedLocales = $this->localeService->getSupportedLocales();
+            $_locale = $supportedLocales[0] ?? 'de'; // fallback to 'de' if no locales configured
+        }
+
         // redirect to easyadmin dashboard if logged on
         if ($this->getUser()) {
             return $this->redirectToRoute('admin', ['_locale' => $_locale]);

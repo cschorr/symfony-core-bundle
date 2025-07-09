@@ -2,12 +2,12 @@ parameters:
   app.locales:
     - de
     - en
+    - es
     - fr
+    - it
     - nl
     - se
-    - zh_TW
-    - it
-    - es
+    - zh_TW   
 services:
   _defaults:
     autowire: true
