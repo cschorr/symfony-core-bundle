@@ -130,4 +130,17 @@ Items per page: Elemente pro Seite
 
 # Permission fields
 'Read Permission': Leseberechtigung
-'Write Permission': Schreibberechtigung
+'You are logged in as': Sie sind angemeldet als
+'Demo Credentials': Demo-Zugangsdaten
+'Admin User': Administrator
+'Regular User': Normaler Benutzer
+'Placeholder image': Platzhalterbild
+'supported by': unterstützt von
+
+
+# Login page translations
+'Demo Credentials': Demo-Zugangsdaten
+'Admin User': Administrator
+'Regular User': Normaler Benutzer
+'Placeholder image': Platzhalterbild
+'supported by': unterstützt von

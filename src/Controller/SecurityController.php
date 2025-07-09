@@ -2,19 +2,28 @@
 
 namespace App\Controller;
 
+use App\Service\LocaleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SecurityController extends AbstractController
 {
+    public function __construct(
+        private LocaleService $localeService,
+        private TranslatorInterface $translator
+    ) {
+    }
+
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    #[Route(path: '/login/{_locale}', name: 'app_login_locale', requirements: ['_locale' => '%app.locales.pattern%'])]
+    public function login(AuthenticationUtils $authenticationUtils, string $_locale = 'en'): Response
     {
         // redirect to easyadmin dashboard if logged on
         if ($this->getUser()) {
-            return $this->redirectToRoute('admin');
+            return $this->redirectToRoute('admin', ['_locale' => $_locale]);
         }
 
         // get the login error if there is one
@@ -26,6 +35,8 @@ class SecurityController extends AbstractController
         return $this->render('body/security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
+            'current_locale' => $_locale,
+            'available_locales' => $this->localeService->getEasyAdminLocales(),
         ]);
     }
 

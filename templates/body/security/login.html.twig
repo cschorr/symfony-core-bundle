@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}{{ 'Login'|trans }}{% endblock %}
 
 {% set class_body = 'd-flex align-items-center py-4 bg-body-tertiary' %}
 {% block body %}
@@ -50,9 +50,28 @@
 #}
 
 <div class="form-signin w-100 m-auto bg-white rounded">
+    <!-- Language Switcher -->
+    <div class="position-absolute top-0 end-0 m-3">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ available_locales[current_locale] ?? current_locale|upper }}
+            </button>
+            <ul class="dropdown-menu">
+                {% for locale, display_name in available_locales %}
+                    <li>
+                        <a class="dropdown-item{% if locale == current_locale %} active{% endif %}" 
+                           href="{{ path('app_login_locale', {'_locale': locale}) }}">
+                            {{ display_name }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col" style="min-height:420px">
-            <img src="{{ image_placeholder_portrait }}" alt="Placeholder image" class="img-fluid">
+            <img src="{{ image_placeholder_portrait }}" alt="{{ 'Placeholder image'|trans }}" class="img-fluid">
         </div>
         <div class="col">
             <div class="h-100 w-75 d-flex flex-column justify-content-center">
@@ -65,15 +84,15 @@
             
                     {% if app.user %}
                         <div class="mb-3">
-                            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                            {{ 'You are logged in as'|trans }} {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">{{ 'Logout'|trans }}</a>
                         </div>
                     {% endif %}
             
-                    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+                    <h1 class="h3 mb-3 font-weight-normal">{{ 'Please sign in'|trans }}</h1>
 
-                    <label for="username">Email</label>
+                    <label for="username">{{ 'Email'|trans }}</label>
                     <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-                    <label for="password">Password</label>
+                    <label for="password">{{ 'Password'|trans }}</label>
                     <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
             
                     <input type="hidden" name="_csrf_token"
@@ -86,21 +105,22 @@
             
                         <div class="checkbox mb-3">
                             <input type="checkbox" name="_remember_me" id="_remember_me">
-                            <label for="_remember_me">Remember me</label>
+                            <label for="_remember_me">{{ 'Remember me'|trans }}</label>
                         </div>
                     #}
             
                     <button class="btn btn-lg btn-primary" type="submit">
-                        Sign in
+                        {{ 'Sign in'|trans }}
                     </button>
                 </form>
 
                 <br>
                 <small>
                     <i>
-                        USER ADMIN: admin@example.com<br>
-                        USER: demo@example.com<br>
-                        KEY: pass_1234
+                        {{ 'Demo Credentials'|trans }}:<br>
+                        {{ 'Admin User'|trans }}: admin@example.com<br>
+                        {{ 'Regular User'|trans }}: demo@example.com<br>
+                        {{ 'Password'|trans }}: pass_1234
                     </i>
                 </small>
 
@@ -113,7 +133,7 @@
     </div>
 
     <div class="text-center mt-2">
-        supported by <a href="https://c3net.de" target="_blank">c3:net</a>
+        {{ 'supported by'|trans }} <a href="https://c3net.de" target="_blank">c3:net</a>
     </div>
 
 </div>

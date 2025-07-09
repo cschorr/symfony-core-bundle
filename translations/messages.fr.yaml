@@ -131,3 +131,11 @@ Items per page: Éléments par page
 # Permission fields
 'Read Permission': Permission de lecture
 'Write Permission': Permission d'écriture
+
+
+'You are logged in as': Vous êtes connecté en tant que
+'Demo Credentials': Identifiants de démo
+'Admin User': Utilisateur administrateur
+'Regular User': Utilisateur normal
+'Placeholder image': Image de placeholder
+'supported by': soutenu par
