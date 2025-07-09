@@ -8,7 +8,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Yaml\Yaml;
 
 #[AsCommand(
     name: 'app:locale:sync',
@@ -33,22 +32,12 @@ class LocaleSyncCommand extends Command
         
         $io->section('Current Configuration');
         $io->text("Supported locales: <info>" . implode(', ', $supportedLocales) . "</info>");
-        $io->text("Route pattern: <info>$routePattern</info>");
+        $io->text("Route pattern (auto-generated): <info>$routePattern</info>");
         
         $io->section('EasyAdmin Locale Mapping');
         foreach ($supportedLocales as $locale) {
             $displayName = $this->localeService->getLocaleDisplayName($locale);
             $io->text("• <info>$locale</info> → $displayName");
-        }
-        
-        // Update services.yaml with the generated pattern
-        $servicesFile = dirname(__DIR__, 2) . '/config/services.yaml';
-        if (file_exists($servicesFile)) {
-            $config = Yaml::parseFile($servicesFile);
-            $config['parameters']['app.locales.pattern'] = $routePattern;
-            
-            file_put_contents($servicesFile, Yaml::dump($config, 4, 2));
-            $io->success("Updated services.yaml with route pattern: $routePattern");
         }
         
         $io->section('Translation Files Status');
@@ -68,12 +57,16 @@ class LocaleSyncCommand extends Command
         
         $io->table(['Locale', 'messages.*.yaml', 'EasyAdminBundle.*.yaml'], $files);
         
+        $io->success('✅ Route pattern automatically generated from app.locales!');
+        
         $io->note([
-            'After adding/removing locales in services.yaml:',
-            '1. Run: bin/console app:locale:sync',
+            'Adding/removing locales is now super simple:',
+            '1. Edit app.locales in config/services.yaml',
             '2. Update display names in LocaleService::getLocaleDisplayName()',
             '3. Create missing translation files if needed',
-            '4. Clear cache: bin/console cache:clear'
+            '4. Clear cache: bin/console cache:clear',
+            '',
+            '✨ No manual pattern updates needed - everything is automatic!'
         ]);
         
         return Command::SUCCESS;
