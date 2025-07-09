@@ -75,7 +75,7 @@ class ModuleCrudController extends AbstractCrudController
     public function index(AdminContext $context)
     {
         if (!$this->isGranted('read', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need read permission for the Module module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
         }
         return parent::index($context);
     }
@@ -83,7 +83,7 @@ class ModuleCrudController extends AbstractCrudController
     public function detail(AdminContext $context)
     {
         if (!$this->isGranted('read', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need read permission for the Module module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need read permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
         }
         return parent::detail($context);
     }
@@ -91,7 +91,7 @@ class ModuleCrudController extends AbstractCrudController
     public function new(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the Module module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
         }
         return parent::new($context);
     }
@@ -99,7 +99,7 @@ class ModuleCrudController extends AbstractCrudController
     public function edit(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the Module module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
         }
         return parent::edit($context);
     }
@@ -107,7 +107,7 @@ class ModuleCrudController extends AbstractCrudController
     public function delete(AdminContext $context)
     {
         if (!$this->isGranted('write', $this->getModule())) {
-            throw new AccessDeniedException('Access denied. You need write permission for the Module module.');
+            throw new AccessDeniedException($this->translator->trans('Access denied. You need write permission for the %module% module.', ['%module%' => $this->translator->trans('Module')]));
         }
         return parent::delete($context);
     }
