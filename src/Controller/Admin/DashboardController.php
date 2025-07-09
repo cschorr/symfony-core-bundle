@@ -129,7 +129,6 @@ class DashboardController extends AbstractDashboardController
         }
 
         $entityMapping = $this->navigationService->getModuleEntityMapping();
-        $iconMapping = $this->navigationService->getModuleIconMapping();
 
         // Generate menu items dynamically based on user permissions and active modules
         foreach ($accessibleModules as $module) {
@@ -138,7 +137,7 @@ class DashboardController extends AbstractDashboardController
             // Check if we have an entity mapping for this module
             if (isset($entityMapping[$moduleCode])) {
                 $entityClass = $entityMapping[$moduleCode];
-                $icon = $iconMapping[$moduleCode] ?? 'fas fa-list';
+                $icon = $this->navigationService->getModuleIcon($module);
                 $label = $this->translator->trans($module->getName());
                 
                 yield MenuItem::linkToCrud($label, $icon, $entityClass);

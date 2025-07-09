@@ -83,9 +83,12 @@ class NavigationService
     /**
      * Get module icon mapping for navigation
      * This maps module codes to their FontAwesome icons
+     * @deprecated Use Module::getIcon() instead - icons are now stored in database
      */
     public function getModuleIconMapping(): array
     {
+        // This method is deprecated but kept for backward compatibility
+        // Icons are now stored in the database on the Module entity
         return [
             'Module' => 'fas fa-list',
             'User' => 'fas fa-users',
@@ -93,5 +96,14 @@ class NavigationService
             'CompanyGroup' => 'fas fa-users',
             // Add more icon mappings as needed
         ];
+    }
+
+    /**
+     * Get icon for a module from the database
+     */
+    public function getModuleIcon(Module $module): string
+    {
+        // Return the icon from the database, or a default icon if not set
+        return $module->getIcon() ?? 'fas fa-list';
     }
 }
