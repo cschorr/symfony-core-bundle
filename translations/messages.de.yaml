@@ -47,6 +47,24 @@ Module: Modul
 Modules: Module
 Group: Gruppe
 Groups: Gruppen
+CompanyGroup: Unternehmensgruppe
+CompanyGroups: Unternehmensgruppen
+
+# Management pages
+'%s Management': '%s Verwaltung'
+'Create %s': '%s erstellen'
+'View %s': '%s anzeigen'
+'Edit %s': '%s bearbeiten'
+
+# Field labels
+'Company Group': Unternehmensgruppe
+'Country Code': Ländercode
+Employees: Mitarbeiter
+'User Permissions': Benutzerberechtigungen
+'Module Permissions': Modulberechtigungen
+Mobile: Mobil
+Street: Straße
+ZIP: PLZ
 
 # Permissions
 Permissions: Berechtigungen
@@ -71,6 +89,11 @@ Required field: Pflichtfeld
 Optional: Optional
 Select an option: Option auswählen
 No results found: Keine Ergebnisse gefunden
+
+# Module-specific translations
+'System Modules': System Module
+'Create System Module': System-Modul erstellen
+'Manage system modules and their permissions.': Systemmodule und deren Berechtigungen verwalten.
 
 # Navigation
 Previous: Vorherige

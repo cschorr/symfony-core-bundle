@@ -10,18 +10,22 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController as EasyAdminAbstractCrudController;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 {
     protected EntityManagerInterface $entityManager;
     protected UserModulePermissionRepository $permissionRepository;
+    protected TranslatorInterface $translator;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        UserModulePermissionRepository $permissionRepository
+        UserModulePermissionRepository $permissionRepository,
+        TranslatorInterface $translator
     ) {
         $this->entityManager = $entityManager;
         $this->permissionRepository = $permissionRepository;
+        $this->translator = $translator;
     }
 
     /**
@@ -58,10 +62,10 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPageTitle('index', sprintf('%s Management', $this->getModuleName()))
-            ->setPageTitle('detail', fn ($entity) => sprintf('View %s', $this->getEntityLabel($entity)))
-            ->setPageTitle('new', sprintf('Create %s', $this->getModuleName()))
-            ->setPageTitle('edit', fn ($entity) => sprintf('Edit %s', $this->getEntityLabel($entity)))
+            ->setPageTitle('index', $this->translator->trans('%s Management', [$this->translator->trans($this->getModuleName())]))
+            ->setPageTitle('detail', fn ($entity) => $this->translator->trans('View %s', [$this->getEntityLabel($entity)]))
+            ->setPageTitle('new', $this->translator->trans('Create %s', [$this->translator->trans($this->getModuleName())]))
+            ->setPageTitle('edit', fn ($entity) => $this->translator->trans('Edit %s', [$this->getEntityLabel($entity)]))
             ->setDefaultSort(['id' => 'DESC'])
             ->setPaginatorPageSize(25)
             ->showEntityActionsInlined(false); // Show actions as dropdown menu
@@ -74,9 +78,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     {
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action) => $action->setLabel('Show')->setIcon('fa fa-eye'))
-            ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action) => $action->setLabel('Edit')->setIcon('fa fa-edit'))
-            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->setLabel('Delete')->setIcon('fa fa-trash'))
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action) => $action->setLabel($this->translator->trans('Show'))->setIcon('fa fa-eye'))
+            ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action) => $action->setLabel($this->translator->trans('Edit'))->setIcon('fa fa-edit'))
+            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->setLabel($this->translator->trans('Delete'))->setIcon('fa fa-trash'))
             ->setPermission(Action::DETAIL, 'ROLE_USER')
             ->setPermission(Action::NEW, 'ROLE_USER')
             ->setPermission(Action::EDIT, 'ROLE_USER')
@@ -90,10 +94,8 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     {
         return match (true) {
             method_exists($entity, '__toString') => (string) $entity,
-            method_exists($entity, 'getName') => $entity->getName(),
-            method_exists($entity, 'getTitle') => $entity->getTitle(),
-            method_exists($entity, 'getId') => sprintf('%s #%s', $this->getModuleName(), $entity->getId()),
-            default => $this->getModuleName()
+            method_exists($entity, 'getId') => sprintf('%s #%s', $this->translator->trans($this->getModuleName()), $entity->getId()),
+            default => $this->translator->trans($this->getModuleName())
         };
     }
 
@@ -234,7 +236,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         }
 
         $fields[] = \EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField::new('modulePermissions')
-            ->setLabel('Module Permissions')
+            ->setLabel($this->translator->trans('Module Permissions'))
             ->formatValue(function ($value, $entity) {
                 if (!$entity || !method_exists($entity, 'getModulePermissions') || 
                     !$entity->getModulePermissions() || $entity->getModulePermissions()->isEmpty()) {
