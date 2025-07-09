@@ -23,14 +23,37 @@ class ModuleRepository extends ServiceEntityRepository
      */
     public function findModulesForUser(User $user): array
     {
-        return $this->createQueryBuilder('m')
-            ->join('m.userPermissions', 'ump')
-            ->andWhere('ump.user = :user')
-            ->andWhere('ump.canRead = true OR ump.canWrite = true')
-            ->setParameter('user', $user)
-            ->orderBy('m.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+        $userIdHex = str_replace('-', '', $user->getId()->toRfc4122());
+        
+        $sql = 'SELECT HEX(m.id) as id_hex FROM module m 
+                INNER JOIN user_module_permission ump ON m.id = ump.module_id 
+                WHERE ump.user_id = UNHEX(:userIdHex) 
+                AND (ump.can_read = 1 OR ump.can_write = 1) 
+                ORDER BY m.name ASC';
+        
+        $connection = $this->getEntityManager()->getConnection();
+        $stmt = $connection->prepare($sql);
+        $stmt->bindValue('userIdHex', $userIdHex);
+        
+        $results = $stmt->executeQuery()->fetchAllAssociative();
+        
+        // Convert results to entities
+        $modules = [];
+        foreach ($results as $row) {
+            $uuid = \Symfony\Component\Uid\Uuid::fromString(
+                substr($row['id_hex'], 0, 8) . '-' . 
+                substr($row['id_hex'], 8, 4) . '-' . 
+                substr($row['id_hex'], 12, 4) . '-' . 
+                substr($row['id_hex'], 16, 4) . '-' . 
+                substr($row['id_hex'], 20, 12)
+            );
+            $module = $this->find($uuid);
+            if ($module) {
+                $modules[] = $module;
+            }
+        }
+        
+        return $modules;
     }
 
     /**
@@ -77,6 +100,103 @@ class ModuleRepository extends ServiceEntityRepository
             ->orderBy('m.name', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Find all active modules that a user has read access to
+     * @return Module[]
+     */
+    public function findActiveReadableModulesForUser(User $user): array
+    {
+        return $this->createQueryBuilder('m')
+            ->join('m.userPermissions', 'ump')
+            ->andWhere('ump.user = :user')
+            ->andWhere('ump.canRead = true')
+            ->andWhere('m.active = true')
+            ->setParameter('user', $user)
+            ->orderBy('m.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find all active modules that a user has any permission for
+     * @return Module[]
+     */
+    public function findActiveModulesForUser(User $user): array
+    {
+        $userIdHex = str_replace('-', '', $user->getId()->toRfc4122());
+        
+        $sql = 'SELECT HEX(m.id) as id_hex FROM module m 
+                INNER JOIN user_module_permission ump ON m.id = ump.module_id 
+                WHERE ump.user_id = UNHEX(:userIdHex) 
+                AND (ump.can_read = 1 OR ump.can_write = 1) 
+                AND m.active = 1 
+                ORDER BY m.name ASC';
+        
+        $connection = $this->getEntityManager()->getConnection();
+        $stmt = $connection->prepare($sql);
+        $stmt->bindValue('userIdHex', $userIdHex);
+        
+        $results = $stmt->executeQuery()->fetchAllAssociative();
+        
+        // Convert results to entities
+        $modules = [];
+        foreach ($results as $row) {
+            $uuid = \Symfony\Component\Uid\Uuid::fromString(
+                substr($row['id_hex'], 0, 8) . '-' . 
+                substr($row['id_hex'], 8, 4) . '-' . 
+                substr($row['id_hex'], 12, 4) . '-' . 
+                substr($row['id_hex'], 16, 4) . '-' . 
+                substr($row['id_hex'], 20, 12)
+            );
+            $module = $this->find($uuid);
+            if ($module) {
+                $modules[] = $module;
+            }
+        }
+        
+        return $modules;
+    }
+
+    /**
+     * Find all active modules that a user has any permission for using native SQL
+     * @return Module[]
+     */
+    public function findActiveModulesForUserNative(User $user): array
+    {
+        $userIdHex = str_replace('-', '', $user->getId()->toRfc4122());
+        
+        $sql = 'SELECT HEX(m.id) as id_hex, m.name, m.code, m.active FROM module m 
+                INNER JOIN user_module_permission ump ON m.id = ump.module_id 
+                WHERE ump.user_id = UNHEX(:userIdHex) 
+                AND (ump.can_read = 1 OR ump.can_write = 1) 
+                AND m.active = 1 
+                ORDER BY m.name ASC';
+        
+        $connection = $this->getEntityManager()->getConnection();
+        $stmt = $connection->prepare($sql);
+        $stmt->bindValue('userIdHex', $userIdHex);
+        
+        $results = $stmt->executeQuery()->fetchAllAssociative();
+        
+        // Convert results to entities by finding them by ID
+        $modules = [];
+        foreach ($results as $row) {
+            $uuid = \Symfony\Component\Uid\Uuid::fromString(
+                substr($row['id_hex'], 0, 8) . '-' . 
+                substr($row['id_hex'], 8, 4) . '-' . 
+                substr($row['id_hex'], 12, 4) . '-' . 
+                substr($row['id_hex'], 16, 4) . '-' . 
+                substr($row['id_hex'], 20, 12)
+            );
+            $module = $this->find($uuid);
+            if ($module) {
+                $modules[] = $module;
+            }
+        }
+        
+        return $modules;
     }
 
 //    /**

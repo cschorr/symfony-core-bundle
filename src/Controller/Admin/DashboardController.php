@@ -12,6 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use App\Service\LocaleService;
+use App\Service\NavigationService;
 
 use App\Entity\Module;
 use App\Entity\User;
@@ -23,7 +24,8 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private LocaleService $localeService
+        private LocaleService $localeService,
+        private NavigationService $navigationService
     ) {
     }
 
@@ -108,10 +110,39 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
+        // Always show dashboard
         yield MenuItem::linkToDashboard($this->translator->trans('Dashboard'), 'fa fa-home');
-        yield MenuItem::linkToCrud($this->translator->trans('Module'), 'fas fa-list', Module::class);
-        yield MenuItem::linkToCrud($this->translator->trans('User'), 'fas fa-list', User::class);
-        yield MenuItem::linkToCrud($this->translator->trans('Company'), 'fas fa-building', Company::class);
-        yield MenuItem::linkToCrud($this->translator->trans('CompanyGroup'), 'fas fa-users', CompanyGroup::class);
+
+        /** @var User $user */
+        $user = $this->getUser();
+        
+        if (!$user instanceof User) {
+            return;
+        }
+
+        // Get accessible modules for the current user
+        // Admin users see all active modules, regular users see only modules they have permissions for
+        if ($this->navigationService->isUserAdmin($user)) {
+            $accessibleModules = $this->navigationService->getAllActiveModules();
+        } else {
+            $accessibleModules = $this->navigationService->getAccessibleModulesForUser($user);
+        }
+
+        $entityMapping = $this->navigationService->getModuleEntityMapping();
+        $iconMapping = $this->navigationService->getModuleIconMapping();
+
+        // Generate menu items dynamically based on user permissions and active modules
+        foreach ($accessibleModules as $module) {
+            $moduleCode = $module->getCode();
+            
+            // Check if we have an entity mapping for this module
+            if (isset($entityMapping[$moduleCode])) {
+                $entityClass = $entityMapping[$moduleCode];
+                $icon = $iconMapping[$moduleCode] ?? 'fas fa-list';
+                $label = $this->translator->trans($module->getName());
+                
+                yield MenuItem::linkToCrud($label, $icon, $entityClass);
+            }
+        }
     }
 }
