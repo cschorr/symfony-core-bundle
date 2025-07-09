@@ -451,4 +451,44 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         
         return null;
     }
+    
+    /**
+     * Override to handle foreign key constraint violations
+     */
+    public function delete(AdminContext $context): KeyValueStore|Response
+    {
+        $entity = $context->getEntity()->getInstance();
+        
+        // Check if entity can be deleted (implemented by child classes)
+        if (method_exists($this, 'canDeleteEntity') && !call_user_func([$this, 'canDeleteEntity'], $entity)) {
+            $this->addFlash('danger', $this->translator->trans('Cannot delete record. It has related records that prevent deletion.'));
+            
+            // Redirect back to the detail page
+            $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
+            $url = $adminUrlGenerator
+                ->setController(static::class)
+                ->setAction(Action::DETAIL)
+                ->setEntityId($entity->getId())
+                ->generateUrl();
+            
+            return $this->redirect($url);
+        }
+        
+        try {
+            return parent::delete($context);
+        } catch (\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException $e) {
+            // Handle foreign key constraint violations
+            $this->addFlash('danger', $this->translator->trans('Cannot delete record. It has related records that prevent deletion. Please remove all related records first.'));
+            
+            // Redirect back to the detail page
+            $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
+            $url = $adminUrlGenerator
+                ->setController(static::class)
+                ->setAction(Action::DETAIL)
+                ->setEntityId($entity->getId())
+                ->generateUrl();
+            
+            return $this->redirect($url);
+        }
+    }
 }
