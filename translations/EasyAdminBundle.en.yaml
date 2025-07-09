@@ -1,0 +1,85 @@
+# EasyAdmin specific English translations
+# Page titles
+list.page_title: '%entity_label_plural% List'
+show.page_title: 'Show %entity_label%'
+edit.page_title: 'Edit %entity_label%'
+new.page_title: 'Create new %entity_label%'
+
+# Actions
+action.new: New
+action.show: Show
+action.edit: Edit
+action.delete: Delete
+action.search: Search
+action.detail: Details
+action.save_and_continue: Save and continue editing
+action.save_and_return: Save and return
+
+# Labels
+label.save: Save
+label.cancel: Cancel
+label.delete: Delete
+label.edit: Edit
+label.show: Show
+label.search: Search
+label.filters: Filters
+
+# Batch actions
+batch_action_modal.title: 'You are about to edit %num_items% item(s)'
+batch_action_modal.content: 'This action cannot be undone.'
+batch_action_modal.action: Execute action
+
+# Delete modal
+delete_modal.title: Delete item
+delete_modal.content: 'Are you sure you want to delete this item?'
+
+# Pagination
+paginator.first: First
+paginator.previous: Previous
+paginator.next: Next
+paginator.last: Last
+paginator.counter: '%start%-%end% of %results%'
+paginator.results: '{0} No results|{1} 1 result|]1,Inf] %count% results'
+
+# Filters
+filter.title: Filters
+filter.button.clear: Clear filters
+filter.button.apply: Apply filters
+filter.label.true: Yes
+filter.label.false: No
+filter.label.is_equal_to: is equal to
+filter.label.is_not_equal_to: is not equal to
+filter.label.is_greater_than: is greater than
+filter.label.is_greater_than_or_equal_to: is greater than or equal to
+filter.label.is_less_than: is less than
+filter.label.is_less_than_or_equal_to: is less than or equal to
+filter.label.is_between: is between
+filter.label.contains: contains
+filter.label.not_contains: does not contain
+filter.label.starts_with: starts with
+filter.label.ends_with: ends with
+filter.label.exactly: exactly
+filter.label.not_exactly: not exactly
+filter.label.is_same: is same as
+filter.label.is_not_same: is not same as
+filter.label.is_after: is after
+filter.label.is_after_or_same: is after or same as
+filter.label.is_before: is before
+filter.label.is_before_or_same: is before or same as
+
+# Form field types
+field.text: Text
+field.email: Email
+field.integer: Integer
+field.number: Number
+field.password: Password
+field.percent: Percent
+field.textarea: Textarea
+field.datetime: Date and time
+field.date: Date
+field.time: Time
+field.choice: Choice
+field.boolean: Yes/No
+field.association: Association
+field.file: File
+field.image: Image

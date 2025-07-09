@@ -1,0 +1,85 @@
+# EasyAdmin specific French translations
+# Page titles
+list.page_title: 'Liste %entity_label_plural%'
+show.page_title: 'Afficher %entity_label%'
+edit.page_title: 'Modifier %entity_label%'
+new.page_title: 'Créer nouveau %entity_label%'
+
+# Actions
+action.new: Nouveau
+action.show: Afficher
+action.edit: Modifier
+action.delete: Supprimer
+action.search: Rechercher
+action.detail: Détails
+action.save_and_continue: Enregistrer et continuer
+action.save_and_return: Enregistrer et retourner
+
+# Labels
+label.save: Enregistrer
+label.cancel: Annuler
+label.delete: Supprimer
+label.edit: Modifier
+label.show: Afficher
+label.search: Rechercher
+label.filters: Filtres
+
+# Batch actions
+batch_action_modal.title: 'Vous êtes sur le point de modifier %num_items% élément(s)'
+batch_action_modal.content: 'Cette action ne peut pas être annulée.'
+batch_action_modal.action: Exécuter l'action
+
+# Delete modal
+delete_modal.title: Supprimer l'élément
+delete_modal.content: 'Êtes-vous sûr de vouloir supprimer cet élément ?'
+
+# Pagination
+paginator.first: Premier
+paginator.previous: Précédent
+paginator.next: Suivant
+paginator.last: Dernier
+paginator.counter: '%start%-%end% de %results%'
+paginator.results: '{0} Aucun résultat|{1} 1 résultat|]1,Inf] %count% résultats'
+
+# Filters
+filter.title: Filtres
+filter.button.clear: Effacer les filtres
+filter.button.apply: Appliquer les filtres
+filter.label.true: Oui
+filter.label.false: Non
+filter.label.is_equal_to: est égal à
+filter.label.is_not_equal_to: n'est pas égal à
+filter.label.is_greater_than: est supérieur à
+filter.label.is_greater_than_or_equal_to: est supérieur ou égal à
+filter.label.is_less_than: est inférieur à
+filter.label.is_less_than_or_equal_to: est inférieur ou égal à
+filter.label.is_between: est entre
+filter.label.contains: contient
+filter.label.not_contains: ne contient pas
+filter.label.starts_with: commence par
+filter.label.ends_with: finit par
+filter.label.exactly: exactement
+filter.label.not_exactly: pas exactement
+filter.label.is_same: est identique à
+filter.label.is_not_same: n'est pas identique à
+filter.label.is_after: est après
+filter.label.is_after_or_same: est après ou identique à
+filter.label.is_before: est avant
+filter.label.is_before_or_same: est avant ou identique à
+
+# Form field types
+field.text: Texte
+field.email: Email
+field.integer: Entier
+field.number: Nombre
+field.password: Mot de passe
+field.percent: Pourcentage
+field.textarea: Zone de texte
+field.datetime: Date et heure
+field.date: Date
+field.time: Heure
+field.choice: Choix
+field.boolean: Oui/Non
+field.association: Association
+field.file: Fichier
+field.image: Image
