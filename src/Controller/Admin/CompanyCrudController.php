@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use App\Entity\User;
 use App\Service\PermissionService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -85,7 +86,57 @@ class CompanyCrudController extends AbstractCrudController
             TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
             TextField::new('countryCode')->setLabel($this->translator->trans('Country Code')),
             TextField::new('url')->setLabel($this->translator->trans('Website')),
-            AssociationField::new('employees')->setLabel($this->translator->trans('Employees')),
+            AssociationField::new('employees')
+                ->setLabel($this->translator->trans('Employees'))
+                ->setFormTypeOptions([
+                    'by_reference' => false, // Important for bidirectional relationships
+                    'multiple' => true,
+                ])
+                ->autocomplete(),
         ];
+    }
+
+    /**
+     * Override to handle bidirectional employee relationship
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        /** @var Company $entityInstance */
+        $this->syncEmployeeRelationship($entityInstance);
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+
+    /**
+     * Override to handle bidirectional employee relationship
+     */
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        /** @var Company $entityInstance */
+        $this->syncEmployeeRelationship($entityInstance);
+        parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    /**
+     * Sync the bidirectional relationship between Company and Users (employees)
+     */
+    private function syncEmployeeRelationship(Company $company): void
+    {
+        // Get all users that were previously assigned to this company
+        $previousEmployees = $this->entityManager->getRepository(User::class)
+            ->findBy(['company' => $company]);
+
+        // Remove company reference from users no longer in the collection
+        foreach ($previousEmployees as $user) {
+            if (!$company->getEmployees()->contains($user)) {
+                $user->setCompany(null);
+            }
+        }
+
+        // Set company reference for all current employees
+        foreach ($company->getEmployees() as $employee) {
+            if ($employee->getCompany() !== $company) {
+                $employee->setCompany($company);
+            }
+        }
     }
 }
