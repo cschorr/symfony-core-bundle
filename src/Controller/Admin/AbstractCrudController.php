@@ -63,9 +63,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     {
         return $crud
             ->setPageTitle('index', sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Management')))
-            ->setPageTitle('detail', fn ($entity) => $this->translator->trans('View %s', [$this->getEntityLabel($entity)]))
+            ->setPageTitle('detail', fn ($entity) => sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Show')))
             ->setPageTitle('new', sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Create')))
-            ->setPageTitle('edit', fn ($entity) => $this->translator->trans('Edit %s', [$this->getEntityLabel($entity)]))
+            ->setPageTitle('edit', fn ($entity) => sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Edit')))
             ->setDefaultSort(['id' => 'DESC'])
             ->setPaginatorPageSize(25)
             ->showEntityActionsInlined(false); // Show actions as dropdown menu
@@ -92,11 +92,13 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     protected function getEntityLabel($entity): string
     {
-        return match (true) {
-            method_exists($entity, '__toString') => (string) $entity,
-            method_exists($entity, 'getId') => sprintf('%s #%s', $this->translator->trans($this->getModuleName()), $entity->getId()),
-            default => $this->translator->trans($this->getModuleName())
-        };
+        // If entity has toString method, use it directly (already localized)
+        if (method_exists($entity, '__toString')) {
+            return (string) $entity;
+        }
+        
+        // Otherwise, translate the module name
+        return $this->translator->trans($this->getModuleName());
     }
 
     /**
