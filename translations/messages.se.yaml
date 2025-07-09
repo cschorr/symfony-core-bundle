@@ -4,6 +4,8 @@ Module: Modul
 User: Användare
 Company: Företag
 CompanyGroup: Företagsgrupp
+Management: Hantering
+'%s Management': '%s Hantering'
 Name: Namn
 Email: E-post
 Roles: Roller

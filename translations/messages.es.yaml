@@ -4,6 +4,8 @@ Module: Módulo
 User: Usuario
 Company: Empresa
 CompanyGroup: Grupo de Empresas
+Management: Gestión
+'%s Management': 'Gestión de %s'
 Name: Nombre
 Email: Correo Electrónico
 Roles: Roles

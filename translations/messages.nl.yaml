@@ -4,6 +4,8 @@ Module: Module
 User: Gebruiker
 Company: Bedrijf
 CompanyGroup: Bedrijfsgroep
+Management: Beheer
+'%s Management': '%s Beheer'
 Name: Naam
 Email: E-mail
 Roles: Rollen
