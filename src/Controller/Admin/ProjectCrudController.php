@@ -103,6 +103,7 @@ class ProjectCrudController extends AbstractCrudController
                 ->type('text')
                 ->label('Project Name')
                 ->help('The name of the project')
+                ->linkToShow() // Add link to show action
                 ->build(),
                 
             $this->fieldService->field('description')

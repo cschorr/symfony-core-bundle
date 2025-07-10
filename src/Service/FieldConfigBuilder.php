@@ -117,6 +117,22 @@ class FieldConfigBuilder
         return $this;
     }
 
+    /**
+     * Make this field link to the show action of the related entity.
+     * 
+     * @param string|null $controllerClass Optional: specific controller class to link to.
+     *                                     If null, auto-detects based on entity naming convention.
+     * @return self
+     */
+    public function linkToShow(string $controllerClass = null): self
+    {
+        $this->config['linkToShow'] = true;
+        if ($controllerClass) {
+            $this->config['linkToShowController'] = $controllerClass;
+        }
+        return $this;
+    }
+
     public function association(string $targetEntity, $choiceLabel = 'name'): self
     {
         $this->config['type'] = 'association';

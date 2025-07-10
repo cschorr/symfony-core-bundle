@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +31,8 @@ class UserCrudController extends AbstractCrudController
         DuplicateService $duplicateService,
         RequestStack $requestStack,
         private EasyAdminFieldService $fieldService,
-        private RelationshipSyncService $relationshipSyncService
+        private RelationshipSyncService $relationshipSyncService,
+        private AdminUrlGenerator $adminUrlGenerator
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -138,8 +140,19 @@ class UserCrudController extends AbstractCrudController
                 ...$this->getActiveField(['index']), // Active field first for index
                 $this->fieldService->createIdField(),
                 $this->fieldService->field('email')
-                    ->type('email')
+                    ->type('text')
                     ->label('Email')
+                    ->formatValue(function ($value, $entity) {
+                        // Create a link to the show action instead of mailto
+                        $showUrl = $this->adminUrlGenerator
+                            ->setController(self::class)
+                            ->setAction(Action::DETAIL)
+                            ->setEntityId($entity->getId())
+                            ->generateUrl();
+                        
+                        return sprintf('<a href="%s" class="text-decoration-none">%s</a>', $showUrl, $value);
+                    })
+                    ->renderAsHtml()
                     ->build(),
                     
                 $this->fieldService->field('roles')

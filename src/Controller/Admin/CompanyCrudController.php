@@ -129,8 +129,18 @@ class CompanyCrudController extends AbstractCrudController
     {
         $fields = [];
         
-        // Standard entity fields (ID, name, active)
-        $fields = array_merge($fields, $this->getStandardEntityFields('Company'));
+        // Standard entity fields (ID, name with link, active)
+        $fields = array_merge($fields, [
+            ...$this->getActiveField(), // Active field first
+            $this->fieldService->createIdField(),
+            // Use name field with link to show action instead of regular name field
+            $this->fieldService->field('name')
+                ->type('text')
+                ->label('Company Name')
+                ->required(true)
+                ->linkToShow() // This will auto-detect the CompanyCrudController
+                ->build(),
+        ]);
         
         // Additional company-specific fields
         $fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
