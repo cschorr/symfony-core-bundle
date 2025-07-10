@@ -7,6 +7,8 @@ use App\Entity\User;
 use App\Service\EasyAdminFieldService;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use App\Service\RelationshipSyncService;
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -32,13 +34,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 
 class CompanyCrudController extends AbstractCrudController
 {
+    use FieldConfigurationTrait;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
         PermissionService $permissionService,
         DuplicateService $duplicateService,
         RequestStack $requestStack,
-        private EasyAdminFieldService $fieldService
+        private EasyAdminFieldService $fieldService,
+        private RelationshipSyncService $relationshipSyncService
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -111,7 +116,7 @@ class CompanyCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return $this->fieldService->generateFields(
+        return $this->fieldService->generateFieldsWithValidation(
             $this->getFieldConfigurations(),
             $pageName,
             fn($fields, $pageName) => $this->addActiveField($fields, $pageName)
@@ -119,110 +124,54 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Define all field configurations for the Company entity
+     * Define all field configurations for the Company entity using enhanced approach
      */
     private function getFieldConfigurations(): array
     {
-        return [
-            // Basic fields
-            $this->fieldService->createFieldConfig('id', 'id', [], null, [
-                'hideOnForm' => true,
-                'hideOnIndex' => true,
-            ]),
-            $this->fieldService->createFieldConfig('name', 'text', ['index', 'detail', 'form'], 'Name', [
-                'required' => true,
-            ]),
-            $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension'),
-            $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group'),
+        $fields = [];
+        
+        // Standard entity fields (ID, name)
+        $fields = array_merge($fields, $this->getStandardEntityFields('Company'));
+        
+        // Additional company-specific fields
+        $fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
+        $fields[] = $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group');
 
-            // Communication panel
-            $this->fieldService->createPanelConfig('communication_panel', 'Communication', ['detail', 'form'], 'fas fa-phone'),
-            $this->fieldService->createFieldConfig('email', 'email', ['index', 'detail', 'form'], 'Email Address', [
-                'indexLabel' => 'Email',
-                'panel' => 'communication',
-            ]),
-            $this->fieldService->createFieldConfig('phone', 'telephone', ['detail', 'form'], 'Phone Number', [
-                'panel' => 'communication',
-            ]),
-            $this->fieldService->createFieldConfig('cell', 'telephone', ['detail', 'form'], 'Mobile/Cell Phone', [
-                'panel' => 'communication',
-            ]),
-            $this->fieldService->createFieldConfig('url', 'url', ['index', 'detail', 'form'], 'Website', [
-                'panel' => 'communication',
-            ]),
+        // Contact information (address + communication) using trait
+        $fields = array_merge($fields, $this->getContactFieldGroups(['detail', 'form']));
 
-            // Address panel
-            $this->fieldService->createPanelConfig('address_panel', 'Address Information', ['detail', 'form'], 'fas fa-map-marker-alt'),
-            $this->fieldService->createFieldConfig('street', 'text', ['detail', 'form'], 'Street Address', [
-                'panel' => 'address',
-            ]),
-            $this->fieldService->createFieldConfig('zip', 'text', ['detail', 'form'], 'ZIP/Postal Code', [
-                'panel' => 'address',
-            ]),
-            $this->fieldService->createFieldConfig('city', 'text', ['index', 'detail', 'form'], 'City', [
-                'panel' => 'address',
-            ]),
-            $this->fieldService->createFieldConfig('countryCode', 'country', ['index', 'detail', 'form'], 'Country', [
-                'panel' => 'address',
-            ]),
+        // Employees using enhanced builder pattern
+        $fields[] = $this->fieldService->createPanelConfig('employees_panel', 'Employees', ['detail', 'form'], 'fas fa-users');
+        $fields[] = $this->getUserAssociationField('employees', 'Employees', ['index', 'detail', 'form'], true);
 
-            // Employees panel
-            $this->fieldService->createPanelConfig('employees_panel', 'Employees', ['detail', 'form'], 'fas fa-users'),
-            $this->fieldService->createFieldConfig('employees', 'association', ['index', 'detail', 'form'], 'Employees', [
-                'panel' => 'employees',
-                'multiple' => true,
-                'indexFormat' => 'count',
-                'countLabel' => 'Employees',
-                'targetEntity' => User::class,
-                'choiceLabel' => fn(User $user) => $user->getEmail(),
-            ]),
-        ];
+        return $fields;
     }
 
     /**
-     * Override to handle bidirectional employee relationship
+     * Auto-sync relationships using the service
+     */
+    protected function autoSyncRelationships(object $entity): void
+    {
+        if ($entity instanceof Company) {
+            $this->relationshipSyncService->autoSync($entity);
+        }
+    }
+
+    /**
+     * Override to use the new relationship sync service
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        /** @var Company $entityInstance */
-        $this->syncEmployeeRelationship($entityInstance);
+        $this->beforePersist($entityInstance);
         parent::persistEntity($entityManager, $entityInstance);
     }
 
     /**
-     * Override to handle bidirectional employee relationship
+     * Override to use the new relationship sync service
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        /** @var Company $entityInstance */
-        $this->syncEmployeeRelationship($entityInstance);
+        $this->beforeUpdate($entityInstance);
         parent::updateEntity($entityManager, $entityInstance);
-    }
-
-    /**
-     * Sync the bidirectional relationship between Company and Users (employees)
-     */
-    private function syncEmployeeRelationship(Company $company): void
-    {
-        // Only sync if company has an ID (not for new companies)
-        if ($company->getId()) {
-            // Get all users that were previously assigned to this company
-            $previousEmployees = $this->entityManager->getRepository(User::class)
-                ->findBy(['company' => $company]);
-
-            // Remove company reference from users no longer in the collection
-            foreach ($previousEmployees as $user) {
-                if (!$company->getEmployees()->contains($user)) {
-                    $user->setCompany(null);
-                }
-            }
-        }
-
-        // Set company reference for all current employees
-        foreach ($company->getEmployees() as $employee) {
-            if ($employee->getCompany() !== $company) {
-                $employee->setCompany($company);
-            }
-        }
     }
 }
