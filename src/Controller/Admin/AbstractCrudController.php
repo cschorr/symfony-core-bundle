@@ -9,6 +9,7 @@ use App\Service\DuplicateService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -77,6 +78,15 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->setDefaultSort(['id' => 'DESC'])
             ->setPaginatorPageSize(25)
             ->showEntityActionsInlined(false); // Show actions as dropdown menu
+    }
+
+    /**
+     * Configure assets to include the EasyAdmin theme CSS on all CRUD pages
+     */
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets
+            ->addCssFile('styles/easyadmin-theme.css');
     }
 
     /**
