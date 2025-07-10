@@ -152,9 +152,10 @@ class EasyAdminFieldService
             $field->hideOnIndex();
         }
 
-        // Set columns for form fields
-        if ($pageType === 'form' && isset($config['columns'])) {
-            $field->setColumns($config['columns']);
+        // Set columns for form fields (default to 12 if not specified)
+        if ($pageType === 'form') {
+            $columns = $config['columns'] ?? 12;
+            $field->setColumns($columns);
         }
 
         // Set required
