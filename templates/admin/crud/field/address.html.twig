@@ -1,0 +1,22 @@
+{% if ea.crud.currentAction == 'detail' %}
+    <div class="address-detail">
+        {% if field.value.street %}
+            <div><strong>{{ 'Street'|trans }}:</strong> {{ field.value.street }}</div>
+        {% endif %}
+        {% if field.value.zip or field.value.city %}
+            <div>
+                <strong>{{ 'City'|trans }}:</strong>
+                {% if field.value.zip %}{{ field.value.zip }} {% endif %}{{ field.value.city }}
+            </div>
+        {% endif %}
+        {% if field.value.countryCode %}
+            <div><strong>{{ 'Country'|trans }}:</strong> {{ field.value.countryCode }}</div>
+        {% endif %}
+    </div>
+{% elseif ea.crud.currentAction == 'index' %}
+    {% if field.value.city or field.value.countryCode %}
+        {{ field.value.city }}{% if field.value.city and field.value.countryCode %}, {% endif %}{{ field.value.countryCode }}
+    {% endif %}
+{% else %}
+    {{ form_widget(field.formObject) }}
+{% endif %}

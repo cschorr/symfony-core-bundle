@@ -1,0 +1,32 @@
+{% block address_widget %}
+    <div class="address-form-container">
+        <div class="row">
+            <div class="col-12 mb-3">
+                {{ form_row(form.street) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                {{ form_row(form.zip) }}
+            </div>
+            <div class="col-md-8 mb-3">
+                {{ form_row(form.city) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-3">
+                {{ form_row(form.countryCode) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block address_label %}
+    <label class="form-label fw-bold">
+        {% if label is not empty %}
+            {{ label|trans({}, translation_domain) }}
+        {% else %}
+            Address Information
+        {% endif %}
+    </label>
+{% endblock %}

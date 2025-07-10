@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 
 class CompanyCrudController extends AbstractCrudController
 {
@@ -106,9 +108,38 @@ class CompanyCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
             TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
-            TextField::new('countryCode')->setLabel($this->translator->trans('Country Code')),
             TextField::new('url')->setLabel($this->translator->trans('Website')),
         ];
+
+        // Add address fields
+        if ($pageName !== Crud::PAGE_INDEX) {
+            // Add address panel for forms
+            $fields[] = FormField::addPanel($this->translator->trans('Address Information'))
+                ->setIcon('fas fa-map-marker-alt')
+                ->collapsible();
+            
+            $fields[] = TextField::new('street')
+                ->setLabel($this->translator->trans('Street Address'))
+                ->setRequired(false);
+            
+            $fields[] = TextField::new('zip')
+                ->setLabel($this->translator->trans('ZIP/Postal Code'))
+                ->setRequired(false);
+                
+            $fields[] = TextField::new('city')
+                ->setLabel($this->translator->trans('City'))
+                ->setRequired(false);
+                
+            $fields[] = CountryField::new('countryCode')
+                ->setLabel($this->translator->trans('Country'))
+                ->setRequired(false);
+        } else {
+            // On index page, show address summary
+            $fields[] = TextField::new('city')
+                ->setLabel($this->translator->trans('City'));
+            $fields[] = CountryField::new('countryCode')
+                ->setLabel($this->translator->trans('Country'));
+        }
 
         // Configure employees field differently for index vs forms
         if ($pageName === Crud::PAGE_INDEX) {
