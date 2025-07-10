@@ -505,8 +505,86 @@ body[class*="ea-"].bg-tone-ocean {
     border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Background theme widget visibility control - managed by JavaScript */
+/* Background theme widget styling */
 .ea-sidebar-bg-controls {
     display: block;
-    transition: opacity 0.3s ease;
+    transition: none !important;
+    animation: none !important;
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-bg-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.sidebar-bg-title i {
+    margin-right: 8px;
+    opacity: 0.8;
+}
+
+.sidebar-bg-content .dropdown-toggle {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    font-size: 13px;
+    width: 100%;
+}
+
+.sidebar-bg-content .dropdown-toggle:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+}
+
+.sidebar-bg-status {
+    margin-top: 8px;
+    font-size: 12px;
+    text-align: center;
+    opacity: 0.8;
+}
+
+/* Light mode styling for widget */
+[data-bs-theme="light"] .ea-sidebar-bg-controls,
+body:not([data-bs-theme="dark"]) .ea-sidebar-bg-controls {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+[data-bs-theme="light"] .sidebar-bg-title,
+body:not([data-bs-theme="dark"]) .sidebar-bg-title {
+    color: #333;
+}
+
+[data-bs-theme="light"] .sidebar-bg-content .dropdown-toggle,
+body:not([data-bs-theme="dark"]) .sidebar-bg-content .dropdown-toggle {
+    background: rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;
+    color: #333 !important;
+}
+
+[data-bs-theme="light"] .sidebar-bg-content .dropdown-toggle:hover,
+body:not([data-bs-theme="dark"]) .sidebar-bg-content .dropdown-toggle:hover {
+    background: rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-bs-theme="light"] .sidebar-bg-status,
+body:not([data-bs-theme="dark"]) .sidebar-bg-status {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+/* Dark mode styling for widget */
+[data-bs-theme="dark"] .sidebar-bg-title {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .sidebar-bg-content .dropdown-toggle {
+    color: #fff !important;
+}
+
+[data-bs-theme="dark"] .sidebar-bg-status {
+    color: rgba(255, 255, 255, 0.8);
 }
