@@ -9,6 +9,7 @@ use App\Entity\Module;
 use App\Entity\User;
 use App\Entity\UserModulePermission;
 use App\Entity\Company;
+use App\Entity\Project;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
@@ -27,6 +28,7 @@ class AppFixtures extends Fixture
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
         $this->createCompanyFixtures($manager);
+        $this->createProjectFixtures($manager);
     }
 
     public function createUserFixtures(ObjectManager $manager): void
@@ -134,6 +136,26 @@ class AppFixtures extends Fixture
             $company->setEmail($companyData['email']);
             $company->setCountryCode($companyData['country']);
             $manager->persist($company);
+        }
+        $manager->flush();
+    }
+
+    public function createProjectFixtures(ObjectManager $manager): void
+    {
+        // Example project data
+        $projects = [
+            ['name' => 'Project Alpha', 'status' => 1, 'description' => 'First project description'],
+            ['name' => 'Project Beta', 'status' => 2, 'description' => 'Second project description'],
+            ['name' => 'Project Gamma', 'status' => 0, 'description' => 'Third project description'],
+        ];
+
+        // Create and persist project entities here
+        foreach ($projects as $projectData) {
+            $project = new Project();
+            $project->setName($projectData['name']);
+            $project->setStatus($projectData['status']);
+            $project->setDescription($projectData['description']);
+            $manager->persist($project);
         }
         $manager->flush();
     }
