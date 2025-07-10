@@ -213,40 +213,91 @@ body[class*="ea-"].bg-tone-ocean {
     color: #f9fafb !important;
 }
 
-/* Dark mode cards and panels */
+/* Dark mode cards and panels - Softer, less bright appearance */
 .ea-dark-scheme .card,
 .ea-dark-scheme .panel {
-    background: rgba(55, 65, 81, 0.6) !important;
-    border-color: rgba(75, 85, 99, 0.4) !important;
-    color: #e5e7eb !important;
+    background: rgba(17, 24, 39, 0.7) !important; /* Darker, more muted background */
+    border-color: rgba(55, 65, 81, 0.3) !important; /* Softer border */
+    color: #d1d5db !important; /* Slightly dimmed text */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Dark mode form controls */
+.ea-dark-scheme .card:hover,
+.ea-dark-scheme .panel:hover {
+    background: rgba(17, 24, 39, 0.85) !important;
+    border-color: rgba(55, 65, 81, 0.4) !important;
+}
+
+/* Dark mode form controls - More subdued appearance */
 .ea-dark-scheme .form-control,
-.ea-dark-scheme .form-select,
+.ea-dark-scheme .form-select {
+    background: rgba(17, 24, 39, 0.8) !important; /* Darker background */
+    border-color: rgba(55, 65, 81, 0.4) !important; /* Muted border */
+    color: #e5e7eb !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
 .ea-dark-scheme .form-control:focus,
 .ea-dark-scheme .form-select:focus {
-    background: rgba(55, 65, 81, 0.8) !important;
-    border-color: rgba(107, 114, 128, 0.5) !important;
+    background: rgba(17, 24, 39, 0.9) !important;
+    border-color: rgba(75, 85, 99, 0.6) !important;
     color: #f3f4f6 !important;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
 }
 
-/* Dark mode table styling */
+/* Dark mode table styling - Improved readability */
 .ea-dark-scheme .table,
 .ea-dark-scheme .table tbody tr,
 .ea-dark-scheme .table thead tr,
 .ea-dark-scheme .table tbody tr td,
 .ea-dark-scheme .table thead tr th {
     background: transparent !important;
-    border-color: rgba(75, 85, 99, 0.3) !important;
+    border-color: rgba(55, 65, 81, 0.3) !important; /* Softer borders */
+    color: #d1d5db !important; /* Slightly dimmed text for better comfort */
+}
+
+/* Dark mode table headers - Better contrast */
+.ea-dark-scheme .table thead tr th {
+    background: rgba(17, 24, 39, 0.6) !important; /* Darker header background */
+    color: #f3f4f6 !important;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(55, 65, 81, 0.4) !important;
+}
+
+/* Dark mode table row hover effect */
+.ea-dark-scheme .table tbody tr:hover {
+    background: rgba(17, 24, 39, 0.4) !important;
+}
+
+/* Dark mode dashboard cards - Better visual hierarchy */
+.ea-dark-scheme.ea-dashboard .easyadmin-container .card {
+    background: rgba(17, 24, 39, 0.7) !important;
+    border: 1px solid rgba(55, 65, 81, 0.3) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+.ea-dark-scheme.ea-dashboard .easyadmin-container .card:hover {
+    background: rgba(17, 24, 39, 0.85) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+.ea-dark-scheme.ea-dashboard .easyadmin-container .card-header {
+    background: rgba(17, 24, 39, 0.5) !important;
+    border-bottom: 1px solid rgba(55, 65, 81, 0.3) !important;
     color: #e5e7eb !important;
 }
 
-/* Dark mode table headers */
-.ea-dark-scheme .table thead tr th {
-    background: rgba(55, 65, 81, 0.4) !important;
-    color: #f3f4f6 !important;
-    font-weight: 600;
+.ea-dark-scheme.ea-dashboard .easyadmin-container .card-body {
+    background: transparent !important;
+}
+
+.ea-dark-scheme.ea-dashboard .easyadmin-container .card-body .card {
+    background: rgba(17, 24, 39, 0.6) !important;
+    border: 1px solid rgba(55, 65, 81, 0.25) !important;
+}
+
+.ea-dark-scheme.ea-dashboard .easyadmin-container .card-body .card:hover {
+    background: rgba(17, 24, 39, 0.8) !important;
 }
 
 
@@ -303,4 +354,136 @@ body[class*="ea-"].bg-tone-ocean {
     background-color: rgba(239, 68, 68, 0.1) !important;
     border-color: rgba(239, 68, 68, 0.3) !important;
     color: #fca5a5 !important;
+}
+
+/* Dark mode additional UI elements - Better visual consistency */
+.ea-dark-scheme .badge {
+    background: rgba(17, 24, 39, 0.8) !important;
+    color: #d1d5db !important;
+    border: 1px solid rgba(55, 65, 81, 0.4) !important;
+}
+
+.ea-dark-scheme .badge-primary {
+    background: rgba(59, 130, 246, 0.8) !important;
+    color: #dbeafe !important;
+}
+
+.ea-dark-scheme .badge-success {
+    background: rgba(16, 185, 129, 0.8) !important;
+    color: #d1fae5 !important;
+}
+
+.ea-dark-scheme .badge-warning {
+    background: rgba(245, 158, 11, 0.8) !important;
+    color: #fef3c7 !important;
+}
+
+.ea-dark-scheme .badge-danger {
+    background: rgba(239, 68, 68, 0.8) !important;
+    color: #fee2e2 !important;
+}
+
+/* Dark mode dropdown menus */
+.ea-dark-scheme .dropdown-menu {
+    background: rgba(17, 24, 39, 0.95) !important;
+    border: 1px solid rgba(55, 65, 81, 0.4) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+.ea-dark-scheme .dropdown-item {
+    color: #d1d5db !important;
+}
+
+.ea-dark-scheme .dropdown-item:hover,
+.ea-dark-scheme .dropdown-item:focus {
+    background: rgba(55, 65, 81, 0.6) !important;
+    color: #f3f4f6 !important;
+}
+
+/* Dark mode pagination */
+.ea-dark-scheme .pagination .page-link {
+    background: rgba(17, 24, 39, 0.8) !important;
+    border-color: rgba(55, 65, 81, 0.4) !important;
+    color: #d1d5db !important;
+}
+
+.ea-dark-scheme .pagination .page-link:hover {
+    background: rgba(55, 65, 81, 0.8) !important;
+    border-color: rgba(75, 85, 99, 0.6) !important;
+    color: #f3f4f6 !important;
+}
+
+.ea-dark-scheme .pagination .page-item.active .page-link {
+    background: rgba(59, 130, 246, 0.8) !important;
+    border-color: rgba(59, 130, 246, 0.8) !important;
+}
+
+/* Dark mode modals and overlays */
+.ea-dark-scheme .modal-content {
+    background: rgba(17, 24, 39, 0.95) !important;
+    border: 1px solid rgba(55, 65, 81, 0.4) !important;
+    color: #e5e7eb !important;
+}
+
+.ea-dark-scheme .modal-header {
+    border-bottom: 1px solid rgba(55, 65, 81, 0.3) !important;
+}
+
+.ea-dark-scheme .modal-footer {
+    border-top: 1px solid rgba(55, 65, 81, 0.3) !important;
+}
+
+/* Dark mode text and typography refinements */
+.ea-dark-scheme .text-muted {
+    color: #9ca3af !important;
+}
+
+.ea-dark-scheme .text-secondary {
+    color: #d1d5db !important;
+}
+
+.ea-dark-scheme small,
+.ea-dark-scheme .small {
+    color: #9ca3af !important;
+}
+
+/* Dark mode borders and dividers */
+.ea-dark-scheme hr {
+    border-color: rgba(55, 65, 81, 0.3) !important;
+}
+
+.ea-dark-scheme .border {
+    border-color: rgba(55, 65, 81, 0.4) !important;
+}
+
+.ea-dark-scheme .border-top {
+    border-top-color: rgba(55, 65, 81, 0.3) !important;
+}
+
+.ea-dark-scheme .border-bottom {
+    border-bottom-color: rgba(55, 65, 81, 0.3) !important;
+}
+
+/* Dark mode list group items */
+.ea-dark-scheme .list-group-item {
+    background: rgba(17, 24, 39, 0.7) !important;
+    border-color: rgba(55, 65, 81, 0.3) !important;
+    color: #d1d5db !important;
+}
+
+.ea-dark-scheme .list-group-item:hover {
+    background: rgba(17, 24, 39, 0.9) !important;
+}
+
+/* Dark mode code and pre elements */
+.ea-dark-scheme code {
+    background: rgba(17, 24, 39, 0.8) !important;
+    color: #f472b6 !important;
+    border: 1px solid rgba(55, 65, 81, 0.3) !important;
+}
+
+.ea-dark-scheme pre {
+    background: rgba(17, 24, 39, 0.8) !important;
+    color: #e5e7eb !important;
+    border: 1px solid rgba(55, 65, 81, 0.3) !important;
 }
