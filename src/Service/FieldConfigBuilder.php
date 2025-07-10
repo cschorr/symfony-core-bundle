@@ -87,6 +87,12 @@ class FieldConfigBuilder
         return $this;
     }
 
+    public function autocomplete(bool $autocomplete = true): self
+    {
+        $this->config['autocomplete'] = $autocomplete;
+        return $this;
+    }
+
     public function association(string $targetEntity, $choiceLabel = 'name'): self
     {
         $this->config['type'] = 'association';

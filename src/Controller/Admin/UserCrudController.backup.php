@@ -113,18 +113,8 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        // Get base configuration from our new system
         $config = $this->getFieldConfiguration($pageName);
-        $fields = $this->fieldService->generateFields($config, $pageName);
-        
-        // Add permission fields using the old system (for compatibility)
-        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
-            $fields = $this->addPermissionSummaryField($fields);
-        } elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
-            $fields = $this->addPermissionTabToFields($fields);
-        }
-        
-        return $fields;
+        return $this->fieldService->generateFields($config, $pageName);
     }
 
     /**
@@ -163,6 +153,9 @@ class UserCrudController extends AbstractCrudController
                 ...$this->getActiveField(['index']),
             ]);
             
+            // Add permission summary (handled by abstract controller)
+            $config = $this->addPermissionSummaryField($config);
+            
         } elseif ($pageName === Crud::PAGE_DETAIL) {
             $config = array_merge($config, [
                 ...$this->getUserFields(['detail']),
@@ -180,6 +173,9 @@ class UserCrudController extends AbstractCrudController
                     
                 ...$this->getActiveField(['detail']),
             ]);
+            
+            // Add permission summary (handled by abstract controller)
+            $config = $this->addPermissionSummaryField($config);
             
         } else { // FORM pages (NEW/EDIT)
             $config = array_merge($config, [
@@ -203,6 +199,9 @@ class UserCrudController extends AbstractCrudController
                     
                 ...$this->getActiveField(['form']),
             ]);
+            
+            // Add permission tab (handled by abstract controller)
+            $config = $this->addPermissionTabToFields($config);
         }
 
         return $config;
