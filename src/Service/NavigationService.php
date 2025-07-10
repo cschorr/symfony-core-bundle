@@ -76,6 +76,7 @@ class NavigationService
             'User' => \App\Entity\User::class,
             'Company' => \App\Entity\Company::class,
             'CompanyGroup' => \App\Entity\CompanyGroup::class,
+            'Project' => \App\Entity\Project::class,
             // Add more mappings as needed
         ];
     }
@@ -94,6 +95,7 @@ class NavigationService
             'User' => 'fas fa-users',
             'Company' => 'fas fa-building',
             'CompanyGroup' => 'fas fa-users',
+            'Project' => 'fas fa-users',
             // Add more icon mappings as needed
         ];
     }
