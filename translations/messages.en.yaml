@@ -20,6 +20,8 @@ CompanyGroup: "Company Groups"
 Module: "Modules"
 Modules: "Modules"
 User: "Users"
+Project: "Project"
+Projects: "Projects"
 
 # General UI
 Dashboard: "Dashboard"
@@ -55,6 +57,7 @@ Show: "Show"
 "%d permission(s) assigned": "%d permission(s) assigned"
 "Permission Details": "Permission Details"
 "Unknown User": "Unknown User"
+"Unknown Module": "Unknown Module"
 Read: "Read"
 Write: "Write"
 "Access denied. You need read permission for the %module% module.": "Access denied. You need read permission for the %module% module."
@@ -63,6 +66,17 @@ Write: "Write"
 # User Management
 "Edit User": "Edit User"
 "User Information": "User Information"
+
+# Project Management
+"Edit Project": "Edit Project"
+"Create Project": "Create Project"
+"Manage projects, assignments, and timelines.": "Manage projects, assignments, and timelines."
+"Project Name": "Project Name"
+"The name of the project": "The name of the project"
+Timeline: "Timeline"
+
+# Company Group Management
+"Company Group Name": "Company Group Name"
 Roles: "Roles"
 Admin: "Admin"
 Management: "Management"
@@ -76,3 +90,16 @@ Copy: "Copy"
 
 # Pluralization
 "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned"
+
+# Field Labels and Panels
+"Address Information": "Address Information"
+"Street Address": "Street Address"
+"ZIP/Postal Code": "ZIP/Postal Code"
+"City": "City"
+"Country": "Country"
+"Communication": "Communication"
+"Email Address": "Email Address"
+"Phone Number": "Phone Number"
+"Mobile/Cell Phone": "Mobile/Cell Phone"
+"Website": "Website"
+"Code": "Code"
