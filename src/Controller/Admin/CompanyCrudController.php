@@ -131,58 +131,44 @@ class CompanyCrudController extends AbstractCrudController
             ]),
             $this->fieldService->createFieldConfig('name', 'text', ['index', 'detail', 'form'], 'Name', [
                 'required' => true,
-                'columns' => 12,
             ]),
-            $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension', [
-                'columns' => 12,
-            ]),
-            $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group', [
-                'columns' => 12,
-            ]),
+            $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension'),
+            $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group'),
 
             // Communication panel
             $this->fieldService->createPanelConfig('communication_panel', 'Communication', ['detail', 'form'], 'fas fa-phone'),
             $this->fieldService->createFieldConfig('email', 'email', ['index', 'detail', 'form'], 'Email Address', [
                 'indexLabel' => 'Email',
-                'columns' => 12,
                 'panel' => 'communication',
             ]),
             $this->fieldService->createFieldConfig('phone', 'telephone', ['detail', 'form'], 'Phone Number', [
-                'columns' => 12,
                 'panel' => 'communication',
             ]),
             $this->fieldService->createFieldConfig('cell', 'telephone', ['detail', 'form'], 'Mobile/Cell Phone', [
-                'columns' => 12,
                 'panel' => 'communication',
             ]),
             $this->fieldService->createFieldConfig('url', 'url', ['index', 'detail', 'form'], 'Website', [
-                'columns' => 12,
                 'panel' => 'communication',
             ]),
 
             // Address panel
             $this->fieldService->createPanelConfig('address_panel', 'Address Information', ['detail', 'form'], 'fas fa-map-marker-alt'),
             $this->fieldService->createFieldConfig('street', 'text', ['detail', 'form'], 'Street Address', [
-                'columns' => 12,
                 'panel' => 'address',
             ]),
             $this->fieldService->createFieldConfig('zip', 'text', ['detail', 'form'], 'ZIP/Postal Code', [
-                'columns' => 12,
                 'panel' => 'address',
             ]),
             $this->fieldService->createFieldConfig('city', 'text', ['index', 'detail', 'form'], 'City', [
-                'columns' => 12,
                 'panel' => 'address',
             ]),
             $this->fieldService->createFieldConfig('countryCode', 'country', ['index', 'detail', 'form'], 'Country', [
-                'columns' => 12,
                 'panel' => 'address',
             ]),
 
             // Employees panel
             $this->fieldService->createPanelConfig('employees_panel', 'Employees', ['detail', 'form'], 'fas fa-users'),
             $this->fieldService->createFieldConfig('employees', 'association', ['index', 'detail', 'form'], 'Employees', [
-                'columns' => 12,
                 'panel' => 'employees',
                 'multiple' => true,
                 'indexFormat' => 'count',
