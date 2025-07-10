@@ -39,6 +39,15 @@ body {
     box-shadow: 0 4px 16px rgba(31, 38, 135, 0.1);
 }
 
+/* Dashboard specific styling */
+.ea-dashboard .easyadmin-container h1,
+body[class*="ea-dashboard"] .easyadmin-container h1,
+.ea-dashboard-title {
+    font-size: 2.1rem !important;
+    font-weight: 600;
+    margin-bottom: 0 !important;
+}
+
 /* Content Title Spacing */
 .easyadmin-title-spacing {
     margin-top: 20px;
@@ -106,3 +115,43 @@ body.bg-tone-orange {
     box-shadow: 0 2px 8px rgba(31, 38, 135, 0.1);
 }
 */
+
+/* Dashboard card styling improvements */
+.ea-dashboard .easyadmin-container .card {
+    border: none !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(31, 38, 135, 0.1) !important;
+    border-radius: 10px !important;
+    transition: all 0.3s ease;
+}
+
+.ea-dashboard .easyadmin-container .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(31, 38, 135, 0.15) !important;
+}
+
+.ea-dashboard .easyadmin-container .card-header {
+    border: none !important;
+    background: transparent !important;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.ea-dashboard .easyadmin-container .card-body {
+    border: none !important;
+}
+
+.ea-dashboard .easyadmin-container .card-body .card {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    transition: all 0.3s ease;
+}
+
+.ea-dashboard .easyadmin-container .card-body .card:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
+}
+
+/* Content Title Spacing */
