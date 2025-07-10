@@ -47,9 +47,6 @@ class ProjectCrudController extends AbstractCrudController
     {
         return parent::configureCrud($crud)
             ->setPageTitle('index', $this->translator->trans('Projects'))
-            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Project Singular'), $entity->getName()))
-            ->setPageTitle('new', $this->translator->trans('Create Project'))
-            ->setPageTitle('edit', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Edit Project'), $entity->getName()))
             ->setHelp('index', $this->translator->trans('Manage projects, assignments, and timelines.'));
     }
 
