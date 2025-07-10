@@ -54,11 +54,11 @@ class AppFixtures extends Fixture
         // Modules in navigation order - they will be sorted by ID (UUID) in ascending order
         // The 'code' field is used for translation, 'name' field is for admin display
         $modules = [
-            ['name' => 'System Module', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
-            ['name' => 'Benutzer', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
-            ['name' => 'Unternehmen', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
-            ['name' => 'Unternehmensgruppen', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
-            ['name' => 'Projekte', 'code' => 'Project', 'text' => 'Projekte verwalten', 'icon' => 'fas fa-project-diagram'],
+            ['name' => 'Modules', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
+            ['name' => 'Users', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
+            ['name' => 'Companies', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
+            ['name' => 'CompanyGroups', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
+            ['name' => 'Projects', 'code' => 'Project', 'text' => 'Projekte verwalten', 'icon' => 'fas fa-project-diagram'],
         ];
 
         // Create and persist module entities here

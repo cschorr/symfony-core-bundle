@@ -14,17 +14,19 @@ Logout: "Abmelden"
 "supported by": "unterstützt von"
 "Placeholder image": "Platzhalter-Bild"
 
-# Module/Entity Names (used as translation keys)
-# These keys match the "code" field in the Module entity
+# Module/Entity Names (automatically generated from Module entity)
+# These keys match the "code" and "name" fields in the Module entity
+# Singular forms (code field): User, Company, Module, CompanyGroup, Project
+# Plural forms (name field): Users, Companies, Modules, CompanyGroups, Projects
 User: "Benutzer"
 Users: "Benutzer"
 Company: "Unternehmen"
 Companies: "Unternehmen"
-Module: "Module"
+Module: "Modul"
 Modules: "Module"
-CompanyGroup: "Unternehmensgruppen"
+CompanyGroup: "Unternehmensgruppe"
 CompanyGroups: "Unternehmensgruppen"
-Project: "Projekte"
+Project: "Projekt"
 Projects: "Projekte"
 
 # General UI

@@ -14,17 +14,19 @@ Logout: "Logout"
 "supported by": "supported by"
 "Placeholder image": "Placeholder image"
 
-# Module/Entity Names (used as translation keys)
-# These keys match the "code" field in the Module entity
-User: "Users"
+# Module/Entity Names (automatically generated from Module entity)
+# These keys match the "code" and "name" fields in the Module entity
+# Singular forms (code field): User, Company, Module, CompanyGroup, Project
+# Plural forms (name field): Users, Companies, Modules, CompanyGroups, Projects
+User: "User"
 Users: "Users"
-Company: "Companies"
+Company: "Company"
 Companies: "Companies"
-Module: "Modules"
+Module: "Module"
 Modules: "Modules"
-CompanyGroup: "Company Groups"
+CompanyGroup: "Company Group"
 CompanyGroups: "Company Groups"
-Project: "Projects"
+Project: "Project"
 Projects: "Projects"
 
 # General UI
