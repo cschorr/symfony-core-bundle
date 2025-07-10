@@ -22,8 +22,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Form\Type\AddressType;
+use App\Form\Type\CommunicationType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 
 class CompanyCrudController extends AbstractCrudController
 {
@@ -105,84 +109,189 @@ class CompanyCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        // Base fields for all pages
         $fields = [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
             TextField::new('nameExtension')->setLabel($this->translator->trans('Name Extension')),
-            TextField::new('url')->setLabel($this->translator->trans('Website')),
         ];
 
-        // Add company group field (not on index)
-        if ($pageName !== Crud::PAGE_INDEX) {
-            $fields[] = AssociationField::new('companyGroup')
-                ->setLabel($this->translator->trans('Company Group'))
-                ->setRequired(false);
-        }
-
-        // Add address fields
-        if ($pageName !== Crud::PAGE_INDEX) {
-            // Address panel for forms and detail
-            $fields[] = FormField::addPanel($this->translator->trans('Address Information'))
-                ->setIcon('fas fa-map-marker-alt')
-                ->collapsible($pageName !== Crud::PAGE_DETAIL);
+        // Page-specific field configuration
+        switch ($pageName) {
+            case Crud::PAGE_INDEX:
+                $fields = array_merge($fields, $this->getIndexFields());
+                break;
             
-            if ($pageName === Crud::PAGE_DETAIL) {
-                // On detail page, show individual address fields
-                $fields[] = TextField::new('street')
-                    ->setLabel($this->translator->trans('Street Address'));
-                
-                $fields[] = TextField::new('zip')
-                    ->setLabel($this->translator->trans('ZIP/Postal Code'));
-                    
-                $fields[] = TextField::new('city')
-                    ->setLabel($this->translator->trans('City'));
-                    
-                $fields[] = CountryField::new('countryCode')
-                    ->setLabel($this->translator->trans('Country'));
-            } else {
-                // On form pages (new/edit), use the AddressType form
-                $fields[] = FormField::addFieldset()
-                    ->setFormType(AddressType::class)
-                    ->setFormTypeOptions([
-                        'inherit_data' => true,
-                    ]);
-            }
-        } else {
-            // Index page summary
-            $fields[] = TextField::new('city')
-                ->setLabel($this->translator->trans('City'));
-            $fields[] = CountryField::new('countryCode')
-                ->setLabel($this->translator->trans('Country'));
+            case Crud::PAGE_DETAIL:
+                $fields = array_merge($fields, $this->getDetailFields());
+                break;
+            
+            case Crud::PAGE_NEW:
+            case Crud::PAGE_EDIT:
+                $fields = array_merge($fields, $this->getFormFields());
+                break;
         }
 
-        // Add employees field
-        if ($pageName === Crud::PAGE_INDEX) {
-            $fields[] = AssociationField::new('employees')
-                ->setLabel($this->translator->trans('Employees'))
-                ->formatValue(function ($value, $entity) {
-                    if ($value instanceof Collection) {
-                        return $value->count() . ' ' . $this->translator->trans('Employees');
-                    }
-                    return '0 ' . $this->translator->trans('Employees');
-                });
-        } else {
-            $fields[] = AssociationField::new('employees')
-                ->setLabel($this->translator->trans('Employees'))
-                ->setRequired(false)
-                ->setFormTypeOptions([
-                    'by_reference' => false,
-                    'multiple' => true,
-                    'class' => User::class,
-                    'choice_label' => function (User $user) {
-                        return $user->getEmail();
-                    },
-                ]);
-        }
+        return $fields;
+    }
 
-        // Add active field for index page
-        if ($pageName === Crud::PAGE_INDEX) {
-            $fields = $this->addActiveField($fields, $pageName);
-        }
+    /**
+     * Get fields specific to the index page
+     */
+    private function getIndexFields(): array
+    {
+        $fields = [];
+
+        // Communication summary
+        $fields[] = EmailField::new('email')
+            ->setLabel($this->translator->trans('Email'));
+        $fields[] = UrlField::new('url')
+            ->setLabel($this->translator->trans('Website'));
+
+        // Address summary
+        $fields[] = TextField::new('city')
+            ->setLabel($this->translator->trans('City'));
+        $fields[] = CountryField::new('countryCode')
+            ->setLabel($this->translator->trans('Country'));
+
+        // Employees count
+        $fields[] = AssociationField::new('employees')
+            ->setLabel($this->translator->trans('Employees'))
+            ->formatValue(function ($value, $entity) {
+                if ($value instanceof Collection) {
+                    return $value->count() . ' ' . $this->translator->trans('Employees');
+                }
+                return '0 ' . $this->translator->trans('Employees');
+            });
+
+        // Active status
+        $fields = $this->addActiveField($fields, Crud::PAGE_INDEX);
+
+        return $fields;
+    }
+
+    /**
+     * Get fields specific to the detail page
+     */
+    private function getDetailFields(): array
+    {
+        $fields = [];
+
+        // Company group
+        $fields[] = AssociationField::new('companyGroup')
+            ->setLabel($this->translator->trans('Company Group'));
+
+        // Communication panel (always expanded on detail)
+        $fields[] = FormField::addPanel($this->translator->trans('Communication'))
+            ->setIcon('fas fa-phone')
+            ->collapsible(false);
+
+        $fields[] = EmailField::new('email')
+            ->setLabel($this->translator->trans('Email Address'));
+        $fields[] = TelephoneField::new('phone')
+            ->setLabel($this->translator->trans('Phone Number'));
+        $fields[] = TelephoneField::new('cell')
+            ->setLabel($this->translator->trans('Mobile/Cell Phone'));
+        $fields[] = UrlField::new('url')
+            ->setLabel($this->translator->trans('Website'));
+
+        // Address panel (always expanded on detail)
+        $fields[] = FormField::addPanel($this->translator->trans('Address Information'))
+            ->setIcon('fas fa-map-marker-alt')
+            ->collapsible(false);
+
+        $fields[] = TextField::new('street')
+            ->setLabel($this->translator->trans('Street Address'));
+        $fields[] = TextField::new('zip')
+            ->setLabel($this->translator->trans('ZIP/Postal Code'));
+        $fields[] = TextField::new('city')
+            ->setLabel($this->translator->trans('City'));
+        $fields[] = CountryField::new('countryCode')
+            ->setLabel($this->translator->trans('Country'));
+
+        // Employees
+        $fields[] = FormField::addPanel($this->translator->trans('Employees'))
+            ->setIcon('fas fa-users')
+            ->collapsible(false);
+
+        $fields[] = AssociationField::new('employees')
+            ->setLabel($this->translator->trans('Employees'));
+
+        return $fields;
+    }
+
+    /**
+     * Get fields specific to form pages (new/edit)
+     */
+    private function getFormFields(): array
+    {
+        $fields = [];
+
+        // Company group
+        $fields[] = AssociationField::new('companyGroup')
+            ->setLabel($this->translator->trans('Company Group'))
+            ->setRequired(false);
+
+        // Communication panel (collapsible on forms)
+        $fields[] = FormField::addPanel($this->translator->trans('Communication'))
+            ->setIcon('fas fa-phone')
+            ->collapsible(true);
+
+        // Communication fields using individual fields instead of fieldset
+        $fields[] = EmailField::new('email')
+            ->setLabel($this->translator->trans('Email Address'))
+            ->setRequired(false);
+        
+        $fields[] = TelephoneField::new('phone')
+            ->setLabel($this->translator->trans('Phone Number'))
+            ->setRequired(false);
+            
+        $fields[] = TelephoneField::new('cell')
+            ->setLabel($this->translator->trans('Mobile/Cell Phone'))
+            ->setRequired(false);
+            
+        $fields[] = UrlField::new('url')
+            ->setLabel($this->translator->trans('Website'))
+            ->setRequired(false);
+
+        // Address panel (collapsible on forms)
+        $fields[] = FormField::addPanel($this->translator->trans('Address Information'))
+            ->setIcon('fas fa-map-marker-alt')
+            ->collapsible(true);
+
+        // Address fields using individual fields instead of fieldset
+        $fields[] = TextField::new('street')
+            ->setLabel($this->translator->trans('Street Address'))
+            ->setRequired(false);
+            
+        $fields[] = TextField::new('zip')
+            ->setLabel($this->translator->trans('ZIP/Postal Code'))
+            ->setRequired(false);
+            
+        $fields[] = TextField::new('city')
+            ->setLabel($this->translator->trans('City'))
+            ->setRequired(false);
+            
+        $fields[] = CountryField::new('countryCode')
+            ->setLabel($this->translator->trans('Country'))
+            ->setRequired(false);
+
+        // Employees panel (collapsible on forms)
+        $fields[] = FormField::addPanel($this->translator->trans('Employees'))
+            ->setIcon('fas fa-users')
+            ->collapsible(true);
+
+        $fields[] = AssociationField::new('employees')
+            ->setLabel($this->translator->trans('Employees'))
+            ->setRequired(false)
+            ->setFormTypeOptions([
+                'by_reference' => false,
+                'multiple' => true,
+                'class' => User::class,
+                'choice_label' => function (User $user) {
+                    return $user->getEmail();
+                },
+            ]);
 
         return $fields;
     }
