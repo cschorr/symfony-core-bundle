@@ -22,13 +22,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\PercentField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EasyAdminFieldService
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
+        private AdminUrlGenerator $adminUrlGenerator
     ) {
     }
 
@@ -221,6 +224,11 @@ class EasyAdminFieldService
         // Handle render as HTML
         if (isset($config['renderAsHtml']) && $config['renderAsHtml']) {
             $field->renderAsHtml();
+        }
+
+        // Handle linkToShow functionality
+        if (isset($config['linkToShow']) && $config['linkToShow']) {
+            $this->configureLinkToShow($field, $config);
         }
 
         // Handle country field specific configurations
@@ -485,6 +493,18 @@ class EasyAdminFieldService
     }
 
     /**
+     * Create a name field with link to show action
+     */
+    public function createNameFieldWithLink(string $label = 'Name', bool $required = true, array $pages = ['index', 'detail', 'form'], string $controllerClass = null): array
+    {
+        return $this->createFieldConfig('name', 'text', $pages, $label, [
+            'required' => $required,
+            'linkToShow' => true,
+            'linkToShowController' => $controllerClass,
+        ]);
+    }
+
+    /**
      * Create an association field with count display for index
      */
     public function createAssociationWithCount(
@@ -637,5 +657,59 @@ class EasyAdminFieldService
         
         // If validation passes, generate fields normally
         return $this->generateFields($fieldConfigurations, $pageName, $activeFieldCallback);
+    }
+
+    /**
+     * Configure field to link to show action
+     */
+    private function configureLinkToShow(object $field, array $config): void
+    {
+        $controllerClass = $config['linkToShowController'] ?? null;
+        
+        $field->formatValue(function ($value, $entity) use ($controllerClass) {
+            if (empty($value)) {
+                return $value;
+            }
+            
+            // If no specific controller is provided, try to auto-detect from entity
+            if (!$controllerClass) {
+                $controllerClass = $this->getControllerClassFromEntity($entity);
+            }
+            
+            if ($controllerClass) {
+                try {
+                    $showUrl = $this->adminUrlGenerator
+                        ->setController($controllerClass)
+                        ->setAction(Action::DETAIL)
+                        ->setEntityId($entity->getId())
+                        ->generateUrl();
+                    
+                    return sprintf('<a href="%s" class="text-decoration-none">%s</a>', $showUrl, $value);
+                } catch (\Exception $e) {
+                    // If URL generation fails, return the original value
+                    return $value;
+                }
+            }
+            
+            return $value;
+        })->renderAsHtml();
+    }
+
+    /**
+     * Auto-detect controller class from entity
+     */
+    private function getControllerClassFromEntity(object $entity): ?string
+    {
+        $entityClass = get_class($entity);
+        $entityName = substr($entityClass, strrpos($entityClass, '\\') + 1);
+        
+        // Convention: App\Controller\Admin\{EntityName}CrudController
+        $controllerClass = "App\\Controller\\Admin\\{$entityName}CrudController";
+        
+        if (class_exists($controllerClass)) {
+            return $controllerClass;
+        }
+        
+        return null;
     }
 }
