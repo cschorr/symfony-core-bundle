@@ -8,12 +8,6 @@ parameters:
     app.locales:
         - de
         - en
-        - es
-        - fr
-        - it
-        - nl
-        - se
-        - zh_TW
 
 services:
     # default configuration for services in *this* file
