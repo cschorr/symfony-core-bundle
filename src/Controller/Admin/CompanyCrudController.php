@@ -116,10 +116,9 @@ class CompanyCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return $this->fieldService->generateFieldsWithValidation(
+        return $this->fieldService->generateFields(
             $this->getFieldConfigurations(),
-            $pageName,
-            fn($fields, $pageName) => $this->addActiveField($fields, $pageName)
+            $pageName
         );
     }
 

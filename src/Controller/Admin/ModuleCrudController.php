@@ -90,8 +90,9 @@ class ModuleCrudController extends AbstractCrudController
      */
     private function getFieldConfiguration(string $pageName): array
     {
-        // Base configuration for all pages
+        // Base configuration for all pages - includes active field first
         $config = [
+            ...$this->getActiveField(), // Active field first for all pages
             $this->fieldService->createIdField(),
         ];
 
@@ -104,8 +105,6 @@ class ModuleCrudController extends AbstractCrudController
                     ->build(),
                     
                 $this->getModulePermissionsSummaryField(),
-                
-                ...$this->getActiveField(['index']),
             ]);
             
         } elseif ($pageName === Crud::PAGE_DETAIL) {
@@ -132,8 +131,6 @@ class ModuleCrudController extends AbstractCrudController
                     
                 $this->getModulePermissionsSummaryField(),
                 $this->getModulePermissionsDetailField(),
-                
-                ...$this->getActiveField(['detail']),
             ]);
             
         } else { // FORM pages (NEW/EDIT)
@@ -163,8 +160,6 @@ class ModuleCrudController extends AbstractCrudController
                     ->label('Description')
                     ->help('Optional description of what this module manages')
                     ->build(),
-                    
-                ...$this->getActiveField(['form']),
             ]);
         }
 

@@ -5,12 +5,11 @@ namespace App\Controller\Admin;
 use App\Entity\CompanyGroup;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use App\Service\EasyAdminFieldService;
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -19,12 +18,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CompanyGroupCrudController extends AbstractCrudController
 {
+    use FieldConfigurationTrait;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
         PermissionService $permissionService,
         DuplicateService $duplicateService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        private EasyAdminFieldService $fieldService
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -70,17 +72,33 @@ class CompanyGroupCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
-            IdField::new('id')->hideOnForm()->hideOnIndex(),
-            TextField::new('name'),
-            TextField::new('code')->setLabel($this->translator->trans('Code'))->setRequired(false),
+        return $this->fieldService->generateFields(
+            $this->getFieldConfigurations(),
+            $pageName
+        );
+    }
+
+    /**
+     * Define field configurations for CompanyGroup entity
+     */
+    private function getFieldConfigurations(): array
+    {
+        return [
+            // Active field first, enabled for all views
+            ...$this->getActiveField(),
+            
+            // Standard fields
+            $this->fieldService->createIdField(),
+            $this->fieldService->field('name')
+                ->type('text')
+                ->label('Company Group Name')
+                ->build(),
+                
+            $this->fieldService->field('code')
+                ->type('text')
+                ->label('Code')
+                ->required(false)
+                ->build(),
         ];
-
-        // Add active field for index page
-        if ($pageName === Crud::PAGE_INDEX) {
-            $fields = $this->addActiveField($fields, $pageName);
-        }
-
-        return $fields;
     }
 }
