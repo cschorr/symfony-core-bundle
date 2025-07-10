@@ -129,20 +129,42 @@ class CompanyCrudController extends AbstractCrudController
     {
         $fields = [];
         
-        // Standard entity fields (ID, name)
+        // Standard entity fields (ID, name, active)
         $fields = array_merge($fields, $this->getStandardEntityFields('Company'));
         
         // Additional company-specific fields
         $fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
         $fields[] = $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group');
 
-        // Contact information (address + communication) using trait
-        $fields = array_merge($fields, $this->getContactFieldGroups(['detail', 'form']));
+        // Contact information (address + communication) - customized for index view
+        $fields = array_merge($fields, $this->getCustomContactFieldGroups());
 
         // Employees using enhanced builder pattern
         $fields[] = $this->fieldService->createPanelConfig('employees_panel', 'Employees', ['detail', 'form'], 'fas fa-users');
         $fields[] = $this->getUserAssociationField('employees', 'Employees', ['index', 'detail', 'form'], true);
 
+        return $fields;
+    }
+
+    /**
+     * Get contact field groups customized for Company - excludes city from index view
+     */
+    private function getCustomContactFieldGroups(): array
+    {
+        $fields = [];
+        
+        // Communication fields (includes email and website in index)
+        $fields = array_merge($fields, $this->fieldService->createCommunicationFieldGroup(['detail', 'form']));
+        
+        // Address fields - customized to exclude city from index
+        $fields = array_merge($fields, [
+            $this->fieldService->createPanelConfig('address_panel', 'Address Information', ['detail', 'form'], 'fas fa-map-marker-alt'),
+            $this->fieldService->createFieldConfig('street', 'text', ['detail', 'form'], 'Street Address'),
+            $this->fieldService->createFieldConfig('zip', 'text', ['detail', 'form'], 'ZIP/Postal Code'),
+            $this->fieldService->createFieldConfig('city', 'text', ['detail', 'form'], 'City'), // Excluded from index
+            $this->fieldService->createCountryFieldConfig('countryCode', ['index', 'detail', 'form'], 'Country'), // Flag-only in index
+        ]);
+        
         return $fields;
     }
 

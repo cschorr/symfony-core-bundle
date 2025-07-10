@@ -104,7 +104,7 @@ class ModuleCrudController extends AbstractCrudController
                     ->label('Name')
                     ->build(),
                     
-                $this->getModulePermissionsSummaryField(),
+                ...$this->getModulePermissionsSummaryField(),
             ]);
             
         } elseif ($pageName === Crud::PAGE_DETAIL) {
@@ -129,8 +129,8 @@ class ModuleCrudController extends AbstractCrudController
                     ->label('Description')
                     ->build(),
                     
-                $this->getModulePermissionsSummaryField(),
-                $this->getModulePermissionsDetailField(),
+                ...$this->getModulePermissionsSummaryField(),
+                ...$this->getModulePermissionsDetailField(),
             ]);
             
         } else { // FORM pages (NEW/EDIT)

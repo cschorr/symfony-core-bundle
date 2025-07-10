@@ -79,7 +79,7 @@ class EasyAdminFieldService
             // For panels, check if they should be shown on this page
             if ($fieldConfig['type'] === 'panel') {
                 $pageType = $this->getPageType($pageName);
-                return in_array($pageType, $fieldConfig['pages'] ?? ['form']);
+                return in_array($pageType, $fieldConfig['collapsible'] ?? []);
             }
             // Tabs are only shown on form pages
             return $this->getPageType($pageName) === 'form';
@@ -223,6 +223,11 @@ class EasyAdminFieldService
             $field->renderAsHtml();
         }
 
+        // Handle country field specific configurations
+        if ($config['type'] === 'country') {
+            $this->configureCountryField($field, $config, $pageType);
+        }
+
         // Handle custom formatting
         if (isset($config['format'])) {
             $this->applyCustomFormat($field, $config, $pageType);
@@ -264,6 +269,21 @@ class EasyAdminFieldService
                 }
                 return '0 ' . $this->translator->trans($config['countLabel'] ?? $config['label'] ?? 'Items');
             });
+        }
+    }
+
+    /**
+     * Configure country field to show flag only in index view
+     */
+    private function configureCountryField(object $field, array $config, string $pageType): void
+    {
+        // For index view, show flag only if showFlagOnly is set
+        if ($pageType === 'index' && isset($config['showFlagOnly']) && $config['showFlagOnly']) {
+            // Use EasyAdmin's native showFlag and showName methods
+            $field->showFlag()->showName(false);
+        } else {
+            // For other views, show both flag and name (default)
+            $field->showFlag()->showName(true);
         }
     }
 
@@ -405,7 +425,7 @@ class EasyAdminFieldService
             $this->createFieldConfig('street', 'text', $pages, 'Street Address'),
             $this->createFieldConfig('zip', 'text', $pages, 'ZIP/Postal Code'),
             $this->createFieldConfig('city', 'text', array_merge($pages, ['index']), 'City'),
-            $this->createFieldConfig('countryCode', 'country', array_merge($pages, ['index']), 'Country'),
+            $this->createCountryFieldConfig('countryCode', array_merge($pages, ['index']), 'Country'),
         ];
     }
 
@@ -428,6 +448,19 @@ class EasyAdminFieldService
             $this->createFieldConfig('cell', 'telephone', $pages, 'Mobile/Cell Phone'),
             $this->createFieldConfig('url', 'url', array_merge($pages, ['index']), 'Website'),
         ];
+    }
+
+    /**
+     * Create a country field with flag-only display in index view
+     */
+    public function createCountryFieldConfig(string $fieldName, array $pages = ['index', 'detail', 'form'], string $label = 'Country'): array
+    {
+        return $this->field($fieldName)
+            ->type('country')
+            ->label($label)
+            ->pages($pages)
+            ->option('showFlagOnly', in_array('index', $pages)) // Custom option to show flag only in index
+            ->build();
     }
 
     /**
