@@ -10,6 +10,40 @@ body {
     min-height: 100vh !important;
 }
 
+/* CRUD Container Styling */
+.crud-container {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    transition: all 0.3s ease;
+}
+
+.crud-container:hover {
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+}
+
+/* CRUD Footer Styling */
+.crud-footer {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 16px rgba(31, 38, 135, 0.1);
+}
+
+/* Content Title Spacing */
+.crud-title-spacing {
+    margin-top: 20px;
+}
+
 /* Color tone variations for EasyAdmin pages */
 body[class*="ea-"].bg-tone-blue,
 body.bg-tone-blue {
