@@ -512,4 +512,41 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             return $this->redirect($url);
         }
     }
+
+    /**
+     * Auto-sync bidirectional relationships using RelationshipSyncService
+     */
+    protected function autoSyncRelationships(object $entity): void
+    {
+        // This can be overridden by child controllers if they inject RelationshipSyncService
+    }
+
+    /**
+     * Get common field validation rules
+     */
+    protected function getFieldValidationRules(): array
+    {
+        return [
+            'name' => ['required' => true, 'maxLength' => 255],
+            'email' => ['required' => false, 'type' => 'email'],
+            'phone' => ['required' => false, 'type' => 'telephone'],
+            'url' => ['required' => false, 'type' => 'url'],
+        ];
+    }
+
+    /**
+     * Apply common business logic before persist
+     */
+    protected function beforePersist(object $entity): void
+    {
+        $this->autoSyncRelationships($entity);
+    }
+
+    /**
+     * Apply common business logic before update
+     */
+    protected function beforeUpdate(object $entity): void
+    {
+        $this->autoSyncRelationships($entity);
+    }
 }

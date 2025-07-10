@@ -2,25 +2,27 @@
 
 namespace App\Service;
 
-use App\Entity\User;
-use Doctrine\Common\Collections\Collection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\PercentField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EasyAdminFieldService
@@ -328,5 +330,221 @@ class EasyAdminFieldService
             'icon' => $icon,
             'collapsible' => $collapsibleOn,
         ];
+    }
+
+    /**
+     * Create pre-configured address fields with panel
+     */
+    public function createAddressFieldGroup(array $pages = ['detail', 'form'], array $options = []): array
+    {
+        $panelName = $options['panelName'] ?? 'address_panel';
+        $panelLabel = $options['panelLabel'] ?? 'Address Information';
+        $panelIcon = $options['panelIcon'] ?? 'fas fa-map-marker-alt';
+        $collapsible = $options['collapsible'] ?? ['form'];
+        
+        return [
+            $this->createPanelConfig($panelName, $panelLabel, $pages, $panelIcon, $collapsible),
+            $this->createFieldConfig('street', 'text', $pages, 'Street Address'),
+            $this->createFieldConfig('zip', 'text', $pages, 'ZIP/Postal Code'),
+            $this->createFieldConfig('city', 'text', array_merge($pages, ['index']), 'City'),
+            $this->createFieldConfig('countryCode', 'country', array_merge($pages, ['index']), 'Country'),
+        ];
+    }
+
+    /**
+     * Create pre-configured communication fields with panel
+     */
+    public function createCommunicationFieldGroup(array $pages = ['detail', 'form'], array $options = []): array
+    {
+        $panelName = $options['panelName'] ?? 'communication_panel';
+        $panelLabel = $options['panelLabel'] ?? 'Communication';
+        $panelIcon = $options['panelIcon'] ?? 'fas fa-phone';
+        $collapsible = $options['collapsible'] ?? ['form'];
+        
+        return [
+            $this->createPanelConfig($panelName, $panelLabel, $pages, $panelIcon, $collapsible),
+            $this->createFieldConfig('email', 'email', array_merge($pages, ['index']), 'Email Address', [
+                'indexLabel' => 'Email'
+            ]),
+            $this->createFieldConfig('phone', 'telephone', $pages, 'Phone Number'),
+            $this->createFieldConfig('cell', 'telephone', $pages, 'Mobile/Cell Phone'),
+            $this->createFieldConfig('url', 'url', array_merge($pages, ['index']), 'Website'),
+        ];
+    }
+
+    /**
+     * Create a basic ID field with smart defaults
+     */
+    public function createIdField(): array
+    {
+        return $this->createFieldConfig('id', 'id', ['detail'], 'ID', [
+            'hideOnForm' => true,
+            'hideOnIndex' => true,
+        ]);
+    }
+
+    /**
+     * Create a name field with smart defaults
+     */
+    public function createNameField(string $label = 'Name', bool $required = true, array $pages = ['index', 'detail', 'form']): array
+    {
+        return $this->createFieldConfig('name', 'text', $pages, $label, [
+            'required' => $required,
+        ]);
+    }
+
+    /**
+     * Create an association field with count display for index
+     */
+    public function createAssociationWithCount(
+        string $fieldName,
+        string $label,
+        string $targetEntity,
+        $choiceLabel = 'name',
+        array $pages = ['index', 'detail', 'form']
+    ): array {
+        return $this->createFieldConfig($fieldName, 'association', $pages, $label, [
+            'multiple' => true,
+            'indexFormat' => 'count',
+            'countLabel' => $label,
+            'targetEntity' => $targetEntity,
+            'choiceLabel' => $choiceLabel,
+        ]);
+    }
+
+    /**
+     * Builder pattern for complex field configurations
+     */
+    public function field(string $name, string $type = null): FieldConfigBuilder
+    {
+        return new FieldConfigBuilder($name, $type, $this);
+    }
+
+    /**
+     * Create multiple field configurations at once
+     */
+    public function createFields(array $fieldDefinitions): array
+    {
+        $configs = [];
+        foreach ($fieldDefinitions as $definition) {
+            if (is_string($definition)) {
+                // Simple field name only - auto-detect type
+                $configs[] = $this->autoDetectField($definition);
+            } elseif (is_array($definition)) {
+                // Full configuration array
+                $configs[] = $definition;
+            }
+        }
+        return $configs;
+    }
+
+    /**
+     * Auto-detect field type and create basic configuration
+     */
+    private function autoDetectField(string $fieldName): array
+    {
+        $type = match(true) {
+            str_contains($fieldName, 'email') => 'email',
+            str_contains($fieldName, 'phone') || str_contains($fieldName, 'cell') => 'telephone',
+            str_contains($fieldName, 'url') || str_contains($fieldName, 'website') => 'url',
+            str_contains($fieldName, 'country') => 'country',
+            str_contains($fieldName, 'date') => 'date',
+            str_contains($fieldName, 'time') => 'datetime',
+            str_contains($fieldName, 'active') || str_contains($fieldName, 'enabled') => 'boolean',
+            $fieldName === 'id' => 'id',
+            default => 'text',
+        };
+
+        $pages = $fieldName === 'id' 
+            ? ['detail'] 
+            : ['index', 'detail', 'form'];
+
+        $options = $fieldName === 'id' 
+            ? ['hideOnForm' => true, 'hideOnIndex' => true]
+            : [];
+
+        return $this->createFieldConfig($fieldName, $type, $pages, ucfirst($fieldName), $options);
+    }
+
+    /**
+     * Validate field configuration and provide helpful error messages
+     */
+    public function validateFieldConfiguration(array $config): array
+    {
+        $errors = [];
+        
+        // Check required fields
+        if (!isset($config['name']) || empty($config['name'])) {
+            $errors[] = "Field configuration must include a 'name' property";
+        }
+        
+        if (!isset($config['type']) || empty($config['type'])) {
+            $errors[] = "Field configuration must include a 'type' property";
+        }
+        
+        // Validate field type
+        if (isset($config['type'])) {
+            $validTypes = ['id', 'text', 'textarea', 'email', 'telephone', 'url', 'country', 
+                          'association', 'boolean', 'integer', 'number', 'money', 'date', 
+                          'datetime', 'time', 'choice', 'image', 'panel'];
+            
+            if (!in_array($config['type'], $validTypes)) {
+                $errors[] = "Invalid field type '{$config['type']}'. Valid types: " . implode(', ', $validTypes);
+            }
+        }
+        
+        // Validate pages
+        if (isset($config['pages'])) {
+            $validPages = ['index', 'detail', 'form'];
+            $invalidPages = array_diff($config['pages'], $validPages);
+            if (!empty($invalidPages)) {
+                $errors[] = "Invalid page(s): " . implode(', ', $invalidPages) . ". Valid pages: " . implode(', ', $validPages);
+            }
+        }
+        
+        // Validate columns
+        if (isset($config['columns']) && ($config['columns'] < 1 || $config['columns'] > 12)) {
+            $errors[] = "Column width must be between 1 and 12, got: {$config['columns']}";
+        }
+        
+        // Association-specific validation
+        if ($config['type'] === 'association' && isset($config['multiple']) && $config['multiple']) {
+            if (!isset($config['targetEntity'])) {
+                $errors[] = "Association field with multiple=true requires 'targetEntity' option";
+            }
+        }
+        
+        return $errors;
+    }
+
+    /**
+     * Generate fields with validation
+     */
+    public function generateFieldsWithValidation(array $fieldConfigurations, string $pageName, ?callable $activeFieldCallback = null): array
+    {
+        $allErrors = [];
+        
+        // Validate all configurations first
+        foreach ($fieldConfigurations as $index => $config) {
+            if (is_array($config)) {
+                $errors = $this->validateFieldConfiguration($config);
+                if (!empty($errors)) {
+                    $fieldName = $config['name'] ?? "field at index {$index}";
+                    $allErrors[$fieldName] = $errors;
+                }
+            }
+        }
+        
+        // If there are validation errors, throw exception with details
+        if (!empty($allErrors)) {
+            $errorMessage = "Field configuration errors:\n";
+            foreach ($allErrors as $fieldName => $errors) {
+                $errorMessage .= "- {$fieldName}: " . implode(', ', $errors) . "\n";
+            }
+            throw new \InvalidArgumentException($errorMessage);
+        }
+        
+        // If validation passes, generate fields normally
+        return $this->generateFields($fieldConfigurations, $pageName, $activeFieldCallback);
     }
 }
