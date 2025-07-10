@@ -129,19 +129,24 @@ class DebugNavigationCommand extends Command
 
         $io->table(['Code', 'Name', 'Active'], $rows);
 
-        // Check entity mapping (dynamic generation)
-        $io->section('Entity Mapping (Dynamic)');
-        foreach ($modules as $module) {
-            $entityClass = $this->navigationService->getEntityClassFromModule($module);
-            $io->writeln(sprintf('%s => %s', $module->getCode(), $entityClass));
+        // Check entity mapping
+        $entityMapping = $this->navigationService->getModuleEntityMapping();
+        $io->section('Entity Mapping');
+        foreach ($entityMapping as $code => $class) {
+            $io->writeln(sprintf('%s => %s', $code, $class));
         }
 
         // Check which modules would appear in navigation
         $io->section('Navigation Items');
         $navigationCount = 0;
         foreach ($modules as $module) {
-            $navigationCount++;
-            $io->writeln(sprintf('✓ %s (%s)', $module->getName(), $module->getCode()));
+            $moduleCode = $module->getCode();
+            if (isset($entityMapping[$moduleCode])) {
+                $navigationCount++;
+                $io->writeln(sprintf('✓ %s (%s)', $module->getName(), $moduleCode));
+            } else {
+                $io->writeln(sprintf('✗ %s (%s) - No entity mapping', $module->getName(), $moduleCode));
+            }
         }
 
         $io->success(sprintf('Would show %d navigation items', $navigationCount));

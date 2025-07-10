@@ -66,39 +66,19 @@ class NavigationService
     }
 
     /**
-     * Get entity class name for a module based on its code
-     * Dynamically builds the entity class name from the module code
+     * Get module entity mapping for navigation
+     * This maps module codes to their corresponding entity classes
      */
-    public function getModuleEntityClass(string $moduleCode): string
+    public function getModuleEntityMapping(): array
     {
-        return '\\App\\Entity\\' . $moduleCode;
-    }
-
-    /**
-     * Get entity class name for a module
-     * Dynamically builds the entity class name from the module's code field
-     */
-    public function getEntityClassFromModule(Module $module): string
-    {
-        return $this->getModuleEntityClass($module->getCode());
-    }
-
-    /**
-     * Get CRUD controller class name for a module based on its code
-     * Dynamically builds the CRUD controller class name from the module code
-     */
-    public function getModuleCrudControllerClass(string $moduleCode): string
-    {
-        return '\\App\\Controller\\Admin\\' . $moduleCode . 'CrudController';
-    }
-
-    /**
-     * Get CRUD controller class name for a module
-     * Dynamically builds the CRUD controller class name from the module's code field
-     */
-    public function getCrudControllerFromModule(Module $module): string
-    {
-        return $this->getModuleCrudControllerClass($module->getCode());
+        return [
+            'Module' => \App\Entity\Module::class,
+            'User' => \App\Entity\User::class,
+            'Company' => \App\Entity\Company::class,
+            'CompanyGroup' => \App\Entity\CompanyGroup::class,
+            'Project' => \App\Entity\Project::class,
+            // Add more mappings as needed
+        ];
     }
 
     /**
