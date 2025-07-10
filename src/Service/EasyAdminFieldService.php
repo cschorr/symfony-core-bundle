@@ -201,6 +201,28 @@ class EasyAdminFieldService
      */
     private function applyAdditionalConfigurations(object $field, array $config, string $pageType): void
     {
+        // Handle help text
+        if (isset($config['help'])) {
+            $field->setHelp($this->translator->trans($config['help']));
+        }
+
+        // Handle form type options
+        if (isset($config['formTypeOptions'])) {
+            foreach ($config['formTypeOptions'] as $key => $value) {
+                $field->setFormTypeOption($key, $value);
+            }
+        }
+
+        // Handle format value callback
+        if (isset($config['formatValue'])) {
+            $field->formatValue($config['formatValue']);
+        }
+
+        // Handle render as HTML
+        if (isset($config['renderAsHtml']) && $config['renderAsHtml']) {
+            $field->renderAsHtml();
+        }
+
         // Handle custom formatting
         if (isset($config['format'])) {
             $this->applyCustomFormat($field, $config, $pageType);
