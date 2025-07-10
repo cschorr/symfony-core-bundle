@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 1000);
         }
+        
+        // Create the color tone selector only for admin pages (not login)
+        createColorToneSelector();
     }
     
     // Create color tone selector
@@ -138,49 +141,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log('Color tone selector added to sidebar:', sidebarElement.className);
         } else {
-            console.error('Could not find suitable sidebar element');
-            // Try to add to body as fallback
-            const fallbackElement = document.body;
-            console.log('Adding to body as fallback');
-            
-            const fallbackSection = document.createElement('div');
-            fallbackSection.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1000;
-                background: rgba(255, 255, 255, 0.9);
-                padding: 15px;
-                border-radius: 8px;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            `;
-            fallbackSection.innerHTML = `
-                <h6 style="margin: 0 0 10px 0; color: #333;">Background Theme</h6>
-                <select id="fallbackColorPicker" style="width: 100%; padding: 5px;">
-                    <option value="ocean" selected>Ocean (Default)</option>
-                    <option value="default">Dark Theme</option>
-                    <option value="blue">Blue</option>
-                    <option value="green">Green</option>
-                    <option value="purple">Purple</option>
-                    <option value="orange">Orange</option>
-                </select>
-                <div id="fallbackStatus" style="margin-top: 10px; font-size: 12px; color: #666;">Ocean Theme Active (Default)</div>
-            `;
-            
-            fallbackElement.appendChild(fallbackSection);
-            
-            // Add event listener for fallback
-            const fallbackPicker = document.getElementById('fallbackColorPicker');
-            fallbackPicker.addEventListener('change', function() {
-                const tone = this.value;
-                console.log('Fallback picker changed to:', tone);
-                changeColorTone(tone);
-            });
+            console.log('No EasyAdmin sidebar found - theme picker not added');
         }
     }
-    
-    // Create the color tone selector
-    createColorToneSelector();
     
     // Debug: Add manual color tone testing
     console.log('Admin.js loaded - Background customization active');
