@@ -109,6 +109,9 @@ class CompanyCrudController extends AbstractCrudController
             TextField::new('name'),
             TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
             TextField::new('url')->setLabel($this->translator->trans('Website')),
+            AssociationField::new('companyGroup')
+                ->setLabel($this->translator->trans('Company Group'))
+                ->setRequired(false),
         ];
 
         // Add address fields

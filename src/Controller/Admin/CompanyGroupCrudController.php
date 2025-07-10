@@ -73,7 +73,7 @@ class CompanyGroupCrudController extends AbstractCrudController
         $fields = [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
-            TextareaField::new('text')->setLabel($this->translator->trans('Description')),
+            TextField::new('code')->setLabel($this->translator->trans('Code'))->setRequired(false),
         ];
 
         // Add active field for index page
