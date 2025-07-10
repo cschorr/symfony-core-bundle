@@ -504,3 +504,9 @@ body[class*="ea-"].bg-tone-ocean {
     -webkit-backdrop-filter: blur(12px) !important;
     border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
+
+/* Background theme widget visibility control - managed by JavaScript */
+.ea-sidebar-bg-controls {
+    display: block;
+    transition: opacity 0.3s ease;
+}

@@ -140,9 +140,105 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             console.log('Color tone selector added to sidebar:', sidebarElement.className);
+            
+            // Setup sidebar monitoring after widget is created
+            setupSidebarMonitoring();
         } else {
             console.log('No EasyAdmin sidebar found - theme picker not added');
         }
+    }
+    
+    // Function to check sidebar state and control widget visibility
+    function controlWidgetVisibility() {
+        const widget = document.querySelector('.ea-sidebar-bg-controls');
+        if (!widget) {
+            console.log('Widget not found');
+            return;
+        }
+        
+        // Check various indicators of sidebar collapsed state
+        const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+        const sidebar = document.querySelector('.sidebar');
+        const body = document.body;
+        const navigationToggler = document.getElementById('navigation-toggler');
+        
+        let isCollapsed = false;
+        let reasons = [];
+        
+        // Primary check: Navigation toggler visibility (indicates mobile/responsive mode)
+        if (navigationToggler) {
+            const togglerStyle = window.getComputedStyle(navigationToggler);
+            const isTogglerVisible = togglerStyle.display !== 'none' && togglerStyle.visibility !== 'hidden';
+            
+            if (isTogglerVisible) {
+                isCollapsed = true;
+                reasons.push('navigation-toggler-visible');
+            }
+        }
+        
+        // Check if sidebar wrapper width is very small (collapsed state)
+        if (sidebarWrapper && !isCollapsed) {
+            const sidebarRect = sidebarWrapper.getBoundingClientRect();
+            if (sidebarRect.width < 80) {
+                isCollapsed = true;
+                reasons.push('sidebar-width-small: ' + sidebarRect.width);
+            }
+        }
+        
+        // Check if window is very small (mobile)
+        if (window.innerWidth < 768 && !isCollapsed) {
+            isCollapsed = true;
+            reasons.push('window-width-mobile: ' + window.innerWidth);
+        }
+        
+        // Show/hide widget based on collapsed state
+        if (isCollapsed) {
+            widget.style.display = 'none';
+            console.log('Widget hidden - reasons:', reasons);
+        } else {
+            widget.style.display = 'block';
+            console.log('Widget shown - sidebar appears expanded');
+        }
+        
+        // Safety check: if we can't determine the state reliably, show the widget
+        if (!navigationToggler && !sidebarWrapper) {
+            console.log('Widget shown - unable to determine sidebar state reliably');
+            widget.style.display = 'block';
+            return;
+        }
+        
+        console.log('Widget visibility check - collapsed:', isCollapsed, 'widget display:', widget.style.display);
+    }
+    
+    // Monitor for sidebar state changes
+    function setupSidebarMonitoring() {
+        // Initial check
+        setTimeout(controlWidgetVisibility, 500);
+        
+        // Listen for window resize
+        window.addEventListener('resize', controlWidgetVisibility);
+        
+        // Listen for navigation toggler clicks
+        const navigationToggler = document.getElementById('navigation-toggler');
+        if (navigationToggler) {
+            navigationToggler.addEventListener('click', () => {
+                setTimeout(controlWidgetVisibility, 100);
+            });
+        }
+        
+        // Listen for potential sidebar width changes via ResizeObserver
+        if (window.ResizeObserver) {
+            const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+            if (sidebarWrapper) {
+                const resizeObserver = new ResizeObserver(() => {
+                    controlWidgetVisibility();
+                });
+                resizeObserver.observe(sidebarWrapper);
+            }
+        }
+        
+        // Fallback: check periodically
+        setInterval(controlWidgetVisibility, 2000);
     }
     
     // Debug: Add manual color tone testing
@@ -150,3 +246,35 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Current body classes:', document.body.className);
     console.log('Current pathname:', window.location.pathname);
 });
+
+// Make functions available globally for testing
+window.showThemeWidget = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    if (widget) {
+        widget.style.display = 'block';
+        console.log('Theme widget force shown');
+    }
+};
+
+window.hideThemeWidget = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    if (widget) {
+        widget.style.display = 'none';
+        console.log('Theme widget force hidden');
+    }
+};
+
+window.checkWidgetState = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+    const navigationToggler = document.getElementById('navigation-toggler');
+    
+    console.log('Widget state check:');
+    console.log('- Widget exists:', !!widget);
+    console.log('- Widget display:', widget ? widget.style.display : 'N/A');
+    console.log('- Sidebar wrapper exists:', !!sidebarWrapper);
+    console.log('- Sidebar wrapper width:', sidebarWrapper ? sidebarWrapper.getBoundingClientRect().width : 'N/A');
+    console.log('- Navigation toggler exists:', !!navigationToggler);
+    console.log('- Navigation toggler visible:', navigationToggler ? window.getComputedStyle(navigationToggler).display !== 'none' : 'N/A');
+    console.log('- Window width:', window.innerWidth);
+};
