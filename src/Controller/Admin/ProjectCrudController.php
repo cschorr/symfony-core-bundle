@@ -117,7 +117,8 @@ class ProjectCrudController extends AbstractCrudController
                 ->type('choice')
                 ->label('Status')
                 ->help('Current status of the project')
-                ->formTypeOption('choices', [
+                ->pages(['index', 'detail', 'form'])  // Include index page for better visibility
+                ->choices([
                     $this->translator->trans('Planning') => 0,
                     $this->translator->trans('In Progress') => 1,
                     $this->translator->trans('On Hold') => 2,
@@ -210,5 +211,16 @@ class ProjectCrudController extends AbstractCrudController
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()) ||
                 in_array('ROLE_USER', $user->getRoles()));
+    }
+
+    /**
+     * Override to set default status for new projects
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof Project && $entityInstance->getStatus() === 0) {
+            $entityInstance->setStatus(0); // Ensure Planning status is set
+        }
+        parent::persistEntity($entityManager, $entityInstance);
     }
 }

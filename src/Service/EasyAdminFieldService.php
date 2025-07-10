@@ -159,6 +159,7 @@ class EasyAdminFieldService
             'date' => DateField::new($config['name']),
             'datetime' => DateTimeField::new($config['name']),
             'time' => TimeField::new($config['name']),
+            'choice' => ChoiceField::new($config['name']),
             default => null,
         };
     }
@@ -254,6 +255,11 @@ class EasyAdminFieldService
         // Handle money field configurations
         if ($config['type'] === 'money') {
             $this->configureMoneyField($field, $config);
+        }
+
+        // Handle choice field configurations
+        if ($config['type'] === 'choice') {
+            $this->configureChoiceField($field, $config);
         }
 
         // Handle custom field options
@@ -355,6 +361,27 @@ class EasyAdminFieldService
         }
         if (isset($config['storedAsCents'])) {
             $field->setStoredAsCents($config['storedAsCents']);
+        }
+    }
+
+    /**
+     * Configure choice fields
+     */
+    private function configureChoiceField(object $field, array $config): void
+    {
+        // Set choices if provided
+        if (isset($config['choices'])) {
+            $field->setChoices($config['choices']);
+        }
+        
+        // Set multiple selection if specified
+        if (isset($config['multiple']) && $config['multiple']) {
+            $field->allowMultipleChoices(true);
+        }
+        
+        // Set expanded if specified (renders as radio buttons or checkboxes)
+        if (isset($config['expanded']) && $config['expanded']) {
+            $field->renderExpanded(true);
         }
     }
 
