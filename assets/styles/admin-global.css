@@ -1,66 +1,28 @@
 /* Global EasyAdmin Background Configuration */
-/* This file applies the background image to all EasyAdmin pages */
+/* This file applies only the background image to all EasyAdmin pages */
 
-/* Global CSS that applies to all EasyAdmin pages */
-body.ea-admin-bg,
-body[class*="ea-"],
+/* Simple background image - no other styling changes */
 body {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('/images/bg/bg7.png') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
-    min-height: 100vh !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('/images/bg/bg7.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
-/* Color tone variations - make them more visible */
+/* Color tone variations */
 body.bg-tone-blue {
-    background-image: linear-gradient(rgba(59, 130, 246, 0.6), rgba(59, 130, 246, 0.6)), url('/images/bg/bg7.png') !important;
+    background-image: linear-gradient(rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.3)), url('/images/bg/bg7.png');
 }
 
 body.bg-tone-green {
-    background-image: linear-gradient(rgba(34, 197, 94, 0.6), rgba(34, 197, 94, 0.6)), url('/images/bg/bg7.png') !important;
+    background-image: linear-gradient(rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.3)), url('/images/bg/bg7.png');
 }
 
 body.bg-tone-purple {
-    background-image: linear-gradient(rgba(147, 51, 234, 0.6), rgba(147, 51, 234, 0.6)), url('/images/bg/bg7.png') !important;
+    background-image: linear-gradient(rgba(147, 51, 234, 0.3), rgba(147, 51, 234, 0.3)), url('/images/bg/bg7.png');
 }
 
 body.bg-tone-orange {
-    background-image: linear-gradient(rgba(251, 146, 60, 0.6), rgba(251, 146, 60, 0.6)), url('/images/bg/bg7.png') !important;
-}
-
-/* Global transparency and blur effects for all EasyAdmin elements */
-.ea-wrapper,
-.ea-main-wrapper,
-.ea-content-wrapper,
-.ea-sidebar,
-.ea-header,
-.main-content,
-.content-wrapper {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px) !important;
-    border-radius: 8px !important;
-}
-
-/* Make sure all cards and panels have the glass effect */
-.card,
-.panel,
-.form-panel,
-.table-panel,
-.ea-form-panel,
-.ea-table-panel,
-.content-panel {
-    background: rgba(255, 255, 255, 0.9) !important;
-    backdrop-filter: blur(5px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.2) !important;
-}
-
-/* Header transparency */
-.ea-header-toolbar,
-.navbar,
-.header-toolbar {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px) !important;
+    background-image: linear-gradient(rgba(251, 146, 60, 0.3), rgba(251, 146, 60, 0.3)), url('/images/bg/bg7.png');
 }
