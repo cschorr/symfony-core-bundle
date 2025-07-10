@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ProjetCrudController extends AbstractCrudController
+class ProjectCrudController extends AbstractCrudController
 {
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -131,11 +131,11 @@ class ProjetCrudController extends AbstractCrudController
                     }
                     return $value->getName();
                 }),
-            DateField::new('startDate')
+            DateField::new('startedAt')
                 ->setLabel($this->translator->trans('Start Date'))
                 ->setHelp($this->translator->trans('Project start date'))
                 ->hideOnIndex(),
-            DateField::new('endDate')
+            DateField::new('endedAt')
                 ->setLabel($this->translator->trans('End Date'))
                 ->setHelp($this->translator->trans('Project end date'))
                 ->hideOnIndex(),
@@ -155,7 +155,7 @@ class ProjetCrudController extends AbstractCrudController
         $viewTimeline = Action::new('viewTimeline', $this->translator->trans('Timeline'), 'fas fa-calendar-alt')
             ->linkToCrudAction('viewTimeline')
             ->displayIf(function ($entity) {
-                return $entity->getStartDate() && $entity->getEndDate();
+                return $entity->getStartedAt() && $entity->getEndedAt();
             });
 
         return $actions
