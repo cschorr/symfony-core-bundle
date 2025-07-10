@@ -12,11 +12,14 @@
 
 {% block body_class %}ea-dashboard bg-tone-default{% endblock %}
 
-{% block content_title %}
-    <h1 class="ea-dashboard-title">
-        <i class="fas fa-tachometer-alt"></i>
-        {{ 'Dashboard'|trans }}
-    </h1>
+{% block content_header_wrapper %}
+    <div class="easyadmin-title-spacing"></div>
+    <div class="easyadmin-container">
+        <h1 class="ea-dashboard-title">
+            <i class="fa fa-tachometer-alt"></i>
+            {{ 'Dashboard'|trans }}
+        </h1>
+    </div>
 {% endblock %}
 
 {% block page_content %}

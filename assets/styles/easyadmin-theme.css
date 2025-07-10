@@ -44,6 +44,19 @@ body {
     margin-top: 20px;
 }
 
+/* Ensure dashboard containers display properly */
+.ea-dashboard .easyadmin-container,
+body[class*="ea-dashboard"] .easyadmin-container {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin-top: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15) !important;
+}
+
 /* Color tone variations for EasyAdmin pages */
 body[class*="ea-"].bg-tone-blue,
 body.bg-tone-blue {
