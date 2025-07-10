@@ -126,21 +126,27 @@ class CompanyCrudController extends AbstractCrudController
                 ->setIcon('fas fa-map-marker-alt')
                 ->collapsible($pageName !== Crud::PAGE_DETAIL);
             
-            $fields[] = TextField::new('street')
-                ->setLabel($this->translator->trans('Street Address'))
-                ->setRequired(false);
-            
-            $fields[] = TextField::new('zip')
-                ->setLabel($this->translator->trans('ZIP/Postal Code'))
-                ->setRequired(false);
+            if ($pageName === Crud::PAGE_DETAIL) {
+                // On detail page, show individual address fields
+                $fields[] = TextField::new('street')
+                    ->setLabel($this->translator->trans('Street Address'));
                 
-            $fields[] = TextField::new('city')
-                ->setLabel($this->translator->trans('City'))
-                ->setRequired(false);
-                
-            $fields[] = CountryField::new('countryCode')
-                ->setLabel($this->translator->trans('Country'))
-                ->setRequired(false);
+                $fields[] = TextField::new('zip')
+                    ->setLabel($this->translator->trans('ZIP/Postal Code'));
+                    
+                $fields[] = TextField::new('city')
+                    ->setLabel($this->translator->trans('City'));
+                    
+                $fields[] = CountryField::new('countryCode')
+                    ->setLabel($this->translator->trans('Country'));
+            } else {
+                // On form pages (new/edit), use the AddressType form
+                $fields[] = FormField::addFieldset()
+                    ->setFormType(AddressType::class)
+                    ->setFormTypeOptions([
+                        'inherit_data' => true,
+                    ]);
+            }
         } else {
             // Index page summary
             $fields[] = TextField::new('city')
