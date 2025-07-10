@@ -47,7 +47,7 @@ class ProjectCrudController extends AbstractCrudController
     {
         return parent::configureCrud($crud)
             ->setPageTitle('index', $this->translator->trans('Projects'))
-            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Project'), $entity->getName()))
+            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Project Singular'), $entity->getName()))
             ->setPageTitle('new', $this->translator->trans('Create Project'))
             ->setPageTitle('edit', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Edit Project'), $entity->getName()))
             ->setHelp('index', $this->translator->trans('Manage projects, assignments, and timelines.'));
@@ -119,23 +119,23 @@ class ProjectCrudController extends AbstractCrudController
             $this->fieldService->field('status')
                 ->type('choice')
                 ->label('Status')
-                ->choices([
-                    'Planning' => 0,
-                    'In Progress' => 1,
-                    'On Hold' => 2,
-                    'Completed' => 3,
-                    'Cancelled' => 4,
-                ])
                 ->help('Current status of the project')
+                ->formTypeOption('choices', [
+                    $this->translator->trans('Planning') => 0,
+                    $this->translator->trans('In Progress') => 1,
+                    $this->translator->trans('On Hold') => 2,
+                    $this->translator->trans('Completed') => 3,
+                    $this->translator->trans('Cancelled') => 4,
+                ])
                 ->formatValue(function ($value, $entity) {
                     $statusNames = [
-                        0 => 'Planning',
-                        1 => 'In Progress', 
-                        2 => 'On Hold',
-                        3 => 'Completed',
-                        4 => 'Cancelled'
+                        0 => $this->translator->trans('Planning'),
+                        1 => $this->translator->trans('In Progress'), 
+                        2 => $this->translator->trans('On Hold'),
+                        3 => $this->translator->trans('Completed'),
+                        4 => $this->translator->trans('Cancelled')
                     ];
-                    return $statusNames[$value] ?? 'Unknown';
+                    return $statusNames[$value] ?? $this->translator->trans('Unknown');
                 })
                 ->build(),
                 
