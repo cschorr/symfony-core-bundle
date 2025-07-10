@@ -494,3 +494,13 @@ body[class*="ea-"].bg-tone-ocean {
 .ea-dark-scheme .main-sidebar {
     background: rgba(31, 41, 55, 0.85) !important;
 }
+
+/* Light mode sidebar styling - Glass morphism effect matching easyadmin-container */
+.ea-sidebar,
+.sidebar,
+.main-sidebar {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
