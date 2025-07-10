@@ -1,14 +1,22 @@
-# Address Fields in EasyAdmin
+# Address Form Type Documentation
 
 ## Overview
 
-This documentation explains how to add address fields to your EasyAdmin CRUD controllers for entities that use the `SetAddressTrait`.
+This documentation explains how to use the `AddressType` form in your EasyAdmin CRUD controllers for entities that use the `SetAddressTrait`. This approach groups all address fields together in a clean, organized way without requiring custom templates.
+
+## Files Created
+
+### AddressType Form
+- **File**: `src/Form/Type/AddressType.php`
+- **Purpose**: Symfony form type that groups address fields (street, zip, city, countryCode)
+- **Features**: Uses Symfony's built-in CountryType for proper country selection
 
 ## Implementation
 
 ### CompanyCrudController Example
 
 ```php
+use App\Form\Type\AddressType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -18,9 +26,16 @@ public function configureFields(string $pageName): iterable
     $fields = [
         IdField::new('id')->hideOnForm()->hideOnIndex(),
         TextField::new('name'),
-        TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
+        TextField::new('nameExtension')->setLabel($this->translator->trans('Name Extension')),
         TextField::new('url')->setLabel($this->translator->trans('Website')),
     ];
+
+    // Add company group field only for forms and detail pages
+    if ($pageName !== Crud::PAGE_INDEX) {
+        $fields[] = AssociationField::new('companyGroup')
+            ->setLabel($this->translator->trans('Company Group'))
+            ->setRequired(false);
+    }
 
     // Add address fields
     if ($pageName !== Crud::PAGE_INDEX) {
@@ -29,21 +44,11 @@ public function configureFields(string $pageName): iterable
             ->setIcon('fas fa-map-marker-alt')
             ->collapsible();
         
-        $fields[] = TextField::new('street')
-            ->setLabel($this->translator->trans('Street Address'))
-            ->setRequired(false);
-        
-        $fields[] = TextField::new('zip')
-            ->setLabel($this->translator->trans('ZIP/Postal Code'))
-            ->setRequired(false);
-            
-        $fields[] = TextField::new('city')
-            ->setLabel($this->translator->trans('City'))
-            ->setRequired(false);
-            
-        $fields[] = CountryField::new('countryCode')
-            ->setLabel($this->translator->trans('Country'))
-            ->setRequired(false);
+        $fields[] = FormField::addFieldset()
+            ->setFormType(AddressType::class)
+            ->setFormTypeOptions([
+                'inherit_data' => true,
+            ]);
     } else {
         // On index page, show address summary
         $fields[] = TextField::new('city')

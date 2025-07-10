@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use App\Form\Type\AddressType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 
@@ -107,41 +108,51 @@ class CompanyCrudController extends AbstractCrudController
         $fields = [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
             TextField::new('name'),
-            TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
+            TextField::new('nameExtension')->setLabel($this->translator->trans('Name Extension')),
             TextField::new('url')->setLabel($this->translator->trans('Website')),
-            AssociationField::new('companyGroup')
-                ->setLabel($this->translator->trans('Company Group'))
-                ->setRequired(false),
         ];
 
-        // Add address fields
+        // Add company group field only for forms and detail pages
         if ($pageName !== Crud::PAGE_INDEX) {
-            // Add address panel for forms
-            $fields[] = FormField::addPanel($this->translator->trans('Address Information'))
-                ->setIcon('fas fa-map-marker-alt')
-                ->collapsible();
-            
-            $fields[] = TextField::new('street')
-                ->setLabel($this->translator->trans('Street Address'))
+            $fields[] = AssociationField::new('companyGroup')
+                ->setLabel($this->translator->trans('Company Group'))
                 ->setRequired(false);
-            
-            $fields[] = TextField::new('zip')
-                ->setLabel($this->translator->trans('ZIP/Postal Code'))
-                ->setRequired(false);
-                
-            $fields[] = TextField::new('city')
-                ->setLabel($this->translator->trans('City'))
-                ->setRequired(false);
-                
-            $fields[] = CountryField::new('countryCode')
-                ->setLabel($this->translator->trans('Country'))
-                ->setRequired(false);
-        } else {
+        }
+
+        // Add address fields
+        if ($pageName === Crud::PAGE_INDEX) {
             // On index page, show address summary
             $fields[] = TextField::new('city')
                 ->setLabel($this->translator->trans('City'));
             $fields[] = CountryField::new('countryCode')
                 ->setLabel($this->translator->trans('Country'));
+        } elseif ($pageName === Crud::PAGE_DETAIL) {
+            // On detail page, show individual address fields
+            $fields[] = FormField::addPanel($this->translator->trans('Address Information'))
+                ->setIcon('fas fa-map-marker-alt');
+            
+            $fields[] = TextField::new('street')
+                ->setLabel($this->translator->trans('Street Address'));
+            
+            $fields[] = TextField::new('zip')
+                ->setLabel($this->translator->trans('ZIP/Postal Code'));
+                
+            $fields[] = TextField::new('city')
+                ->setLabel($this->translator->trans('City'));
+                
+            $fields[] = CountryField::new('countryCode')
+                ->setLabel($this->translator->trans('Country'));
+        } else {
+            // On form pages (new/edit), use the grouped AddressType form
+            $fields[] = FormField::addPanel($this->translator->trans('Address Information'))
+                ->setIcon('fas fa-map-marker-alt')
+                ->collapsible();
+            
+            $fields[] = FormField::addFieldset()
+                ->setFormType(AddressType::class)
+                ->setFormTypeOptions([
+                    'inherit_data' => true,
+                ]);
         }
 
         // Configure employees field differently for index vs forms
