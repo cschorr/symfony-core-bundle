@@ -157,14 +157,28 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Get contact field groups customized for Company - excludes city from index view
+     * Get custom communication fields - excludes email from index view
+     */
+    private function getCustomCommunicationFields(): array
+    {
+        return [
+            $this->fieldService->createPanelConfig('communication_panel', 'Communication', ['detail', 'form'], 'fas fa-phone'),
+            $this->fieldService->createFieldConfig('email', 'email', ['detail', 'form'], 'Email Address'),
+            $this->fieldService->createFieldConfig('phone', 'telephone', ['detail', 'form'], 'Phone Number'),
+            $this->fieldService->createFieldConfig('cell', 'telephone', ['detail', 'form'], 'Mobile/Cell Phone'),
+            $this->fieldService->createFieldConfig('url', 'url', ['index', 'detail', 'form'], 'Website'), // Keep website in index
+        ];
+    }
+
+    /**
+     * Get contact field groups customized for Company - excludes city and email from index view
      */
     private function getCustomContactFieldGroups(): array
     {
         $fields = [];
         
-        // Communication fields (includes email and website in index)
-        $fields = array_merge($fields, $this->fieldService->createCommunicationFieldGroup(['detail', 'form']));
+        // Custom communication fields (excludes email from index)
+        $fields = array_merge($fields, $this->getCustomCommunicationFields());
         
         // Address fields - customized to exclude city from index
         $fields = array_merge($fields, [

@@ -102,6 +102,7 @@ class ModuleCrudController extends AbstractCrudController
                 $this->fieldService->field('name')
                     ->type('text')
                     ->label('Name')
+                    ->linkToShow() // This will auto-detect the ModuleCrudController
                     ->build(),
                     
                 ...$this->getModulePermissionsSummaryField(),
