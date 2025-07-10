@@ -15,11 +15,13 @@
 {% block content_header_wrapper %}
     <div class="easyadmin-title-spacing"></div>
     <div class="easyadmin-container">
-        <h1 class="ea-dashboard-title">
-            <i class="fa fa-tachometer-alt"></i>
-            {{ 'Dashboard'|trans }}
-        </h1>
+        {{ parent() }}
     </div>
+{% endblock %}
+
+{% block content_title %}
+    <i class="fa fa-tachometer-alt"></i>
+    {{ 'Dashboard'|trans }}
 {% endblock %}
 
 {% block page_content %}
