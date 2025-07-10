@@ -81,12 +81,13 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Configure assets to include the EasyAdmin theme CSS on all CRUD pages
+     * Configure assets to include the EasyAdmin theme CSS and admin.js on all CRUD pages
      */
     public function configureAssets(Assets $assets): Assets
     {
         return $assets
-            ->addCssFile('styles/easyadmin-theme.css');
+            ->addCssFile('styles/easyadmin-theme.css')
+            ->addJsFile('admin.js');
     }
 
     /**
