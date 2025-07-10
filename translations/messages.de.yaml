@@ -104,3 +104,33 @@ Client: "Kunde"
 "End Date": "Enddatum"
 "Project end date": "Projekt-Enddatum"
 Timeline: "Zeitplan"
+
+# Company Management
+"Name Extension": "Namenserweiterung"
+"Company Group": "Unternehmensgruppe"
+"Communication": "Kommunikation"
+"Email Address": "E-Mail-Adresse"
+"Phone Number": "Telefonnummer"
+"Mobile/Cell Phone": "Mobiltelefon"
+"Address Information": "Adressinformationen"
+"Street Address": "Straßenadresse"
+"ZIP/Postal Code": "PLZ/Postleitzahl"
+"City": "Stadt"
+"Country": "Land"
+"Mitarbeiter": "Mitarbeiter"
+
+# Form Actions
+"Erstellen und weiteres Element hinzufügen": "Erstellen und weiteres Element hinzufügen"
+"Erstellen": "Erstellen"
+
+# Field Labels
+"Name": "Name"
+
+# Navigation
+"Unternehmen": "Unternehmen"
+"Unternehmensgruppen": "Unternehmensgruppen"
+"Projekt": "Projekt"
+
+# Page Titles
+"Unternehmen Erstellen": "Unternehmen Erstellen"
+"Unternehmen Bearbeiten": "Unternehmen Bearbeiten"
