@@ -14,10 +14,11 @@ Logout: "Logout"
 "supported by": "supported by"
 "Placeholder image": "Placeholder image"
 
-# Module/Entity Names (automatically generated from Module entity)
+# Module/Entity Names (direct translation approach)
 # These keys match the "code" and "name" fields in the Module entity
-# Singular forms (code field): User, Company, Module, CompanyGroup, Project
-# Plural forms (name field): Users, Companies, Modules, CompanyGroups, Projects
+# - Singular forms (code field): User, Company, Module, CompanyGroup, Project
+# - Plural forms (name field): Users, Companies, Modules, CompanyGroups, Projects
+# Navigation uses the plural forms automatically via $module->getName()
 User: "User"
 Users: "Users"
 Company: "Company"

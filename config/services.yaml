@@ -31,8 +31,6 @@ services:
     App\Command\MigrateEasyAdminFieldsCommand:
         arguments:
             $projectDir: '%kernel.project_dir%'
-    
-    # ModuleSyncTranslationsCommand uses ParameterBagInterface for project dir
 
 # Twig configuration
 twig:

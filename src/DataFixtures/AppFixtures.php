@@ -52,7 +52,8 @@ class AppFixtures extends Fixture
     public function createModuleFixtures(ObjectManager $manager): void
     {
         // Modules in navigation order - they will be sorted by ID (UUID) in ascending order
-        // The 'code' field is used for translation, 'name' field is for admin display
+        // The 'code' field is the singular form, 'name' field is the plural form
+        // Navigation uses $module->getName() which returns the plural form for translation
         $modules = [
             ['name' => 'Modules', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
             ['name' => 'Users', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
