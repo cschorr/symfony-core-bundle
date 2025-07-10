@@ -487,3 +487,10 @@ body[class*="ea-"].bg-tone-ocean {
     color: #e5e7eb !important;
     border: 1px solid rgba(55, 65, 81, 0.3) !important;
 }
+
+/* Dark mode sidebar styling - Try multiple possible selectors */
+.ea-dark-scheme .ea-sidebar,
+.ea-dark-scheme .sidebar,
+.ea-dark-scheme .main-sidebar {
+    background: rgba(31, 41, 55, 0.85) !important;
+}
