@@ -12,14 +12,3 @@
         {{ parent() }}
     </div>
 {% endblock %}
-
-{#
-{% block content_footer_wrapper %}
-    {% set footer_content %}{{ parent() }}{% endset %}
-    {% if footer_content is not empty %}
-        <div class="easyadmin-footer">
-            {{ footer_content|raw }}
-        </div>
-    {% endif %}
-{% endblock %}
-#}
