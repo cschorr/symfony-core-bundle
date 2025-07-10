@@ -40,15 +40,24 @@ class EasyAdminFieldService
         $fields = [];
         
         foreach ($fieldConfigurations as $fieldConfig) {
-            // Skip fields not meant for this page
-            if (!$this->shouldShowField($fieldConfig, $pageName)) {
+            // Handle direct field objects (for backward compatibility)
+            if (is_object($fieldConfig)) {
+                $fields[] = $fieldConfig;
                 continue;
             }
             
-            // Create the field based on configuration
-            $field = $this->createField($fieldConfig, $pageName);
-            if ($field) {
-                $fields[] = $field;
+            // Handle configuration arrays
+            if (is_array($fieldConfig)) {
+                // Skip fields not meant for this page
+                if (!$this->shouldShowField($fieldConfig, $pageName)) {
+                    continue;
+                }
+                
+                // Create the field based on configuration
+                $field = $this->createField($fieldConfig, $pageName);
+                if ($field) {
+                    $fields[] = $field;
+                }
             }
         }
 
@@ -65,6 +74,17 @@ class EasyAdminFieldService
      */
     private function shouldShowField(array $fieldConfig, string $pageName): bool
     {
+        // Handle special field types that should always be shown (tabs, panels)
+        if (isset($fieldConfig['type']) && in_array($fieldConfig['type'], ['tab', 'panel'])) {
+            // For panels, check if they should be shown on this page
+            if ($fieldConfig['type'] === 'panel') {
+                $pageType = $this->getPageType($pageName);
+                return in_array($pageType, $fieldConfig['pages'] ?? ['form']);
+            }
+            // Tabs are only shown on form pages
+            return $this->getPageType($pageName) === 'form';
+        }
+        
         $pageType = $this->getPageType($pageName);
         return in_array($pageType, $fieldConfig['pages'] ?? []);
     }
@@ -95,6 +115,11 @@ class EasyAdminFieldService
             return FormField::addPanel($this->translator->trans($config['label']))
                 ->setIcon($config['icon'] ?? '')
                 ->collapsible($isCollapsible);
+        }
+
+        // Handle tabs
+        if ($config['type'] === 'tab') {
+            return FormField::addTab($this->translator->trans($config['label']));
         }
 
         // Create field based on type
@@ -225,6 +250,11 @@ class EasyAdminFieldService
      */
     private function configureAssociationField(object $field, array $config, string $pageType): void
     {
+        // Handle autocomplete
+        if ($config['autocomplete'] ?? false) {
+            $field->autocomplete();
+        }
+
         // Handle multiple selection
         if ($pageType === 'form' && ($config['multiple'] ?? false)) {
             $formOptions = [
@@ -313,22 +343,28 @@ class EasyAdminFieldService
     }
 
     /**
-     * Create a panel configuration
+     * Create a tab configuration
      */
-    public function createPanelConfig(
-        string $name,
-        string $label,
-        array $pages = ['detail', 'form'],
-        ?string $icon = null,
-        array $collapsibleOn = ['form']
-    ): array {
+    public function createTabConfig(string $name, string $label): array
+    {
         return [
+            'type' => 'tab',
             'name' => $name,
-            'type' => 'panel',
-            'pages' => $pages,
             'label' => $label,
+        ];
+    }
+
+    /**
+     * Create a panel configuration for grouping fields
+     */
+    public function createPanelConfig(string $name, string $label, array $pages = ['form'], string $icon = 'fas fa-folder'): array
+    {
+        return [
+            'type' => 'panel',
+            'name' => $name,
+            'label' => $label,
+            'pages' => $pages,
             'icon' => $icon,
-            'collapsible' => $collapsibleOn,
         ];
     }
 

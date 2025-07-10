@@ -128,4 +128,163 @@ trait FieldConfigurationTrait
     {
         return false;
     }
+
+    /**
+     * Get user/employee related fields
+     */
+    protected function getUserFields(array $pages = ['detail', 'form']): array
+    {
+        return [
+            $this->fieldService->field('email')
+                ->type('email')
+                ->label('Email Address')
+                ->pages($pages)
+                ->build(),
+            $this->fieldService->field('roles')
+                ->type('choice')
+                ->label('Roles')
+                ->choices([
+                    'User' => 'ROLE_USER',
+                    'Admin' => 'ROLE_ADMIN',
+                ])
+                ->multiple(true)
+                ->pages($pages)
+                ->build(),
+        ];
+    }
+
+    /**
+     * Get project-related fields
+     */
+    protected function getProjectFields(array $pages = ['detail', 'form']): array
+    {
+        return [
+            $this->fieldService->field('description')
+                ->type('textarea')
+                ->label('Description')
+                ->pages($pages)
+                ->build(),
+            $this->fieldService->field('startDate')
+                ->type('date')
+                ->label('Start Date')
+                ->pages($pages)
+                ->build(),
+            $this->fieldService->field('endDate')
+                ->type('date')
+                ->label('End Date')
+                ->pages($pages)
+                ->build(),
+            $this->fieldService->field('status')
+                ->type('choice')
+                ->label('Status')
+                ->choices([
+                    'Planning' => 'planning',
+                    'Active' => 'active',
+                    'On Hold' => 'on_hold',
+                    'Completed' => 'completed',
+                    'Cancelled' => 'cancelled'
+                ])
+                ->pages($pages)
+                ->build(),
+        ];
+    }
+
+    /**
+     * Get common association fields
+     */
+    protected function getAssociationFields(array $associations, array $pages = ['detail', 'form']): array
+    {
+        $fields = [];
+        
+        foreach ($associations as $association => $config) {
+            $fieldBuilder = $this->fieldService->field($association)
+                ->type('association')
+                ->pages($pages);
+                
+            if (isset($config['label'])) {
+                $fieldBuilder->label($config['label']);
+            }
+            
+            if (isset($config['autocomplete']) && $config['autocomplete']) {
+                $fieldBuilder->autocomplete(true);
+            }
+            
+            if (isset($config['multiple']) && $config['multiple']) {
+                $fieldBuilder->multiple(true);
+            }
+            
+            $fields[] = $fieldBuilder->build();
+        }
+        
+        return $fields;
+    }
+
+    /**
+     * Get notes/description field
+     */
+    protected function getNotesField(array $pages = ['detail', 'form'], string $label = 'Notes'): array
+    {
+        return [
+            $this->fieldService->field('notes')
+                ->type('textarea')
+                ->label($label)
+                ->pages($pages)
+                ->build(),
+        ];
+    }
+
+    /**
+     * Get active/status field
+     */
+    protected function getActiveField(array $pages = ['index', 'detail', 'form']): array
+    {
+        return [
+            $this->fieldService->field('active')
+                ->type('boolean')
+                ->label('Active')
+                ->pages($pages)
+                ->build(),
+        ];
+    }
+
+    /**
+     * Create a complete basic entity configuration
+     */
+    protected function getBasicEntityConfiguration(string $entityLabel, array $additionalFields = []): array
+    {
+        $config = [
+            ...$this->getStandardEntityFields($entityLabel),
+            ...$additionalFields,
+            ...$this->getNotesField(),
+            ...$this->getActiveField(),
+            ...$this->getTimestampFields(),
+        ];
+        
+        return $config;
+    }
+
+    /**
+     * Create a panel/tab structure for form organization
+     */
+    protected function createFormStructure(array $sections, array $pages = ['form']): array
+    {
+        $fields = [];
+        
+        foreach ($sections as $sectionName => $sectionConfig) {
+            $icon = $sectionConfig['icon'] ?? 'fas fa-folder';
+            $isTab = $sectionConfig['type'] ?? 'panel' === 'tab';
+            
+            if ($isTab) {
+                $fields[] = $this->fieldService->createTabConfig($sectionName, $sectionConfig['label'] ?? $sectionName);
+            } else {
+                $fields[] = $this->fieldService->createPanelConfig($sectionName, $sectionConfig['label'] ?? $sectionName, $pages, $icon);
+            }
+            
+            if (isset($sectionConfig['fields'])) {
+                $fields = array_merge($fields, $sectionConfig['fields']);
+            }
+        }
+        
+        return $fields;
+    }
 }
