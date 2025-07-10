@@ -111,19 +111,23 @@ class DashboardController extends AbstractDashboardController
             $accessibleModules = $this->navigationService->getAccessibleModulesForUser($user);
         }
 
-        $entityMapping = $this->navigationService->getModuleEntityMapping();
-
         // Generate menu items dynamically based on user permissions and active modules
         foreach ($accessibleModules as $module) {
             $moduleCode = $module->getCode();
             
-            // Check if we have an entity mapping for this module
-            if (isset($entityMapping[$moduleCode])) {
-                $entityClass = $entityMapping[$moduleCode];
+            // Get CRUD controller class dynamically from module code
+            $crudControllerClass = $this->navigationService->getCrudControllerFromModule($module);
+            
+            // Check if the CRUD controller class exists before creating menu item
+            if (class_exists($crudControllerClass)) {
                 $icon = $this->navigationService->getModuleIcon($module);
                 $label = $this->translator->trans($moduleCode);
                 
-                yield MenuItem::linkToCrud($label, $icon, $entityClass);
+                // Use linkToRoute with EasyAdmin's admin route and controller parameter
+                yield MenuItem::linkToRoute($label, $icon, 'admin', [
+                    'crudAction' => 'index',
+                    'crudControllerFqcn' => $crudControllerClass
+                ]);
             }
         }
     }
