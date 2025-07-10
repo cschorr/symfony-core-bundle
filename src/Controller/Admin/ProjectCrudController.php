@@ -181,31 +181,7 @@ class ProjectCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $actions = parent::configureActions($actions);
-
-        // Add custom action for project timeline view
-        $viewTimeline = Action::new('viewTimeline', $this->translator->trans('Timeline'), 'fas fa-calendar-alt')
-            ->linkToCrudAction('viewTimeline')
-            ->displayIf(function ($entity) {
-                return $entity->getStartedAt() && $entity->getEndedAt();
-            });
-
-        return $actions
-            ->add(Crud::PAGE_INDEX, $viewTimeline)
-            ->add(Crud::PAGE_DETAIL, $viewTimeline);
-    }
-
-    public function viewTimeline(AdminContext $context): Response
-    {
-        $project = $context->getEntity()->getInstance();
-        
-        // You can implement timeline view logic here
-        // For now, redirect to detail view
-        return $this->redirectToRoute('admin', [
-            'crudAction' => 'detail',
-            'crudControllerFqcn' => static::class,
-            'entityId' => $project->getId(),
-        ]);
+        return parent::configureActions($actions);
     }
 
     protected function canCreateEntity(): bool
