@@ -116,6 +116,11 @@ body.bg-tone-orange {
     background-image: linear-gradient(rgba(251, 146, 60, 0.3), rgba(251, 146, 60, 0.3)), url('/images/bg/bg7.png') !important;
 }
 
+body[class*="ea-"].bg-tone-ocean,
+body.bg-tone-ocean {
+    background-image: linear-gradient(to right, rgba(0, 84, 115, 0.3), rgba(0, 168, 134, 0.3)), url('/images/bg/bg7.png') !important;
+}
+
 /* Ensure the background applies to EasyAdmin layout elements */
 .ea-layout,
 .ea-page {

@@ -5,7 +5,7 @@ function changeColorTone(tone) {
     console.log('Changing color tone to:', tone);
     
     // Remove existing tone classes
-    document.body.classList.remove('bg-tone-blue', 'bg-tone-green', 'bg-tone-purple', 'bg-tone-orange');
+    document.body.classList.remove('bg-tone-blue', 'bg-tone-green', 'bg-tone-purple', 'bg-tone-orange', 'bg-tone-ocean');
     
     // Add the new tone class
     if (tone && tone !== 'default') {
@@ -21,9 +21,10 @@ function changeColorTone(tone) {
             'blue': 'Blue Theme Active',
             'green': 'Green Theme Active',
             'purple': 'Purple Theme Active',
-            'orange': 'Orange Theme Active'
+            'orange': 'Orange Theme Active',
+            'ocean': 'Ocean Theme Active'
         };
-        statusElement.textContent = statusTexts[tone] || 'Default Theme Active';
+        statusElement.textContent = statusTexts[tone] || 'Ocean Theme Active';
     }
     
     // Store the preference
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add the custom background class to the body
         document.body.classList.add('ea-admin-bg');
         
-        // Load saved color tone preference
+        // Load saved color tone preference or set ocean as default
         const savedTone = localStorage.getItem('admin-bg-tone');
         if (savedTone && savedTone !== 'default') {
             document.body.classList.add('bg-tone-' + savedTone);
@@ -53,15 +54,28 @@ document.addEventListener('DOMContentLoaded', function() {
                         'blue': 'Blue Theme Active',
                         'green': 'Green Theme Active',
                         'purple': 'Purple Theme Active',
-                        'orange': 'Orange Theme Active'
+                        'orange': 'Orange Theme Active',
+                        'ocean': 'Ocean Theme Active'
                     };
-                    statusElement.textContent = statusTexts[savedTone] || 'Default Theme Active';
+                    statusElement.textContent = statusTexts[savedTone] || 'Ocean Theme Active';
+                }
+            }, 1000);
+        } else {
+            // Set ocean as default if no preference is saved
+            document.body.classList.add('bg-tone-ocean');
+            localStorage.setItem('admin-bg-tone', 'ocean');
+            
+            // Update status when page loads
+            setTimeout(() => {
+                const statusElement = document.getElementById('sidebarBgStatus');
+                if (statusElement) {
+                    statusElement.textContent = 'Ocean Theme Active';
                 }
             }, 1000);
         }
     }
     
-    // Create color tone selector (if you want to add it to the interface)
+    // Create color tone selector
     function createColorToneSelector() {
         console.log('Creating color tone selector...');
         
@@ -93,11 +107,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <li><a class="dropdown-item" href="#" data-tone="green">Green</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="purple">Purple</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="orange">Orange</a></li>
+                                <li><a class="dropdown-item" href="#" data-tone="ocean">Ocean</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="sidebar-bg-status" id="sidebarBgStatus">
-                        Default Theme Active
+                        Ocean Theme Active
                     </div>
                 </div>
             `;
@@ -147,8 +162,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <option value="green">Green</option>
                     <option value="purple">Purple</option>
                     <option value="orange">Orange</option>
+                    <option value="ocean" selected>Ocean</option>
                 </select>
-                <div id="fallbackStatus" style="margin-top: 10px; font-size: 12px; color: #666;">Default Theme Active</div>
+                <div id="fallbackStatus" style="margin-top: 10px; font-size: 12px; color: #666;">Ocean Theme Active</div>
             `;
             
             fallbackElement.appendChild(fallbackSection);
@@ -163,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Uncomment the line below if you want to add the color tone selector to the interface
+    // Create the color tone selector
     createColorToneSelector();
     
     // Debug: Add manual color tone testing
@@ -289,6 +305,12 @@ style.textContent = `
         background: rgba(251, 146, 60, 0.2);
         border-color: rgba(251, 146, 60, 0.3);
         color: #c2410c;
+    }
+    
+    body.bg-tone-ocean .sidebar-bg-status {
+        background: rgba(0, 168, 134, 0.2);
+        border-color: rgba(0, 168, 134, 0.3);
+        color: #065f46;
     }
     
     /* Make sidebar taller to accommodate new controls */
