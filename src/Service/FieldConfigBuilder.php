@@ -93,6 +93,30 @@ class FieldConfigBuilder
         return $this;
     }
 
+    public function help(string $help): self
+    {
+        $this->config['help'] = $help;
+        return $this;
+    }
+
+    public function formTypeOption(string $key, $value): self
+    {
+        $this->config['formTypeOptions'][$key] = $value;
+        return $this;
+    }
+
+    public function formatValue(callable $formatter): self
+    {
+        $this->config['formatValue'] = $formatter;
+        return $this;
+    }
+
+    public function renderAsHtml(bool $renderAsHtml = true): self
+    {
+        $this->config['renderAsHtml'] = $renderAsHtml;
+        return $this;
+    }
+
     public function association(string $targetEntity, $choiceLabel = 'name'): self
     {
         $this->config['type'] = 'association';
