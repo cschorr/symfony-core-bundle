@@ -98,10 +98,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
         
-        // Create the color tone selector only for admin pages (not login) - but only once
-        if (!document.querySelector('.ea-sidebar-bg-controls')) {
-            createColorToneSelector();
-        }
+        // Widget creation disabled - just use ocean theme automatically
+        // if (!document.querySelector('.ea-sidebar-bg-controls')) {
+        //     createColorToneSelector();
+        // }
     }
     
     // Create color tone selector
