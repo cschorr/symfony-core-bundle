@@ -58,6 +58,7 @@ class AppFixtures extends Fixture
             ['name' => 'User Management', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
             ['name' => 'Company Management', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
             ['name' => 'Company Group Management', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
+            ['name' => 'Projekte', 'code' => 'Project', 'text' => 'Projekte', 'icon' => 'fas fa-layer-group'],
         ];
 
         // Create and persist module entities here
@@ -82,6 +83,7 @@ class AppFixtures extends Fixture
         $companyModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'Company']);
         $moduleModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'Module']);
         $companyGroupModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'CompanyGroup']);
+        $projectModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'Project']);
 
         // Helper function to create permission if it doesn't exist
         $createPermissionIfNotExists = function($user, $module, $canRead, $canWrite) use ($manager) {
@@ -106,6 +108,7 @@ class AppFixtures extends Fixture
         $createPermissionIfNotExists($adminUser, $companyModule, true, true);
         $createPermissionIfNotExists($adminUser, $moduleModule, true, true);
         $createPermissionIfNotExists($adminUser, $companyGroupModule, true, true);
+        $createPermissionIfNotExists($adminUser, $projectModule, true, true);
 
         // Demo user permissions
         $createPermissionIfNotExists($demoUser, $userModule, true, false); // Read-only access to user module
