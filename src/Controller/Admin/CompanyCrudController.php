@@ -112,8 +112,10 @@ class CompanyCrudController extends AbstractCrudController
         // Base fields for all pages
         $fields = [
             IdField::new('id')->hideOnForm()->hideOnIndex(),
-            TextField::new('name'),
-            TextField::new('nameExtension')->setLabel($this->translator->trans('Name Extension')),
+            TextField::new('name')->setColumns(12),
+            TextField::new('nameExtension')
+                ->setLabel($this->translator->trans('Name Extension'))
+                ->setColumns(12),
         ];
 
         // Page-specific field configuration
@@ -230,7 +232,8 @@ class CompanyCrudController extends AbstractCrudController
         // Company group
         $fields[] = AssociationField::new('companyGroup')
             ->setLabel($this->translator->trans('Company Group'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
 
         // Communication panel (collapsible on forms)
         $fields[] = FormField::addPanel($this->translator->trans('Communication'))
@@ -240,19 +243,23 @@ class CompanyCrudController extends AbstractCrudController
         // Communication fields using individual fields instead of fieldset
         $fields[] = EmailField::new('email')
             ->setLabel($this->translator->trans('Email Address'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
         
         $fields[] = TelephoneField::new('phone')
             ->setLabel($this->translator->trans('Phone Number'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
             
         $fields[] = TelephoneField::new('cell')
             ->setLabel($this->translator->trans('Mobile/Cell Phone'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
             
         $fields[] = UrlField::new('url')
             ->setLabel($this->translator->trans('Website'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
 
         // Address panel (collapsible on forms)
         $fields[] = FormField::addPanel($this->translator->trans('Address Information'))
@@ -262,19 +269,23 @@ class CompanyCrudController extends AbstractCrudController
         // Address fields using individual fields instead of fieldset
         $fields[] = TextField::new('street')
             ->setLabel($this->translator->trans('Street Address'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
             
         $fields[] = TextField::new('zip')
             ->setLabel($this->translator->trans('ZIP/Postal Code'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
             
         $fields[] = TextField::new('city')
             ->setLabel($this->translator->trans('City'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
             
         $fields[] = CountryField::new('countryCode')
             ->setLabel($this->translator->trans('Country'))
-            ->setRequired(false);
+            ->setRequired(false)
+            ->setColumns(12);
 
         // Employees panel (collapsible on forms)
         $fields[] = FormField::addPanel($this->translator->trans('Employees'))
@@ -284,6 +295,7 @@ class CompanyCrudController extends AbstractCrudController
         $fields[] = AssociationField::new('employees')
             ->setLabel($this->translator->trans('Employees'))
             ->setRequired(false)
+            ->setColumns(12)
             ->setFormTypeOptions([
                 'by_reference' => false,
                 'multiple' => true,
