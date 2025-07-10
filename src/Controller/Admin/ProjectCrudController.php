@@ -145,7 +145,7 @@ class ProjectCrudController extends AbstractCrudController
                 ->help('User responsible for this project')
                 ->formatValue(function ($value, $entity) {
                     if (!$value) {
-                        return 'Not assigned';
+                        return $this->translator->trans('Keine Zuordnung');
                     }
                     return $value->getEmail();
                 })
@@ -157,7 +157,7 @@ class ProjectCrudController extends AbstractCrudController
                 ->help('Company or client for this project')
                 ->formatValue(function ($value, $entity) {
                     if (!$value) {
-                        return 'No client assigned';
+                        return $this->translator->trans('Keine Zuordnung');
                     }
                     return $value->getName();
                 })
