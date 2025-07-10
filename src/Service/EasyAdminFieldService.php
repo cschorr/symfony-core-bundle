@@ -416,16 +416,16 @@ class EasyAdminFieldService
     public function createAddressFieldGroup(array $pages = ['detail', 'form'], array $options = []): array
     {
         $panelName = $options['panelName'] ?? 'address_panel';
-        $panelLabel = $options['panelLabel'] ?? 'Address Information';
+        $panelLabel = $options['panelLabel'] ?? $this->translator->trans('Address Information');
         $panelIcon = $options['panelIcon'] ?? 'fas fa-map-marker-alt';
         $collapsible = $options['collapsible'] ?? ['form'];
         
         return [
             $this->createPanelConfig($panelName, $panelLabel, $pages, $panelIcon, $collapsible),
-            $this->createFieldConfig('street', 'text', $pages, 'Street Address'),
-            $this->createFieldConfig('zip', 'text', $pages, 'ZIP/Postal Code'),
-            $this->createFieldConfig('city', 'text', array_merge($pages, ['index']), 'City'),
-            $this->createCountryFieldConfig('countryCode', array_merge($pages, ['index']), 'Country'),
+            $this->createFieldConfig('street', 'text', $pages, $this->translator->trans('Street Address')),
+            $this->createFieldConfig('zip', 'text', $pages, $this->translator->trans('ZIP/Postal Code')),
+            $this->createFieldConfig('city', 'text', array_merge($pages, ['index']), $this->translator->trans('City')),
+            $this->createCountryFieldConfig('countryCode', array_merge($pages, ['index']), $this->translator->trans('Country')),
         ];
     }
 
@@ -435,18 +435,18 @@ class EasyAdminFieldService
     public function createCommunicationFieldGroup(array $pages = ['detail', 'form'], array $options = []): array
     {
         $panelName = $options['panelName'] ?? 'communication_panel';
-        $panelLabel = $options['panelLabel'] ?? 'Communication';
+        $panelLabel = $options['panelLabel'] ?? $this->translator->trans('Communication');
         $panelIcon = $options['panelIcon'] ?? 'fas fa-phone';
         $collapsible = $options['collapsible'] ?? ['form'];
         
         return [
             $this->createPanelConfig($panelName, $panelLabel, $pages, $panelIcon, $collapsible),
-            $this->createFieldConfig('email', 'email', array_merge($pages, ['index']), 'Email Address', [
-                'indexLabel' => 'Email'
+            $this->createFieldConfig('email', 'email', array_merge($pages, ['index']), $this->translator->trans('Email Address'), [
+                'indexLabel' => $this->translator->trans('Email')
             ]),
-            $this->createFieldConfig('phone', 'telephone', $pages, 'Phone Number'),
-            $this->createFieldConfig('cell', 'telephone', $pages, 'Mobile/Cell Phone'),
-            $this->createFieldConfig('url', 'url', array_merge($pages, ['index']), 'Website'),
+            $this->createFieldConfig('phone', 'telephone', $pages, $this->translator->trans('Phone Number')),
+            $this->createFieldConfig('cell', 'telephone', $pages, $this->translator->trans('Mobile/Cell Phone')),
+            $this->createFieldConfig('url', 'url', array_merge($pages, ['index']), $this->translator->trans('Website')),
         ];
     }
 
@@ -457,7 +457,7 @@ class EasyAdminFieldService
     {
         return $this->field($fieldName)
             ->type('country')
-            ->label($label)
+            ->label($this->translator->trans($label))
             ->pages($pages)
             ->option('showFlagOnly', in_array('index', $pages)) // Custom option to show flag only in index
             ->build();
