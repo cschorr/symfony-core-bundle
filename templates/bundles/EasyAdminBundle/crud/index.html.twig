@@ -1,14 +1,14 @@
 {% extends '@!EasyAdmin/crud/index.html.twig' %}
 
 {% block content_header_wrapper %}
-    <div class="crud-title-spacing"></div>
-    <div class="crud-container">
+    <div class="easyadmin-title-spacing"></div>
+    <div class="easyadmin-container">
         {{ parent() }}
     </div>
 {% endblock %}
 
 {% block main %}
-    <div class="crud-container">
+    <div class="easyadmin-container">
         {{ parent() }}
     </div>
 {% endblock %}
@@ -16,7 +16,7 @@
 {% block content_footer_wrapper %}
     {% set footer_content %}{{ parent() }}{% endset %}
     {% if footer_content is not empty %}
-        <div class="crud-footer">
+        <div class="easyadmin-footer">
             {{ footer_content|raw }}
         </div>
     {% endif %}

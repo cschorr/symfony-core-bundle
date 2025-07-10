@@ -10,8 +10,8 @@ body {
     min-height: 100vh !important;
 }
 
-/* CRUD Container Styling */
-.crud-container {
+/* EasyAdmin Container Styling - Universal glass container for all pages */
+.easyadmin-container {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -23,12 +23,12 @@ body {
     transition: all 0.3s ease;
 }
 
-.crud-container:hover {
+.easyadmin-container:hover {
     box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
 }
 
-/* CRUD Footer Styling */
-.crud-footer {
+/* EasyAdmin Footer Styling */
+.easyadmin-footer {
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -40,7 +40,7 @@ body {
 }
 
 /* Content Title Spacing */
-.crud-title-spacing {
+.easyadmin-title-spacing {
     margin-top: 20px;
 }
 
