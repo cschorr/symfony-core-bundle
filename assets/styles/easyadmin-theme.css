@@ -12,7 +12,7 @@ body {
 
 /* EasyAdmin Container Styling - Universal glass container for all pages */
 .easyadmin-container {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.65);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 12px;
@@ -53,10 +53,39 @@ body[class*="ea-dashboard"] .easyadmin-container h1,
     margin-top: 20px;
 }
 
+/* Override EasyAdmin default title spacing */
+.ea-content-header-wrapper,
+.ea-content-title-wrapper,
+.content-header-title {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Remove default spacing above CRUD page titles */
+.ea-crud .ea-content-header,
+.ea-crud .content-header,
+.ea-index .content-header {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Ensure no spacing on title containers */
+.ea-content-wrapper > .content-header,
+.ea-main-content > .content-header {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
 /* Ensure dashboard containers display properly */
 .ea-dashboard .easyadmin-container,
 body[class*="ea-dashboard"] .easyadmin-container {
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.65) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
     border-radius: 12px !important;
@@ -152,6 +181,58 @@ body.bg-tone-orange {
 .ea-dashboard .easyadmin-container .card-body .card:hover {
     background: rgba(255, 255, 255, 0.9) !important;
     transform: translateY(-1px);
+}
+
+/* Override EasyAdmin table and content backgrounds */
+.ea-table,
+.table,
+.table-responsive,
+.ea-index .table-responsive,
+.ea-index .table,
+.ea-crud .table,
+.ea-crud .table-responsive {
+    background: transparent !important;
+}
+
+/* Make table rows transparent */
+.table tbody tr,
+.table thead tr,
+.table tbody tr td,
+.table thead tr th {
+    background: transparent !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Override any white backgrounds in content areas */
+.ea-content-wrapper,
+.ea-main-content,
+.content-wrapper,
+.main-content {
+    background: transparent !important;
+}
+
+/* Make forms and panels transparent */
+.form-control,
+.form-select,
+.card,
+.panel {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Make CRUD title container backgrounds transparent */
+.ea-content-header-wrapper .easyadmin-container,
+.ea-content-title-wrapper .easyadmin-container,
+.content-header .easyadmin-container {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Override any remaining white backgrounds in title areas */
+.ea-content-header,
+.content-header,
+.ea-content-title,
+.content-title {
+    background: transparent !important;
 }
 
 /* Content Title Spacing */
