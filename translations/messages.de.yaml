@@ -14,14 +14,17 @@ Logout: "Abmelden"
 "supported by": "unterstützt von"
 "Placeholder image": "Platzhalter-Bild"
 
-# Entity Names
+# Module/Entity Names (used as translation keys)
+# These keys match the "code" field in the Module entity
+User: "Benutzer"
+Users: "Benutzer"
 Company: "Unternehmen"
-CompanyGroup: "Unternehmensgruppen"
+Companies: "Unternehmen"
 Module: "Module"
 Modules: "Module"
-User: "Benutzer"
+CompanyGroup: "Unternehmensgruppen"
+CompanyGroups: "Unternehmensgruppen"
 Project: "Projekte"
-"Project Singular": "Projekt"
 Projects: "Projekte"
 
 # General UI
@@ -131,15 +134,6 @@ Client: "Kunde"
 # Field Labels
 "Name": "Name"
 
-# Navigation
-"Unternehmen": "Unternehmen"
-"Unternehmensgruppen": "Unternehmensgruppen"
-"Projekt": "Projekt"
-
-# Page Titles
-"Unternehmen Erstellen": "Unternehmen Erstellen"
-"Unternehmen Bearbeiten": "Unternehmen Bearbeiten"
-
 # Missing translations
 Street: "Straße"
 Active: "Aktiv"
@@ -154,7 +148,6 @@ Copy: "Kopieren"
 Temporary: "Temporär"
 "Welcome to your Dashboard": "Willkommen zu Ihrem Dashboard"
 "This is your customized EasyAdmin dashboard with a beautiful background image and color tone.": "Dies ist Ihr angepasstes EasyAdmin-Dashboard mit einem schönen Hintergrundbild und Farbton."
-Users: "Benutzer"
 "Manage system users and their permissions": "Systembenutzer und ihre Berechtigungen verwalten"
 "View Users": "Benutzer anzeigen"
 "Configure and manage system modules": "Systemmodule konfigurieren und verwalten"

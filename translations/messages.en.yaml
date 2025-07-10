@@ -14,14 +14,17 @@ Logout: "Logout"
 "supported by": "supported by"
 "Placeholder image": "Placeholder image"
 
-# Entity Names
+# Module/Entity Names (used as translation keys)
+# These keys match the "code" field in the Module entity
+User: "Users"
+Users: "Users"
 Company: "Companies"
-CompanyGroup: "Company Groups"
+Companies: "Companies"
 Module: "Modules"
 Modules: "Modules"
-User: "Users"
+CompanyGroup: "Company Groups"
+CompanyGroups: "Company Groups"
 Project: "Projects"
-"Project Singular": "Project"
 Projects: "Projects"
 
 # General UI
