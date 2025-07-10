@@ -17,12 +17,12 @@ function changeColorTone(tone) {
     const statusElement = document.getElementById('sidebarBgStatus');
     if (statusElement) {
         const statusTexts = {
-            'default': 'Default Theme Active',
+            'default': 'Dark Theme Active',
             'blue': 'Blue Theme Active',
             'green': 'Green Theme Active',
             'purple': 'Purple Theme Active',
             'orange': 'Orange Theme Active',
-            'ocean': 'Ocean Theme Active'
+            'ocean': 'Ocean Theme Active (Default)'
         };
         statusElement.textContent = statusTexts[tone] || 'Ocean Theme Active';
     }
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'green': 'Green Theme Active',
                         'purple': 'Purple Theme Active',
                         'orange': 'Orange Theme Active',
-                        'ocean': 'Ocean Theme Active'
+                        'ocean': 'Ocean Theme Active (Default)'
                     };
                     statusElement.textContent = statusTexts[savedTone] || 'Ocean Theme Active';
                 }
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 const statusElement = document.getElementById('sidebarBgStatus');
                 if (statusElement) {
-                    statusElement.textContent = 'Ocean Theme Active';
+                    statusElement.textContent = 'Ocean Theme Active (Default)';
                 }
             }, 1000);
         }
@@ -102,17 +102,17 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <i class="fas fa-palette"></i> Background Tone
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="colorToneDropdown">
-                                <li><a class="dropdown-item" href="#" data-tone="default">Default (Dark)</a></li>
+                                <li><a class="dropdown-item" href="#" data-tone="ocean">Ocean (Default)</a></li>
+                                <li><a class="dropdown-item" href="#" data-tone="default">Dark Theme</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="blue">Blue</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="green">Green</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="purple">Purple</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="orange">Orange</a></li>
-                                <li><a class="dropdown-item" href="#" data-tone="ocean">Ocean</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="sidebar-bg-status" id="sidebarBgStatus">
-                        Ocean Theme Active
+                        Ocean Theme Active (Default)
                     </div>
                 </div>
             `;
@@ -157,14 +157,14 @@ document.addEventListener('DOMContentLoaded', function() {
             fallbackSection.innerHTML = `
                 <h6 style="margin: 0 0 10px 0; color: #333;">Background Theme</h6>
                 <select id="fallbackColorPicker" style="width: 100%; padding: 5px;">
-                    <option value="default">Default (Dark)</option>
+                    <option value="ocean" selected>Ocean (Default)</option>
+                    <option value="default">Dark Theme</option>
                     <option value="blue">Blue</option>
                     <option value="green">Green</option>
                     <option value="purple">Purple</option>
                     <option value="orange">Orange</option>
-                    <option value="ocean" selected>Ocean</option>
                 </select>
-                <div id="fallbackStatus" style="margin-top: 10px; font-size: 12px; color: #666;">Ocean Theme Active</div>
+                <div id="fallbackStatus" style="margin-top: 10px; font-size: 12px; color: #666;">Ocean Theme Active (Default)</div>
             `;
             
             fallbackElement.appendChild(fallbackSection);
@@ -197,34 +197,33 @@ style.textContent = `
         bottom: 0;
         left: 0;
         right: 0;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: transparent;
         margin-top: auto;
         padding: 15px;
     }
     
     .sidebar-bg-section {
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: transparent;
+        border-radius: 6px;
+        padding: 12px;
+        border: none;
     }
     
     .sidebar-bg-title {
-        color: #2c3e50;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 10px;
-        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        color: var(--text-color, #374151);
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        text-shadow: none;
         display: flex;
         align-items: center;
+        opacity: 0.9;
     }
     
     .sidebar-bg-title i {
-        margin-right: 8px;
-        color: #3498db;
-        font-size: 1rem;
+        margin-right: 6px;
+        color: var(--primary-color, #3b82f6);
+        font-size: 0.9rem;
     }
     
     .sidebar-bg-content .dropdown {
@@ -233,84 +232,124 @@ style.textContent = `
     
     .sidebar-bg-content .btn {
         width: 100%;
-        background: rgba(108, 117, 125, 0.8);
-        border: none;
-        color: white;
-        font-size: 0.85rem;
-        padding: 8px 12px;
-        border-radius: 6px;
-        transition: all 0.3s ease;
+        background: var(--surface-color, rgba(255, 255, 255, 0.1));
+        border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+        color: var(--text-color, #374151);
+        font-size: 0.8rem;
+        padding: 6px 10px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        box-shadow: none;
     }
     
-    .sidebar-bg-content .btn:hover {
-        background: rgba(108, 117, 125, 1);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    .sidebar-bg-content .btn:hover,
+    .sidebar-bg-content .btn:focus {
+        background: var(--surface-hover-color, rgba(255, 255, 255, 0.15));
+        border-color: var(--border-hover-color, rgba(255, 255, 255, 0.25));
+        transform: none;
+        box-shadow: none;
+        color: var(--text-color, #374151);
     }
     
     .sidebar-bg-content .dropdown-menu {
         width: 100%;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        background: var(--dropdown-bg, #ffffff);
+        backdrop-filter: none;
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 4px 0;
     }
     
     .sidebar-bg-content .dropdown-item {
-        padding: 8px 16px;
-        font-size: 0.85rem;
-        color: #2c3e50;
-        transition: all 0.3s ease;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        color: var(--text-color, #374151);
+        transition: background-color 0.15s ease;
+        border: none;
     }
     
-    .sidebar-bg-content .dropdown-item:hover {
-        background: rgba(52, 152, 219, 0.1);
-        color: #3498db;
+    .sidebar-bg-content .dropdown-item:hover,
+    .sidebar-bg-content .dropdown-item:focus {
+        background: var(--item-hover-bg, #f3f4f6);
+        color: var(--text-color, #374151);
     }
     
     /* Active Status Indicator in Sidebar */
     .sidebar-bg-status {
-        margin-top: 10px;
-        padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        font-size: 0.8rem;
-        color: #2c3e50;
+        margin-top: 8px;
+        padding: 6px 10px;
+        background: transparent;
+        border-radius: 4px;
+        border: none;
+        font-size: 0.75rem;
+        color: var(--text-muted, #6b7280);
         text-align: center;
-        font-weight: 500;
+        font-weight: 400;
+        opacity: 0.8;
     }
     
-    /* Color-specific status indicators */
+    /* Dark mode specific styles */
+    .ea-dark-scheme .sidebar-bg-title {
+        color: #d1d5db;
+    }
+    
+    .ea-dark-scheme .sidebar-bg-title i {
+        color: #60a5fa;
+    }
+    
+    .ea-dark-scheme .sidebar-bg-content .btn {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #d1d5db;
+    }
+    
+    .ea-dark-scheme .sidebar-bg-content .btn:hover,
+    .ea-dark-scheme .sidebar-bg-content .btn:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.15);
+        color: #f3f4f6;
+    }
+    
+    .ea-dark-scheme .sidebar-bg-content .dropdown-menu {
+        background: #374151;
+        border-color: #4b5563;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .ea-dark-scheme .sidebar-bg-content .dropdown-item {
+        color: #d1d5db;
+    }
+    
+    .ea-dark-scheme .sidebar-bg-content .dropdown-item:hover,
+    .ea-dark-scheme .sidebar-bg-content .dropdown-item:focus {
+        background: #4b5563;
+        color: #f3f4f6;
+    }
+    
+    .ea-dark-scheme .sidebar-bg-status {
+        color: #9ca3af;
+    }
+    
+    /* Color-specific status indicators - simplified */
     body.bg-tone-blue .sidebar-bg-status {
-        background: rgba(59, 130, 246, 0.2);
-        border-color: rgba(59, 130, 246, 0.3);
-        color: #1e40af;
+        color: #3b82f6;
     }
     
     body.bg-tone-green .sidebar-bg-status {
-        background: rgba(34, 197, 94, 0.2);
-        border-color: rgba(34, 197, 94, 0.3);
-        color: #15803d;
+        color: #10b981;
     }
     
     body.bg-tone-purple .sidebar-bg-status {
-        background: rgba(147, 51, 234, 0.2);
-        border-color: rgba(147, 51, 234, 0.3);
-        color: #7c2d12;
+        color: #8b5cf6;
     }
     
     body.bg-tone-orange .sidebar-bg-status {
-        background: rgba(251, 146, 60, 0.2);
-        border-color: rgba(251, 146, 60, 0.3);
-        color: #c2410c;
+        color: #f59e0b;
     }
     
     body.bg-tone-ocean .sidebar-bg-status {
-        background: rgba(0, 168, 134, 0.2);
-        border-color: rgba(0, 168, 134, 0.3);
-        color: #065f46;
+        color: #06b6d4;
     }
     
     /* Make sidebar taller to accommodate new controls */
