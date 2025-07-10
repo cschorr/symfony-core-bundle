@@ -132,14 +132,11 @@ class UserCrudController extends AbstractCrudController
      */
     private function getFieldConfiguration(string $pageName): array
     {
-        // Base configuration for all pages
-        $config = [
-            $this->fieldService->createIdField(),
-        ];
-
         // Page-specific field configurations
         if ($pageName === Crud::PAGE_INDEX) {
-            $config = array_merge($config, [
+            $config = [
+                ...$this->getActiveField(['index']), // Active field first for index
+                $this->fieldService->createIdField(),
                 $this->fieldService->field('email')
                     ->type('email')
                     ->label('Email')
@@ -159,12 +156,12 @@ class UserCrudController extends AbstractCrudController
                     ->type('association')
                     ->label('Company')
                     ->build(),
-                    
-                ...$this->getActiveField(['index']),
-            ]);
+            ];
             
         } elseif ($pageName === Crud::PAGE_DETAIL) {
-            $config = array_merge($config, [
+            $config = [
+                ...$this->getActiveField(['detail']), // Active field first for detail
+                $this->fieldService->createIdField(),
                 ...$this->getUserFields(['detail']),
                 ...$this->getNotesField(['detail']),
                 
@@ -177,14 +174,16 @@ class UserCrudController extends AbstractCrudController
                     ->type('association')
                     ->label('Projects')
                     ->build(),
-                    
-                ...$this->getActiveField(['detail']),
-            ]);
+            ];
             
-        } else { // FORM pages (NEW/EDIT)
-            $config = array_merge($config, [
-                // User Information Tab
+        } else { // FORM pages (NEW/EDIT) - Use tabs
+            $config = [
+                // User Information Tab - includes active field inside tab
                 $this->fieldService->createTabConfig('user_info', 'User Information'),
+                
+                // Active field inside the tab
+                ...$this->getActiveField(['form']),
+                $this->fieldService->createIdField(),
                 
                 ...$this->getUserFields(['form']),
                 ...$this->getNotesField(['form']),
@@ -200,9 +199,7 @@ class UserCrudController extends AbstractCrudController
                     ->label('Projects')
                     ->multiple(true)
                     ->build(),
-                    
-                ...$this->getActiveField(['form']),
-            ]);
+            ];
         }
 
         return $config;

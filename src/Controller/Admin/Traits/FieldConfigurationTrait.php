@@ -9,11 +9,13 @@ namespace App\Controller\Admin\Traits;
 trait FieldConfigurationTrait
 {
     /**
-     * Get standard entity field configuration (ID, name, timestamps)
+     * Get standard entity field configuration (Active, ID, name, timestamps)
+     * Active field is first for better visibility in index view
      */
     protected function getStandardEntityFields(string $entityLabel = 'Entity'): array
     {
         return [
+            ...$this->getActiveField(), // Active field first, enabled for all views by default
             $this->fieldService->createIdField(),
             $this->fieldService->createNameField($entityLabel . ' Name'),
         ];
@@ -234,7 +236,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get active/status field
+     * Get active/status field for all pages by default
      */
     protected function getActiveField(array $pages = ['index', 'detail', 'form']): array
     {
@@ -248,15 +250,23 @@ trait FieldConfigurationTrait
     }
 
     /**
+     * Get active field specifically for first position in index view
+     * @deprecated Use getActiveField() instead - it now defaults to all pages
+     */
+    protected function getActiveFieldFirst(array $pages = ['index', 'detail', 'form']): array
+    {
+        return $this->getActiveField($pages);
+    }
+
+    /**
      * Create a complete basic entity configuration
      */
     protected function getBasicEntityConfiguration(string $entityLabel, array $additionalFields = []): array
     {
         $config = [
-            ...$this->getStandardEntityFields($entityLabel),
+            ...$this->getStandardEntityFields($entityLabel), // Already includes active field first
             ...$additionalFields,
             ...$this->getNotesField(),
-            ...$this->getActiveField(),
             ...$this->getTimestampFields(),
         ];
         
