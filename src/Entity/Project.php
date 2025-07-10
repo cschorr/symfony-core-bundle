@@ -14,8 +14,8 @@ class Project extends AbstractEntity
    use StringNameTrait;
    use SetStartEndTrait;
 
-   #[ORM\Column]
-   private ?int $status = null;
+   #[ORM\Column(nullable: false, options: ['default' => 0])]
+   private int $status = 0;
 
    #[ORM\ManyToOne(inversedBy: 'projects')]
    private ?User $assignee = null;
@@ -26,7 +26,7 @@ class Project extends AbstractEntity
    #[ORM\Column(type: Types::TEXT, nullable: true)]
    private ?string $description = null;
 
-   public function getStatus(): ?int
+   public function getStatus(): int
    {
        return $this->status;
    }
