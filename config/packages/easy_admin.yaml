@@ -1,0 +1,19 @@
+easy_admin:
+    design:
+        # Custom CSS files for EasyAdmin
+        assets:
+            css:
+                - 'styles/admin.css'
+                - 'styles/admin-global.css'
+            js:
+                - 'admin.js'
+        # Custom brand styling
+        brand:
+            color: '#343a40'
+        # Menu configuration
+        menu:
+            # Override default menu styling
+            css_class: 'ea-menu-custom'
+        # Form theme
+        form_themes:
+            - '@EasyAdmin/crud/form_theme.html.twig'

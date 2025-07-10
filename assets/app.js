@@ -6,10 +6,15 @@ import './bootstrap.js';
  * which should already be in your base.html.twig.
  */
 import './styles/app.css';
+import './styles/admin.css';
+import './styles/admin-global.css';
 
 // custom: import bs5 css
 import 'bootstrap/dist/css/bootstrap.min.css';
 // custom: import bootstrap JS for dropdown functionality
 import 'bootstrap';
+
+// Import admin functionality
+import './admin.js';
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
