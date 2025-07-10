@@ -79,7 +79,6 @@ Write: "Schreiben"
 "Access denied. You need write permission for the %module% module.": "Zugriff verweigert. Sie benötigen Schreibberechtigung für das %module%-Modul."
 
 # User Management
-"Edit User": "Benutzer bearbeiten"
 "User Information": "Benutzerinformationen"
 Roles: "Rollen"
 Admin: "Administrator"
@@ -89,8 +88,6 @@ Management: "Verwaltung"
 "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 Berechtigung zugewiesen|]1,Inf[ %count% Berechtigungen zugewiesen"
 
 # Project Management
-"Create Project": "Projekt erstellen"
-"Edit Project": "Projekt bearbeiten"
 "Manage projects, assignments, and timelines.": "Projekte, Zuweisungen und Zeitpläne verwalten."
 "Project Name": "Projektname"
 "The name of the project": "Der Name des Projekts"

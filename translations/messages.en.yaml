@@ -71,12 +71,9 @@ Write: "Write"
 "Access denied. You need write permission for the %module% module.": "Access denied. You need write permission for the %module% module."
 
 # User Management
-"Edit User": "Edit User"
 "User Information": "User Information"
 
 # Project Management
-"Edit Project": "Edit Project"
-"Create Project": "Create Project"
 "Manage projects, assignments, and timelines.": "Manage projects, assignments, and timelines."
 "Project Name": "Project Name"
 "The name of the project": "The name of the project"
@@ -86,7 +83,6 @@ Write: "Write"
 "On Hold": "On Hold"
 "Completed": "Completed"
 "Cancelled": "Cancelled"
-"Unknown": "Unknown"
 "Unknown": "Unknown"
 
 # Company Group Management
@@ -115,6 +111,5 @@ Copy: "Copy"
 "Email Address": "Email Address"
 "Phone Number": "Phone Number"
 "Mobile/Cell Phone": "Mobile/Cell Phone"
-"Website": "Website"
 "Code": "Code"
 "Keine Zuordnung": "No Assignment"

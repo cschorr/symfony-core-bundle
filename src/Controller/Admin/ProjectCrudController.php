@@ -46,7 +46,6 @@ class ProjectCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->setPageTitle('index', $this->translator->trans('Projects'))
             ->setHelp('index', $this->translator->trans('Manage projects, assignments, and timelines.'));
     }
 
