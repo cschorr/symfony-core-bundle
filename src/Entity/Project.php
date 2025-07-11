@@ -11,66 +11,99 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project extends AbstractEntity
 {
-   use StringNameTrait;
-   use SetStartEndTrait;
+    use StringNameTrait;
+    use SetStartEndTrait;
 
-   #[ORM\Column(nullable: false, options: ['default' => 0])]
-   private int $status = 0;
+    // Status-Konstanten für bessere Lesbarkeit
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_IN_PROGRESS = 'in_progress';
+    public const STATUS_REVIEW = 'review';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_CANCELLED = 'cancelled';
 
-   #[ORM\ManyToOne(inversedBy: 'projects')]
-   private ?User $assignee = null;
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: false, options: ['default' => 'draft'])]
+    private string $status = self::STATUS_DRAFT;
 
-   #[ORM\ManyToOne(inversedBy: 'projects')]
-   private ?Company $client = null;
+    #[ORM\ManyToOne(inversedBy: 'projects')]
+    private ?User $assignee = null;
 
-   #[ORM\Column(type: Types::TEXT, nullable: true)]
-   private ?string $description = null;
+    #[ORM\ManyToOne(inversedBy: 'projects')]
+    private ?Company $client = null;
 
-   public function getStatus(): int
-   {
-       return $this->status;
-   }
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
-   public function setStatus(int $status): static
-   {
-       $this->status = $status;
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
 
-       return $this;
-   }
+    public function setStatus(int $status): static
+    {
+        $this->status = $status;
 
-   public function getAssignee(): ?User
-   {
-       return $this->assignee;
-   }
+        return $this;
+    }
 
-   public function setAssignee(?User $assignee): static
-   {
-       $this->assignee = $assignee;
+    public function getAssignee(): ?User
+    {
+        return $this->assignee;
+    }
 
-       return $this;
-   }
+    public function setAssignee(?User $assignee): static
+    {
+        $this->assignee = $assignee;
 
-   public function getClient(): ?Company
-   {
-       return $this->client;
-   }
+        return $this;
+    }
 
-   public function setClient(?Company $client): static
-   {
-       $this->client = $client;
+    public function getClient(): ?Company
+    {
+        return $this->client;
+    }
 
-       return $this;
-   }
+    public function setClient(?Company $client): static
+    {
+        $this->client = $client;
 
-   public function getDescription(): ?string
-   {
-       return $this->description;
-   }
+        return $this;
+    }
 
-   public function setDescription(?string $description): static
-   {
-       $this->description = $description;
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
 
-       return $this;
-   }
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    // Hilfsmethoden für den Status
+    public function isInProgress(): bool
+    {
+        return $this->status === self::STATUS_IN_PROGRESS;
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === self::STATUS_CANCELLED;
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === self::STATUS_DRAFT;
+    }
+
+    public function isInReview(): bool
+    {
+        return $this->status === self::STATUS_REVIEW;
+    }
 }
