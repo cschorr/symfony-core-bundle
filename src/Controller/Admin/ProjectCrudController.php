@@ -5,17 +5,12 @@ namespace App\Controller\Admin;
 use App\Entity\Project;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use App\Service\EasyAdminFieldService;
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,12 +20,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProjectCrudController extends AbstractCrudController
 {
+    use FieldConfigurationTrait;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
         PermissionService $permissionService,
         DuplicateService $duplicateService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        private EasyAdminFieldService $fieldService
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -48,10 +46,6 @@ class ProjectCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->setPageTitle('index', $this->translator->trans('Projects'))
-            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Project'), $entity->getName()))
-            ->setPageTitle('new', $this->translator->trans('Create Project'))
-            ->setPageTitle('edit', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Edit Project'), $entity->getName()))
             ->setHelp('index', $this->translator->trans('Manage projects, assignments, and timelines.'));
     }
 
@@ -87,93 +81,105 @@ class ProjectCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
-            IdField::new('id')->hideOnForm()->hideOnIndex(),
-            TextField::new('name')
-                ->setLabel($this->translator->trans('Project Name'))
-                ->setHelp($this->translator->trans('The name of the project')),
-            TextareaField::new('description')
-                ->setLabel($this->translator->trans('Description'))
-                ->setHelp($this->translator->trans('Detailed description of the project'))
-                ->hideOnIndex(),
-            ChoiceField::new('status')
-                ->setLabel($this->translator->trans('Status'))
-                ->setChoices([
+        return $this->fieldService->generateFields(
+            $this->getFieldConfigurations(),
+            $pageName
+        );
+    }
+
+    /**
+     * Define field configurations for Project entity
+     */
+    private function getFieldConfigurations(): array
+    {
+        return [
+            // Active field first, enabled for all views
+            ...$this->getActiveField(),
+            
+            // Standard fields
+            $this->fieldService->createIdField(),
+            
+            $this->fieldService->field('name')
+                ->type('text')
+                ->label('Project Name')
+                ->help('The name of the project')
+                ->linkToShow() // Add link to show action
+                ->build(),
+                
+            $this->fieldService->field('description')
+                ->type('textarea')
+                ->label('Description')
+                ->help('Detailed description of the project')
+                ->pages(['detail', 'form'])
+                ->build(),
+                
+            $this->fieldService->field('status')
+                ->type('choice')
+                ->label('Status')
+                ->help('Current status of the project')
+                ->pages(['index', 'detail', 'form'])  // Include index page for better visibility
+                ->choices([
                     $this->translator->trans('Planning') => 0,
                     $this->translator->trans('In Progress') => 1,
                     $this->translator->trans('On Hold') => 2,
                     $this->translator->trans('Completed') => 3,
                     $this->translator->trans('Cancelled') => 4,
                 ])
-                ->setHelp($this->translator->trans('Current status of the project'))
-                ->renderAsBadges([
-                    0 => 'secondary', // Planning
-                    1 => 'primary',   // In Progress
-                    2 => 'warning',   // On Hold
-                    3 => 'success',   // Completed
-                    4 => 'danger',    // Cancelled
-                ]),
-            AssociationField::new('assignee')
-                ->setLabel($this->translator->trans('Assignee'))
-                ->setHelp($this->translator->trans('User responsible for this project'))
+                ->formatValue(function ($value, $entity) {
+                    $statusNames = [
+                        0 => $this->translator->trans('Planning'),
+                        1 => $this->translator->trans('In Progress'), 
+                        2 => $this->translator->trans('On Hold'),
+                        3 => $this->translator->trans('Completed'),
+                        4 => $this->translator->trans('Cancelled')
+                    ];
+                    return $statusNames[$value] ?? $this->translator->trans('Unknown');
+                })
+                ->build(),
+                
+            $this->fieldService->field('assignee')
+                ->type('association')
+                ->label('Assignee')
+                ->help('User responsible for this project')
                 ->formatValue(function ($value, $entity) {
                     if (!$value) {
-                        return $this->translator->trans('Not assigned');
+                        return $this->translator->trans('Keine Zuordnung');
                     }
                     return $value->getEmail();
-                }),
-            AssociationField::new('client')
-                ->setLabel($this->translator->trans('Client'))
-                ->setHelp($this->translator->trans('Company or client for this project'))
+                })
+                ->build(),
+                
+            $this->fieldService->field('client')
+                ->type('association')
+                ->label('Client')
+                ->help('Company or client for this project')
                 ->formatValue(function ($value, $entity) {
                     if (!$value) {
-                        return $this->translator->trans('No client assigned');
+                        return $this->translator->trans('Keine Zuordnung');
                     }
                     return $value->getName();
-                }),
-            DateField::new('startedAt')
-                ->setLabel($this->translator->trans('Start Date'))
-                ->setHelp($this->translator->trans('Project start date'))
-                ->hideOnIndex(),
-            DateField::new('endedAt')
-                ->setLabel($this->translator->trans('End Date'))
-                ->setHelp($this->translator->trans('Project end date'))
-                ->hideOnIndex(),
+                })
+                ->build(),
+                
+            $this->fieldService->field('startedAt')
+                ->type('date')
+                ->label('Start Date')
+                ->help('Project start date')
+                ->pages(['detail', 'form'])
+                ->build(),
+                
+            $this->fieldService->field('endedAt')
+                ->type('date')
+                ->label('End Date')
+                ->help('Project end date')
+                ->pages(['detail', 'form'])
+                ->build(),
         ];
-
-        // Add active field to all pages
-        $fields = $this->addActiveField($fields, $pageName);
-
-        return $fields;
     }
 
     public function configureActions(Actions $actions): Actions
     {
-        $actions = parent::configureActions($actions);
-
-        // Add custom action for project timeline view
-        $viewTimeline = Action::new('viewTimeline', $this->translator->trans('Timeline'), 'fas fa-calendar-alt')
-            ->linkToCrudAction('viewTimeline')
-            ->displayIf(function ($entity) {
-                return $entity->getStartedAt() && $entity->getEndedAt();
-            });
-
-        return $actions
-            ->add(Crud::PAGE_INDEX, $viewTimeline)
-            ->add(Crud::PAGE_DETAIL, $viewTimeline);
-    }
-
-    public function viewTimeline(AdminContext $context): Response
-    {
-        $project = $context->getEntity()->getInstance();
-        
-        // You can implement timeline view logic here
-        // For now, redirect to detail view
-        return $this->redirectToRoute('admin', [
-            'crudAction' => 'detail',
-            'crudControllerFqcn' => static::class,
-            'entityId' => $project->getId(),
-        ]);
+        return parent::configureActions($actions);
     }
 
     protected function canCreateEntity(): bool
@@ -205,5 +211,16 @@ class ProjectCrudController extends AbstractCrudController
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()) ||
                 in_array('ROLE_USER', $user->getRoles()));
+    }
+
+    /**
+     * Override to set default status for new projects
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof Project && $entityInstance->getStatus() === 0) {
+            $entityInstance->setStatus(0); // Ensure Planning status is set
+        }
+        parent::persistEntity($entityManager, $entityInstance);
     }
 }

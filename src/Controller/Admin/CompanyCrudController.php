@@ -4,8 +4,11 @@ namespace App\Controller\Admin;
 
 use App\Entity\Company;
 use App\Entity\User;
+use App\Service\EasyAdminFieldService;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use App\Service\RelationshipSyncService;
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -21,15 +24,26 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use App\Form\Type\AddressType;
+use App\Form\Type\CommunicationType;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 
 class CompanyCrudController extends AbstractCrudController
 {
+    use FieldConfigurationTrait;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
         PermissionService $permissionService,
         DuplicateService $duplicateService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        private EasyAdminFieldService $fieldService,
+        private RelationshipSyncService $relationshipSyncService
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -102,90 +116,107 @@ class CompanyCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
-            IdField::new('id')->hideOnForm()->hideOnIndex(),
-            TextField::new('name'),
-            TextField::new('nameExtension')->setLabel($this->translator->trans('Description')),
-            TextField::new('countryCode')->setLabel($this->translator->trans('Country Code')),
-            TextField::new('url')->setLabel($this->translator->trans('Website')),
-        ];
+        return $this->fieldService->generateFields(
+            $this->getFieldConfigurations(),
+            $pageName
+        );
+    }
 
-        // Configure employees field differently for index vs forms
-        if ($pageName === Crud::PAGE_INDEX) {
-            $fields[] = AssociationField::new('employees')
-                ->setLabel($this->translator->trans('Employees'))
-                ->formatValue(function ($value, $entity) {
-                    if ($value instanceof Collection) {
-                        return $value->count() . ' ' . $this->translator->trans('Employees');
-                    }
-                    return '0 ' . $this->translator->trans('Employees');
-                });
-        } else {
-            $fields[] = AssociationField::new('employees')
-                ->setLabel($this->translator->trans('Employees'))
-                ->setRequired(false)
-                ->setFormTypeOptions([
-                    'by_reference' => false,
-                    'multiple' => true,
-                    'class' => User::class,
-                    'choice_label' => function (User $user) {
-                        return $user->getEmail();
-                    },
-                ]);
-        }
+    /**
+     * Define all field configurations for the Company entity using enhanced approach
+     */
+    private function getFieldConfigurations(): array
+    {
+        $fields = [];
+        
+        // Standard entity fields (ID, name with link, active)
+        $fields = array_merge($fields, [
+            ...$this->getActiveField(), // Active field first
+            $this->fieldService->createIdField(),
+            // Use name field with link to show action instead of regular name field
+            $this->fieldService->field('name')
+                ->type('text')
+                ->label('Company Name')
+                ->required(true)
+                ->linkToShow() // This will auto-detect the CompanyCrudController
+                ->build(),
+        ]);
+        
+        // Additional company-specific fields
+        $fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
+        $fields[] = $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group');
 
-        // Add active field for index page
-        if ($pageName === Crud::PAGE_INDEX) {
-            $fields = $this->addActiveField($fields, $pageName);
-        }
+        // Contact information (address + communication) - customized for index view
+        $fields = array_merge($fields, $this->getCustomContactFieldGroups());
+
+        // Employees using enhanced builder pattern
+        $fields[] = $this->fieldService->createPanelConfig('employees_panel', 'Employees', ['detail', 'form'], 'fas fa-users');
+        $fields[] = $this->getUserAssociationField('employees', 'Employees', ['index', 'detail', 'form'], true);
 
         return $fields;
     }
 
     /**
-     * Override to handle bidirectional employee relationship
+     * Get custom communication fields - excludes email from index view
+     */
+    private function getCustomCommunicationFields(): array
+    {
+        return [
+            $this->fieldService->createPanelConfig('communication_panel', 'Communication', ['detail', 'form'], 'fas fa-phone'),
+            $this->fieldService->createFieldConfig('email', 'email', ['detail', 'form'], 'Email Address'),
+            $this->fieldService->createFieldConfig('phone', 'telephone', ['detail', 'form'], 'Phone Number'),
+            $this->fieldService->createFieldConfig('cell', 'telephone', ['detail', 'form'], 'Mobile/Cell Phone'),
+            $this->fieldService->createFieldConfig('url', 'url', ['index', 'detail', 'form'], 'Website'), // Keep website in index
+        ];
+    }
+
+    /**
+     * Get contact field groups customized for Company - excludes city and email from index view
+     */
+    private function getCustomContactFieldGroups(): array
+    {
+        $fields = [];
+        
+        // Custom communication fields (excludes email from index)
+        $fields = array_merge($fields, $this->getCustomCommunicationFields());
+        
+        // Address fields - customized to exclude city from index
+        $fields = array_merge($fields, [
+            $this->fieldService->createPanelConfig('address_panel', 'Address Information', ['detail', 'form'], 'fas fa-map-marker-alt'),
+            $this->fieldService->createFieldConfig('street', 'text', ['detail', 'form'], 'Street Address'),
+            $this->fieldService->createFieldConfig('zip', 'text', ['detail', 'form'], 'ZIP/Postal Code'),
+            $this->fieldService->createFieldConfig('city', 'text', ['detail', 'form'], 'City'), // Excluded from index
+            $this->fieldService->createCountryFieldConfig('countryCode', ['index', 'detail', 'form'], 'Country'), // Flag-only in index
+        ]);
+        
+        return $fields;
+    }
+
+    /**
+     * Auto-sync relationships using the service
+     */
+    protected function autoSyncRelationships(object $entity): void
+    {
+        if ($entity instanceof Company) {
+            $this->relationshipSyncService->autoSync($entity);
+        }
+    }
+
+    /**
+     * Override to use the new relationship sync service
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        /** @var Company $entityInstance */
-        $this->syncEmployeeRelationship($entityInstance);
+        $this->beforePersist($entityInstance);
         parent::persistEntity($entityManager, $entityInstance);
     }
 
     /**
-     * Override to handle bidirectional employee relationship
+     * Override to use the new relationship sync service
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        /** @var Company $entityInstance */
-        $this->syncEmployeeRelationship($entityInstance);
+        $this->beforeUpdate($entityInstance);
         parent::updateEntity($entityManager, $entityInstance);
-    }
-
-    /**
-     * Sync the bidirectional relationship between Company and Users (employees)
-     */
-    private function syncEmployeeRelationship(Company $company): void
-    {
-        // Only sync if company has an ID (not for new companies)
-        if ($company->getId()) {
-            // Get all users that were previously assigned to this company
-            $previousEmployees = $this->entityManager->getRepository(User::class)
-                ->findBy(['company' => $company]);
-
-            // Remove company reference from users no longer in the collection
-            foreach ($previousEmployees as $user) {
-                if (!$company->getEmployees()->contains($user)) {
-                    $user->setCompany(null);
-                }
-            }
-        }
-
-        // Set company reference for all current employees
-        foreach ($company->getEmployees() as $employee) {
-            if ($employee->getCompany() !== $company) {
-                $employee->setCompany($company);
-            }
-        }
     }
 }

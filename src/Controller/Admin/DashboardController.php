@@ -9,15 +9,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use App\Service\LocaleService;
 use App\Service\NavigationService;
 
-use App\Entity\Module;
 use App\Entity\User;
-use App\Entity\Company;
-use App\Entity\CompanyGroup;
 
 #[AdminDashboard(routePath: '/admin/{_locale}', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
@@ -111,9 +106,9 @@ class DashboardController extends AbstractDashboardController
             $accessibleModules = $this->navigationService->getAccessibleModulesForUser($user);
         }
 
-        $entityMapping = $this->navigationService->getModuleEntityMapping();
-
         // Generate menu items dynamically based on user permissions and active modules
+        $entityMapping = $this->navigationService->getModuleEntityMapping();
+        
         foreach ($accessibleModules as $module) {
             $moduleCode = $module->getCode();
             
@@ -121,7 +116,11 @@ class DashboardController extends AbstractDashboardController
             if (isset($entityMapping[$moduleCode])) {
                 $entityClass = $entityMapping[$moduleCode];
                 $icon = $this->navigationService->getModuleIcon($module);
-                $label = $this->translator->trans($moduleCode);
+                
+                // Use the module name (plural form) for navigation labels
+                // This corresponds to the "name" field in the Module entity (e.g., "Users", "Companies")
+                $moduleNamePlural = $module->getName();
+                $label = $this->translator->trans($moduleNamePlural);
                 
                 yield MenuItem::linkToCrud($label, $icon, $entityClass);
             }
