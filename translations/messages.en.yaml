@@ -14,12 +14,21 @@ Logout: "Logout"
 "supported by": "supported by"
 "Placeholder image": "Placeholder image"
 
-# Entity Names
-Company: "Companies"
-CompanyGroup: "Company Groups"
-Module: "Modules"
+# Module/Entity Names (direct translation approach)
+# These keys match the "code" and "name" fields in the Module entity
+# - Singular forms (code field): User, Company, Module, CompanyGroup, Project
+# - Plural forms (name field): Users, Companies, Modules, CompanyGroups, Projects
+# Navigation uses the plural forms automatically via $module->getName()
+User: "User"
+Users: "Users"
+Company: "Company"
+Companies: "Companies"
+Module: "Module"
 Modules: "Modules"
-User: "Users"
+CompanyGroup: "Company Group"
+CompanyGroups: "Company Groups"
+Project: "Project"
+Projects: "Projects"
 
 # General UI
 Dashboard: "Dashboard"
@@ -55,14 +64,29 @@ Show: "Show"
 "%d permission(s) assigned": "%d permission(s) assigned"
 "Permission Details": "Permission Details"
 "Unknown User": "Unknown User"
+"Unknown Module": "Unknown Module"
 Read: "Read"
 Write: "Write"
 "Access denied. You need read permission for the %module% module.": "Access denied. You need read permission for the %module% module."
 "Access denied. You need write permission for the %module% module.": "Access denied. You need write permission for the %module% module."
 
 # User Management
-"Edit User": "Edit User"
 "User Information": "User Information"
+
+# Project Management
+"Manage projects, assignments, and timelines.": "Manage projects, assignments, and timelines."
+"Project Name": "Project Name"
+"The name of the project": "The name of the project"
+"Status": "Status"
+"Planning": "Planning"
+"In Progress": "In Progress"
+"On Hold": "On Hold"
+"Completed": "Completed"
+"Cancelled": "Cancelled"
+"Unknown": "Unknown"
+
+# Company Group Management
+"Company Group Name": "Company Group Name"
 Roles: "Roles"
 Admin: "Admin"
 Management: "Management"
@@ -76,3 +100,16 @@ Copy: "Copy"
 
 # Pluralization
 "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned"
+
+# Field Labels and Panels
+"Address Information": "Address Information"
+"Street Address": "Street Address"
+"ZIP/Postal Code": "ZIP/Postal Code"
+"City": "City"
+"Country": "Country"
+"Communication": "Communication"
+"Email Address": "Email Address"
+"Phone Number": "Phone Number"
+"Mobile/Cell Phone": "Mobile/Cell Phone"
+"Code": "Code"
+"Keine Zuordnung": "No Assignment"

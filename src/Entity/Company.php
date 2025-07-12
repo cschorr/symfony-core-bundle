@@ -16,8 +16,8 @@ class Company extends AbstractEntity
 {
     use StringNameTrait;
     use StringNameExtensionTrait;
-    use SetAddressTrait;
     use SetCommunicationTrait;
+    use SetAddressTrait;
 
     #[ORM\ManyToOne(inversedBy: 'companies')]
     private ?CompanyGroup $companyGroup = null;

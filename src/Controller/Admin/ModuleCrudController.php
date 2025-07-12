@@ -5,14 +5,13 @@ namespace App\Controller\Admin;
 use App\Entity\Module;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use App\Service\EasyAdminFieldService;
+use App\Service\RelationshipSyncService;
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,12 +21,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ModuleCrudController extends AbstractCrudController
 {
+    use FieldConfigurationTrait;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
         PermissionService $permissionService,
         DuplicateService $duplicateService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        private EasyAdminFieldService $fieldService,
+        private RelationshipSyncService $relationshipSyncService
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -77,25 +80,103 @@ class ModuleCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
-            IdField::new('id')->hideOnForm()->hideOnIndex(),
-            TextField::new('name')
-                ->setHelp($this->translator->trans('Display name for the module')),
-            TextField::new('code')
-                ->hideOnIndex()
-                ->setHelp($this->translator->trans('Unique code that matches the entity name (e.g., User, Company, Module)'))
-                ->setFormTypeOption('attr', ['placeholder' => $this->translator->trans('e.g., User, Company, Module')]),
-            TextField::new('icon')
-                ->hideOnIndex()
-                ->setLabel($this->translator->trans('Icon'))
-                ->setHelp($this->translator->trans('FontAwesome icon class (e.g., fas fa-users, fas fa-building)'))
-                ->setFormTypeOption('attr', ['placeholder' => $this->translator->trans('e.g., fas fa-users, fas fa-building')]),
-            TextareaField::new('text')
-                ->setLabel($this->translator->trans('Description'))
-                ->setHelp($this->translator->trans('Optional description of what this module manages')),
-            AssociationField::new('userPermissions')
-                ->setLabel($this->translator->trans('User Permissions'))
-                ->hideOnForm()
+        // Get base configuration from our new system
+        $config = $this->getFieldConfiguration($pageName);
+        return $this->fieldService->generateFields($config, $pageName);
+    }
+
+    /**
+     * Get field configuration for Module entity
+     */
+    private function getFieldConfiguration(string $pageName): array
+    {
+        // Base configuration for all pages - includes active field first
+        $config = [
+            ...$this->getActiveField(), // Active field first for all pages
+            $this->fieldService->createIdField(),
+        ];
+
+        // Page-specific field configurations
+        if ($pageName === Crud::PAGE_INDEX) {
+            $config = array_merge($config, [
+                $this->fieldService->field('name')
+                    ->type('text')
+                    ->label('Name')
+                    ->linkToShow() // This will auto-detect the ModuleCrudController
+                    ->build(),
+                    
+                ...$this->getModulePermissionsSummaryField(),
+            ]);
+            
+        } elseif ($pageName === Crud::PAGE_DETAIL) {
+            $config = array_merge($config, [
+                $this->fieldService->field('name')
+                    ->type('text')
+                    ->label('Name')
+                    ->build(),
+                    
+                $this->fieldService->field('code')
+                    ->type('text')
+                    ->label('Code')
+                    ->build(),
+                    
+                $this->fieldService->field('icon')
+                    ->type('text')
+                    ->label('Icon')
+                    ->build(),
+                    
+                $this->fieldService->field('text')
+                    ->type('textarea')
+                    ->label('Description')
+                    ->build(),
+                    
+                ...$this->getModulePermissionsSummaryField(),
+                ...$this->getModulePermissionsDetailField(),
+            ]);
+            
+        } else { // FORM pages (NEW/EDIT)
+            $config = array_merge($config, [
+                $this->fieldService->field('name')
+                    ->type('text')
+                    ->label('Name')
+                    ->help('Display name for the module')
+                    ->build(),
+                    
+                $this->fieldService->field('code')
+                    ->type('text')
+                    ->label('Code')
+                    ->help('Unique code that matches the entity name (e.g., User, Company, Module)')
+                    ->formTypeOption('attr', ['placeholder' => 'e.g., User, Company, Module'])
+                    ->build(),
+                    
+                $this->fieldService->field('icon')
+                    ->type('text')
+                    ->label('Icon')
+                    ->help('FontAwesome icon class (e.g., fas fa-users, fas fa-building)')
+                    ->formTypeOption('attr', ['placeholder' => 'e.g., fas fa-users, fas fa-building'])
+                    ->build(),
+                    
+                $this->fieldService->field('text')
+                    ->type('textarea')
+                    ->label('Description')
+                    ->help('Optional description of what this module manages')
+                    ->build(),
+            ]);
+        }
+
+        return $config;
+    }
+
+    /**
+     * Get module permissions summary field configuration
+     */
+    private function getModulePermissionsSummaryField(): array
+    {
+        return [
+            $this->fieldService->field('userPermissions')
+                ->type('association')
+                ->label('User Permissions')
+                ->pages(['index', 'detail'])
                 ->formatValue(function ($value, $entity) {
                     if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
                         return $this->translator->trans('No permissions assigned');
@@ -103,10 +184,21 @@ class ModuleCrudController extends AbstractCrudController
                     
                     $count = $entity->getUserPermissions()->count();
                     return sprintf($this->translator->trans('%d permission(s) assigned'), $count);
-                }),
-            AssociationField::new('userPermissions', $this->translator->trans('Permission Details'))
-                ->hideOnForm()
-                ->hideOnIndex()
+                })
+                ->build(),
+        ];
+    }
+
+    /**
+     * Get module permissions detail field configuration
+     */
+    private function getModulePermissionsDetailField(): array
+    {
+        return [
+            $this->fieldService->field('userPermissions')
+                ->type('association')
+                ->label('Permission Details')
+                ->pages(['detail'])
                 ->formatValue(function ($value, $entity) {
                     if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
                         return $this->translator->trans('No permissions assigned');
@@ -126,13 +218,27 @@ class ModuleCrudController extends AbstractCrudController
                     
                     return implode('<br>', $permissions);
                 })
-                ->renderAsHtml(),
+                ->renderAsHtml(true)
+                ->build(),
         ];
+    }
 
-        // Add active field to all pages
-        $fields = $this->addActiveField($fields, $pageName);
+    /**
+     * Override to use the new relationship sync service
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $this->relationshipSyncService->autoSync($entityInstance);
+        parent::persistEntity($entityManager, $entityInstance);
+    }
 
-        return $fields;
+    /**
+     * Override to use the new relationship sync service
+     */
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $this->relationshipSyncService->autoSync($entityInstance);
+        parent::updateEntity($entityManager, $entityInstance);
     }
 
     protected function canCreateEntity(): bool

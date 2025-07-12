@@ -48,13 +48,7 @@ class LocaleService
     {
         return match ($locale) {
             'en' => '🇺🇸 English',
-            'fr' => '🇫🇷 Français',
             'de' => '🇩🇪 Deutsch',
-            'nl' => '🇳🇱 Nederlands',
-            'se' => '🇸🇪 Svenska',
-            'zh_TW' => '🇹🇼 繁體中文',
-            'it' => '🇮🇹 Italiano',
-            'es' => '🇪🇸 Español',
             default => strtoupper($locale)
         };
     }

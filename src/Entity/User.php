@@ -8,12 +8,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Entity\Traits\Set\SetCommunicationTrait;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    use SetCommunicationTrait;
+
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 

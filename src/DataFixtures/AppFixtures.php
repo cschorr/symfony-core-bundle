@@ -9,6 +9,7 @@ use App\Entity\Module;
 use App\Entity\User;
 use App\Entity\UserModulePermission;
 use App\Entity\Company;
+use App\Entity\Project;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
@@ -27,6 +28,7 @@ class AppFixtures extends Fixture
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
         $this->createCompanyFixtures($manager);
+        $this->createProjectFixtures($manager);
     }
 
     public function createUserFixtures(ObjectManager $manager): void
@@ -52,13 +54,14 @@ class AppFixtures extends Fixture
     public function createModuleFixtures(ObjectManager $manager): void
     {
         // Modules in navigation order - they will be sorted by ID (UUID) in ascending order
-        // The 'code' field is used for translation, 'name' field is for admin display
+        // The 'code' field is the singular form, 'name' field is the plural form
+        // Navigation uses $module->getName() which returns the plural form for translation
         $modules = [
-            ['name' => 'System Module Management', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
-            ['name' => 'User Management', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
-            ['name' => 'Company Management', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
-            ['name' => 'Company Group Management', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
-            ['name' => 'Projekte', 'code' => 'Project', 'text' => 'Projekte', 'icon' => 'fas fa-layer-group'],
+            ['name' => 'Modules', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
+            ['name' => 'Users', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
+            ['name' => 'Companies', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
+            ['name' => 'CompanyGroups', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
+            ['name' => 'Projects', 'code' => 'Project', 'text' => 'Projekte verwalten', 'icon' => 'fas fa-project-diagram'],
         ];
 
         // Create and persist module entities here
@@ -121,8 +124,9 @@ class AppFixtures extends Fixture
     {
         // Example company data
         $companies = [
-            ['name' => 'Example Company', 'email' => 'info@example.com'],
-            ['name' => 'Demo Client', 'email' => 'info@demo.com'],
+            ['name' => 'Stake holder', 'email' => 'info@example.com', 'country' => 'DE'],
+            ['name' => 'Demo Client', 'email' => 'info@demo.com', 'country' => 'DE'],
+            ['name' => 'Test Company', 'email' => 'info@test.com', 'country' => 'DE'],
         ];
 
         // Create and persist company entities here
@@ -130,7 +134,28 @@ class AppFixtures extends Fixture
             $company = new Company();
             $company->setName($companyData['name']);
             $company->setEmail($companyData['email']);
+            $company->setCountryCode($companyData['country']);
             $manager->persist($company);
+        }
+        $manager->flush();
+    }
+
+    public function createProjectFixtures(ObjectManager $manager): void
+    {
+        // Example project data
+        $projects = [
+            ['name' => 'Project Alpha', 'status' => 1, 'description' => 'First project description'],
+            ['name' => 'Project Beta', 'status' => 2, 'description' => 'Second project description'],
+            ['name' => 'Project Gamma', 'status' => 0, 'description' => 'Third project description'],
+        ];
+
+        // Create and persist project entities here
+        foreach ($projects as $projectData) {
+            $project = new Project();
+            $project->setName($projectData['name']);
+            $project->setStatus($projectData['status']);
+            $project->setDescription($projectData['description']);
+            $manager->persist($project);
         }
         $manager->flush();
     }

@@ -1,12 +1,5 @@
 easy_admin:
     design:
-        # Custom CSS files for EasyAdmin
-        assets:
-            css:
-                - 'styles/admin.css'
-                - 'styles/admin-global.css'
-            js:
-                - 'admin.js'
         # Custom brand styling
         brand:
             color: '#343a40'

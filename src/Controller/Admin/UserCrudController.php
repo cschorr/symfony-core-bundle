@@ -6,17 +6,14 @@ use App\Entity\User;
 use App\Entity\Company;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use App\Service\EasyAdminFieldService;
+use App\Service\RelationshipSyncService;
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,12 +22,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserCrudController extends AbstractCrudController
 {
+    use FieldConfigurationTrait;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
         PermissionService $permissionService,
         DuplicateService $duplicateService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        private EasyAdminFieldService $fieldService,
+        private RelationshipSyncService $relationshipSyncService,
+        private AdminUrlGenerator $adminUrlGenerator
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -100,6 +102,12 @@ class UserCrudController extends AbstractCrudController
     }
 
     #[IsGranted('write', subject: 'User')]
+    public function new(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    {
+        return parent::new($context);
+    }
+
+    #[IsGranted('write', subject: 'User')]
     public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::delete($context);
@@ -107,118 +115,124 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
-            IdField::new('id')->hideOnForm()->hideOnIndex(),
-        ];
-
-        if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
-            // User Information Tab
-            $fields[] = FormField::addTab($this->translator->trans('User Information'));
-            $fields[] = EmailField::new('email');
-            $fields[] = ChoiceField::new('roles')
-                ->setLabel($this->translator->trans('Roles'))
-                ->setChoices([
-                    $this->translator->trans('User') => 'ROLE_USER',
-                    $this->translator->trans('Admin') => 'ROLE_ADMIN',
-                ])
-                ->allowMultipleChoices()
-                ->renderExpanded(false);
-            $fields[] = TextareaField::new('notes');
-            $fields[] = AssociationField::new('company')
-                ->autocomplete();
-            $fields[] = AssociationField::new('projects');
-
-            // Add active field using the helper method
-            $fields = $this->addActiveField($fields, $pageName);
-
-            // Add permission tab (handled by abstract controller)
+        // Get base configuration from our new system
+        $config = $this->getFieldConfiguration($pageName);
+        $fields = $this->fieldService->generateFields($config, $pageName);
+        
+        // Add permission fields using the old system (for compatibility)
+        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
+            $fields = $this->addPermissionSummaryField($fields);
+        } elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
             $fields = $this->addPermissionTabToFields($fields);
-        } elseif ($pageName === Crud::PAGE_DETAIL) {
-            // For detail page, show all fields including notes
-            $fields[] = EmailField::new('email');
-            $fields[] = ChoiceField::new('roles')
-                ->setLabel($this->translator->trans('Roles'))
-                ->setChoices([
-                    $this->translator->trans('User') => 'ROLE_USER',
-                    $this->translator->trans('Admin') => 'ROLE_ADMIN',
-                ])
-                ->allowMultipleChoices()
-                ->renderExpanded(false);
-            $fields[] = TextareaField::new('notes');
-            $fields[] = AssociationField::new('company');
-            $fields[] = AssociationField::new('projects');
-            
-            // Add active field using the helper method
-            $fields = $this->addActiveField($fields, $pageName);
-            
-            // Add permission summary (handled by abstract controller)
-            $fields = $this->addPermissionSummaryField($fields);
-        } else {
-            // For index page, show all fields without tabs and hide notes
-            $fields[] = EmailField::new('email');
-            $fields[] = ChoiceField::new('roles')
-                ->setLabel($this->translator->trans('Roles'))
-                ->setChoices([
-                    $this->translator->trans('User') => 'ROLE_USER',
-                    $this->translator->trans('Admin') => 'ROLE_ADMIN',
-                ])
-                ->allowMultipleChoices()
-                ->renderExpanded(false);
-            $fields[] = AssociationField::new('company');
-            
-            // Add permission summary (handled by abstract controller)
-            $fields = $this->addPermissionSummaryField($fields);
-            
-            // Add active field as the last field using the helper method
-            $fields = $this->addActiveField($fields, $pageName);
         }
-
+        
         return $fields;
     }
 
     /**
-     * Override to handle bidirectional relationship with Company
+     * Get field configuration for User entity
+     */
+    private function getFieldConfiguration(string $pageName): array
+    {
+        // Page-specific field configurations
+        if ($pageName === Crud::PAGE_INDEX) {
+            $config = [
+                ...$this->getActiveField(['index']), // Active field first for index
+                $this->fieldService->createIdField(),
+                $this->fieldService->field('email')
+                    ->type('text')
+                    ->label('Email')
+                    ->formatValue(function ($value, $entity) {
+                        // Create a link to the show action instead of mailto
+                        $showUrl = $this->adminUrlGenerator
+                            ->setController(self::class)
+                            ->setAction(Action::DETAIL)
+                            ->setEntityId($entity->getId())
+                            ->generateUrl();
+                        
+                        return sprintf('<a href="%s" class="text-decoration-none">%s</a>', $showUrl, $value);
+                    })
+                    ->renderAsHtml()
+                    ->build(),
+                    
+                $this->fieldService->field('roles')
+                    ->type('choice')
+                    ->label('Roles')
+                    ->choices([
+                        'User' => 'ROLE_USER',
+                        'Admin' => 'ROLE_ADMIN',
+                    ])
+                    ->multiple(true)
+                    ->build(),
+                    
+                $this->fieldService->field('company')
+                    ->type('association')
+                    ->label('Company')
+                    ->build(),
+            ];
+            
+        } elseif ($pageName === Crud::PAGE_DETAIL) {
+            $config = [
+                ...$this->getActiveField(['detail']), // Active field first for detail
+                $this->fieldService->createIdField(),
+                ...$this->getUserFields(['detail']),
+                ...$this->getNotesField(['detail']),
+                
+                $this->fieldService->field('company')
+                    ->type('association')
+                    ->label('Company')
+                    ->build(),
+                    
+                $this->fieldService->field('projects')
+                    ->type('association')
+                    ->label('Projects')
+                    ->build(),
+            ];
+            
+        } else { // FORM pages (NEW/EDIT) - Use tabs
+            $config = [
+                // User Information Tab - includes active field inside tab
+                $this->fieldService->createTabConfig('user_info', 'User Information'),
+                
+                // Active field inside the tab
+                ...$this->getActiveField(['form']),
+                $this->fieldService->createIdField(),
+                
+                ...$this->getUserFields(['form']),
+                ...$this->getNotesField(['form']),
+                
+                $this->fieldService->field('company')
+                    ->type('association')
+                    ->label('Company')
+                    ->autocomplete(true)
+                    ->build(),
+                    
+                $this->fieldService->field('projects')
+                    ->type('association')
+                    ->label('Projects')
+                    ->multiple(true)
+                    ->build(),
+            ];
+        }
+
+        return $config;
+    }
+
+    /**
+     * Override to use the new relationship sync service
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        /** @var User $entityInstance */
-        $this->syncCompanyRelationship($entityInstance);
+        $this->relationshipSyncService->autoSync($entityInstance);
         parent::persistEntity($entityManager, $entityInstance);
     }
 
     /**
-     * Override to handle bidirectional relationship with Company
+     * Override to use the new relationship sync service
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        /** @var User $entityInstance */
-        $this->syncCompanyRelationship($entityInstance);
+        $this->relationshipSyncService->autoSync($entityInstance);
         parent::updateEntity($entityManager, $entityInstance);
-    }
-
-    /**
-     * Sync the bidirectional relationship between User and Company
-     */
-    private function syncCompanyRelationship(User $user): void
-    {
-        // Get the current company
-        $currentCompany = $user->getCompany();
-        
-        // If user has an ID (not a new user), handle previous company relationship
-        if ($user->getId()) {
-            // Find the original user to see what company they were previously assigned to
-            $originalUser = $this->entityManager->getRepository(User::class)->find($user->getId());
-            $previousCompany = $originalUser?->getCompany();
-            
-            // If the company has changed, remove user from previous company
-            if ($previousCompany && $previousCompany !== $currentCompany) {
-                $previousCompany->removeEmployee($user);
-            }
-        }
-        
-        // Add user to current company if set
-        if ($currentCompany && !$currentCompany->getEmployees()->contains($user)) {
-            $currentCompany->addEmployee($user);
-        }
     }
 }

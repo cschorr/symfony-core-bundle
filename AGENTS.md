@@ -1,2 +1,7 @@
 - we are using "ddev" in dev environment
-- always use "bin/kickstart.sh" to rebuild my database during the current project phase
+- always use "bin/kickstart.sh" to rebuild the database during the current project phase
+- we are using asset mapper
+- since we code in dev environment there is no need to run the asset-map:compile command
+- we are using easyadmin version 4
+- please interact with the easyadmin code base and watch easyadmins own state management
+- dont run any migrations in current dev phase, since we are re-creating the database each time

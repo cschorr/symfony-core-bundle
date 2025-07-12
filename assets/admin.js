@@ -5,7 +5,7 @@ function changeColorTone(tone) {
     console.log('Changing color tone to:', tone);
     
     // Remove existing tone classes
-    document.body.classList.remove('bg-tone-blue', 'bg-tone-green', 'bg-tone-purple', 'bg-tone-orange');
+    document.body.classList.remove('bg-tone-blue', 'bg-tone-green', 'bg-tone-purple', 'bg-tone-orange', 'bg-tone-ocean');
     
     // Add the new tone class
     if (tone && tone !== 'default') {
@@ -17,13 +17,14 @@ function changeColorTone(tone) {
     const statusElement = document.getElementById('sidebarBgStatus');
     if (statusElement) {
         const statusTexts = {
-            'default': 'Default Theme Active',
+            'default': 'Dark Theme Active',
             'blue': 'Blue Theme Active',
             'green': 'Green Theme Active',
             'purple': 'Purple Theme Active',
-            'orange': 'Orange Theme Active'
+            'orange': 'Orange Theme Active',
+            'ocean': 'Ocean Theme Active (Default)'
         };
-        statusElement.textContent = statusTexts[tone] || 'Default Theme Active';
+        statusElement.textContent = statusTexts[tone] || 'Ocean Theme Active';
     }
     
     // Store the preference
@@ -34,13 +35,37 @@ function changeColorTone(tone) {
 // Make function available globally
 window.changeColorTone = changeColorTone;
 
+// Simple function to check EasyAdmin's sidebar state using official system
+function isEasyAdminSidebarCollapsed() {
+    const body = document.body;
+    
+    // Check EasyAdmin's official CSS classes that are added by page-layout.js
+    const hasFullContentWidth = body.classList.contains('ea-content-width-full');
+    
+    // Check for very small screens
+    if (window.innerWidth < 576) {
+        return true;
+    }
+    
+    // EasyAdmin sets ea-content-width-full when sidebar is collapsed
+    return hasFullContentWidth;
+}
+
+// Make helper function available globally
+window.isEasyAdminSidebarCollapsed = isEasyAdminSidebarCollapsed;
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎯 DOMContentLoaded fired');
+    console.log('🌐 Current URL:', window.location.href);
+    console.log('📍 Pathname:', window.location.pathname);
+    
     // Check if we're on an admin page
     if (window.location.pathname.includes('/admin')) {
+        console.log('✅ Admin page detected');
         // Add the custom background class to the body
         document.body.classList.add('ea-admin-bg');
         
-        // Load saved color tone preference
+        // Load saved color tone preference or set ocean as default
         const savedTone = localStorage.getItem('admin-bg-tone');
         if (savedTone && savedTone !== 'default') {
             document.body.classList.add('bg-tone-' + savedTone);
@@ -53,27 +78,69 @@ document.addEventListener('DOMContentLoaded', function() {
                         'blue': 'Blue Theme Active',
                         'green': 'Green Theme Active',
                         'purple': 'Purple Theme Active',
-                        'orange': 'Orange Theme Active'
+                        'orange': 'Orange Theme Active',
+                        'ocean': 'Ocean Theme Active (Default)'
                     };
-                    statusElement.textContent = statusTexts[savedTone] || 'Default Theme Active';
+                    statusElement.textContent = statusTexts[savedTone] || 'Ocean Theme Active';
+                }
+            }, 1000);
+        } else {
+            // Set ocean as default if no preference is saved
+            document.body.classList.add('bg-tone-ocean');
+            localStorage.setItem('admin-bg-tone', 'ocean');
+            
+            // Update status when page loads
+            setTimeout(() => {
+                const statusElement = document.getElementById('sidebarBgStatus');
+                if (statusElement) {
+                    statusElement.textContent = 'Ocean Theme Active (Default)';
                 }
             }, 1000);
         }
+        
+        // Widget creation disabled - just use ocean theme automatically
+        // if (!document.querySelector('.ea-sidebar-bg-controls')) {
+        //     createColorToneSelector();
+        // }
     }
     
-    // Create color tone selector (if you want to add it to the interface)
+    // Create color tone selector
     function createColorToneSelector() {
         console.log('Creating color tone selector...');
         
-        // Add to the sidebar - try multiple selectors to find the right location
-        let sidebarElement = document.querySelector('.ea-sidebar') || 
-                           document.querySelector('.sidebar') || 
-                           document.querySelector('.main-sidebar') ||
-                           document.querySelector('aside');
-        
-        console.log('Found sidebar element:', sidebarElement);
-        
-        if (sidebarElement) {
+        // Wait a bit for EasyAdmin to fully load
+        setTimeout(() => {
+            // Try multiple approaches to find EasyAdmin's sidebar
+            let sidebarElement = null;
+            
+            // First try specific EasyAdmin selectors
+            const possibleSelectors = [
+                '.ea-sidebar',
+                '[data-ea-sidebar]',
+                '#ea-sidebar',
+                'aside.sidebar',
+                '.sidebar',
+                '.main-sidebar',
+                'aside',
+                '[role="navigation"]',
+                '.sidebar-wrapper',
+                '#sidebar'
+            ];
+            
+            console.log('Testing sidebar selectors...');
+            for (const selector of possibleSelectors) {
+                const element = document.querySelector(selector);
+                console.log(`${selector}:`, element ? `Found (${element.tagName}.${element.className})` : 'Not found');
+                if (element && !sidebarElement) {
+                    sidebarElement = element;
+                }
+            }
+            
+            console.log('Selected sidebar element:', sidebarElement);
+            console.log('Sidebar element class:', sidebarElement ? sidebarElement.className : 'N/A');
+            console.log('Sidebar element tag:', sidebarElement ? sidebarElement.tagName : 'N/A');
+            
+            if (sidebarElement) {
             // Create a sidebar section for background controls
             const sidebarSection = document.createElement('div');
             sidebarSection.className = 'ea-sidebar-bg-controls';
@@ -88,7 +155,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <i class="fas fa-palette"></i> Background Tone
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="colorToneDropdown">
-                                <li><a class="dropdown-item" href="#" data-tone="default">Default (Dark)</a></li>
+                                <li><a class="dropdown-item" href="#" data-tone="ocean">Ocean (Default)</a></li>
+                                <li><a class="dropdown-item" href="#" data-tone="default">Dark Theme</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="blue">Blue</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="green">Green</a></li>
                                 <li><a class="dropdown-item" href="#" data-tone="purple">Purple</a></li>
@@ -97,14 +165,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                     <div class="sidebar-bg-status" id="sidebarBgStatus">
-                        Default Theme Active
+                        Ocean Theme Active (Default)
                     </div>
                 </div>
             `;
             
             // Add to the bottom of the sidebar
             sidebarElement.appendChild(sidebarSection);
-            console.log('Sidebar section added');
+            console.log('Sidebar section added to:', sidebarElement.tagName, sidebarElement.className);
+            console.log('Widget element:', sidebarSection);
+            console.log('Widget in DOM:', document.contains(sidebarSection));
             
             // Add event listeners AFTER adding to DOM
             const menuItems = sidebarSection.querySelectorAll('[data-tone]');
@@ -122,49 +192,121 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             console.log('Color tone selector added to sidebar:', sidebarElement.className);
+            
+            // Setup EasyAdmin sidebar state watching
+            setupEasyAdminSidebarWatch();
+            
+            // Force check visibility after creation
+            setTimeout(() => {
+                console.log('Post-creation widget check...');
+                const widget = document.querySelector('.ea-sidebar-bg-controls');
+                console.log('Widget found after creation:', !!widget);
+                if (widget) {
+                    console.log('Widget display after creation:', widget.style.display);
+                    console.log('Widget computed display:', window.getComputedStyle(widget).display);
+                    console.log('Widget offsetHeight:', widget.offsetHeight);
+                    console.log('Widget offsetWidth:', widget.offsetWidth);
+                }
+            }, 100);
+            
         } else {
-            console.error('Could not find suitable sidebar element');
-            // Try to add to body as fallback
-            const fallbackElement = document.body;
-            console.log('Adding to body as fallback');
+            console.log('No EasyAdmin sidebar found - trying fallback location');
+            // Try to add to a navigation area or main container as fallback
+            const fallbackContainer = document.querySelector('.wrapper') || 
+                                    document.querySelector('.main-header') || 
+                                    document.querySelector('body');
             
-            const fallbackSection = document.createElement('div');
-            fallbackSection.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1000;
-                background: rgba(255, 255, 255, 0.9);
-                padding: 15px;
-                border-radius: 8px;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            `;
-            fallbackSection.innerHTML = `
-                <h6 style="margin: 0 0 10px 0; color: #333;">Background Theme</h6>
-                <select id="fallbackColorPicker" style="width: 100%; padding: 5px;">
-                    <option value="default">Default (Dark)</option>
-                    <option value="blue">Blue</option>
-                    <option value="green">Green</option>
-                    <option value="purple">Purple</option>
-                    <option value="orange">Orange</option>
-                </select>
-                <div id="fallbackStatus" style="margin-top: 10px; font-size: 12px; color: #666;">Default Theme Active</div>
-            `;
-            
-            fallbackElement.appendChild(fallbackSection);
-            
-            // Add event listener for fallback
-            const fallbackPicker = document.getElementById('fallbackColorPicker');
-            fallbackPicker.addEventListener('change', function() {
-                const tone = this.value;
-                console.log('Fallback picker changed to:', tone);
-                changeColorTone(tone);
-            });
+            if (fallbackContainer) {
+                console.log('Adding widget to fallback container');
+                // Create a simpler fallback widget
+                const fallbackWidget = document.createElement('div');
+                fallbackWidget.className = 'ea-sidebar-bg-controls-fallback';
+                fallbackWidget.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    z-index: 9999;
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 15px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                `;
+                fallbackWidget.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <strong><i class="fas fa-palette"></i> Background Theme</strong>
+                    </div>
+                    <select onchange="changeColorTone(this.value)" style="width: 100%; padding: 5px; border-radius: 4px;">
+                        <option value="ocean">Ocean (Default)</option>
+                        <option value="default">Dark Theme</option>
+                        <option value="blue">Blue</option>
+                        <option value="green">Green</option>
+                        <option value="purple">Purple</option>
+                        <option value="orange">Orange</option>
+                    </select>
+                    <div id="sidebarBgStatus" style="margin-top: 8px; font-size: 12px; text-align: center; opacity: 0.8;">
+                        Ocean Theme Active (Default)
+                    </div>
+                `;
+                fallbackContainer.appendChild(fallbackWidget);
+                console.log('Fallback widget added');
+            }
+        }
+        }, 1000); // Wait for EasyAdmin to fully load
+    }
+    
+    // Simple widget visibility controller
+    function updateWidgetVisibility() {
+        const widget = document.querySelector('.ea-sidebar-bg-controls');
+        if (!widget) {
+            console.log('Widget not found in updateWidgetVisibility');
+            return;
+        }
+        
+        const isCollapsed = isEasyAdminSidebarCollapsed();
+        const currentDisplay = widget.style.display;
+        
+        console.log('updateWidgetVisibility - collapsed:', isCollapsed, 'current display:', currentDisplay);
+        
+        // Only change if different from current state to avoid unnecessary changes
+        if (isCollapsed && currentDisplay !== 'none') {
+            widget.style.display = 'none';
+            console.log('Widget HIDDEN - sidebar collapsed');
+        } else if (!isCollapsed && currentDisplay !== 'block') {
+            widget.style.display = 'block';
+            console.log('Widget SHOWN - sidebar expanded');
+        } else {
+            console.log('Widget state unchanged');
         }
     }
     
-    // Uncomment the line below if you want to add the color tone selector to the interface
-    createColorToneSelector();
+    // Setup monitoring for EasyAdmin sidebar state using official CSS classes
+    function setupEasyAdminSidebarWatch() {
+        // Initial check
+        updateWidgetVisibility();
+        
+        // Watch for EasyAdmin's CSS class changes on body
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    const hasFullWidth = document.body.classList.contains('ea-content-width-full');
+                    console.log('EasyAdmin class changed - ea-content-width-full:', hasFullWidth);
+                    updateWidgetVisibility();
+                }
+            });
+        });
+        
+        observer.observe(document.body, { 
+            attributes: true, 
+            attributeFilter: ['class'] 
+        });
+        
+        // Listen for window resize for responsive behavior
+        window.addEventListener('resize', updateWidgetVisibility);
+        
+        console.log('EasyAdmin CSS class monitoring setup complete');
+    }
     
     // Debug: Add manual color tone testing
     console.log('Admin.js loaded - Background customization active');
@@ -172,160 +314,101 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Current pathname:', window.location.pathname);
 });
 
-// Add some CSS animations for smooth transitions
-const style = document.createElement('style');
-style.textContent = `
-    /* Sidebar Background Controls Styling */
-    .ea-sidebar-bg-controls {
-        position: relative;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        margin-top: auto;
-        padding: 15px;
+// Make functions available globally for testing
+window.showThemeWidget = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    if (widget) {
+        widget.style.display = 'block';
+        console.log('Theme widget force shown');
+    }
+};
+
+window.hideThemeWidget = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    if (widget) {
+        widget.style.display = 'none';
+        console.log('Theme widget force hidden');
+    }
+};
+
+window.checkWidgetState = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    const navigationToggler = document.getElementById('navigation-toggler');
+    const contentWidth = localStorage.getItem('ea/content/width') || document.body.dataset.eaContentWidth;
+    
+    console.log('EasyAdmin sidebar state check:');
+    console.log('- Widget exists:', !!widget);
+    console.log('- Widget display:', widget ? widget.style.display : 'N/A');
+    console.log('- EasyAdmin content width:', contentWidth);
+    console.log('- Navigation toggler exists:', !!navigationToggler);
+    console.log('- Navigation toggler visible:', navigationToggler ? window.getComputedStyle(navigationToggler).display !== 'none' : 'N/A');
+    console.log('- Window width:', window.innerWidth);
+    console.log('- Sidebar collapsed?:', isEasyAdminSidebarCollapsed ? isEasyAdminSidebarCollapsed() : 'function not available');
+};
+
+// Add manual test function to check current state immediately
+window.testSidebarState = function() {
+    console.log('=== EASYADMIN CSS CLASS TEST ===');
+    const body = document.body;
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    
+    console.log('body.className:', body.className);
+    console.log('ea-content-width-full:', body.classList.contains('ea-content-width-full'));
+    console.log('ea-content-width-normal:', body.classList.contains('ea-content-width-normal'));
+    console.log('ea-sidebar-width-normal:', body.classList.contains('ea-sidebar-width-normal'));
+    console.log('ea-sidebar-width-full:', body.classList.contains('ea-sidebar-width-full'));
+    
+    console.log('data-ea-content-width:', body.dataset.eaContentWidth);
+    console.log('data-ea-sidebar-width:', body.dataset.eaSidebarWidth);
+    
+    console.log('localStorage ea/content/width:', localStorage.getItem('ea/content/width'));
+    console.log('localStorage ea/sidebar/width:', localStorage.getItem('ea/sidebar/width'));
+    
+    console.log('window.innerWidth:', window.innerWidth);
+    console.log('widget exists:', !!widget);
+    if (widget) {
+        console.log('widget.style.display:', widget.style.display);
     }
     
-    .sidebar-bg-section {
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    console.log('isEasyAdminSidebarCollapsed():', isEasyAdminSidebarCollapsed());
+    console.log('================================');
+};
+
+// Add immediate test functions for debugging
+window.forceShowWidget = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    if (widget) {
+        widget.style.display = 'block';
+        console.log('Widget force shown');
+    } else {
+        console.log('Widget not found');
     }
+};
+
+window.forceHideWidget = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    if (widget) {
+        widget.style.display = 'none';
+        console.log('Widget force hidden');
+    } else {
+        console.log('Widget not found');
+    }
+};
+
+window.checkCurrentState = function() {
+    const widget = document.querySelector('.ea-sidebar-bg-controls');
+    const isCollapsed = isEasyAdminSidebarCollapsed();
     
-    .sidebar-bg-title {
-        color: #2c3e50;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 10px;
-        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
-        display: flex;
-        align-items: center;
-    }
+    console.log('=== CURRENT STATE CHECK ===');
+    console.log('Widget exists:', !!widget);
+    console.log('Widget display:', widget ? widget.style.display : 'N/A');
+    console.log('Sidebar collapsed:', isCollapsed);
+    console.log('Body classes:', document.body.className);
+    console.log('Should show widget:', !isCollapsed);
     
-    .sidebar-bg-title i {
-        margin-right: 8px;
-        color: #3498db;
-        font-size: 1rem;
+    if (widget) {
+        updateWidgetVisibility();
+        console.log('After update - Widget display:', widget.style.display);
     }
-    
-    .sidebar-bg-content .dropdown {
-        width: 100%;
-    }
-    
-    .sidebar-bg-content .btn {
-        width: 100%;
-        background: rgba(108, 117, 125, 0.8);
-        border: none;
-        color: white;
-        font-size: 0.85rem;
-        padding: 8px 12px;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-    }
-    
-    .sidebar-bg-content .btn:hover {
-        background: rgba(108, 117, 125, 1);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-    
-    .sidebar-bg-content .dropdown-menu {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-    
-    .sidebar-bg-content .dropdown-item {
-        padding: 8px 16px;
-        font-size: 0.85rem;
-        color: #2c3e50;
-        transition: all 0.3s ease;
-    }
-    
-    .sidebar-bg-content .dropdown-item:hover {
-        background: rgba(52, 152, 219, 0.1);
-        color: #3498db;
-    }
-    
-    /* Active Status Indicator in Sidebar */
-    .sidebar-bg-status {
-        margin-top: 10px;
-        padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        font-size: 0.8rem;
-        color: #2c3e50;
-        text-align: center;
-        font-weight: 500;
-    }
-    
-    /* Color-specific status indicators */
-    body.bg-tone-blue .sidebar-bg-status {
-        background: rgba(59, 130, 246, 0.2);
-        border-color: rgba(59, 130, 246, 0.3);
-        color: #1e40af;
-    }
-    
-    body.bg-tone-green .sidebar-bg-status {
-        background: rgba(34, 197, 94, 0.2);
-        border-color: rgba(34, 197, 94, 0.3);
-        color: #15803d;
-    }
-    
-    body.bg-tone-purple .sidebar-bg-status {
-        background: rgba(147, 51, 234, 0.2);
-        border-color: rgba(147, 51, 234, 0.3);
-        color: #7c2d12;
-    }
-    
-    body.bg-tone-orange .sidebar-bg-status {
-        background: rgba(251, 146, 60, 0.2);
-        border-color: rgba(251, 146, 60, 0.3);
-        color: #c2410c;
-    }
-    
-    /* Make sidebar taller to accommodate new controls */
-    .ea-sidebar {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    /* Ensure main menu takes available space */
-    .ea-main-menu {
-        flex: 1;
-    }
-    
-    body {
-        transition: background-image 0.5s ease-in-out !important;
-    }
-    
-    .ea-main-wrapper,
-    .ea-sidebar,
-    .ea-content-wrapper,
-    .ea-header,
-    .card {
-        transition: background 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
-    }
-    
-    /* Remove old fixed positioning styles */
-    .color-tone-selector {
-        position: relative;
-        top: auto;
-        right: auto;
-        z-index: auto;
-        background: transparent;
-        border-radius: 0;
-        padding: 0;
-        box-shadow: none;
-        backdrop-filter: none;
-    }
-`;
-document.head.appendChild(style);
+    console.log('========================');
+};
