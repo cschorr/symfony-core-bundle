@@ -36,11 +36,6 @@ class CompanyGroupCrudController extends AbstractCrudController
         return CompanyGroup::class;
     }
 
-    protected function getSystemEntityCode(): string
-    {
-        return 'CompanyGroup';
-    }
-
     protected function hasPermissionManagement(): bool
     {
         return false;
@@ -86,14 +81,14 @@ class CompanyGroupCrudController extends AbstractCrudController
         return [
             // Active field first, enabled for all views
             ...$this->getActiveField(),
-            
+
             // Standard fields
             $this->fieldService->createIdField(),
             $this->fieldService->field('name')
                 ->type('text')
                 ->label($this->translator->trans('Name'))
                 ->build(),
-                
+
             $this->fieldService->field('code')
                 ->type('text')
                 ->label($this->translator->trans('Code'))
