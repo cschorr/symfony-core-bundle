@@ -151,6 +151,11 @@ class SystemEntityCrudController extends AbstractCrudController
                     ->linkToShow() // This will auto-detect the SystemEntityCrudController
                     ->build(),
                     
+                $this->fieldService->field('code')
+                    ->type('text')
+                    ->label('Code')
+                    ->build(),
+                    
                 ...$this->getSystemEntityPermissionsSummaryField(),
             ]);
             
