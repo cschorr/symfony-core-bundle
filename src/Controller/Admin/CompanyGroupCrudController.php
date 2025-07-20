@@ -91,7 +91,7 @@ class CompanyGroupCrudController extends AbstractCrudController
             $this->fieldService->createIdField(),
             $this->fieldService->field('name')
                 ->type('text')
-                ->label($this->translator->trans('Company Group Name'))
+                ->label($this->translator->trans('Name'))
                 ->build(),
                 
             $this->fieldService->field('code')

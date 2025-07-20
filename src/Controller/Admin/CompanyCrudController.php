@@ -159,7 +159,7 @@ class CompanyCrudController extends AbstractCrudController
             // Company name with link to detail for index page
             $this->fieldService->field('name')
                 ->type('text')
-                ->label('Company Name')
+                ->label('Name')
                 ->required(true)
                 ->linkToShow() // This will auto-detect the CompanyCrudController
                 ->pages(['index'])
@@ -200,7 +200,7 @@ class CompanyCrudController extends AbstractCrudController
             
         $fields[] = $this->fieldService->field('name')
             ->type('text')
-            ->label('Company Name')
+            ->label('Name')
             ->required(true)
             ->pages(['detail', 'form']) // Show on detail and form pages inside tab
             ->build();

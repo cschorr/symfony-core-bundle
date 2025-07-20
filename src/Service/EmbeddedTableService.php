@@ -7,11 +7,13 @@ use App\Controller\Admin\ProjectCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmbeddedTableService
 {
     public function __construct(
-        private AdminUrlGenerator $adminUrlGenerator
+        private AdminUrlGenerator $adminUrlGenerator,
+        private TranslatorInterface $translator
     ) {}
 
     /**
@@ -20,7 +22,11 @@ class EmbeddedTableService
      */
     public function createEmbeddedTableFormatter(array $columns, string $title, string $emptyMessage = null): \Closure
     {
-        $emptyMessage = $emptyMessage ?? "No " . strtolower($title) . " assigned";
+        // Use translator for empty message if not provided
+        if ($emptyMessage === null) {
+            $defaultKey = "No " . strtolower($title) . " assigned";
+            $emptyMessage = $this->translator->trans($defaultKey);
+        }
         
         return function ($value, $entity) use ($columns, $title, $emptyMessage) {
             if ($value instanceof Collection && $value->count() > 0) {
@@ -59,8 +65,9 @@ class EmbeddedTableService
         $columnCount = count($columns);
         $columnWidth = floor(100 / $columnCount);
         foreach ($columns as $property => $label) {
+            $translatedLabel = $this->translator->trans($label);
             $html .= '<th data-ea-property-name="' . $property . '" class="text text-start text-truncate" style="width: ' . $columnWidth . '% !important;">';
-            $html .= '<span class="text-truncate">' . htmlspecialchars($label) . '</span>';
+            $html .= '<span class="text-truncate">' . htmlspecialchars($translatedLabel) . '</span>';
             $html .= '</th>';
         }
         $html .= '</tr>';
@@ -86,7 +93,7 @@ class EmbeddedTableService
         
         // Add count info like native EasyAdmin
         $html .= '<div class="list-pagination-counter text-muted">';
-        $html .= 'Showing <strong>' . $items->count() . '</strong> ' . strtolower($title);
+        $html .= $this->translator->trans('Showing') . ' <strong>' . $items->count() . '</strong> ' . $this->translator->trans($title);
         $html .= '</div>';
         
         $html .= '</div>'; // Close content-section-body
@@ -146,14 +153,14 @@ class EmbeddedTableService
                 // Handle numeric status values (like Project entity)
                 if (is_numeric($value)) {
                     $statusMap = [
-                        0 => ['label' => 'Planning', 'class' => 'secondary'],
-                        1 => ['label' => 'In Progress', 'class' => 'primary'],
-                        2 => ['label' => 'On Hold', 'class' => 'warning'],
-                        3 => ['label' => 'Completed', 'class' => 'success'],
-                        4 => ['label' => 'Cancelled', 'class' => 'danger'],
+                        0 => ['label' => $this->translator->trans('Planning'), 'class' => 'secondary'],
+                        1 => ['label' => $this->translator->trans('In Progress'), 'class' => 'primary'],
+                        2 => ['label' => $this->translator->trans('On Hold'), 'class' => 'warning'],
+                        3 => ['label' => $this->translator->trans('Completed'), 'class' => 'success'],
+                        4 => ['label' => $this->translator->trans('Cancelled'), 'class' => 'danger'],
                     ];
                     
-                    $statusInfo = $statusMap[$value] ?? ['label' => 'Unknown', 'class' => 'secondary'];
+                    $statusInfo = $statusMap[$value] ?? ['label' => $this->translator->trans('Unknown'), 'class' => 'secondary'];
                     return '<span class="badge bg-' . $statusInfo['class'] . ' text-truncate">' . $statusInfo['label'] . '</span>';
                 }
                 

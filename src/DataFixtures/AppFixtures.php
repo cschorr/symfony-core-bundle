@@ -57,7 +57,7 @@ class AppFixtures extends Fixture
         // The 'code' field is the singular form, 'name' field is the plural form
         // Navigation uses $systemEntity->getName() which returns the plural form for translation
         $systemEntities = [
-            ['name' => 'System Entities', 'code' => 'SystemEntity', 'text' => 'System entities and configuration', 'icon' => 'fas fa-list'],
+            ['name' => 'SystemEntities', 'code' => 'SystemEntity', 'text' => 'System entities and configuration', 'icon' => 'fas fa-list'],
             ['name' => 'Users', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
             ['name' => 'Companies', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
             ['name' => 'CompanyGroups', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
