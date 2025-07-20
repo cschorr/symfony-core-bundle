@@ -6,6 +6,7 @@ use App\Entity\SystemEntity;
 use App\Entity\User;
 use App\Repository\UserSystemEntityPermissionRepository;
 use App\Repository\SystemEntityRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -18,15 +19,11 @@ class SystemEntityVoter extends Voter
     public const EDIT = 'edit';
     public const DELETE = 'delete';
 
-    private UserSystemEntityPermissionRepository $permissionRepository;
-    private SystemEntityRepository $systemEntityRepository;
-
     public function __construct(
-        UserSystemEntityPermissionRepository $permissionRepository,
-        SystemEntityRepository $systemEntityRepository
+        private readonly UserSystemEntityPermissionRepository $permissionRepository,
+        private readonly SystemEntityRepository $systemEntityRepository,
+        private readonly LoggerInterface $logger
     ) {
-        $this->permissionRepository = $permissionRepository;
-        $this->systemEntityRepository = $systemEntityRepository;
     }
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -39,7 +36,7 @@ class SystemEntityVoter extends Voter
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
-        
+
         // User must be logged in
         if (!$user instanceof UserInterface) {
             return false;
@@ -102,11 +99,11 @@ class SystemEntityVoter extends Voter
     {
         // Try to find by code first, then by name
         $systemEntity = $this->systemEntityRepository->findOneBy(['code' => $subject]);
-        
+
         if (!$systemEntity) {
             $systemEntity = $this->systemEntityRepository->findOneBy(['name' => $subject]);
         }
-        
+
         return $systemEntity;
     }
 }
