@@ -10,25 +10,30 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Traits\Set\SetCommunicationTrait;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ApiResource(
     shortName: 'User',
-    description: 'Represents a user in the system, with roles and permissions.'
+    description: 'Represents a user in the system, with roles and permissions.',
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']]
 )]
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use SetCommunicationTrait;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column(type: 'json')]
+    #[Groups(['user:read', 'user:write'])]
     private array $roles = [];
 
     /**
@@ -41,15 +46,18 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      * @var Collection<int, Project>
      */
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'assignee')]
+    #[Groups(['user:read'])]
     private Collection $projects;
 
     #[ORM\ManyToOne(inversedBy: 'employees')]
+    #[Groups(['user:read', 'user:write'])]
     private ?Company $company = null;
 
     /**
      * @var Collection<int, UserModulePermission>
      */
     #[ORM\OneToMany(targetEntity: UserModulePermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[Groups(['user:read'])]
     private Collection $modulePermissions;
 
     public function __construct()
