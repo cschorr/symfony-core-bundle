@@ -13,6 +13,11 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api:
+            pattern: ^/api/
+            stateless: true
+            provider: app_user_provider
+            # You can add API authentication here later (JWT, API keys, etc.)
         main:
             lazy: true
             provider: app_user_provider
@@ -34,6 +39,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # API routes - allow public access for now (you can secure these later)
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Swagger documentation
+        - { path: ^/api/, roles: PUBLIC_ACCESS } # API endpoints
         # grant access to /admin to both ROLE_ADMIN and ROLE_USER
         - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_USER] }
         # grant access to /profile to ROLE_USER
