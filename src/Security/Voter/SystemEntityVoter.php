@@ -57,11 +57,11 @@ class SystemEntityVoter extends Voter
             $systemEntity = $this->resolveSystemEntityFromString($subject);
             if (!$systemEntity) {
                 // Debug: Log when resolution fails
-                error_log("SystemEntityVoter: Could not resolve '{$subject}' to SystemEntity");
+                $this->logger->debug("SystemEntityVoter: Could not resolve '{$subject}' to SystemEntity");
                 return false;
             }
             // Debug: Log successful resolution
-            error_log("SystemEntityVoter: Resolved '{$subject}' to SystemEntity ID: {$systemEntity->getId()}");
+            $this->logger->debug("SystemEntityVoter: Resolved '{$subject}' to SystemEntity ID: {$systemEntity->getId()}");
         }
 
         if (!$systemEntity instanceof SystemEntity) {
