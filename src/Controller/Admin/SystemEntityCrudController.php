@@ -45,11 +45,6 @@ class SystemEntityCrudController extends AbstractCrudController
         return SystemEntity::class;
     }
 
-    protected function getSystemEntityCode(): string
-    {
-        return 'SystemEntity';
-    }
-
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
@@ -96,7 +91,7 @@ class SystemEntityCrudController extends AbstractCrudController
         // Get base configuration from our new system
         $config = $this->getFieldConfiguration($pageName);
         $fields = $this->fieldService->generateFields($config, $pageName);
-        
+
         // Add permission tab for form pages
         if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
             // Get the current entity from context if available
@@ -108,23 +103,23 @@ class SystemEntityCrudController extends AbstractCrudController
                     $entity = $entityInstance;
                 }
             }
-            
+
             // First, we need to wrap the basic fields in a tab
             $fieldsWithTabs = [];
-            
+
             // Add basic information tab
             $fieldsWithTabs[] = FormField::addTab($this->translator->trans('System Entity Information'))
                 ->setHelp($this->translator->trans('Basic information about the system entity'))
                 ->collapsible();
-            
+
             // Add all the basic fields
             foreach ($fields as $field) {
                 $fieldsWithTabs[] = $field;
             }
-            
+
             // Then add permission tabs with entity data
             $fieldsWithTabs = $this->permissionService->addSystemEntityPermissionTabToFieldsWithEntity($fieldsWithTabs, $entity);
-            
+
             return $fieldsWithTabs;
         }
 
@@ -150,41 +145,41 @@ class SystemEntityCrudController extends AbstractCrudController
                     ->label('Name')
                     ->linkToShow() // This will auto-detect the SystemEntityCrudController
                     ->build(),
-                    
+
                 $this->fieldService->field('code')
                     ->type('text')
                     ->label('Code')
                     ->build(),
-                    
+
                 ...$this->getSystemEntityPermissionsSummaryField(),
             ]);
-            
+
         } elseif ($pageName === Crud::PAGE_DETAIL) {
             $config = array_merge($config, [
                 $this->fieldService->field('name')
                     ->type('text')
                     ->label('Name')
                     ->build(),
-                    
+
                 $this->fieldService->field('code')
                     ->type('text')
                     ->label('Code')
                     ->build(),
-                    
+
                 $this->fieldService->field('icon')
                     ->type('text')
                     ->label('Icon')
                     ->build(),
-                    
+
                 $this->fieldService->field('text')
                     ->type('textarea')
                     ->label('Description')
                     ->build(),
-                    
+
                 ...$this->getSystemEntityPermissionsSummaryField(),
                 ...$this->getSystemEntityPermissionsDetailField(),
             ]);
-            
+
         } else { // FORM pages (NEW/EDIT)
             $config = array_merge($config, [
                 $this->fieldService->field('name')
@@ -192,21 +187,21 @@ class SystemEntityCrudController extends AbstractCrudController
                     ->label('Name')
                     ->help('Display name for the system entity')
                     ->build(),
-                    
+
                 $this->fieldService->field('code')
                     ->type('text')
                     ->label('Code')
                     ->help('Unique code that matches the entity name (e.g., User, Company, SystemEntity)')
                     ->formTypeOption('attr', ['placeholder' => 'e.g., User, Company, SystemEntity'])
                     ->build(),
-                    
+
                 $this->fieldService->field('icon')
                     ->type('text')
                     ->label('Icon')
                     ->help('FontAwesome icon class (e.g., fas fa-users, fas fa-building)')
                     ->formTypeOption('attr', ['placeholder' => 'e.g., fas fa-users, fas fa-building'])
                     ->build(),
-                    
+
                 $this->fieldService->field('text')
                     ->type('textarea')
                     ->label('Description')
@@ -232,7 +227,7 @@ class SystemEntityCrudController extends AbstractCrudController
                     if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
                         return $this->translator->trans('No permissions assigned');
                     }
-                    
+
                     $count = $entity->getUserPermissions()->count();
                     return sprintf($this->translator->trans('%d permission(s) assigned'), $count);
                 })
@@ -254,7 +249,7 @@ class SystemEntityCrudController extends AbstractCrudController
                     if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
                         return $this->translator->trans('No permissions assigned');
                     }
-                    
+
                     $permissions = [];
                     foreach ($entity->getUserPermissions() as $permission) {
                         $user = $permission->getUser();
@@ -263,10 +258,10 @@ class SystemEntityCrudController extends AbstractCrudController
                         if ($permission->canRead()) $access[] = $this->translator->trans('Read');
                         if ($permission->canWrite()) $access[] = $this->translator->trans('Write');
                         $accessString = implode(', ', $access);
-                        
+
                         $permissions[] = sprintf('%s: %s', $userEmail, $accessString);
                     }
-                    
+
                     return implode('<br>', $permissions);
                 })
                 ->renderAsHtml(true)
@@ -309,41 +304,41 @@ class SystemEntityCrudController extends AbstractCrudController
         }
 
         $formData = $request->request->all();
-        
+
         // Get all users to process their permissions
         $users = $this->entityManager->getRepository(User::class)->findAll();
-        
+
         foreach ($users as $user) {
             $readFieldName = 'userPermission_read_' . $user->getId();
             $writeFieldName = 'userPermission_write_' . $user->getId();
-            
+
             $canRead = isset($formData[$readFieldName]) && $formData[$readFieldName] === '1';
             $canWrite = isset($formData[$writeFieldName]) && $formData[$writeFieldName] === '1';
-            
+
             // Find or create permission entity
             $permission = $this->userSystemEntityPermissionRepository
                 ->findOneBy([
                     'user' => $user,
                     'systemEntity' => $systemEntity
                 ]);
-            
+
             if ($canRead || $canWrite) {
                 if (!$permission) {
                     $permission = new UserSystemEntityPermission();
                     $permission->setUser($user);
                     $permission->setSystemEntity($systemEntity);
                 }
-                
+
                 $permission->setCanRead($canRead);
                 $permission->setCanWrite($canWrite);
-                
+
                 $this->entityManager->persist($permission);
             } elseif ($permission) {
                 // Remove permission if both read and write are false
                 $this->entityManager->remove($permission);
             }
         }
-        
+
         $this->entityManager->flush();
     }
 

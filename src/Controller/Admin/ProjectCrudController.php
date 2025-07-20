@@ -38,11 +38,6 @@ class ProjectCrudController extends AbstractCrudController
         return Project::class;
     }
 
-    protected function getSystemEntityCode(): string
-    {
-        return 'Project';
-    }
-
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
@@ -95,24 +90,24 @@ class ProjectCrudController extends AbstractCrudController
         return [
             // Active field first, enabled for all views
             ...$this->getActiveField(),
-            
+
             // Standard fields
             $this->fieldService->createIdField(),
-            
+
             $this->fieldService->field('name')
                 ->type('text')
                 ->label('Name')
                 ->help('The name of the project')
                 ->linkToShow() // Add link to show action
                 ->build(),
-                
+
             $this->fieldService->field('description')
                 ->type('textarea')
                 ->label('Description')
                 ->help('Detailed description of the project')
                 ->pages(['detail', 'form'])
                 ->build(),
-                
+
             $this->fieldService->field('status')
                 ->type('choice')
                 ->label('Status')
@@ -128,7 +123,7 @@ class ProjectCrudController extends AbstractCrudController
                 ->formatValue(function ($value, $entity) {
                     $statusNames = [
                         0 => $this->translator->trans('Planning'),
-                        1 => $this->translator->trans('In Progress'), 
+                        1 => $this->translator->trans('In Progress'),
                         2 => $this->translator->trans('On Hold'),
                         3 => $this->translator->trans('Completed'),
                         4 => $this->translator->trans('Cancelled')
@@ -136,7 +131,7 @@ class ProjectCrudController extends AbstractCrudController
                     return $statusNames[$value] ?? $this->translator->trans('Unknown');
                 })
                 ->build(),
-                
+
             $this->fieldService->field('assignee')
                 ->type('association')
                 ->label('Assignee')
@@ -148,7 +143,7 @@ class ProjectCrudController extends AbstractCrudController
                     return $value->getEmail();
                 })
                 ->build(),
-                
+
             $this->fieldService->field('client')
                 ->type('association')
                 ->label('Client')
@@ -160,14 +155,14 @@ class ProjectCrudController extends AbstractCrudController
                     return $value->getName();
                 })
                 ->build(),
-                
+
             $this->fieldService->field('startedAt')
                 ->type('date')
                 ->label('Start Date')
                 ->help('Project start date')
                 ->pages(['detail', 'form'])
                 ->build(),
-                
+
             $this->fieldService->field('endedAt')
                 ->type('date')
                 ->label('End Date')
@@ -185,15 +180,15 @@ class ProjectCrudController extends AbstractCrudController
     protected function canCreateEntity(): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && 
-               (in_array('ROLE_ADMIN', $user->getRoles()) || 
+        return $user instanceof \App\Entity\User &&
+               (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 in_array('ROLE_USER', $user->getRoles()));
     }
 
     protected function canEditEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && 
+        return $user instanceof \App\Entity\User &&
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()));
     }
@@ -207,7 +202,7 @@ class ProjectCrudController extends AbstractCrudController
     protected function canViewEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && 
+        return $user instanceof \App\Entity\User &&
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()) ||
                 in_array('ROLE_USER', $user->getRoles()));

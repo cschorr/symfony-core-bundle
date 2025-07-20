@@ -58,11 +58,6 @@ class CompanyCrudController extends AbstractCrudController
         return Company::class;
     }
 
-    protected function getSystemEntityCode(): string
-    {
-        return 'Company';
-    }
-
     protected function hasPermissionManagement(): bool
     {
         return false;
@@ -96,7 +91,7 @@ class CompanyCrudController extends AbstractCrudController
     {
         return parent::delete($context);
     }
-    
+
     /**
      * Check if a company can be deleted (no related records)
      */
@@ -105,17 +100,17 @@ class CompanyCrudController extends AbstractCrudController
         if (!$entity instanceof Company) {
             return true;
         }
-        
+
         // Check if company has employees
         if ($entity->getEmployees()->count() > 0) {
             return false;
         }
-        
+
         // Check if company has projects
         if ($entity->getProjects()->count() > 0) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -133,7 +128,7 @@ class CompanyCrudController extends AbstractCrudController
     private function getFieldConfigurations(): array
     {
         $fields = [];
-        
+
         // Fields for index page only (no tabs on index)
         $fields = array_merge($fields, $this->getIndexPageFields());
 
@@ -155,7 +150,7 @@ class CompanyCrudController extends AbstractCrudController
                 ->label('Active')
                 ->pages(['index'])
                 ->build(),
-                
+
             // Company name with link to detail for index page
             $this->fieldService->field('name')
                 ->type('text')
@@ -164,10 +159,10 @@ class CompanyCrudController extends AbstractCrudController
                 ->linkToShow() // This will auto-detect the CompanyCrudController
                 ->pages(['index'])
                 ->build(),
-                
+
             // Additional fields for index view
             $this->fieldService->createFieldConfig('companyGroup', 'association', ['index'], 'Company Group'),
-            
+
             // Contact information for index view
             $this->fieldService->createFieldConfig('url', 'url', ['index'], 'Website'),
             $this->fieldService->createCountryFieldConfig('countryCode', ['index'], 'Country'),
@@ -180,37 +175,37 @@ class CompanyCrudController extends AbstractCrudController
     private function getTabOrganizedFields(): array
     {
         $fields = [];
-        
+
         // Company Information Tab
         $fields[] = $this->fieldService->createTabConfig('company_info_tab', 'Company Information');
-        
+
         // Active field for detail and form pages
         $fields[] = $this->fieldService->field('active')
             ->type('boolean')
             ->label('Active')
             ->pages(['detail', 'form'])
             ->build();
-            
+
         $fields[] = $this->fieldService->field('id')
             ->type('id')
             ->label('ID')
             ->pages(['detail']) // ID only on detail page, not form
             ->build();
-            
+
         $fields[] = $this->fieldService->field('name')
             ->type('text')
             ->label('Name')
             ->required(true)
             ->pages(['detail', 'form']) // Show on detail and form pages inside tab
             ->build();
-            
+
         $fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
         $fields[] = $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group');
-        
+
         // Contact Information Tab
         $fields[] = $this->fieldService->createTabConfig('contact_tab', 'Contact Information');
         $fields = array_merge($fields, $this->getContactFieldsForTabs());
-        
+
         // Users Tab
         $fields[] = $this->fieldService->createTabConfig('users_tab', 'Users');
         $fields[] = $this->fieldService->field('employees')
@@ -218,13 +213,13 @@ class CompanyCrudController extends AbstractCrudController
             ->label('Users/Employees')
             ->pages(['detail'])
             ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
-                'email' => 'Email', 
+                'email' => 'Email',
                 'active' => 'Active',
                 'createdAt' => 'Created'
             ], 'Users', 'No users assigned'))
             ->renderAsHtml(true)
             ->build();
-            
+
         // For form page, show regular association field for users
         $fields[] = $this->fieldService->field('employees')
             ->type('association')
@@ -247,7 +242,7 @@ class CompanyCrudController extends AbstractCrudController
             ], 'Projects', 'No projects assigned'))
             ->renderAsHtml(true)
             ->build();
-            
+
         // For form page, show regular association field for projects
         $fields[] = $this->fieldService->field('projects')
             ->type('association')
@@ -271,7 +266,7 @@ class CompanyCrudController extends AbstractCrudController
             $this->fieldService->createFieldConfig('phone', 'telephone', ['detail', 'form'], 'Phone Number'),
             $this->fieldService->createFieldConfig('cell', 'telephone', ['detail', 'form'], 'Mobile/Cell Phone'),
             $this->fieldService->createFieldConfig('url', 'url', ['detail', 'form'], 'Website'),
-            
+
             // Address fields
             $this->fieldService->createFieldConfig('street', 'text', ['detail', 'form'], 'Street Address'),
             $this->fieldService->createFieldConfig('zip', 'text', ['detail', 'form'], 'ZIP/Postal Code'),

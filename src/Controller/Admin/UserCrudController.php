@@ -47,11 +47,6 @@ class UserCrudController extends AbstractCrudController
         return User::class;
     }
 
-    protected function getSystemEntityCode(): string
-    {
-        return 'User';
-    }
-
     protected function hasPermissionManagement(): bool
     {
         return true;
@@ -84,7 +79,7 @@ class UserCrudController extends AbstractCrudController
     {
         // Get the current user entity
         $user = $context->getEntity()->getInstance();
-        
+
         // Refresh the entity from the database with all associations properly loaded
         if ($user->getId()) {
             $freshUser = $this->entityManager->getRepository(User::class)
@@ -97,12 +92,12 @@ class UserCrudController extends AbstractCrudController
                 ->setParameter('id', $user->getId())
                 ->getQuery()
                 ->getOneOrNullResult();
-            
+
             if ($freshUser) {
                 $context->getEntity()->setInstance($freshUser);
             }
         }
-        
+
         return parent::edit($context);
     }
 
@@ -124,7 +119,7 @@ class UserCrudController extends AbstractCrudController
             $this->getFieldConfigurations(),
             $pageName
         );
-        
+
         // Add permission fields for edit/new pages with proper tabbed structure
         if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
             // Get the current entity from context if available
@@ -136,14 +131,14 @@ class UserCrudController extends AbstractCrudController
                     $entity = $entityInstance;
                 }
             }
-            
+
             // Add permission tabs with entity data
             $fields = $this->permissionService->addPermissionTabToFields($fields, $entity);
         } elseif ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
             // Add permission summary field for index and detail pages
             $fields = $this->addPermissionSummaryField($fields);
         }
-        
+
         return $fields;
     }
 
@@ -153,7 +148,7 @@ class UserCrudController extends AbstractCrudController
     private function getFieldConfigurations(): array
     {
         $fields = [];
-        
+
         // Fields for index page only (no tabs on index)
         $fields = array_merge($fields, $this->getIndexPageFields());
 
@@ -175,7 +170,7 @@ class UserCrudController extends AbstractCrudController
                 ->label('Active')
                 ->pages(['index'])
                 ->build(),
-                
+
             // Email field with link to detail for index page
             $this->fieldService->field('email')
                 ->type('text')
@@ -186,13 +181,13 @@ class UserCrudController extends AbstractCrudController
                         ->setAction(Action::DETAIL)
                         ->setEntityId($entity->getId())
                         ->generateUrl();
-                    
+
                     return sprintf('<a href="%s" class="text-decoration-none">%s</a>', $showUrl, $value);
                 })
                 ->renderAsHtml()
                 ->pages(['index'])
                 ->build(),
-                    
+
             $this->fieldService->field('roles')
                 ->type('choice')
                 ->label('Roles')
@@ -203,7 +198,7 @@ class UserCrudController extends AbstractCrudController
                 ->multiple(true)
                 ->pages(['index'])
                 ->build(),
-                    
+
             $this->fieldService->field('company')
                 ->type('association')
                 ->label('Company')
@@ -218,27 +213,27 @@ class UserCrudController extends AbstractCrudController
     private function getTabOrganizedFields(): array
     {
         $fields = [];
-        
+
         // User Information Tab
         $fields[] = $this->fieldService->createTabConfig('user_info_tab', 'User Information');
-        
+
         // Active field for detail and form pages
         $fields[] = $this->fieldService->field('active')
             ->type('boolean')
             ->label('Active')
             ->pages(['detail', 'form'])
             ->build();
-            
+
         $fields[] = $this->fieldService->field('id')
             ->type('id')
             ->label('ID')
             ->pages(['detail']) // ID only on detail page, not form
             ->build();
-            
+
         // User basic fields
         $fields = array_merge($fields, $this->getUserFields(['detail', 'form']));
         $fields = array_merge($fields, $this->getNotesField(['detail', 'form']));
-        
+
         $fields[] = $this->fieldService->field('company')
             ->type('association')
             ->label('Company')
@@ -259,7 +254,7 @@ class UserCrudController extends AbstractCrudController
             ], 'Projects', 'No projects assigned'))
             ->renderAsHtml(true)
             ->build();
-            
+
         // For form page, show regular association field for projects
         $fields[] = $this->fieldService->field('projects')
             ->type('association')
