@@ -2,7 +2,10 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Module;
+use App\Entity\SystemEntity;
+use App\Entity\User;
+use App\Entity\UserSystemEntityPermission;
+use App\Repository\UserSystemEntityPermissionRepository;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
@@ -12,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ModuleCrudController extends AbstractCrudController
+class SystemEntityCrudController extends AbstractCrudController
 {
     use FieldConfigurationTrait;
 
@@ -30,63 +34,105 @@ class ModuleCrudController extends AbstractCrudController
         DuplicateService $duplicateService,
         RequestStack $requestStack,
         private EasyAdminFieldService $fieldService,
-        private RelationshipSyncService $relationshipSyncService
+        private RelationshipSyncService $relationshipSyncService,
+        private UserSystemEntityPermissionRepository $userSystemEntityPermissionRepository
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
 
     public static function getEntityFqcn(): string
     {
-        return Module::class;
+        return SystemEntity::class;
     }
 
-    protected function getModuleCode(): string
+    protected function getSystemEntityCode(): string
     {
-        return 'Module';
+        return 'SystemEntity';
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->setPageTitle('index', $this->translator->trans('System Modules'))
-            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('Module'), $entity->getName()))
-            ->setPageTitle('new', $this->translator->trans('Create System Module'))
-            ->setHelp('index', $this->translator->trans('Manage system modules and their permissions.'));
+            ->setPageTitle('index', $this->translator->trans('System Entities'))
+            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('SystemEntity'), $entity->getName()))
+            ->setPageTitle('new', $this->translator->trans('Create System Entity'))
+            ->setHelp('index', $this->translator->trans('Manage system entities and their permissions.'));
     }
 
-    #[IsGranted('read', subject: 'Module')]
-    public function index(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[IsGranted('read', subject: 'SystemEntity')]
+    public function index(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $SystemEntity = 'SystemEntity'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::index($context);
     }
 
-    #[IsGranted('read', subject: 'Module')]
-    public function detail(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[IsGranted('read', subject: 'SystemEntity')]
+    public function detail(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $SystemEntity = 'SystemEntity'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
-    #[IsGranted('write', subject: 'Module')]
-    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[IsGranted('write', subject: 'SystemEntity')]
+    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $SystemEntity = 'SystemEntity'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::edit($context);
     }
 
-    #[IsGranted('write', subject: 'Module')]
-    public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Module = 'Module'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[IsGranted('write', subject: 'SystemEntity')]
+    public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $SystemEntity = 'SystemEntity'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::delete($context);
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return parent::configureActions($actions);
+    }
+
+    /**
+     * Get field configuration for SystemEntity entity
+     */
     public function configureFields(string $pageName): iterable
     {
         // Get base configuration from our new system
         $config = $this->getFieldConfiguration($pageName);
-        return $this->fieldService->generateFields($config, $pageName);
+        $fields = $this->fieldService->generateFields($config, $pageName);
+        
+        // Add permission tab for form pages
+        if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
+            // Get the current entity from context if available
+            $entity = null;
+            $context = $this->getContext();
+            if ($context && $context->getEntity()) {
+                $entityInstance = $context->getEntity()->getInstance();
+                if ($entityInstance instanceof SystemEntity) {
+                    $entity = $entityInstance;
+                }
+            }
+            
+            // First, we need to wrap the basic fields in a tab
+            $fieldsWithTabs = [];
+            
+            // Add basic information tab
+            $fieldsWithTabs[] = FormField::addTab($this->translator->trans('System Entity Information'))
+                ->setHelp($this->translator->trans('Basic information about the system entity'))
+                ->collapsible();
+            
+            // Add all the basic fields
+            foreach ($fields as $field) {
+                $fieldsWithTabs[] = $field;
+            }
+            
+            // Then add permission tabs with entity data
+            $fieldsWithTabs = $this->permissionService->addSystemEntityPermissionTabToFieldsWithEntity($fieldsWithTabs, $entity);
+            
+            return $fieldsWithTabs;
+        }
+
+        return $fields;
     }
 
     /**
-     * Get field configuration for Module entity
+     * Get field configuration for SystemEntity entity
      */
     private function getFieldConfiguration(string $pageName): array
     {
@@ -102,10 +148,10 @@ class ModuleCrudController extends AbstractCrudController
                 $this->fieldService->field('name')
                     ->type('text')
                     ->label('Name')
-                    ->linkToShow() // This will auto-detect the ModuleCrudController
+                    ->linkToShow() // This will auto-detect the SystemEntityCrudController
                     ->build(),
                     
-                ...$this->getModulePermissionsSummaryField(),
+                ...$this->getSystemEntityPermissionsSummaryField(),
             ]);
             
         } elseif ($pageName === Crud::PAGE_DETAIL) {
@@ -130,8 +176,8 @@ class ModuleCrudController extends AbstractCrudController
                     ->label('Description')
                     ->build(),
                     
-                ...$this->getModulePermissionsSummaryField(),
-                ...$this->getModulePermissionsDetailField(),
+                ...$this->getSystemEntityPermissionsSummaryField(),
+                ...$this->getSystemEntityPermissionsDetailField(),
             ]);
             
         } else { // FORM pages (NEW/EDIT)
@@ -139,14 +185,14 @@ class ModuleCrudController extends AbstractCrudController
                 $this->fieldService->field('name')
                     ->type('text')
                     ->label('Name')
-                    ->help('Display name for the module')
+                    ->help('Display name for the system entity')
                     ->build(),
                     
                 $this->fieldService->field('code')
                     ->type('text')
                     ->label('Code')
-                    ->help('Unique code that matches the entity name (e.g., User, Company, Module)')
-                    ->formTypeOption('attr', ['placeholder' => 'e.g., User, Company, Module'])
+                    ->help('Unique code that matches the entity name (e.g., User, Company, SystemEntity)')
+                    ->formTypeOption('attr', ['placeholder' => 'e.g., User, Company, SystemEntity'])
                     ->build(),
                     
                 $this->fieldService->field('icon')
@@ -159,7 +205,7 @@ class ModuleCrudController extends AbstractCrudController
                 $this->fieldService->field('text')
                     ->type('textarea')
                     ->label('Description')
-                    ->help('Optional description of what this module manages')
+                    ->help('Optional description of what this system entity manages')
                     ->build(),
             ]);
         }
@@ -168,9 +214,9 @@ class ModuleCrudController extends AbstractCrudController
     }
 
     /**
-     * Get module permissions summary field configuration
+     * Get system entity permissions summary field configuration
      */
-    private function getModulePermissionsSummaryField(): array
+    private function getSystemEntityPermissionsSummaryField(): array
     {
         return [
             $this->fieldService->field('userPermissions')
@@ -190,9 +236,9 @@ class ModuleCrudController extends AbstractCrudController
     }
 
     /**
-     * Get module permissions detail field configuration
+     * Get system entity permissions detail field configuration
      */
-    private function getModulePermissionsDetailField(): array
+    private function getSystemEntityPermissionsDetailField(): array
     {
         return [
             $this->fieldService->field('userPermissions')
@@ -224,21 +270,76 @@ class ModuleCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to use the new relationship sync service
+     * Override to use the new relationship sync service and handle permissions
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
+        $this->processSystemEntityPermissions($entityInstance);
         $this->relationshipSyncService->autoSync($entityInstance);
         parent::persistEntity($entityManager, $entityInstance);
     }
 
     /**
-     * Override to use the new relationship sync service
+     * Override to use the new relationship sync service and handle permissions
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
+        $this->processSystemEntityPermissions($entityInstance);
         $this->relationshipSyncService->autoSync($entityInstance);
         parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    /**
+     * Process system entity permission checkboxes from form
+     */
+    private function processSystemEntityPermissions($systemEntity): void
+    {
+        if (!$systemEntity instanceof SystemEntity) {
+            return;
+        }
+
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            return;
+        }
+
+        $formData = $request->request->all();
+        
+        // Get all users to process their permissions
+        $users = $this->entityManager->getRepository(User::class)->findAll();
+        
+        foreach ($users as $user) {
+            $readFieldName = 'userPermission_read_' . $user->getId();
+            $writeFieldName = 'userPermission_write_' . $user->getId();
+            
+            $canRead = isset($formData[$readFieldName]) && $formData[$readFieldName] === '1';
+            $canWrite = isset($formData[$writeFieldName]) && $formData[$writeFieldName] === '1';
+            
+            // Find or create permission entity
+            $permission = $this->userSystemEntityPermissionRepository
+                ->findOneBy([
+                    'user' => $user,
+                    'systemEntity' => $systemEntity
+                ]);
+            
+            if ($canRead || $canWrite) {
+                if (!$permission) {
+                    $permission = new UserSystemEntityPermission();
+                    $permission->setUser($user);
+                    $permission->setSystemEntity($systemEntity);
+                }
+                
+                $permission->setCanRead($canRead);
+                $permission->setCanWrite($canWrite);
+                
+                $this->entityManager->persist($permission);
+            } elseif ($permission) {
+                // Remove permission if both read and write are false
+                $this->entityManager->remove($permission);
+            }
+        }
+        
+        $this->entityManager->flush();
     }
 
     protected function canCreateEntity(): bool

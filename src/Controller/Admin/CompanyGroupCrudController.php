@@ -36,7 +36,7 @@ class CompanyGroupCrudController extends AbstractCrudController
         return CompanyGroup::class;
     }
 
-    protected function getModuleCode(): string
+    protected function getSystemEntityCode(): string
     {
         return 'CompanyGroup';
     }
@@ -91,12 +91,12 @@ class CompanyGroupCrudController extends AbstractCrudController
             $this->fieldService->createIdField(),
             $this->fieldService->field('name')
                 ->type('text')
-                ->label('Company Group Name')
+                ->label($this->translator->trans('Company Group Name'))
                 ->build(),
                 
             $this->fieldService->field('code')
                 ->type('text')
-                ->label('Code')
+                ->label($this->translator->trans('Code'))
                 ->required(false)
                 ->build(),
         ];

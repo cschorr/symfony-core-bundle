@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Module;
+use App\Entity\SystemEntity;
 use App\Entity\User;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
@@ -44,25 +44,42 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Get the module code that corresponds to the entity name
+     * Get the system entity code that corresponds to the entity name
      */
-    abstract protected function getModuleCode(): string;
-    
+    abstract protected function getSystemEntityCode(): string;
+
     /**
-     * Get the module name associated with this CRUD controller
-     * Automatically translates the module code
+     * Get the translated system entity name for display (singular)
      */
-    protected function getModuleName(): string
+    protected function getSystemEntityName(): string
     {
-        return $this->translator->trans($this->getModuleCode());
+        return $this->translator->trans($this->getSystemEntityCode());
     }
 
     /**
-     * Get the module entity for permission checking
+     * Get the translated system entity name for display (plural)
      */
-    protected function getModule(): Module
+    protected function getSystemEntityNamePlural(): string
     {
-        return $this->permissionService->getModuleByCode($this->getModuleCode());
+        // Map entity codes to their proper plural translation keys
+        $pluralMap = [
+            'User' => 'Users',
+            'Company' => 'Companies', 
+            'SystemEntity' => 'System Entities',
+            'CompanyGroup' => 'CompanyGroups',
+            'Project' => 'Projects'
+        ];
+        
+        $entityCode = $this->getSystemEntityCode();
+        $pluralKey = $pluralMap[$entityCode] ?? $entityCode . 's';
+        
+        return $this->translator->trans($pluralKey);
+    }    /**
+     * Get the system entity for permission checking
+     */
+    protected function getSystemEntity(): SystemEntity
+    {
+        return $this->permissionService->getSystemEntityByCode($this->getSystemEntityCode());
     }
 
     /**
@@ -71,10 +88,10 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPageTitle('index', sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Management')))
-            ->setPageTitle('detail', fn ($entity) => sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Show')))
-            ->setPageTitle('new', sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Create')))
-            ->setPageTitle('edit', fn ($entity) => sprintf('%s %s', $this->translator->trans($this->getModuleName()), $this->translator->trans('Edit')))
+            ->setPageTitle('index', $this->getSystemEntityNamePlural())
+            ->setPageTitle('detail', fn ($entity) => sprintf('%s %s', $this->getSystemEntityName(), $this->translator->trans('Show')))
+            ->setPageTitle('new', sprintf('%s %s', $this->getSystemEntityName(), $this->translator->trans('Create')))
+            ->setPageTitle('edit', fn ($entity) => sprintf('%s %s', $this->getSystemEntityName(), $this->translator->trans('Edit')))
             ->setDefaultSort(['id' => 'DESC'])
             ->setPaginatorPageSize(25)
             ->showEntityActionsInlined(false); // Show actions as dropdown menu
@@ -119,13 +136,13 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->setPermission('duplicate', 'ROLE_USER');
         
         // Check permissions and disable actions accordingly
-        if (!$this->isGranted('read', $this->getModule())) {
+        if (!$this->isGranted('read', $this->getSystemEntity())) {
             $actions
                 ->disable(Action::INDEX)
                 ->disable(Action::DETAIL);
         }
 
-        if (!$this->isGranted('write', $this->getModule())) {
+        if (!$this->isGranted('write', $this->getSystemEntity())) {
             $actions
                 ->disable(Action::NEW)
                 ->disable(Action::EDIT)
@@ -158,8 +175,8 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             return (string) $entity;
         }
         
-        // Otherwise, translate the module name
-        return $this->translator->trans($this->getModuleName());
+        // Otherwise, translate the system entity name
+        return $this->translator->trans($this->getSystemEntityName());
     }
 
     /**
@@ -171,15 +188,25 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Create module permission fields for entities that support permission management
+     * Create system entity permission fields for entities that support permission management
      */
-    protected function createModulePermissionFields(): array
+    protected function createSystemEntityPermissionFields(): array
     {
         if (!$this->hasPermissionManagement()) {
             return [];
         }
 
-        return $this->permissionService->createModulePermissionFields($this->getContext());
+        // Get the current entity from context if available
+        $entity = null;
+        $context = $this->getContext();
+        if ($context && $context->getEntity()) {
+            $entityInstance = $context->getEntity()->getInstance();
+            if ($entityInstance instanceof User) {
+                $entity = $entityInstance;
+            }
+        }
+
+        return $this->permissionService->createSystemEntityPermissionFields($entity);
     }
 
     /**
@@ -191,7 +218,17 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             return $fields;
         }
 
-        return $this->permissionService->addPermissionTabToFields($fields, $this->getContext());
+        // Get the current entity from context if available
+        $entity = null;
+        $context = $this->getContext();
+        if ($context && $context->getEntity()) {
+            $entityInstance = $context->getEntity()->getInstance();
+            if ($entityInstance instanceof User) {
+                $entity = $entityInstance;
+            }
+        }
+
+        return $this->permissionService->addPermissionTabToFields($fields, $entity);
     }
 
     /**
@@ -211,16 +248,14 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if (!$this->hasPermissionManagement()) {
-            parent::persistEntity($entityManager, $entityInstance);
-            return;
+        parent::persistEntity($entityManager, $entityInstance);
+        
+        // Handle permissions if this is a User entity
+        if ($entityInstance instanceof User && $this->hasPermissionManagement()) {
+            $request = $this->getContext()->getRequest();
+            $formData = $request->request->all();
+            $this->permissionService->handleSystemEntityPermissions($entityInstance, $formData);
         }
-
-        $this->permissionService->persistEntityWithPermissions(
-            fn($entity) => parent::persistEntity($entityManager, $entity),
-            $entityInstance,
-            $this->getContext()
-        );
     }
 
     /**
@@ -228,16 +263,14 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if (!$this->hasPermissionManagement()) {
-            parent::updateEntity($entityManager, $entityInstance);
-            return;
+        parent::updateEntity($entityManager, $entityInstance);
+        
+        // Handle permissions if this is a User entity
+        if ($entityInstance instanceof User && $this->hasPermissionManagement()) {
+            $request = $this->getContext()->getRequest();
+            $formData = $request->request->all();
+            $this->permissionService->handleSystemEntityPermissions($entityInstance, $formData);
         }
-
-        $this->permissionService->updateEntityWithPermissions(
-            fn($entity) => parent::updateEntity($entityManager, $entity),
-            $entityInstance,
-            $this->getContext()
-        );
     }
 
     /**
@@ -246,7 +279,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     public function duplicateAction(AdminContext $context): Response
     {
         // Check permissions manually
-        if (!$this->isGranted('write', $this->getModule())) {
+        if (!$this->isGranted('write', $this->getSystemEntity())) {
             throw $this->createAccessDeniedException();
         }
         

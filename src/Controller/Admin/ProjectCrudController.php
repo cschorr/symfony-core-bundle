@@ -38,7 +38,7 @@ class ProjectCrudController extends AbstractCrudController
         return Project::class;
     }
 
-    protected function getModuleCode(): string
+    protected function getSystemEntityCode(): string
     {
         return 'Project';
     }

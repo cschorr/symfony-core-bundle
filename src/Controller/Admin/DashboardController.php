@@ -98,29 +98,29 @@ class DashboardController extends AbstractDashboardController
             return;
         }
 
-        // Get accessible modules for the current user
-        // Admin users see all active modules, regular users see only modules they have permissions for
+        // Get accessible system entities for the current user
+        // Admin users see all active system entities, regular users see only system entities they have permissions for
         if ($this->navigationService->isUserAdmin($user)) {
-            $accessibleModules = $this->navigationService->getAllActiveModules();
+            $accessibleSystemEntities = $this->navigationService->getAllActiveSystemEntities();
         } else {
-            $accessibleModules = $this->navigationService->getAccessibleModulesForUser($user);
+            $accessibleSystemEntities = $this->navigationService->getAccessibleSystemEntitiesForUser($user);
         }
 
-        // Generate menu items dynamically based on user permissions and active modules
-        $entityMapping = $this->navigationService->getModuleEntityMapping();
+        // Generate menu items dynamically based on user permissions and active system entities
+        $entityMapping = $this->navigationService->getSystemEntityEntityMapping();
         
-        foreach ($accessibleModules as $module) {
-            $moduleCode = $module->getCode();
+        foreach ($accessibleSystemEntities as $systemEntity) {
+            $systemEntityCode = $systemEntity->getCode();
             
-            // Check if we have an entity mapping for this module
-            if (isset($entityMapping[$moduleCode])) {
-                $entityClass = $entityMapping[$moduleCode];
-                $icon = $this->navigationService->getModuleIcon($module);
+            // Check if we have an entity mapping for this system entity
+            if (isset($entityMapping[$systemEntityCode])) {
+                $entityClass = $entityMapping[$systemEntityCode];
+                $icon = $this->navigationService->getSystemEntityIcon($systemEntity);
                 
-                // Use the module name (plural form) for navigation labels
-                // This corresponds to the "name" field in the Module entity (e.g., "Users", "Companies")
-                $moduleNamePlural = $module->getName();
-                $label = $this->translator->trans($moduleNamePlural);
+                // Use the system entity name (plural form) for navigation labels
+                // This corresponds to the "name" field in the SystemEntity entity (e.g., "Users", "Companies")
+                $systemEntityNamePlural = $systemEntity->getName();
+                $label = $this->translator->trans($systemEntityNamePlural);
                 
                 yield MenuItem::linkToCrud($label, $icon, $entityClass);
             }

@@ -53,7 +53,7 @@ class CompanyCrudController extends AbstractCrudController
         return Company::class;
     }
 
-    protected function getModuleCode(): string
+    protected function getSystemEntityCode(): string
     {
         return 'Company';
     }

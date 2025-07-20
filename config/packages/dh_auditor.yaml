@@ -15,6 +15,6 @@ dh_auditor:
             entities:
                 App\Entity\Company: ~
                 App\Entity\CompanyGroup: ~
-                App\Entity\Module: ~
+                App\Entity\SystemEntity: ~
                 App\Entity\Project: ~
                 App\Entity\User: ~

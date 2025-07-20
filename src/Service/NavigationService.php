@@ -2,53 +2,53 @@
 
 namespace App\Service;
 
-use App\Entity\Module;
+use App\Entity\SystemEntity;
 use App\Entity\User;
-use App\Repository\ModuleRepository;
+use App\Repository\SystemEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class NavigationService
 {
     public function __construct(
-        private ModuleRepository $moduleRepository,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private SystemEntityRepository $systemEntityRepository,
     ) {
     }
 
     /**
-     * Get all active modules that the user can access (has read or write permissions)
-     * @return Module[]
+     * Get all active system entities that the user can access (has read or write permissions)
+     * @return SystemEntity[]
      */
-    public function getAccessibleModulesForUser(User $user): array
+    public function getAccessibleSystemEntitiesForUser(User $user): array
     {
-        return $this->moduleRepository->findActiveModulesForUser($user);
+        return $this->systemEntityRepository->findActiveSystemEntitiesForUser($user);
     }
 
     /**
-     * Check if user can access a specific module (module is active and user has permissions)
+     * Check if user can access a specific system entity (system entity is active and user has permissions)
      */
-    public function canUserAccessModule(User $user, string $moduleCode): bool
+    public function canUserAccessSystemEntity(User $user, string $systemEntityCode): bool
     {
-        $module = $this->entityManager->getRepository(Module::class)
-            ->findOneBy(['code' => $moduleCode, 'active' => true]);
-
-        if (!$module) {
+        $systemEntity = $this->systemEntityRepository->findOneBy(['code' => $systemEntityCode, 'active' => true]);
+        
+        if (!$systemEntity) {
             return false;
         }
 
-        // Check if user has any permission for this module
-        foreach ($user->getModulePermissions() as $permission) {
-            if ($permission->getModule() === $module && 
-                ($permission->canRead() || $permission->canWrite())) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->systemEntityRepository->userHasSystemEntityPermission($user, $systemEntity);
     }
 
     /**
-     * Check if user is admin (has ROLE_ADMIN)
+     * Get all active system entities (admin view)
+     * @return SystemEntity[]
+     */
+    public function getAllActiveSystemEntities(): array
+    {
+        return $this->systemEntityRepository->findBy(['active' => true], ['name' => 'ASC']);
+    }
+
+    /**
+     * Check if user has admin role
      */
     public function isUserAdmin(User $user): bool
     {
@@ -56,37 +56,38 @@ class NavigationService
     }
 
     /**
-     * Get all active modules for admin users
-     * @return Module[]
+     * Get system entity by code for icon display
      */
-    public function getAllActiveModules(): array
+    public function getSystemEntityIcon(SystemEntity $systemEntity): string
     {
-        return $this->entityManager->getRepository(Module::class)
-            ->findBy(['active' => true], ['id' => 'ASC']);
+        return $systemEntity->getIcon() ?? $this->getSystemEntityIconMapping()[$systemEntity->getCode()] ?? 'fas fa-circle';
     }
 
     /**
-     * Get module entity mapping for navigation
-     * This maps module codes to their corresponding entity classes
+     * Get system entity-to-entity class mapping
      */
-    public function getModuleEntityMapping(): array
+    public function getSystemEntityEntityMapping(): array
     {
         return [
-            'Module' => \App\Entity\Module::class,
+            'SystemEntity' => \App\Entity\SystemEntity::class,
             'User' => \App\Entity\User::class,
             'Company' => \App\Entity\Company::class,
             'CompanyGroup' => \App\Entity\CompanyGroup::class,
             'Project' => \App\Entity\Project::class,
-            // Add more mappings as needed
         ];
     }
 
     /**
-     * Get icon for a module from the database
+     * Get system entity icon mapping for fallback
      */
-    public function getModuleIcon(Module $module): string
+    public function getSystemEntityIconMapping(): array
     {
-        // Return the icon from the database, or a default icon if not set
-        return $module->getIcon() ?? 'fas fa-list';
+        return [
+            'SystemEntity' => 'fas fa-list',
+            'User' => 'fas fa-users',
+            'Company' => 'fas fa-building',
+            'CompanyGroup' => 'fas fa-layer-group',
+            'Project' => 'fas fa-project-diagram',
+        ];
     }
 }
