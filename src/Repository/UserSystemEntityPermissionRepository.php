@@ -135,16 +135,8 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
      */
     public function userHasReadAccess(User $user, SystemEntity $systemEntity): bool
     {
-        return (bool) $this->createQueryBuilder('usep')
-            ->select('1')
-            ->andWhere('usep.user = :user')
-            ->andWhere('usep.systemEntity = :systemEntity')
-            ->andWhere('usep.canRead = :canRead')
-            ->setParameter('user', $user)
-            ->setParameter('systemEntity', $systemEntity)
-            ->setParameter('canRead', true)
-            ->getQuery()
-            ->getOneOrNullResult();
+        $permission = $this->findByUserAndSystemEntity($user, $systemEntity);
+        return $permission && $permission->canRead();
     }
 
     /**
@@ -152,16 +144,8 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
      */
     public function userHasWriteAccess(User $user, SystemEntity $systemEntity): bool
     {
-        return (bool) $this->createQueryBuilder('usep')
-            ->select('1')
-            ->andWhere('usep.user = :user')
-            ->andWhere('usep.systemEntity = :systemEntity')
-            ->andWhere('usep.canWrite = :canWrite')
-            ->setParameter('user', $user)
-            ->setParameter('systemEntity', $systemEntity)
-            ->setParameter('canWrite', true)
-            ->getQuery()
-            ->getOneOrNullResult();
+        $permission = $this->findByUserAndSystemEntity($user, $systemEntity);
+        return $permission && $permission->canWrite();
     }
 
     /**

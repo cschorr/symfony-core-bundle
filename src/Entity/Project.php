@@ -106,4 +106,9 @@ class Project extends AbstractEntity
     {
         return $this->status === self::STATUS_ON_HOLD;
     }
+
+    public function __toString(): string
+    {
+        return $this->getName() ?? 'Unnamed Project';
+    }
 }
