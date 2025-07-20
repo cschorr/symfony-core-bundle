@@ -1,5 +1,15 @@
 {% extends '@!EasyAdmin/crud/index.html.twig' %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/easyadmin-theme.css') }}">
+{% endblock %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    <script src="{{ asset('admin.js') }}" defer></script>
+{% endblock %}
+
 {% block content_header_wrapper %}
     <div class="easyadmin-title-spacing"></div>
     <div class="easyadmin-container">

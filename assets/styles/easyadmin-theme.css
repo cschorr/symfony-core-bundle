@@ -67,6 +67,25 @@ body[class*="ea-dashboard"] .easyadmin-container h1 {
     padding-bottom: 0 !important;
 }
 
+/* Force dashboard header to match CRUD header styling exactly */
+.dashboard-page .ea-content-header-wrapper,
+.dashboard-page .content-header-wrapper,
+.dashboard-page .ea-content-header,
+.dashboard-page .content-header {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.dashboard-page .ea-content-header-wrapper .easyadmin-container,
+.dashboard-page .content-header-wrapper .easyadmin-container {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    margin-top: 20px !important;
+    margin-bottom: 0 !important;
+}
+
 /* Color tone variations for EasyAdmin pages */
 body.bg-tone-blue,
 body[class*="ea-"].bg-tone-blue {
