@@ -9,10 +9,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Traits\Set\SetCommunicationTrait;
+use ApiPlatform\Metadata\ApiResource;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ApiResource(
+    shortName: 'User',
+    description: 'Represents a user in the system, with roles and permissions.'
+)]
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use SetCommunicationTrait;
