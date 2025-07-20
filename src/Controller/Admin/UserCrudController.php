@@ -4,10 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Entity\Company;
+use App\Controller\Admin\ProjectCrudController;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
 use App\Service\RelationshipSyncService;
+use App\Service\EmbeddedTableService;
 use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -15,6 +17,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +36,8 @@ class UserCrudController extends AbstractCrudController
         RequestStack $requestStack,
         private EasyAdminFieldService $fieldService,
         private RelationshipSyncService $relationshipSyncService,
-        private AdminUrlGenerator $adminUrlGenerator
+        private AdminUrlGenerator $adminUrlGenerator,
+        private EmbeddedTableService $embeddedTableService
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -116,14 +120,13 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        // Get base configuration from our new system
-        $config = $this->getFieldConfiguration($pageName);
-        $fields = $this->fieldService->generateFields($config, $pageName);
+        $fields = $this->fieldService->generateFields(
+            $this->getFieldConfigurations(),
+            $pageName
+        );
         
-        // Add permission fields using the proper system
-        if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
-            $fields = $this->addPermissionSummaryField($fields);
-        } elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
+        // Add permission fields for edit/new pages with proper tabbed structure
+        if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
             // Get the current entity from context if available
             $entity = null;
             $context = $this->getContext();
@@ -134,112 +137,138 @@ class UserCrudController extends AbstractCrudController
                 }
             }
             
-            // First, we need to wrap the basic fields in a tab
-            $fieldsWithTabs = [];
-            
-            // Add basic information tab
-            $fieldsWithTabs[] = FormField::addTab($this->translator->trans('User Information'))
-                ->setHelp($this->translator->trans('Basic information about the user'))
-                ->collapsible();
-            
-            // Add all the basic fields
-            foreach ($fields as $field) {
-                $fieldsWithTabs[] = $field;
-            }
-            
-            // Then add permission tabs with entity data
-            $fieldsWithTabs = $this->permissionService->addPermissionTabToFields($fieldsWithTabs, $entity);
-            
-            return $fieldsWithTabs;
+            // Add permission tabs with entity data
+            $fields = $this->permissionService->addPermissionTabToFields($fields, $entity);
+        } elseif ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
+            // Add permission summary field for index and detail pages
+            $fields = $this->addPermissionSummaryField($fields);
         }
         
         return $fields;
     }
 
     /**
-     * Get field configuration for User entity
+     * Define all field configurations for the User entity using enhanced approach
      */
-    private function getFieldConfiguration(string $pageName): array
+    private function getFieldConfigurations(): array
     {
-        // Page-specific field configurations
-        if ($pageName === Crud::PAGE_INDEX) {
-            $config = [
-                ...$this->getActiveField(['index']), // Active field first for index
-                $this->fieldService->createIdField(),
-                $this->fieldService->field('email')
-                    ->type('text')
-                    ->label('Email')
-                    ->formatValue(function ($value, $entity) {
-                        // Create a link to the show action instead of mailto
-                        $showUrl = $this->adminUrlGenerator
-                            ->setController(self::class)
-                            ->setAction(Action::DETAIL)
-                            ->setEntityId($entity->getId())
-                            ->generateUrl();
-                        
-                        return sprintf('<a href="%s" class="text-decoration-none">%s</a>', $showUrl, $value);
-                    })
-                    ->renderAsHtml()
-                    ->build(),
-                    
-                $this->fieldService->field('roles')
-                    ->type('choice')
-                    ->label('Roles')
-                    ->choices([
-                        $this->translator->trans('User') => 'ROLE_USER',
-                        $this->translator->trans('Admin') => 'ROLE_ADMIN',
-                    ])
-                    ->multiple(true)
-                    ->build(),
-                    
-                $this->fieldService->field('company')
-                    ->type('association')
-                    ->label('Company')
-                    ->build(),
-            ];
-            
-        } elseif ($pageName === Crud::PAGE_DETAIL) {
-            $config = [
-                ...$this->getActiveField(['detail']), // Active field first for detail
-                $this->fieldService->createIdField(),
-                ...$this->getUserFields(['detail']),
-                ...$this->getNotesField(['detail']),
-                
-                $this->fieldService->field('company')
-                    ->type('association')
-                    ->label('Company')
-                    ->build(),
-                    
-                $this->fieldService->field('projects')
-                    ->type('association')
-                    ->label('Projects')
-                    ->build(),
-            ];
-            
-        } else { // FORM pages (NEW/EDIT) - Basic fields only, tabs handled in configureFields
-            $config = [
-                // Active field
-                ...$this->getActiveField(['form']),
-                $this->fieldService->createIdField(),
-                
-                ...$this->getUserFields(['form']),
-                ...$this->getNotesField(['form']),
-                
-                $this->fieldService->field('company')
-                    ->type('association')
-                    ->label('Company')
-                    ->autocomplete(true)
-                    ->build(),
-                    
-                $this->fieldService->field('projects')
-                    ->type('association')
-                    ->label('Projects')
-                    ->multiple(true)
-                    ->build(),
-            ];
-        }
+        $fields = [];
+        
+        // Fields for index page only (no tabs on index)
+        $fields = array_merge($fields, $this->getIndexPageFields());
 
-        return $config;
+        // For detail and form pages, organize everything into tabs
+        $fields = array_merge($fields, $this->getTabOrganizedFields());
+
+        return $fields;
+    }
+
+    /**
+     * Get fields specifically for index page (outside of any tabs)
+     */
+    private function getIndexPageFields(): array
+    {
+        return [
+            // Active field for index page only
+            $this->fieldService->field('active')
+                ->type('boolean')
+                ->label('Active')
+                ->pages(['index'])
+                ->build(),
+                
+            // Email field with link to detail for index page
+            $this->fieldService->field('email')
+                ->type('text')
+                ->label('Email')
+                ->formatValue(function ($value, $entity) {
+                    $showUrl = $this->adminUrlGenerator
+                        ->setController(self::class)
+                        ->setAction(Action::DETAIL)
+                        ->setEntityId($entity->getId())
+                        ->generateUrl();
+                    
+                    return sprintf('<a href="%s" class="text-decoration-none">%s</a>', $showUrl, $value);
+                })
+                ->renderAsHtml()
+                ->pages(['index'])
+                ->build(),
+                    
+            $this->fieldService->field('roles')
+                ->type('choice')
+                ->label('Roles')
+                ->choices([
+                    $this->translator->trans('User') => 'ROLE_USER',
+                    $this->translator->trans('Admin') => 'ROLE_ADMIN',
+                ])
+                ->multiple(true)
+                ->pages(['index'])
+                ->build(),
+                    
+            $this->fieldService->field('company')
+                ->type('association')
+                ->label('Company')
+                ->pages(['index'])
+                ->build(),
+        ];
+    }
+
+    /**
+     * Get all fields organized into tabs for detail and form pages
+     */
+    private function getTabOrganizedFields(): array
+    {
+        $fields = [];
+        
+        // User Information Tab
+        $fields[] = $this->fieldService->createTabConfig('user_info_tab', 'User Information');
+        
+        // Active field for detail and form pages
+        $fields[] = $this->fieldService->field('active')
+            ->type('boolean')
+            ->label('Active')
+            ->pages(['detail', 'form'])
+            ->build();
+            
+        $fields[] = $this->fieldService->field('id')
+            ->type('id')
+            ->label('ID')
+            ->pages(['detail']) // ID only on detail page, not form
+            ->build();
+            
+        // User basic fields
+        $fields = array_merge($fields, $this->getUserFields(['detail', 'form']));
+        $fields = array_merge($fields, $this->getNotesField(['detail', 'form']));
+        
+        $fields[] = $this->fieldService->field('company')
+            ->type('association')
+            ->label('Company')
+            ->pages(['detail', 'form'])
+            ->autocomplete(true)
+            ->build();
+
+        // Projects Tab
+        $fields[] = $this->fieldService->createTabConfig('projects_tab', 'Projects');
+        $fields[] = $this->fieldService->field('projects')
+            ->type('association')
+            ->label('Projects')
+            ->pages(['detail'])
+            ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
+                'name' => 'Project Name',
+                'status' => 'Status',
+                'createdAt' => 'Created'
+            ], 'Projects', 'No projects assigned'))
+            ->renderAsHtml(true)
+            ->build();
+            
+        // For form page, show regular association field for projects
+        $fields[] = $this->fieldService->field('projects')
+            ->type('association')
+            ->label('Projects')
+            ->multiple(true)
+            ->pages(['form'])
+            ->build();
+
+        return $fields;
     }
 
     /**

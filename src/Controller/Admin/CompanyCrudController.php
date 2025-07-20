@@ -4,10 +4,13 @@ namespace App\Controller\Admin;
 
 use App\Entity\Company;
 use App\Entity\User;
+use App\Controller\Admin\UserCrudController;
+use App\Controller\Admin\ProjectCrudController;
 use App\Service\EasyAdminFieldService;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\RelationshipSyncService;
+use App\Service\EmbeddedTableService;
 use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -43,7 +46,9 @@ class CompanyCrudController extends AbstractCrudController
         DuplicateService $duplicateService,
         RequestStack $requestStack,
         private EasyAdminFieldService $fieldService,
-        private RelationshipSyncService $relationshipSyncService
+        private RelationshipSyncService $relationshipSyncService,
+        private AdminUrlGenerator $adminUrlGenerator,
+        private EmbeddedTableService $embeddedTableService
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -129,67 +134,151 @@ class CompanyCrudController extends AbstractCrudController
     {
         $fields = [];
         
-        // Standard entity fields (ID, name with link, active)
-        $fields = array_merge($fields, [
-            ...$this->getActiveField(), // Active field first
-            $this->fieldService->createIdField(),
-            // Use name field with link to show action instead of regular name field
+        // Fields for index page only (no tabs on index)
+        $fields = array_merge($fields, $this->getIndexPageFields());
+
+        // For detail and form pages, organize everything into tabs
+        $fields = array_merge($fields, $this->getTabOrganizedFields());
+
+        return $fields;
+    }
+
+    /**
+     * Get fields specifically for index page (outside of any tabs)
+     */
+    private function getIndexPageFields(): array
+    {
+        return [
+            // Active field for index page only
+            $this->fieldService->field('active')
+                ->type('boolean')
+                ->label('Active')
+                ->pages(['index'])
+                ->build(),
+                
+            // Company name with link to detail for index page
             $this->fieldService->field('name')
                 ->type('text')
                 ->label('Company Name')
                 ->required(true)
                 ->linkToShow() // This will auto-detect the CompanyCrudController
+                ->pages(['index'])
                 ->build(),
-        ]);
-        
-        // Additional company-specific fields
-        $fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
-        $fields[] = $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group');
-
-        // Contact information (address + communication) - customized for index view
-        $fields = array_merge($fields, $this->getCustomContactFieldGroups());
-
-        // Employees using enhanced builder pattern
-        $fields[] = $this->fieldService->createPanelConfig('employees_panel', 'Employees', ['detail', 'form'], 'fas fa-users');
-        $fields[] = $this->getUserAssociationField('employees', 'Employees', ['index', 'detail', 'form'], true);
-
-        return $fields;
-    }
-
-    /**
-     * Get custom communication fields - excludes email from index view
-     */
-    private function getCustomCommunicationFields(): array
-    {
-        return [
-            $this->fieldService->createPanelConfig('communication_panel', 'Communication', ['detail', 'form'], 'fas fa-phone'),
-            $this->fieldService->createFieldConfig('email', 'email', ['detail', 'form'], 'Email Address'),
-            $this->fieldService->createFieldConfig('phone', 'telephone', ['detail', 'form'], 'Phone Number'),
-            $this->fieldService->createFieldConfig('cell', 'telephone', ['detail', 'form'], 'Mobile/Cell Phone'),
-            $this->fieldService->createFieldConfig('url', 'url', ['index', 'detail', 'form'], 'Website'), // Keep website in index
+                
+            // Additional fields for index view
+            $this->fieldService->createFieldConfig('nameExtension', 'text', ['index'], 'Name Extension'),
+            $this->fieldService->createFieldConfig('companyGroup', 'association', ['index'], 'Company Group'),
+            
+            // Contact information for index view
+            $this->fieldService->createFieldConfig('url', 'url', ['index'], 'Website'),
+            $this->fieldService->createCountryFieldConfig('countryCode', ['index'], 'Country'),
         ];
     }
 
     /**
-     * Get contact field groups customized for Company - excludes city and email from index view
+     * Get all fields organized into tabs for detail and form pages
      */
-    private function getCustomContactFieldGroups(): array
+    private function getTabOrganizedFields(): array
     {
         $fields = [];
         
-        // Custom communication fields (excludes email from index)
-        $fields = array_merge($fields, $this->getCustomCommunicationFields());
+        // Company Information Tab
+        $fields[] = $this->fieldService->createTabConfig('company_info_tab', 'Company Information');
         
-        // Address fields - customized to exclude city from index
-        $fields = array_merge($fields, [
-            $this->fieldService->createPanelConfig('address_panel', 'Address Information', ['detail', 'form'], 'fas fa-map-marker-alt'),
+        // Active field for detail and form pages
+        $fields[] = $this->fieldService->field('active')
+            ->type('boolean')
+            ->label('Active')
+            ->pages(['detail', 'form'])
+            ->build();
+            
+        $fields[] = $this->fieldService->field('id')
+            ->type('id')
+            ->label('ID')
+            ->pages(['detail']) // ID only on detail page, not form
+            ->build();
+            
+        $fields[] = $this->fieldService->field('name')
+            ->type('text')
+            ->label('Company Name')
+            ->required(true)
+            ->pages(['detail', 'form']) // Show on detail and form pages inside tab
+            ->build();
+            
+        $fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
+        $fields[] = $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group');
+        
+        // Contact Information Tab
+        $fields[] = $this->fieldService->createTabConfig('contact_tab', 'Contact Information');
+        $fields = array_merge($fields, $this->getContactFieldsForTabs());
+        
+        // Users Tab
+        $fields[] = $this->fieldService->createTabConfig('users_tab', 'Users');
+        $fields[] = $this->fieldService->field('employees')
+            ->type('association')
+            ->label('Users/Employees')
+            ->pages(['detail'])
+            ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
+                'email' => 'Email', 
+                'active' => 'Active',
+                'createdAt' => 'Created'
+            ], 'Users', 'No users assigned'))
+            ->renderAsHtml(true)
+            ->build();
+            
+        // For form page, show regular association field for users
+        $fields[] = $this->fieldService->field('employees')
+            ->type('association')
+            ->label('Users/Employees')
+            ->multiple(true)
+            ->pages(['form'])
+            ->autocomplete(true)
+            ->build();
+
+        // Projects Tab
+        $fields[] = $this->fieldService->createTabConfig('projects_tab', 'Projects');
+        $fields[] = $this->fieldService->field('projects')
+            ->type('association')
+            ->label('Projects')
+            ->pages(['detail'])
+            ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
+                'name' => 'Project Name',
+                'status' => 'Status',
+                'createdAt' => 'Created'
+            ], 'Projects', 'No projects assigned'))
+            ->renderAsHtml(true)
+            ->build();
+            
+        // For form page, show regular association field for projects
+        $fields[] = $this->fieldService->field('projects')
+            ->type('association')
+            ->label('Projects')
+            ->multiple(true)
+            ->pages(['form'])
+            ->autocomplete(true)
+            ->build();
+
+        return $fields;
+    }
+
+    /**
+     * Get contact fields for use inside tabs (without panels)
+     */
+    private function getContactFieldsForTabs(): array
+    {
+        return [
+            // Communication fields
+            $this->fieldService->createFieldConfig('email', 'email', ['detail', 'form'], 'Email Address'),
+            $this->fieldService->createFieldConfig('phone', 'telephone', ['detail', 'form'], 'Phone Number'),
+            $this->fieldService->createFieldConfig('cell', 'telephone', ['detail', 'form'], 'Mobile/Cell Phone'),
+            $this->fieldService->createFieldConfig('url', 'url', ['detail', 'form'], 'Website'),
+            
+            // Address fields
             $this->fieldService->createFieldConfig('street', 'text', ['detail', 'form'], 'Street Address'),
             $this->fieldService->createFieldConfig('zip', 'text', ['detail', 'form'], 'ZIP/Postal Code'),
-            $this->fieldService->createFieldConfig('city', 'text', ['detail', 'form'], 'City'), // Excluded from index
-            $this->fieldService->createCountryFieldConfig('countryCode', ['index', 'detail', 'form'], 'Country'), // Flag-only in index
-        ]);
-        
-        return $fields;
+            $this->fieldService->createFieldConfig('city', 'text', ['detail', 'form'], 'City'),
+            $this->fieldService->createCountryFieldConfig('countryCode', ['detail', 'form'], 'Country'),
+        ];
     }
 
     /**

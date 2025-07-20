@@ -5,6 +5,7 @@ namespace App\Security\Voter;
 use App\Entity\SystemEntity;
 use App\Entity\User;
 use App\Repository\UserSystemEntityPermissionRepository;
+use App\Repository\SystemEntityRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -18,10 +19,14 @@ class SystemEntityVoter extends Voter
     public const DELETE = 'delete';
 
     private UserSystemEntityPermissionRepository $permissionRepository;
+    private SystemEntityRepository $systemEntityRepository;
 
-    public function __construct(UserSystemEntityPermissionRepository $permissionRepository)
-    {
+    public function __construct(
+        UserSystemEntityPermissionRepository $permissionRepository,
+        SystemEntityRepository $systemEntityRepository
+    ) {
         $this->permissionRepository = $permissionRepository;
+        $this->systemEntityRepository = $systemEntityRepository;
     }
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -51,8 +56,12 @@ class SystemEntityVoter extends Voter
             // Try to resolve string to SystemEntity entity
             $systemEntity = $this->resolveSystemEntityFromString($subject);
             if (!$systemEntity) {
+                // Debug: Log when resolution fails
+                error_log("SystemEntityVoter: Could not resolve '{$subject}' to SystemEntity");
                 return false;
             }
+            // Debug: Log successful resolution
+            error_log("SystemEntityVoter: Resolved '{$subject}' to SystemEntity ID: {$systemEntity->getId()}");
         }
 
         if (!$systemEntity instanceof SystemEntity) {
@@ -62,11 +71,15 @@ class SystemEntityVoter extends Voter
         // Check specific permission
         switch ($attribute) {
             case self::READ:
-                return $this->canRead($systemEntity, $user);
+                $canRead = $this->canRead($systemEntity, $user);
+                error_log("SystemEntityVoter: User {$user->getUserIdentifier()} can read {$systemEntity->getCode()}: " . ($canRead ? 'YES' : 'NO'));
+                return $canRead;
             case self::WRITE:
             case self::EDIT:
             case self::DELETE:
-                return $this->canWrite($systemEntity, $user);
+                $canWrite = $this->canWrite($systemEntity, $user);
+                error_log("SystemEntityVoter: User {$user->getUserIdentifier()} can write {$systemEntity->getCode()}: " . ($canWrite ? 'YES' : 'NO'));
+                return $canWrite;
         }
 
         return false;
@@ -87,9 +100,13 @@ class SystemEntityVoter extends Voter
      */
     private function resolveSystemEntityFromString(string $subject): ?SystemEntity
     {
-        // This could be a system entity code like 'User', 'Company', etc.
-        // For now, we'll return null and let it fail - proper implementation would need a service
-        // that can resolve system entity names/codes to entities
-        return null;
+        // Try to find by code first, then by name
+        $systemEntity = $this->systemEntityRepository->findOneBy(['code' => $subject]);
+        
+        if (!$systemEntity) {
+            $systemEntity = $this->systemEntityRepository->findOneBy(['name' => $subject]);
+        }
+        
+        return $systemEntity;
     }
 }
