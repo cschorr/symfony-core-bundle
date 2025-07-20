@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -42,7 +43,7 @@ class UserCrudController extends AbstractCrudController
         return User::class;
     }
 
-    protected function getModuleCode(): string
+    protected function getSystemEntityCode(): string
     {
         return 'User';
     }
@@ -119,11 +120,37 @@ class UserCrudController extends AbstractCrudController
         $config = $this->getFieldConfiguration($pageName);
         $fields = $this->fieldService->generateFields($config, $pageName);
         
-        // Add permission fields using the old system (for compatibility)
+        // Add permission fields using the proper system
         if ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
             $fields = $this->addPermissionSummaryField($fields);
         } elseif ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
-            $fields = $this->addPermissionTabToFields($fields);
+            // Get the current entity from context if available
+            $entity = null;
+            $context = $this->getContext();
+            if ($context && $context->getEntity()) {
+                $entityInstance = $context->getEntity()->getInstance();
+                if ($entityInstance instanceof User) {
+                    $entity = $entityInstance;
+                }
+            }
+            
+            // First, we need to wrap the basic fields in a tab
+            $fieldsWithTabs = [];
+            
+            // Add basic information tab
+            $fieldsWithTabs[] = FormField::addTab($this->translator->trans('User Information'))
+                ->setHelp($this->translator->trans('Basic information about the user'))
+                ->collapsible();
+            
+            // Add all the basic fields
+            foreach ($fields as $field) {
+                $fieldsWithTabs[] = $field;
+            }
+            
+            // Then add permission tabs with entity data
+            $fieldsWithTabs = $this->permissionService->addPermissionTabToFields($fieldsWithTabs, $entity);
+            
+            return $fieldsWithTabs;
         }
         
         return $fields;
@@ -159,8 +186,8 @@ class UserCrudController extends AbstractCrudController
                     ->type('choice')
                     ->label('Roles')
                     ->choices([
-                        'User' => 'ROLE_USER',
-                        'Admin' => 'ROLE_ADMIN',
+                        $this->translator->trans('User') => 'ROLE_USER',
+                        $this->translator->trans('Admin') => 'ROLE_ADMIN',
                     ])
                     ->multiple(true)
                     ->build(),
@@ -189,12 +216,9 @@ class UserCrudController extends AbstractCrudController
                     ->build(),
             ];
             
-        } else { // FORM pages (NEW/EDIT) - Use tabs
+        } else { // FORM pages (NEW/EDIT) - Basic fields only, tabs handled in configureFields
             $config = [
-                // User Information Tab - includes active field inside tab
-                $this->fieldService->createTabConfig('user_info', 'User Information'),
-                
-                // Active field inside the tab
+                // Active field
                 ...$this->getActiveField(['form']),
                 $this->fieldService->createIdField(),
                 

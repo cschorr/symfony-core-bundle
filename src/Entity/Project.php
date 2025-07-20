@@ -14,15 +14,15 @@ class Project extends AbstractEntity
     use StringNameTrait;
     use SetStartEndTrait;
 
-    // Status-Konstanten für bessere Lesbarkeit
-    public const STATUS_DRAFT = 'draft';
-    public const STATUS_IN_PROGRESS = 'in_progress';
-    public const STATUS_REVIEW = 'review';
-    public const STATUS_COMPLETED = 'completed';
-    public const STATUS_CANCELLED = 'cancelled';
+    // Status constants for better readability
+    public const STATUS_PLANNING = 0;
+    public const STATUS_IN_PROGRESS = 1;
+    public const STATUS_ON_HOLD = 2;
+    public const STATUS_COMPLETED = 3;
+    public const STATUS_CANCELLED = 4;
 
-    #[ORM\Column(type: Types::STRING, length: 50, nullable: false, options: ['default' => 'draft'])]
-    private string $status = self::STATUS_DRAFT;
+    #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['default' => 0])]
+    private int $status = self::STATUS_PLANNING;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?User $assignee = null;
@@ -81,7 +81,7 @@ class Project extends AbstractEntity
         return $this;
     }
 
-    // Hilfsmethoden für den Status
+    // Status helper methods
     public function isInProgress(): bool
     {
         return $this->status === self::STATUS_IN_PROGRESS;
@@ -97,13 +97,13 @@ class Project extends AbstractEntity
         return $this->status === self::STATUS_CANCELLED;
     }
 
-    public function isDraft(): bool
+    public function isPlanning(): bool
     {
-        return $this->status === self::STATUS_DRAFT;
+        return $this->status === self::STATUS_PLANNING;
     }
 
-    public function isInReview(): bool
+    public function isOnHold(): bool
     {
-        return $this->status === self::STATUS_REVIEW;
+        return $this->status === self::STATUS_ON_HOLD;
     }
 }

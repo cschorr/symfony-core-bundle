@@ -43,109 +43,112 @@ class DebugNavigationCommand extends Command
         $isAdmin = $this->navigationService->isUserAdmin($user);
         $io->info(sprintf('Is Admin: %s', $isAdmin ? 'Yes' : 'No'));
 
-        // Get accessible modules
+        // Get accessible system entities
         if ($isAdmin) {
-            $modules = $this->navigationService->getAllActiveModules();
-            $io->info('Getting ALL active modules (admin mode)');
+            $systemEntities = $this->navigationService->getAllActiveSystemEntities();
+            $io->info('Getting ALL active system entities (admin mode)');
         } else {
-            $modules = $this->navigationService->getAccessibleModulesForUser($user);
-            $io->info('Getting accessible modules for user');
+            $systemEntities = $this->navigationService->getAccessibleSystemEntitiesForUser($user);
+            $io->info('Getting accessible system entities for user');
         }
 
-        $io->info(sprintf('Found %d modules', count($modules)));
+        $io->info(sprintf('Found %d system entities', count($systemEntities)));
 
         // Debug: Check user ID and permissions
         $io->section('User Details');
         $io->writeln(sprintf('User ID: %s', $user->getId()));
         $io->writeln(sprintf('User Email: %s', $user->getEmail()));
-        $io->writeln(sprintf('Permissions Count: %d', $user->getModulePermissions()->count()));
+        $io->writeln(sprintf('Permissions Count: %d', $user->getSystemEntityPermissions()->count()));
 
         // Show user permissions
         $io->section('User Permissions');
-        foreach ($user->getModulePermissions() as $permission) {
+        foreach ($user->getSystemEntityPermissions() as $permission) {
             $io->writeln(sprintf(
-                'Module: %s (%s), Read: %s, Write: %s, Active: %s',
-                $permission->getModule()->getName(),
-                $permission->getModule()->getCode(),
+                'SystemEntity: %s (%s), Read: %s, Write: %s, Active: %s',
+                $permission->getSystemEntity()->getName(),
+                $permission->getSystemEntity()->getCode(),
                 $permission->canRead() ? 'Yes' : 'No',
                 $permission->canWrite() ? 'Yes' : 'No',
-                $permission->getModule()->isActive() ? 'Yes' : 'No'
+                $permission->getSystemEntity()->isActive() ? 'Yes' : 'No'
             ));
         }
 
         // Test repository method directly
         $io->section('Repository Test');
-        $moduleRepo = $this->entityManager->getRepository(\App\Entity\Module::class);
+        $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\SystemEntity::class);
         
         // Test the original method first
-        $allUserModules = $moduleRepo->findModulesForUser($user);
-        $io->writeln(sprintf('findModulesForUser returned %d modules', count($allUserModules)));
+        $allUserSystemEntities = $systemEntityRepo->findSystemEntitiesForUser($user);
+        $io->writeln(sprintf('findSystemEntitiesForUser returned %d system entities', count($allUserSystemEntities)));
         
-        $testModules = $moduleRepo->findActiveModulesForUser($user);
-        $io->writeln(sprintf('findActiveModulesForUser returned %d modules', count($testModules)));
+        $testSystemEntities = $systemEntityRepo->findActiveSystemEntitiesForUser($user);
+        $io->writeln(sprintf('findActiveSystemEntitiesForUser returned %d system entities', count($testSystemEntities)));
 
         // Debug SQL queries
         $io->section('SQL Debug');
         
-        // Test the findActiveModulesForUser query
-        $queryBuilder = $moduleRepo->createQueryBuilder('m')
-            ->join('m.userPermissions', 'ump')
-            ->andWhere('ump.user = :user')
-            ->andWhere('(ump.canRead = true OR ump.canWrite = true)')
-            ->andWhere('m.active = true')
+        // Test the findActiveSystemEntitiesForUser query
+        $queryBuilder = $systemEntityRepo->createQueryBuilder('se')
+            ->leftJoin('se.userPermissions', 'up')
+            ->where('se.active = :active')
+            ->andWhere('(up.user = :user AND (up.canRead = :canRead OR up.canWrite = :canWrite))')
+            ->setParameter('active', true)
             ->setParameter('user', $user)
-            ->orderBy('m.name', 'ASC');
+            ->setParameter('canRead', true)
+            ->setParameter('canWrite', true);
             
-        $query = $queryBuilder->getQuery();
+        $sql = $queryBuilder->getQuery()->getSQL();
         $io->writeln('Generated SQL:');
-        $io->writeln($query->getSQL());
+        $io->writeln($sql);
         
+        $results = $queryBuilder->getQuery()->getResult();
+        $io->writeln(sprintf('Query returned %d system entities', count($results)));        
         $io->writeln('Parameters:');
-        foreach ($query->getParameters() as $param) {
+        foreach ($queryBuilder->getQuery()->getParameters() as $param) {
             $io->writeln(sprintf('  %s => %s', $param->getName(), $param->getValue()));
         }
 
-        // Show details of all user modules
-        if (!empty($allUserModules)) {
-            $io->writeln('All user modules:');
-            foreach ($allUserModules as $module) {
+        // Show details of all user system entities
+        if (!empty($allUserSystemEntities)) {
+            $io->writeln('All user system entities:');
+            foreach ($allUserSystemEntities as $systemEntity) {
                 $io->writeln(sprintf('  - %s (%s) - Active: %s', 
-                    $module->getName(), 
-                    $module->getCode(), 
-                    $module->isActive() ? 'Yes' : 'No'
+                    $systemEntity->getName(), 
+                    $systemEntity->getCode(), 
+                    $systemEntity->isActive() ? 'Yes' : 'No'
                 ));
             }
         }
 
-        // Show modules
+        // Show system entities
         $rows = [];
-        foreach ($modules as $module) {
+        foreach ($systemEntities as $systemEntity) {
             $rows[] = [
-                $module->getCode(),
-                $module->getName(),
-                $module->isActive() ? 'Yes' : 'No'
+                $systemEntity->getCode(),
+                $systemEntity->getName(),
+                $systemEntity->isActive() ? 'Yes' : 'No'
             ];
         }
 
         $io->table(['Code', 'Name', 'Active'], $rows);
 
         // Check entity mapping
-        $entityMapping = $this->navigationService->getModuleEntityMapping();
+        $entityMapping = $this->navigationService->getSystemEntityEntityMapping();
         $io->section('Entity Mapping');
         foreach ($entityMapping as $code => $class) {
             $io->writeln(sprintf('%s => %s', $code, $class));
         }
 
-        // Check which modules would appear in navigation
+        // Check which system entities would appear in navigation
         $io->section('Navigation Items');
         $navigationCount = 0;
-        foreach ($modules as $module) {
-            $moduleCode = $module->getCode();
-            if (isset($entityMapping[$moduleCode])) {
+        foreach ($systemEntities as $systemEntity) {
+            $systemEntityCode = $systemEntity->getCode();
+            if (isset($entityMapping[$systemEntityCode])) {
                 $navigationCount++;
-                $io->writeln(sprintf('✓ %s (%s)', $module->getName(), $moduleCode));
+                $io->writeln(sprintf('✓ %s (%s)', $systemEntity->getName(), $systemEntityCode));
             } else {
-                $io->writeln(sprintf('✗ %s (%s) - No entity mapping', $module->getName(), $moduleCode));
+                $io->writeln(sprintf('✗ %s (%s) - No entity mapping', $systemEntity->getName(), $systemEntityCode));
             }
         }
 

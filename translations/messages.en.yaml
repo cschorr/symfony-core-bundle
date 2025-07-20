@@ -14,17 +14,19 @@ Logout: "Logout"
 "supported by": "supported by"
 "Placeholder image": "Placeholder image"
 
-# Module/Entity Names (direct translation approach)
-# These keys match the "code" and "name" fields in the Module entity
-# - Singular forms (code field): User, Company, Module, CompanyGroup, Project
-# - Plural forms (name field): Users, Companies, Modules, CompanyGroups, Projects
-# Navigation uses the plural forms automatically via $module->getName()
+# SystemEntity/Entity Names (direct translation approach)
+# These keys match the "code" and "name" fields in the SystemEntity entity
+# - Singular forms (code field): User, Company, SystemEntity, CompanyGroup, Project
+# - Plural forms (name field): Users, Companies, System Entities, CompanyGroups, Projects
+# Navigation uses the plural forms automatically via $systemEntity->getName()
 User: "User"
 Users: "Users"
 Company: "Company"
 Companies: "Companies"
-Module: "Module"
-Modules: "Modules"
+SystemEntity: "System Entity"
+"System Entities": "System Entities"
+"Configure and manage system entities": "Configure and manage system entities"
+"View System Entities": "View System Entities"
 CompanyGroup: "Company Group"
 CompanyGroups: "Company Groups"
 Project: "Project"
@@ -32,6 +34,16 @@ Projects: "Projects"
 
 # General UI
 Dashboard: "Dashboard"
+"Theme Settings": "Theme Settings"
+"Background Tone": "Background Tone"
+"Status": "Status"
+"Default Theme Active": "Default Theme Active"
+Default: "Default"
+Blue: "Blue"
+Green: "Green"
+Purple: "Purple"
+Orange: "Orange"
+Ocean: "Ocean"
 Description: "Description"
 "Country Code": "Country Code"
 Website: "Website"
@@ -47,37 +59,58 @@ Show: "Show"
 "Edit %s": "Edit %s"
 "Create %s": "Create %s"
 
-# Module Management
-"System Modules": "System Modules"
-"Create System Module": "Create System Module"
-"Manage system modules and their permissions.": "Manage system modules and their permissions."
-"Display name for the module": "Display name for the module"
-"Unique code that matches the entity name (e.g., User, Company, Module)": "Unique code that matches the entity name (e.g., User, Company, Module)"
-"e.g., User, Company, Module": "e.g., User, Company, Module"
-"Optional description of what this module manages": "Optional description of what this module manages"
+# SystemEntity Management
+"Create System Entity": "Create System Entity"
+"System Entity Information": "System Entity Information"
+"Basic information about the system entity": "Basic information about the system entity"
+"Manage system entities and their permissions.": "Manage system entities and their permissions."
+"Display name for the system entity": "Display name for the system entity"
+"Unique code that matches the entity name (e.g., User, Company, SystemEntity)": "Unique code that matches the entity name (e.g., User, Company, SystemEntity)"
+"e.g., User, Company, SystemEntity": "e.g., User, Company, SystemEntity"
+"Optional description of what this system entity manages": "Optional description of what this system entity manages"
 
 # Permissions
 "User Permissions": "User Permissions"
-"Module Permissions": "Module Permissions"
+"Manage user permissions for this system entity": "Manage user permissions for this system entity"
+"Can Read": "Can Read"
+"Can Write": "Can Write"
+"SystemEntity Permissions": "SystemEntity Permissions"
+"System Permissions": "System Permissions"
+"Count of system entity permissions for this user": "Count of system entity permissions for this user"
 "No permissions": "No permissions"
 "No permissions assigned": "No permissions assigned"
 "%d permission(s) assigned": "%d permission(s) assigned"
 "Permission Details": "Permission Details"
 "Unknown User": "Unknown User"
-"Unknown Module": "Unknown Module"
+"Unknown SystemEntity": "Unknown SystemEntity"
 Read: "Read"
 Write: "Write"
-"Access denied. You need read permission for the %module% module.": "Access denied. You need read permission for the %module% module."
-"Access denied. You need write permission for the %module% module.": "Access denied. You need write permission for the %module% module."
+"Access denied. You need read permission for the %systemEntity% system entity.": "Access denied. You need read permission for the %systemEntity% system entity."
+"Access denied. You need write permission for the %systemEntity% system entity.": "Access denied. You need write permission for the %systemEntity% system entity."
 
 # User Management
 "User Information": "User Information"
+"Basic information about the user": "Basic information about the user"
+Roles: "Roles"
+Admin: "Admin"
+Management: "Management"
 
 # Project Management
 "Manage projects, assignments, and timelines.": "Manage projects, assignments, and timelines."
 "Project Name": "Project Name"
 "The name of the project": "The name of the project"
-"Status": "Status"
+"Detailed description of the project": "Detailed description of the project"
+"Current status of the project": "Current status of the project"
+Assignee: "Assignee"
+"User responsible for this project": "User responsible for this project"
+"Not assigned": "Not assigned"
+Client: "Client"
+"Company or client for this project": "Company or client for this project"
+"No client assigned": "No client assigned"
+"Start Date": "Start Date"
+"Project start date": "Project start date"
+"End Date": "End Date"
+"Project end date": "Project end date"
 "Planning": "Planning"
 "In Progress": "In Progress"
 "On Hold": "On Hold"
@@ -87,9 +120,30 @@ Write: "Write"
 
 # Company Group Management
 "Company Group Name": "Company Group Name"
-Roles: "Roles"
-Admin: "Admin"
-Management: "Management"
+
+# Company Management
+"Name Extension": "Name Extension"
+"Company Group": "Company Group"
+"Communication": "Communication"
+"Email Address": "Email Address"
+"Phone Number": "Phone Number"
+"Mobile/Cell Phone": "Mobile/Cell Phone"
+"Address Information": "Address Information"
+"Street Address": "Street Address"
+"ZIP/Postal Code": "ZIP/Postal Code"
+"City": "City"
+"Country": "Country"
+"Mitarbeiter": "Employees"
+
+# Form Actions
+"Erstellen und weiteres Element hinzufügen": "Create and add another item"
+"Erstellen": "Create"
+
+# Field Labels
+"Name": "Name"
+Street: "Street"
+Icon: "Icon"
+Code: "Code"
 
 # Duplication
 "Duplicate this record": "Duplicate this record"
@@ -101,15 +155,16 @@ Copy: "Copy"
 # Pluralization
 "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned"
 
-# Field Labels and Panels
-"Address Information": "Address Information"
-"Street Address": "Street Address"
-"ZIP/Postal Code": "ZIP/Postal Code"
-"City": "City"
-"Country": "Country"
-"Communication": "Communication"
-"Email Address": "Email Address"
-"Phone Number": "Phone Number"
-"Mobile/Cell Phone": "Mobile/Cell Phone"
-"Code": "Code"
-"Keine Zuordnung": "No Assignment"
+# Additional missing translations
+Temporary: "Temporary"
+"Welcome to your Dashboard": "Welcome to your Dashboard"
+"This is your customized EasyAdmin dashboard with a beautiful background image and color tone.": "This is your customized EasyAdmin dashboard with a beautiful background image and color tone."
+"Manage system users and their permissions": "Manage system users and their permissions"
+"View Users": "View Users"
+"View SystemEntities": "View System Entities"
+"FontAwesome icon class (e.g., fas fa-users, fas fa-building)": "FontAwesome icon class (e.g., fas fa-users, fas fa-building)"
+"e.g., fas fa-users, fas fa-building": "e.g., fas fa-users, fas fa-building"
+"Error duplicating entity:": "Error duplicating entity:"
+"Cannot delete record. It has related records that prevent deletion.": "Cannot delete record. It has related records that prevent deletion."
+"Cannot delete record. It has related records that prevent deletion. Please remove all related records first.": "Cannot delete record. It has related records that prevent deletion. Please remove all related records first."
+"Keine Zuordnung": "❌ No Assignment"

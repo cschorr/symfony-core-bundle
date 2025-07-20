@@ -5,13 +5,13 @@ namespace App\Entity;
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Entity\Traits\Single\StringTextTrait;
 use App\Entity\Traits\Single\StringCodeTrait;
-use App\Repository\ModuleRepository;
+use App\Repository\SystemEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ModuleRepository::class)]
-class Module extends AbstractEntity
+#[ORM\Entity(repositoryClass: SystemEntityRepository::class)]
+class SystemEntity extends AbstractEntity
 {
     use StringNameTrait;
     use StringTextTrait;
@@ -21,9 +21,9 @@ class Module extends AbstractEntity
     private ?string $icon = null;
 
     /**
-     * @var Collection<int, UserModulePermission>
+     * @var Collection<int, UserSystemEntityPermission>
      */
-    #[ORM\OneToMany(targetEntity: UserModulePermission::class, mappedBy: 'module', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: UserSystemEntityPermission::class, mappedBy: 'systemEntity', cascade: ['persist', 'remove'])]
     private Collection $userPermissions;
 
     public function __construct()
@@ -34,33 +34,33 @@ class Module extends AbstractEntity
 
     public function __toString(): string
     {
-        return $this->getName() ?? 'Unnamed Module';
+        return $this->getName() ?? 'Unnamed SystemEntity';
     }
 
     /**
-     * @return Collection<int, UserModulePermission>
+     * @return Collection<int, UserSystemEntityPermission>
      */
     public function getUserPermissions(): Collection
     {
         return $this->userPermissions;
     }
 
-    public function addUserPermission(UserModulePermission $userPermission): static
+    public function addUserPermission(UserSystemEntityPermission $userPermission): static
     {
         if (!$this->userPermissions->contains($userPermission)) {
             $this->userPermissions->add($userPermission);
-            $userPermission->setModule($this);
+            $userPermission->setSystemEntity($this);
         }
 
         return $this;
     }
 
-    public function removeUserPermission(UserModulePermission $userPermission): static
+    public function removeUserPermission(UserSystemEntityPermission $userPermission): static
     {
         if ($this->userPermissions->removeElement($userPermission)) {
             // set the owning side to null (unless already changed)
-            if ($userPermission->getModule() === $this) {
-                $userPermission->setModule(null);
+            if ($userPermission->getSystemEntity() === $this) {
+                $userPermission->setSystemEntity(null);
             }
         }
 
@@ -68,7 +68,7 @@ class Module extends AbstractEntity
     }
 
     /**
-     * Get all users who have read access to this module
+     * Get all users who have read access to this system entity
      * @return User[]
      */
     public function getUsersWithReadAccess(): array
@@ -83,7 +83,7 @@ class Module extends AbstractEntity
     }
 
     /**
-     * Get all users who have write access to this module
+     * Get all users who have write access to this system entity
      * @return User[]
      */
     public function getUsersWithWriteAccess(): array
@@ -98,7 +98,7 @@ class Module extends AbstractEntity
     }
 
     /**
-     * Check if a user has read access to this module
+     * Check if a user has read access to this system entity
      */
     public function userHasReadAccess(User $user): bool
     {
@@ -111,7 +111,7 @@ class Module extends AbstractEntity
     }
 
     /**
-     * Check if a user has write access to this module
+     * Check if a user has write access to this system entity
      */
     public function userHasWriteAccess(User $user): bool
     {

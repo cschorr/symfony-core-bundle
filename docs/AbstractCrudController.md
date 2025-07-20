@@ -2,12 +2,12 @@
 
 ## Overview
 
-The `AbstractCrudController` provides centralized functionality for all EasyAdmin CRUD controllers in the application. It integrates permission checking using the `ModuleVoter` and provides common methods for managing entities with proper access control.
+The `AbstractCrudController` provides centralized functionality for all EasyAdmin CRUD controllers in the application. It integrates permission checking using the `SystemEntityVoter` and provides common methods for managing entities with proper access control.
 
 ## Key Features
 
 1. **Permission-based Access Control**: Automatically checks user permissions before allowing actions
-2. **Module-based Security**: Each controller is associated with a specific module for permission checking
+2. **SystemEntity-based Security**: Each controller is associated with a specific system entity for permission checking
 3. **Admin Override**: Admin users bypass permission checks and have full access
 4. **Common CRUD Operations**: Standardized create, read, update, delete operations
 5. **Helper Methods**: Utility methods for common tasks and entity management
@@ -21,7 +21,7 @@ For entities that need permission management (like User entities), the abstract 
 ```php
 class UserCrudController extends AbstractCrudController
 {
-    protected function getModuleName(): string
+    protected function getSystemEntityName(): string
     {
         return 'Benutzer';
     }
@@ -42,7 +42,7 @@ class UserCrudController extends AbstractCrudController
         if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
             // Add your regular fields here
             
-            // Add permission tab automatically
+            // Add permission tab automatically (restores tab-based organization)
             $fields = $this->addPermissionTabToFields($fields);
         } else {
             // For index page, add permission summary
@@ -58,18 +58,19 @@ class UserCrudController extends AbstractCrudController
 
 For an entity to support permission management, it needs:
 
-1. **Module Permission Relationship**: The entity must have a relationship to `UserModulePermission`
-2. **Required Methods**: `getModulePermissions()`, `addModulePermission()`, and `getModulePermissions()->clear()`
-3. **Permission Entity**: The permission entity should have `setUser()`, `setModule()`, `setCanRead()`, `setCanWrite()`, etc.
+1. **SystemEntity Permission Relationship**: The entity must have a relationship to `UserSystemEntityPermission`
+2. **Required Methods**: `getSystemEntityPermissions()`, `addSystemEntityPermission()`, and `getSystemEntityPermissions()->clear()`
+3. **Permission Entity**: The permission entity should have `setUser()`, `setSystemEntity()`, `setCanRead()`, `setCanWrite()`, etc.
 
 ### Permission Management Methods
 
 The abstract controller provides these methods:
 
 - `hasPermissionManagement()`: Override to return `true` for entities with permissions
-- `addPermissionTabToFields($fields)`: Adds permission tab to form fields
+- `addPermissionTabToFields($fields)`: Adds permission tab to form fields (restores tab organization)
+- `createSystemEntityPermissionFields()`: Creates system entity permission form fields
 - `addPermissionSummaryField($fields)`: Adds permission summary for index pages
-- `handleModulePermissions($entity)`: Automatically handles permission saving
+- `handleSystemEntityPermissions($entity)`: Automatically handles permission saving
 
 ## Basic Usage
 
@@ -91,9 +92,9 @@ class YourEntityCrudController extends AbstractCrudController
         return YourEntity::class;
     }
 
-    protected function getModuleName(): string
+    protected function getSystemEntityName(): string
     {
-        return 'YourModuleName'; // Must match the module name in your database
+        return 'YourSystemEntityName'; // Must match the systemEntity name in your database
     }
 
     public function configureFields(string $pageName): iterable
@@ -111,7 +112,7 @@ class YourEntityCrudController extends AbstractCrudController
 
 Every concrete controller must implement:
 
-- `getModuleName()`: Returns the name of the module associated with this controller for permission checking
+- `getSystemEntityName()`: Returns the name of the systemEntity associated with this controller for permission checking
 
 ## Permission System
 
@@ -202,8 +203,8 @@ public function configureActions(Actions $actions): Actions
 // Get current user with proper type checking
 $user = $this->getCurrentUser();
 
-// Get modules accessible to current user
-$accessibleModules = $this->getAccessibleModules();
+// Get systemEntitys accessible to current user
+$accessibleSystemEntitys = $this->getAccessibleSystemEntitys();
 
 // Get entity label for display
 $label = $this->getEntityLabel($entity);
@@ -243,7 +244,7 @@ protected function beforeDelete($entity): void
 ```php
 class ProjectCrudController extends AbstractCrudController
 {
-    protected function getModuleName(): string
+    protected function getSystemEntityName(): string
     {
         return 'Projekte';
     }
@@ -284,11 +285,11 @@ class ProjectCrudController extends AbstractCrudController
         if ($this->hasPermission('write')) {
             $fields[] = AssociationField::new('assignedUsers')
                 ->setQueryBuilder(function ($queryBuilder) {
-                    // Only show users from accessible modules
-                    $accessibleModules = $this->getAccessibleModules();
-                    if (!empty($accessibleModules)) {
-                        $queryBuilder->where('entity.module IN (:modules)')
-                                   ->setParameter('modules', $accessibleModules);
+                    // Only show users from accessible systemEntitys
+                    $accessibleSystemEntitys = $this->getAccessibleSystemEntitys();
+                    if (!empty($accessibleSystemEntitys)) {
+                        $queryBuilder->where('entity.systemEntity IN (:systemEntitys)')
+                                   ->setParameter('systemEntitys', $accessibleSystemEntitys);
                     }
                     return $queryBuilder;
                 });
@@ -304,7 +305,7 @@ class ProjectCrudController extends AbstractCrudController
 ```php
 class ReportCrudController extends AbstractCrudController
 {
-    protected function getModuleName(): string
+    protected function getSystemEntityName(): string
     {
         return 'Berichte';
     }
@@ -342,7 +343,7 @@ class ReportCrudController extends AbstractCrudController
 
 ## Best Practices
 
-1. **Module Names**: Ensure module names in `getModuleName()` match exactly with names in your database
+1. **SystemEntity Names**: Ensure systemEntity names in `getSystemEntityName()` match exactly with names in your database
 2. **Permission Granularity**: Use `read` for viewing operations and `write` for modifications
 3. **Admin Override**: Remember that admins bypass most permission checks
 4. **Custom Logic**: Override permission methods for entity-specific business rules
@@ -354,7 +355,7 @@ class ReportCrudController extends AbstractCrudController
 To migrate existing EasyAdmin controllers:
 
 1. Change `extends AbstractCrudController` to `extends AbstractCrudController`
-2. Add the required `getModuleName()` method
+2. Add the required `getSystemEntityName()` method
 3. Remove manual permission checks (now handled automatically)
 4. Update constructor to include the required dependencies (handled by parent)
 5. Test all CRUD operations to ensure proper permission enforcement
@@ -363,7 +364,7 @@ To migrate existing EasyAdmin controllers:
 
 ### Common Issues
 
-1. **Module Not Found**: Ensure the module name exists in your database
+1. **SystemEntity Not Found**: Ensure the systemEntity name exists in your database
 2. **Permission Denied**: Check that users have proper permissions assigned
 3. **Admin Access**: Verify admin users have `ROLE_ADMIN` in their roles array
 4. **Constructor Issues**: Don't override constructor without calling parent constructor
@@ -375,7 +376,7 @@ To migrate existing EasyAdmin controllers:
 public function index(AdminContext $context): Response
 {
     dump([
-        'module' => $this->getModuleName(),
+        'systemEntity' => $this->getSystemEntityName(),
         'hasRead' => $this->hasPermission('read'),
         'hasWrite' => $this->hasPermission('write'),
         'isAdmin' => $this->isAdmin(),
