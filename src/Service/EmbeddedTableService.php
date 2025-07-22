@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Controller\Admin\UserCrudController;
 use App\Controller\Admin\ProjectCrudController;
+use App\Enum\ProjectStatus;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Doctrine\Common\Collections\Collection;
@@ -155,7 +156,7 @@ class EmbeddedTableService
                 }
                 
                 // Handle ProjectStatus enum
-                if ($value instanceof \App\Enum\ProjectStatus) {
+                if ($value instanceof ProjectStatus) {
                     return '<span class="badge bg-' . $value->getBadgeClass() . ' text-truncate">' . $value->getLabel() . '</span>';
                 }
                 
