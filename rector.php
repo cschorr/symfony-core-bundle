@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Symfony\Set\SymfonySetList;
 
 return RectorConfig::configure()
     ->withSymfonyContainerXml(__DIR__ . '/var/cache/dev/App_KernelDevDebugContainer.xml')
+    ->withPhpVersion(80400)
     ->withPaths([
         __DIR__ . '/assets',
         __DIR__ . '/config',
@@ -15,11 +15,7 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/tests',
     ])
-    ->withSets([
-        SymfonySetList::SYMFONY_62,
-        SymfonySetList::SYMFONY_CODE_QUALITY,
-        SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
-    ])
+    ->withSets()
     ->withPreparedSets(
         codingStyle: true,
         privatization: true,
