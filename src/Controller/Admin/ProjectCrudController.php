@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Project;
+use App\Entity\User;
+use App\Enum\ProjectStatus;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
@@ -114,14 +116,14 @@ class ProjectCrudController extends AbstractCrudController
                 ->help('Current status of the project')
                 ->pages(['index', 'detail', 'form'])  // Include index page for better visibility
                 ->choices([
-                    $this->translator->trans('Planning') => \App\Enum\ProjectStatus::PLANNING,
-                    $this->translator->trans('In Progress') => \App\Enum\ProjectStatus::IN_PROGRESS,
-                    $this->translator->trans('On Hold') => \App\Enum\ProjectStatus::ON_HOLD,
-                    $this->translator->trans('Completed') => \App\Enum\ProjectStatus::COMPLETED,
-                    $this->translator->trans('Cancelled') => \App\Enum\ProjectStatus::CANCELLED,
+                    $this->translator->trans('Planning') => ProjectStatus::PLANNING,
+                    $this->translator->trans('In Progress') => ProjectStatus::IN_PROGRESS,
+                    $this->translator->trans('On Hold') => ProjectStatus::ON_HOLD,
+                    $this->translator->trans('Completed') => ProjectStatus::COMPLETED,
+                    $this->translator->trans('Cancelled') => ProjectStatus::CANCELLED,
                 ])
                 ->formatValue(function ($value, $entity) {
-                    if ($value instanceof \App\Enum\ProjectStatus) {
+                    if ($value instanceof ProjectStatus) {
                         return $value->getLabel();
                     }
                     return $this->translator->trans('Unknown');
@@ -176,7 +178,7 @@ class ProjectCrudController extends AbstractCrudController
     protected function canCreateEntity(): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User &&
+        return $user instanceof User &&
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 in_array('ROLE_USER', $user->getRoles()));
     }
@@ -184,7 +186,7 @@ class ProjectCrudController extends AbstractCrudController
     protected function canEditEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User &&
+        return $user instanceof User &&
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()));
     }
@@ -192,13 +194,13 @@ class ProjectCrudController extends AbstractCrudController
     protected function canDeleteEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && in_array('ROLE_ADMIN', $user->getRoles());
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     protected function canViewEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User &&
+        return $user instanceof User &&
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()) ||
                 in_array('ROLE_USER', $user->getRoles()));
@@ -209,8 +211,8 @@ class ProjectCrudController extends AbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if ($entityInstance instanceof Project && $entityInstance->getStatus() === \App\Enum\ProjectStatus::PLANNING) {
-            $entityInstance->setStatus(\App\Enum\ProjectStatus::PLANNING); // Ensure Planning status is set
+        if ($entityInstance instanceof Project && $entityInstance->getStatus() === ProjectStatus::PLANNING) {
+            $entityInstance->setStatus(ProjectStatus::PLANNING); // Ensure Planning status is set
         }
         parent::persistEntity($entityManager, $entityInstance);
     }
