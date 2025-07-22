@@ -5,11 +5,12 @@ namespace App\DataFixtures;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
-use App\Entity\Module;
+use App\Entity\SystemEntity;
 use App\Entity\User;
-use App\Entity\UserModulePermission;
+use App\Entity\UserSystemEntityPermission;
 use App\Entity\Company;
 use App\Entity\Project;
+use App\Enum\ProjectStatus;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
@@ -24,7 +25,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // load entities
-        $this->createModuleFixtures($manager);
+        $this->createSystemEntityFixtures($manager);
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
         $this->createCompanyFixtures($manager);
@@ -51,71 +52,71 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 
-    public function createModuleFixtures(ObjectManager $manager): void
+    public function createSystemEntityFixtures(ObjectManager $manager): void
     {
-        // Modules in navigation order - they will be sorted by ID (UUID) in ascending order
+        // System entities in navigation order - they will be sorted by ID (UUID) in ascending order
         // The 'code' field is the singular form, 'name' field is the plural form
-        // Navigation uses $module->getName() which returns the plural form for translation
-        $modules = [
-            ['name' => 'Modules', 'code' => 'Module', 'text' => 'System modules and configuration', 'icon' => 'fas fa-list'],
+        // Navigation uses $systemEntity->getName() which returns the plural form for translation
+        $systemEntities = [
+            ['name' => 'SystemEntities', 'code' => 'SystemEntity', 'text' => 'System entities and configuration', 'icon' => 'fas fa-list'],
             ['name' => 'Users', 'code' => 'User', 'text' => 'Benutzerverwaltung', 'icon' => 'fas fa-users'],
             ['name' => 'Companies', 'code' => 'Company', 'text' => 'Kunden, Lieferanten, Partner etc.', 'icon' => 'fas fa-building'],
             ['name' => 'CompanyGroups', 'code' => 'CompanyGroup', 'text' => 'Gruppen von Unternehmen', 'icon' => 'fas fa-layer-group'],
             ['name' => 'Projects', 'code' => 'Project', 'text' => 'Projekte verwalten', 'icon' => 'fas fa-project-diagram'],
         ];
 
-        // Create and persist module entities here
-        foreach ($modules as $moduleData) {
-            $module = new Module();
-            $module->setName($moduleData['name']);
-            $module->setCode($moduleData['code']);
-            $module->setText($moduleData['text']);
-            $module->setIcon($moduleData['icon']);
-            $manager->persist($module);
+        // Create and persist system entity entities here
+        foreach ($systemEntities as $systemEntityData) {
+            $systemEntity = new SystemEntity();
+            $systemEntity->setName($systemEntityData['name']);
+            $systemEntity->setCode($systemEntityData['code']);
+            $systemEntity->setText($systemEntityData['text']);
+            $systemEntity->setIcon($systemEntityData['icon']);
+            $manager->persist($systemEntity);
         }
         $manager->flush();
     }
 
     public function createPermissionFixtures(ObjectManager $manager): void
     {
-        // Get users and modules from the database
+        // Get users and system entities from the database
         $adminUser = $manager->getRepository(User::class)->findOneBy(['email' => 'admin@example.com']);
         $demoUser = $manager->getRepository(User::class)->findOneBy(['email' => 'demo@example.com']);
         
-        $userModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'User']);
-        $companyModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'Company']);
-        $moduleModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'Module']);
-        $companyGroupModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'CompanyGroup']);
-        $projectModule = $manager->getRepository(Module::class)->findOneBy(['code' => 'Project']);
+        $userSystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'User']);
+        $companySystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'Company']);
+        $systemEntitySystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'SystemEntity']);
+        $companyGroupSystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'CompanyGroup']);
+        $projectSystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'Project']);
 
         // Helper function to create permission if it doesn't exist
-        $createPermissionIfNotExists = function($user, $module, $canRead, $canWrite) use ($manager) {
-            if (!$user || !$module) return;
+        $createPermissionIfNotExists = function($user, $systemEntity, $canRead, $canWrite) use ($manager) {
+            if (!$user || !$systemEntity) return;
             
             // Check if permission already exists
-            $existingPermission = $manager->getRepository(UserModulePermission::class)
-                ->findOneBy(['user' => $user, 'module' => $module]);
+            $existingPermission = $manager->getRepository(UserSystemEntityPermission::class)
+                ->findOneBy(['user' => $user, 'systemEntity' => $systemEntity]);
             
             if (!$existingPermission) {
-                $permission = new UserModulePermission();
+                $permission = new UserSystemEntityPermission();
                 $permission->setUser($user);
-                $permission->setModule($module);
+                $permission->setSystemEntity($systemEntity);
                 $permission->setCanRead($canRead);
                 $permission->setCanWrite($canWrite);
                 $manager->persist($permission);
             }
         };
 
-        // Admin has full access to all modules
-        $createPermissionIfNotExists($adminUser, $userModule, true, true);
-        $createPermissionIfNotExists($adminUser, $companyModule, true, true);
-        $createPermissionIfNotExists($adminUser, $moduleModule, true, true);
-        $createPermissionIfNotExists($adminUser, $companyGroupModule, true, true);
-        $createPermissionIfNotExists($adminUser, $projectModule, true, true);
+        // Admin has full access to all system entities
+        $createPermissionIfNotExists($adminUser, $userSystemEntity, true, true);
+        $createPermissionIfNotExists($adminUser, $companySystemEntity, true, true);
+        $createPermissionIfNotExists($adminUser, $systemEntitySystemEntity, true, true);
+        $createPermissionIfNotExists($adminUser, $companyGroupSystemEntity, true, true);
+        $createPermissionIfNotExists($adminUser, $projectSystemEntity, true, true);
 
         // Demo user permissions
-        $createPermissionIfNotExists($demoUser, $userModule, true, false); // Read-only access to user module
-        $createPermissionIfNotExists($demoUser, $companyModule, true, true); // Full access to company module
+        $createPermissionIfNotExists($demoUser, $userSystemEntity, true, false); // Read-only access to user system entity
+        $createPermissionIfNotExists($demoUser, $companySystemEntity, true, true); // Full access to company system entity
 
         $manager->flush();
     }
@@ -144,9 +145,9 @@ class AppFixtures extends Fixture
     {
         // Example project data
         $projects = [
-            ['name' => 'Project Alpha', 'status' => 1, 'description' => 'First project description'],
-            ['name' => 'Project Beta', 'status' => 2, 'description' => 'Second project description'],
-            ['name' => 'Project Gamma', 'status' => 0, 'description' => 'Third project description'],
+            ['name' => 'Project Alpha', 'status' => ProjectStatus::IN_PROGRESS, 'description' => 'First project description'],
+            ['name' => 'Project Beta', 'status' => ProjectStatus::ON_HOLD, 'description' => 'Second project description'],
+            ['name' => 'Project Gamma', 'status' => ProjectStatus::PLANNING, 'description' => 'Third project description'],
         ];
 
         // Create and persist project entities here

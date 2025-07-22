@@ -54,17 +54,17 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private ?Company $company = null;
 
     /**
-     * @var Collection<int, UserModulePermission>
+     * @var Collection<int, UserSystemEntityPermission>
      */
-    #[ORM\OneToMany(targetEntity: UserModulePermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: UserSystemEntityPermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     #[Groups(['user:read'])]
-    private Collection $modulePermissions;
+    private Collection $systemEntityPermissions;
 
     public function __construct()
     {
         parent::__construct();
         $this->projects = new ArrayCollection();
-        $this->modulePermissions = new ArrayCollection();
+        $this->systemEntityPermissions = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -185,29 +185,29 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * @return Collection<int, UserModulePermission>
+     * @return Collection<int, UserSystemEntityPermission>
      */
-    public function getModulePermissions(): Collection
+    public function getSystemEntityPermissions(): Collection
     {
-        return $this->modulePermissions;
+        return $this->systemEntityPermissions;
     }
 
-    public function addModulePermission(UserModulePermission $modulePermission): static
+    public function addSystemEntityPermission(UserSystemEntityPermission $systemEntityPermission): static
     {
-        if (!$this->modulePermissions->contains($modulePermission)) {
-            $this->modulePermissions->add($modulePermission);
-            $modulePermission->setUser($this);
+        if (!$this->systemEntityPermissions->contains($systemEntityPermission)) {
+            $this->systemEntityPermissions->add($systemEntityPermission);
+            $systemEntityPermission->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeModulePermission(UserModulePermission $modulePermission): static
+    public function removeSystemEntityPermission(UserSystemEntityPermission $systemEntityPermission): static
     {
-        if ($this->modulePermissions->removeElement($modulePermission)) {
+        if ($this->systemEntityPermissions->removeElement($systemEntityPermission)) {
             // set the owning side to null (unless already changed)
-            if ($modulePermission->getUser() === $this) {
-                $modulePermission->setUser(null);
+            if ($systemEntityPermission->getUser() === $this) {
+                $systemEntityPermission->setUser(null);
             }
         }
 
@@ -215,12 +215,12 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * Check if user has read access to a module
+     * Check if user has read access to a system entity
      */
-    public function hasReadAccessToModule(Module $module): bool
+    public function hasReadAccessToSystemEntity(SystemEntity $systemEntity): bool
     {
-        foreach ($this->modulePermissions as $permission) {
-            if ($permission->getModule() === $module && $permission->canRead()) {
+        foreach ($this->systemEntityPermissions as $permission) {
+            if ($permission->getSystemEntity() === $systemEntity && $permission->canRead()) {
                 return true;
             }
         }
@@ -228,12 +228,12 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * Check if user has write access to a module
+     * Check if user has write access to a system entity
      */
-    public function hasWriteAccessToModule(Module $module): bool
+    public function hasWriteAccessToSystemEntity(SystemEntity $systemEntity): bool
     {
-        foreach ($this->modulePermissions as $permission) {
-            if ($permission->getModule() === $module && $permission->canWrite()) {
+        foreach ($this->systemEntityPermissions as $permission) {
+            if ($permission->getSystemEntity() === $systemEntity && $permission->canWrite()) {
                 return true;
             }
         }
@@ -241,32 +241,32 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * Get all modules user has read access to
-     * @return Module[]
+     * Get all system entities user has read access to
+     * @return SystemEntity[]
      */
-    public function getReadableModules(): array
+    public function getReadableSystemEntities(): array
     {
-        $modules = [];
-        foreach ($this->modulePermissions as $permission) {
+        $systemEntities = [];
+        foreach ($this->systemEntityPermissions as $permission) {
             if ($permission->canRead()) {
-                $modules[] = $permission->getModule();
+                $systemEntities[] = $permission->getSystemEntity();
             }
         }
-        return $modules;
+        return $systemEntities;
     }
 
     /**
-     * Get all modules user has write access to
-     * @return Module[]
+     * Get all system entities user has write access to
+     * @return SystemEntity[]
      */
-    public function getWritableModules(): array
+    public function getWritableSystemEntities(): array
     {
-        $modules = [];
-        foreach ($this->modulePermissions as $permission) {
+        $systemEntities = [];
+        foreach ($this->systemEntityPermissions as $permission) {
             if ($permission->canWrite()) {
-                $modules[] = $permission->getModule();
+                $systemEntities[] = $permission->getSystemEntity();
             }
         }
-        return $modules;
+        return $systemEntities;
     }
 }

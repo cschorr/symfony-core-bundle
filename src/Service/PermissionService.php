@@ -2,285 +2,322 @@
 
 namespace App\Service;
 
-use App\Entity\Module;
+use App\Entity\SystemEntity;
 use App\Entity\User;
-use App\Entity\UserModulePermission;
-use App\Repository\UserModulePermissionRepository;
+use App\Entity\UserSystemEntityPermission;
+use App\Repository\SystemEntityRepository;
+use App\Repository\UserSystemEntityPermissionRepository;
+use App\Service\EasyAdminFieldService;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PermissionService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private UserModulePermissionRepository $permissionRepository,
-        private TranslatorInterface $translator
+        private SystemEntityRepository $systemEntityRepository,
+        private UserSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
+        private TranslatorInterface $translator,
     ) {
     }
 
     /**
-     * Get the module entity by code
+     * Get system entity by code
      */
-    public function getModuleByCode(string $moduleCode): Module
+    public function getSystemEntityByCode(string $code): ?SystemEntity
     {
-        $module = $this->entityManager->getRepository(Module::class)
-            ->findOneBy(['code' => $moduleCode]);
-            
-        if (!$module) {
-            throw new \RuntimeException(
-                sprintf('Module with code "%s" not found. Please run fixtures.', $moduleCode)
-            );
-        }
-        
-        return $module;
+        return $this->systemEntityRepository->findOneBy(['code' => $code]);
     }
 
     /**
-     * Create module permission fields for entities that support permission management
+     * Create system entity permission form fields organized in a tab
+     * @return array
      */
-    public function createModulePermissionFields(AdminContext $context): array
+    public function createSystemEntityPermissionFields(?User $entity = null): array
     {
-        $modules = $this->entityManager->getRepository(Module::class)->findAll();
-        
-        // Get the current entity to populate existing values
-        $entity = $context->getEntity()->getInstance();
-        $existingPermissions = [];
-        
-        if ($entity && method_exists($entity, 'getModulePermissions')) {
-            $permissions = $entity->getModulePermissions();
-            
-            foreach ($permissions as $permission) {
-                $moduleId = (string) $permission->getModule()->getId();
-                $existingPermissions[$moduleId] = [
-                    'read' => $permission->canRead(),
-                    'write' => $permission->canWrite()
-                ];
+        $permissionFields = [];
+        $systemEntities = $this->systemEntityRepository->findBy(['active' => true], ['name' => 'ASC']);
+
+        foreach ($systemEntities as $systemEntity) {
+            // Get existing permission for this system entity if entity is provided
+            $permission = null;
+            if ($entity && $entity->getId()) {
+                $permission = $this->userSystemEntityPermissionRepository->findOneBy([
+                    'user' => $entity,
+                    'systemEntity' => $systemEntity
+                ]);
             }
+
+            // Create read permission field
+            $readFieldName = sprintf('systemEntity_%s_read', $systemEntity->getId()->toString());
+            $readField = BooleanField::new($readFieldName)
+                ->setLabel(sprintf('%s (%s)', $this->translator->trans($systemEntity->getName()), $this->translator->trans('Read')))
+                ->setFormTypeOption('attr', ['data-system-entity-id' => $systemEntity->getId()->toString()])
+                ->setFormTypeOption('attr', ['data-permission-type' => 'read'])
+                ->setFormTypeOption('required', false)
+                ->setFormTypeOption('mapped', false); // Don't map to entity property
+
+            if ($permission) {
+                $readField->setFormTypeOption('data', $permission->canRead());
+            }
+
+            // Create write permission field
+            $writeFieldName = sprintf('systemEntity_%s_write', $systemEntity->getId()->toString());
+            $writeField = BooleanField::new($writeFieldName)
+                ->setLabel(sprintf('%s (%s)', $this->translator->trans($systemEntity->getName()), $this->translator->trans('Write')))
+                ->setFormTypeOption('attr', ['data-system-entity-id' => $systemEntity->getId()->toString()])
+                ->setFormTypeOption('attr', ['data-permission-type' => 'write'])
+                ->setFormTypeOption('required', false)
+                ->setFormTypeOption('mapped', false); // Don't map to entity property
+
+            if ($permission) {
+                $writeField->setFormTypeOption('data', $permission->canWrite());
+            }
+
+            $permissionFields[] = $readField;
+            $permissionFields[] = $writeField;
         }
-        
-        // Build the complete table HTML in one go
-        $tableHtml = '
-            <style>
-                .permissions-table {
-                    margin: 20px 0;
-                }
-                .permissions-table .form-check {
-                    margin: 0;
-                    display: flex;
-                    justify-content: center;
-                }
-                .permissions-table .form-check-input {
-                    margin: 0;
-                }
-                .permissions-table td {
-                    vertical-align: middle;
-                    padding: 12px 8px;
-                }
-                .permissions-table .module-name {
-                    font-weight: 500;
-                    color: #495057;
-                }
-            </style>
-            <div class="permissions-table">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 60%;">Module</th>
-                            <th style="width: 20%; text-align: center;">Read</th>
-                            <th style="width: 20%; text-align: center;">Write</th>
-                        </tr>
-                    </thead>
-                    <tbody>';
-        
-        // Add each module row
-        foreach ($modules as $module) {
-            $moduleId = (string) $module->getId();
-            $hasReadPermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['read'];
-            $hasWritePermission = isset($existingPermissions[$moduleId]) && $existingPermissions[$moduleId]['write'];
-            
-            $readChecked = $hasReadPermission ? 'checked' : '';
-            $writeChecked = $hasWritePermission ? 'checked' : '';
-            
-            $tableHtml .= '
-                        <tr>
-                            <td class="module-name">' . htmlspecialchars($module->getName()) . '</td>
-                            <td class="text-center">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" 
-                                           name="User[module_' . $moduleId . '_read]" 
-                                           id="module_' . $moduleId . '_read" 
-                                           value="1" ' . $readChecked . '>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" 
-                                           name="User[module_' . $moduleId . '_write]" 
-                                           id="module_' . $moduleId . '_write" 
-                                           value="1" ' . $writeChecked . '>
-                                </div>
-                            </td>
-                        </tr>';
-        }
-        
-        $tableHtml .= '
-                    </tbody>
-                </table>
-            </div>';
-        
-        // Create a single fieldset with all the HTML
-        $fields[] = FormField::addFieldset($tableHtml)
-            ->setFormTypeOption('label_html', true);
-        
-        return $fields;
+
+        return $permissionFields;
     }
 
     /**
      * Add permission tab to form fields for entities that support permission management
      */
-    public function addPermissionTabToFields(array $fields, AdminContext $context): array
+    public function addPermissionTabToFields(array $fields, ?User $entity = null): array
     {
-        $fields[] = FormField::addTab($this->translator->trans('Module Permissions'));
+        $permissionFields = $this->createSystemEntityPermissionFields($entity);
         
-        $permissionFields = $this->createModulePermissionFields($context);
-        return array_merge($fields, $permissionFields);
-    }
+        if (empty($permissionFields)) {
+            return $fields;
+        }
 
-    /**
-     * Add permission summary field for index pages
-     */
-    public function addPermissionSummaryField(array $fields): array
-    {
-        $fields[] = AssociationField::new('modulePermissions')
-            ->setLabel($this->translator->trans('Module Permissions'))
-            ->formatValue(function ($value, $entity) {
-                if (!$entity || !method_exists($entity, 'getModulePermissions') || 
-                    !$entity->getModulePermissions() || $entity->getModulePermissions()->isEmpty()) {
-                    return '<div style="text-align: right;">' . $this->translator->trans('No permissions') . '</div>';
-                }
-                
-                $count = $entity->getModulePermissions()->count();
-                $permissionText = $this->translator->trans('{1} 1 permission assigned|]1,Inf[ %count% permissions assigned', ['%count%' => $count]);
-                
-                return '<div style="text-align: right;">' . $permissionText . '</div>';
-            })
-            ->renderAsHtml()
-            ->addCssClass('text-end'); // Bootstrap class for right alignment
+        // Create a tab for permissions using FormField::addTab
+        $permissionTab = FormField::addTab($this->translator->trans('SystemEntity Permissions'), 'fas fa-shield-alt');
+
+        // Add the tab first, then the permission fields
+        $fields[] = $permissionTab;
+        $fields = array_merge($fields, $permissionFields);
 
         return $fields;
     }
 
     /**
-     * Handle module permissions for entities that support it
+     * Handle system entity permissions when saving user
      */
-    public function handleModulePermissions($entity, AdminContext $context): void
+    public function handleSystemEntityPermissions(User $user, array $formData): void
     {
-        if (!method_exists($entity, 'getModulePermissions')) {
-            return;
-        }
+        // Get all active system entities
+        $systemEntities = $this->systemEntityRepository->findBy(['active' => true]);
 
-        $request = $context->getRequest();
-        $entityName = (new \ReflectionClass($entity))->getShortName();
-        $formData = $request->request->all()[$entityName] ?? [];
-
-        // Get all modules
-        $modules = $this->entityManager->getRepository(Module::class)->findAll();
-        
-        // Get existing permissions indexed by module ID
-        $existingPermissions = [];
-        foreach ($entity->getModulePermissions() as $permission) {
-            $moduleId = (string) $permission->getModule()->getId();
-            $existingPermissions[$moduleId] = $permission;
-        }
-
-        // Process each module's permissions
-        foreach ($modules as $module) {
-            $moduleId = (string) $module->getId();
-            $readKey = 'module_' . $moduleId . '_read';
-            $writeKey = 'module_' . $moduleId . '_write';
+        foreach ($systemEntities as $systemEntity) {
+            $systemEntityId = $systemEntity->getId()->toString();
             
-            $canRead = isset($formData[$readKey]) && $formData[$readKey] === '1';
-            $canWrite = isset($formData[$writeKey]) && $formData[$writeKey] === '1';
-
-            if (isset($existingPermissions[$moduleId])) {
-                // Update existing permission
-                $permission = $existingPermissions[$moduleId];
-                
-                if ($canRead || $canWrite) {
-                    // Update the permission
-                    $permission->setCanRead($canRead);
-                    $permission->setCanWrite($canWrite);
-                } else {
-                    // Remove permission if no access is granted
-                    $this->entityManager->remove($permission);
-                    $entity->removeModulePermission($permission);
-                }
-            } else {
-                // Create new permission only if at least one permission is granted
-                if ($canRead || $canWrite) {
-                    $permission = new UserModulePermission();
-                    $permission->setUser($entity);
-                    $permission->setModule($module);
-                    $permission->setCanRead($canRead);
-                    $permission->setCanWrite($canWrite);
+            // Check form data for this system entity's permissions
+            $hasReadPermission = false;
+            $hasWritePermission = false;
+            
+            foreach ($formData as $key => $value) {
+                if (is_array($value) && 
+                    isset($value['data-system-entity-id']) && 
+                    $value['data-system-entity-id'] === $systemEntityId) {
                     
-                    $this->entityManager->persist($permission);
-                    $entity->addModulePermission($permission);
+                    if (isset($value['data-permission-type'])) {
+                        if ($value['data-permission-type'] === 'read') {
+                            $hasReadPermission = (bool) $value;
+                        } elseif ($value['data-permission-type'] === 'write') {
+                            $hasWritePermission = (bool) $value;
+                        }
+                    }
                 }
             }
+
+            // Find existing permission
+            $permission = $this->userSystemEntityPermissionRepository->findOneBy([
+                'user' => $user,
+                'systemEntity' => $systemEntity
+            ]);
+
+            // Create or update permission
+            if ($hasReadPermission || $hasWritePermission) {
+                if (!$permission) {
+                    $permission = new UserSystemEntityPermission();
+                    $permission->setUser($user);
+                    $permission->setSystemEntity($systemEntity);
+                }
+                
+                $permission->setCanRead($hasReadPermission);
+                $permission->setCanWrite($hasWritePermission);
+                
+                $this->entityManager->persist($permission);
+            } elseif ($permission) {
+                // Remove permission if both read and write are false
+                $this->entityManager->remove($permission);
+            }
         }
-        
-        // Don't flush here - let the parent method handle the flush
     }
 
     /**
-     * Persist entity with permissions handling
+     * Check if user can read system entity
      */
-    public function persistEntityWithPermissions(callable $parentPersist, $entityInstance, AdminContext $context): void
+    public function canUserReadSystemEntity(User $user, SystemEntity $systemEntity): bool
     {
-        // Start a transaction to ensure atomicity
-        $this->entityManager->beginTransaction();
-        
-        try {
-            // First persist the main entity
-            $parentPersist($entityInstance);
-            
-            // Then handle the permissions after the main entity is persisted
-            $this->handleModulePermissions($entityInstance, $context);
-            
-            // Commit the transaction
-            $this->entityManager->commit();
-        } catch (\Exception $e) {
-            // Rollback on error
-            $this->entityManager->rollback();
-            throw $e;
-        }
+        $permission = $this->userSystemEntityPermissionRepository->findOneBy([
+            'user' => $user,
+            'systemEntity' => $systemEntity
+        ]);
+
+        return $permission && $permission->canRead();
     }
 
     /**
-     * Update entity with permissions handling
+     * Check if user can write system entity  
      */
-    public function updateEntityWithPermissions(callable $parentUpdate, $entityInstance, AdminContext $context): void
+    public function canUserWriteSystemEntity(User $user, SystemEntity $systemEntity): bool
     {
-        // Start a transaction to ensure atomicity
-        $this->entityManager->beginTransaction();
+        $permission = $this->userSystemEntityPermissionRepository->findOneBy([
+            'user' => $user,
+            'systemEntity' => $systemEntity
+        ]);
+
+        return $permission && $permission->canWrite();
+    }
+
+    /**
+     * Add permission tab to fields for SystemEntity (shows user permissions for this system entity)
+     */
+    public function addSystemEntityPermissionTabToFields(array $fields): array
+    {
+        // Get all users to create permission fields
+        $users = $this->entityManager->getRepository(User::class)->findAll();
         
-        try {
-            // Handle permissions first for updates
-            $this->handleModulePermissions($entityInstance, $context);
-            
-            // Then update the main entity
-            $parentUpdate($entityInstance);
-            
-            // Commit the transaction
-            $this->entityManager->commit();
-        } catch (\Exception $e) {
-            // Rollback on error
-            $this->entityManager->rollback();
-            throw $e;
+        // Create tab for permissions
+        $permissionFields = [
+            FormField::addTab($this->translator->trans('User Permissions'))
+                ->setHelp($this->translator->trans('Manage user permissions for this system entity'))
+                ->collapsible()
+        ];
+        
+        foreach ($users as $user) {
+            // Create read permission field
+            $readFieldName = 'userPermission_read_' . $user->getId();
+            $userReadField = BooleanField::new($readFieldName)
+                ->setLabel($user->getEmail() . ' - ' . $this->translator->trans('Can Read'))
+                ->setFormTypeOption('attr', ['data-user-id' => $user->getId()->toString()])
+                ->setFormTypeOption('attr', ['data-permission-type' => 'read'])
+                ->setFormTypeOption('required', false)
+                ->setFormTypeOption('mapped', false); // Don't map to entity property
+                
+            // Create write permission field  
+            $writeFieldName = 'userPermission_write_' . $user->getId();
+            $userWriteField = BooleanField::new($writeFieldName)
+                ->setLabel($user->getEmail() . ' - ' . $this->translator->trans('Can Write'))
+                ->setFormTypeOption('attr', ['data-user-id' => $user->getId()->toString()])
+                ->setFormTypeOption('attr', ['data-permission-type' => 'write'])
+                ->setFormTypeOption('required', false)
+                ->setFormTypeOption('mapped', false); // Don't map to entity property
+                
+            $permissionFields[] = $userReadField;
+            $permissionFields[] = $userWriteField;
         }
+        
+        // Add permission fields to main fields array
+        return array_merge($fields, $permissionFields);
+    }
+
+    /**
+     * Create SystemEntity permission fields with proper data binding
+     */
+    public function addSystemEntityPermissionTabToFieldsWithEntity(array $fields, ?SystemEntity $entity = null): array
+    {
+        // Get all users to create permission fields
+        $users = $this->entityManager->getRepository(User::class)->findAll();
+        
+        // Create tab for permissions
+        $permissionFields = [
+            FormField::addTab($this->translator->trans('User Permissions'))
+                ->setHelp($this->translator->trans('Manage user permissions for this system entity'))
+                ->collapsible()
+        ];
+        
+        foreach ($users as $user) {
+            // Find existing permission
+            $permission = null;
+            if ($entity) {
+                $permission = $this->userSystemEntityPermissionRepository
+                    ->findOneBy([
+                        'user' => $user,
+                        'systemEntity' => $entity
+                    ]);
+            }
+            
+            // Create read permission field
+            $readFieldName = 'userPermission_read_' . $user->getId();
+            $userReadField = BooleanField::new($readFieldName)
+                ->setLabel($user->getEmail() . ' (' . $this->translator->trans('Read') . ')')
+                ->setFormTypeOption('attr', ['data-user-id' => $user->getId()->toString()])
+                ->setFormTypeOption('attr', ['data-permission-type' => 'read'])
+                ->setFormTypeOption('required', false)
+                ->setFormTypeOption('mapped', false); // Don't map to entity property
+                
+            if ($permission) {
+                $userReadField->setFormTypeOption('data', $permission->canRead());
+            }
+                
+            // Create write permission field  
+            $writeFieldName = 'userPermission_write_' . $user->getId();
+            $userWriteField = BooleanField::new($writeFieldName)
+                ->setLabel($user->getEmail() . ' (' . $this->translator->trans('Write') . ')')
+                ->setFormTypeOption('attr', ['data-user-id' => $user->getId()->toString()])
+                ->setFormTypeOption('attr', ['data-permission-type' => 'write'])
+                ->setFormTypeOption('required', false)
+                ->setFormTypeOption('mapped', false); // Don't map to entity property
+                
+            if ($permission) {
+                $userWriteField->setFormTypeOption('data', $permission->canWrite());
+            }
+                
+            $permissionFields[] = $userReadField;
+            $permissionFields[] = $userWriteField;
+        }
+        
+        // Add permission fields to main fields array
+        return array_merge($fields, $permissionFields);
+    }
+
+    /**
+     * Add permission summary field for index pages
+     * @param array $fields
+     * @return array
+     */
+    public function addPermissionSummaryField(array $fields): array
+    {
+        // Add an association field that shows permission summary with count
+        $permissionSummaryField = AssociationField::new('systemEntityPermissions')
+            ->setLabel($this->translator->trans('System Permissions'))
+            ->setHelp($this->translator->trans('Count of system entity permissions for this user'))
+            ->onlyOnIndex()
+            ->formatValue(function ($value, $entity) {
+                if (!$entity instanceof User) {
+                    return $this->translator->trans('No User');
+                }
+                
+                $permissions = $entity->getSystemEntityPermissions();
+                
+                if ($permissions->isEmpty()) {
+                    return $this->translator->trans('No permissions assigned');
+                }
+                
+                $count = $permissions->count();
+                return sprintf($this->translator->trans('%d permission(s) assigned'), $count);
+            });
+            
+        $fields[] = $permissionSummaryField;
+        
+        return $fields;
     }
 }

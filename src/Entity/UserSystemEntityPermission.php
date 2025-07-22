@@ -2,21 +2,21 @@
 
 namespace App\Entity;
 
-use App\Repository\UserModulePermissionRepository;
+use App\Repository\UserSystemEntityPermissionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserModulePermissionRepository::class)]
-#[ORM\Table(name: 'user_module_permission')]
-#[ORM\UniqueConstraint(name: 'UNIQ_USER_MODULE', fields: ['user', 'module'])]
-class UserModulePermission extends AbstractEntity
+#[ORM\Entity(repositoryClass: UserSystemEntityPermissionRepository::class)]
+#[ORM\Table(name: 'user_system_entity_permission')]
+#[ORM\UniqueConstraint(name: 'UNIQ_USER_SYSTEM_ENTITY', fields: ['user', 'systemEntity'])]
+class UserSystemEntityPermission extends AbstractEntity
 {
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'modulePermissions')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'systemEntityPermissions')]
     #[ORM\JoinColumn(name: 'user_id', nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Module::class, inversedBy: 'userPermissions')]
-    #[ORM\JoinColumn(name: 'module_id', nullable: false)]
-    private ?Module $module = null;
+    #[ORM\ManyToOne(targetEntity: SystemEntity::class, inversedBy: 'userPermissions')]
+    #[ORM\JoinColumn(name: 'system_entity_id', nullable: false)]
+    private ?SystemEntity $systemEntity = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $canRead = false;
@@ -36,7 +36,7 @@ class UserModulePermission extends AbstractEntity
         return sprintf(
             '%s - %s (R:%s, W:%s)',
             $this->user?->getEmail() ?? 'Unknown User',
-            $this->module?->getName() ?? 'Unknown Module',
+            $this->systemEntity?->getName() ?? 'Unknown SystemEntity',
             $this->canRead ? 'Y' : 'N',
             $this->canWrite ? 'Y' : 'N'
         );
@@ -53,14 +53,14 @@ class UserModulePermission extends AbstractEntity
         return $this;
     }
 
-    public function getModule(): ?Module
+    public function getSystemEntity(): ?SystemEntity
     {
-        return $this->module;
+        return $this->systemEntity;
     }
 
-    public function setModule(?Module $module): static
+    public function setSystemEntity(?SystemEntity $systemEntity): static
     {
-        $this->module = $module;
+        $this->systemEntity = $systemEntity;
         return $this;
     }
 
