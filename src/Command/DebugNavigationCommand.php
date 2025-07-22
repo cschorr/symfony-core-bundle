@@ -93,7 +93,7 @@ class DebugNavigationCommand extends Command
             ->where('se.active = :active')
             ->andWhere('(up.user = :user AND (up.canRead = :canRead OR up.canWrite = :canWrite))')
             ->setParameter('active', true)
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('canRead', true)
             ->setParameter('canWrite', true);
             

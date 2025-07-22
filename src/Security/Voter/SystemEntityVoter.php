@@ -4,6 +4,7 @@ namespace App\Security\Voter;
 
 use App\Entity\SystemEntity;
 use App\Entity\User;
+use App\Enum\SystemEntityPermission;
 use App\Repository\UserSystemEntityPermissionRepository;
 use App\Repository\SystemEntityRepository;
 use Psr\Log\LoggerInterface;
@@ -14,11 +15,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class SystemEntityVoter extends Voter
 {
-    public const READ = 'read';
-    public const WRITE = 'write';
-    public const EDIT = 'edit';
-    public const DELETE = 'delete';
-
     public function __construct(
         private readonly UserSystemEntityPermissionRepository $permissionRepository,
         private readonly SystemEntityRepository $systemEntityRepository,
@@ -29,7 +25,8 @@ class SystemEntityVoter extends Voter
     protected function supports(string $attribute, mixed $subject): bool
     {
         // Support both SystemEntity entities and system entity codes/names (strings)
-        return in_array($attribute, [self::READ, self::WRITE, self::EDIT, self::DELETE])
+        $validAttributes = array_map(fn(SystemEntityPermission $case) => $case->value, SystemEntityPermission::cases());
+        return in_array($attribute, $validAttributes)
             && ($subject instanceof SystemEntity || is_string($subject));
     }
 
@@ -66,20 +63,19 @@ class SystemEntityVoter extends Voter
         }
 
         // Check specific permission
-        switch ($attribute) {
-            case self::READ:
-                $canRead = $this->canRead($systemEntity, $user);
-                error_log("SystemEntityVoter: User {$user->getUserIdentifier()} can read {$systemEntity->getCode()}: " . ($canRead ? 'YES' : 'NO'));
-                return $canRead;
-            case self::WRITE:
-            case self::EDIT:
-            case self::DELETE:
-                $canWrite = $this->canWrite($systemEntity, $user);
-                error_log("SystemEntityVoter: User {$user->getUserIdentifier()} can write {$systemEntity->getCode()}: " . ($canWrite ? 'YES' : 'NO'));
-                return $canWrite;
+        // Convert string to enum for type safety
+        $permission = SystemEntityPermission::tryFrom($attribute);
+        if (!$permission) {
+            return false;
         }
 
-        return false;
+        // Check specific permission using match expression
+        return match ($permission) {
+            SystemEntityPermission::READ => $this->canRead($systemEntity, $user),
+            SystemEntityPermission::WRITE,
+            SystemEntityPermission::EDIT,
+            SystemEntityPermission::DELETE => $this->canWrite($systemEntity, $user)
+        };
     }
 
     private function canRead(SystemEntity $systemEntity, User $user): bool

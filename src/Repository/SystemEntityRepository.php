@@ -27,7 +27,7 @@ class SystemEntityRepository extends ServiceEntityRepository
             ->join('se.userPermissions', 'up')
             ->andWhere('up.user = :user')
             ->andWhere('up.canRead = true OR up.canWrite = true')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->orderBy('se.id', 'ASC')
             ->getQuery()
             ->getResult();
@@ -42,9 +42,10 @@ class SystemEntityRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('se')
             ->join('se.userPermissions', 'up')
             ->andWhere('up.user = :user')
+            ->andWhere('se.active = :active')
             ->andWhere('up.canRead = true OR up.canWrite = true')
-            ->andWhere('se.active = true')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
+            ->setParameter('active', true)
             ->orderBy('se.id', 'ASC')
             ->getQuery()
             ->getResult();
@@ -127,7 +128,7 @@ class SystemEntityRepository extends ServiceEntityRepository
             ->join('se.userPermissions', 'up')
             ->andWhere('up.user = :user')
             ->andWhere('up.canRead = :canRead')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('canRead', true)
             ->getQuery()
             ->getResult();
@@ -143,7 +144,7 @@ class SystemEntityRepository extends ServiceEntityRepository
             ->join('se.userPermissions', 'up')
             ->andWhere('up.user = :user')
             ->andWhere('up.canWrite = :canWrite')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('canWrite', true)
             ->getQuery()
             ->getResult();
@@ -169,7 +170,7 @@ class SystemEntityRepository extends ServiceEntityRepository
         return (bool) $this->getEntityManager()
             ->createQuery('SELECT 1 FROM App\Entity\UserSystemEntityPermission up 
                           WHERE up.user = :user AND up.systemEntity = :systemEntity AND up.canRead = true')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('systemEntity', $systemEntity)
             ->getOneOrNullResult();
     }
@@ -182,7 +183,7 @@ class SystemEntityRepository extends ServiceEntityRepository
         return (bool) $this->getEntityManager()
             ->createQuery('SELECT 1 FROM App\Entity\UserSystemEntityPermission up 
                           WHERE up.user = :user AND up.systemEntity = :systemEntity AND up.canWrite = true')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('systemEntity', $systemEntity)
             ->getOneOrNullResult();
     }
@@ -195,7 +196,7 @@ class SystemEntityRepository extends ServiceEntityRepository
         return (bool) $this->getEntityManager()
             ->createQuery('SELECT 1 FROM App\Entity\UserSystemEntityPermission up 
                           WHERE up.user = :user AND up.systemEntity = :systemEntity AND (up.canRead = true OR up.canWrite = true)')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('systemEntity', $systemEntity)
             ->getOneOrNullResult();
     }
