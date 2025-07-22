@@ -124,15 +124,7 @@ class ProjectCrudController extends AbstractCrudController
                     if ($value instanceof \App\Enum\ProjectStatus) {
                         return $value->getLabel();
                     }
-                    // Fallback for legacy integer values
-                    $statusNames = [
-                        0 => $this->translator->trans('Planning'),
-                        1 => $this->translator->trans('In Progress'),
-                        2 => $this->translator->trans('On Hold'),
-                        3 => $this->translator->trans('Completed'),
-                        4 => $this->translator->trans('Cancelled')
-                    ];
-                    return $statusNames[$value] ?? $this->translator->trans('Unknown');
+                    return $this->translator->trans('Unknown');
                 })
                 ->build(),
 

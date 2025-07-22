@@ -2,13 +2,13 @@
 
 namespace App\Enum;
 
-enum ProjectStatus: int
+enum ProjectStatus: string
 {
-    case PLANNING = 0;
-    case IN_PROGRESS = 1;
-    case ON_HOLD = 2;
-    case COMPLETED = 3;
-    case CANCELLED = 4;
+    case PLANNING = 'planning';
+    case IN_PROGRESS = 'in_progress';
+    case ON_HOLD = 'on_hold';
+    case COMPLETED = 'completed';
+    case CANCELLED = 'cancelled';
 
     public function getLabel(): string
     {

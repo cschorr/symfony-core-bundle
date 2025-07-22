@@ -211,7 +211,7 @@ class CompanyCrudController extends AbstractCrudController
         $fields[] = $this->fieldService->field('employees')
             ->type('association')
             ->label('Users/Employees')
-            ->pages(['detail'])
+            ->pages(['detail']) // Only show on detail page, not form
             ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
                 'email' => 'Email',
                 'active' => 'Active',
@@ -220,36 +220,18 @@ class CompanyCrudController extends AbstractCrudController
             ->renderAsHtml(true)
             ->build();
 
-        // For form page, show regular association field for users
-        $fields[] = $this->fieldService->field('employees')
-            ->type('association')
-            ->label('Users/Employees')
-            ->multiple(true)
-            ->pages(['form'])
-            ->autocomplete(true)
-            ->build();
-
         // Projects Tab
         $fields[] = $this->fieldService->createTabConfig('projects_tab', 'Projects');
         $fields[] = $this->fieldService->field('projects')
             ->type('association')
             ->label('Projects')
-            ->pages(['detail'])
+            ->pages(['detail']) // Only show on detail page, not form
             ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
                 'name' => 'Project Name',
                 'status' => 'Status',
                 'createdAt' => 'Created'
             ], 'Projects', 'No projects assigned'))
             ->renderAsHtml(true)
-            ->build();
-
-        // For form page, show regular association field for projects
-        $fields[] = $this->fieldService->field('projects')
-            ->type('association')
-            ->label('Projects')
-            ->multiple(true)
-            ->pages(['form'])
-            ->autocomplete(true)
             ->build();
 
         return $fields;
