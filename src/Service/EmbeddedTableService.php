@@ -137,6 +137,10 @@ class EmbeddedTableService
     {
         switch ($property) {
             case 'id':
+                // Handle enum values for ID field
+                if ($value instanceof \BackedEnum) {
+                    $value = $value->value;
+                }
                 return '<span class="field-id text-truncate">' . htmlspecialchars((string)$value) . '</span>';
                 
             case 'active':
@@ -150,7 +154,12 @@ class EmbeddedTableService
                     return '<span class="text-muted text-truncate">-</span>';
                 }
                 
-                // Handle numeric status values (like Project entity)
+                // Handle ProjectStatus enum
+                if ($value instanceof \App\Enum\ProjectStatus) {
+                    return '<span class="badge bg-' . $value->getBadgeClass() . ' text-truncate">' . $value->getLabel() . '</span>';
+                }
+                
+                // Handle numeric status values (legacy support)
                 if (is_numeric($value)) {
                     $statusMap = [
                         0 => ['label' => $this->translator->trans('Planning'), 'class' => 'secondary'],
@@ -217,6 +226,14 @@ class EmbeddedTableService
                 if (empty($value)) {
                     return '<span class="text-muted text-truncate">-</span>';
                 }
+                
+                // Handle enum values
+                if ($value instanceof \BackedEnum) {
+                    $value = $value->value;
+                } elseif ($value instanceof \UnitEnum) {
+                    $value = $value->name;
+                }
+                
                 return '<span class="text-truncate">' . htmlspecialchars((string)$value) . '</span>';
         }
     }

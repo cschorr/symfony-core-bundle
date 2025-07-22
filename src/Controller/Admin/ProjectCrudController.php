@@ -114,13 +114,17 @@ class ProjectCrudController extends AbstractCrudController
                 ->help('Current status of the project')
                 ->pages(['index', 'detail', 'form'])  // Include index page for better visibility
                 ->choices([
-                    $this->translator->trans('Planning') => 0,
-                    $this->translator->trans('In Progress') => 1,
-                    $this->translator->trans('On Hold') => 2,
-                    $this->translator->trans('Completed') => 3,
-                    $this->translator->trans('Cancelled') => 4,
+                    $this->translator->trans('Planning') => \App\Enum\ProjectStatus::PLANNING,
+                    $this->translator->trans('In Progress') => \App\Enum\ProjectStatus::IN_PROGRESS,
+                    $this->translator->trans('On Hold') => \App\Enum\ProjectStatus::ON_HOLD,
+                    $this->translator->trans('Completed') => \App\Enum\ProjectStatus::COMPLETED,
+                    $this->translator->trans('Cancelled') => \App\Enum\ProjectStatus::CANCELLED,
                 ])
                 ->formatValue(function ($value, $entity) {
+                    if ($value instanceof \App\Enum\ProjectStatus) {
+                        return $value->getLabel();
+                    }
+                    // Fallback for legacy integer values
                     $statusNames = [
                         0 => $this->translator->trans('Planning'),
                         1 => $this->translator->trans('In Progress'),
@@ -213,8 +217,8 @@ class ProjectCrudController extends AbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if ($entityInstance instanceof Project && $entityInstance->getStatus() === 0) {
-            $entityInstance->setStatus(0); // Ensure Planning status is set
+        if ($entityInstance instanceof Project && $entityInstance->getStatus() === \App\Enum\ProjectStatus::PLANNING) {
+            $entityInstance->setStatus(\App\Enum\ProjectStatus::PLANNING); // Ensure Planning status is set
         }
         parent::persistEntity($entityManager, $entityInstance);
     }
