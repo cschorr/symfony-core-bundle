@@ -64,16 +64,24 @@ class NavigationService
     }
 
     /**
-     * Get system entity-to-entity class mapping
+     * Get system entity-to-entity class mapping dynamically from database
      */
     public function getSystemEntityEntityMapping(): array
     {
-        return [
+        // Predefined mapping of system entity codes to their corresponding entity classes
+        $classMapping = [
             'SystemEntity' => \App\Entity\SystemEntity::class,
             'User' => \App\Entity\User::class,
             'Company' => \App\Entity\Company::class,
             'CompanyGroup' => \App\Entity\CompanyGroup::class,
             'Project' => \App\Entity\Project::class,
         ];
+        
+        // Get only active system entities from database
+        $activeSystemEntities = $this->systemEntityRepository->findBy(['active' => true]);
+        $activeCodes = array_map(fn($entity) => $entity->getCode(), $activeSystemEntities);
+        
+        // Return only mappings for active system entities
+        return array_filter($classMapping, fn($key) => in_array($key, $activeCodes), ARRAY_FILTER_USE_KEY);
     }
 }
