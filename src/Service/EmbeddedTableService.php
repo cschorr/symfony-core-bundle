@@ -155,14 +155,16 @@ class EmbeddedTableService
                     return '<span class="text-muted text-truncate">-</span>';
                 }
                 
-                // Handle ProjectStatus enum
+                // Handle ProjectStatus enum directly
                 if ($value instanceof ProjectStatus) {
                     return '<span class="badge bg-' . $value->getBadgeClass() . ' text-truncate">' . $value->getLabel() . '</span>';
                 }
                 
-                // Handle numeric status values (legacy support) - convert to enum
+                // Convert any other value to enum (handles both legacy int and string values)
+                $enum = null;
                 if (is_numeric($value)) {
-                    $enumFromInt = match((int)$value) {
+                    // Legacy numeric conversion
+                    $enum = match((int)$value) {
                         0 => ProjectStatus::PLANNING,
                         1 => ProjectStatus::IN_PROGRESS,
                         2 => ProjectStatus::ON_HOLD,
@@ -170,30 +172,14 @@ class EmbeddedTableService
                         4 => ProjectStatus::CANCELLED,
                         default => null
                     };
-                    
-                    if ($enumFromInt) {
-                        return '<span class="badge bg-' . $enumFromInt->getBadgeClass() . ' text-truncate">' . $enumFromInt->getLabel() . '</span>';
-                    }
-                    
-                    return '<span class="badge bg-secondary text-truncate">' . $this->translator->trans('Unknown') . '</span>';
+                } elseif (is_string($value)) {
+                    // String to enum conversion
+                    $enum = ProjectStatus::tryFrom($value);
                 }
                 
-                // Handle string status values - convert to enum
-                if (is_string($value)) {
-                    $enumFromString = ProjectStatus::tryFrom($value);
-                    if ($enumFromString) {
-                        return '<span class="badge bg-' . $enumFromString->getBadgeClass() . ' text-truncate">' . $enumFromString->getLabel() . '</span>';
-                    }
-                    
-                    // Fallback for non-enum string values
-                    $badgeClass = match($value) {
-                        'active' => 'success',
-                        'completed' => 'primary', 
-                        'on_hold' => 'warning',
-                        'cancelled' => 'danger',
-                        default => 'secondary'
-                    };
-                    return '<span class="badge bg-' . $badgeClass . ' text-truncate">' . ucfirst($value) . '</span>';
+                // Use enum if found, otherwise show unknown
+                if ($enum) {
+                    return '<span class="badge bg-' . $enum->getBadgeClass() . ' text-truncate">' . $enum->getLabel() . '</span>';
                 }
                 
                 return '<span class="badge bg-secondary text-truncate">' . $this->translator->trans('Unknown') . '</span>';
