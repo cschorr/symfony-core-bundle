@@ -60,7 +60,7 @@ class NavigationService
      */
     public function getSystemEntityIcon(SystemEntity $systemEntity): string
     {
-        return $systemEntity->getIcon() ?? $this->getSystemEntityIconMapping()[$systemEntity->getCode()] ?? 'fas fa-circle';
+        return $systemEntity->getIcon() ?? 'fas fa-circle';
     }
 
     /**
@@ -74,20 +74,6 @@ class NavigationService
             'Company' => \App\Entity\Company::class,
             'CompanyGroup' => \App\Entity\CompanyGroup::class,
             'Project' => \App\Entity\Project::class,
-        ];
-    }
-
-    /**
-     * Get system entity icon mapping for fallback
-     */
-    public function getSystemEntityIconMapping(): array
-    {
-        return [
-            'SystemEntity' => 'fas fa-list',
-            'User' => 'fas fa-users',
-            'Company' => 'fas fa-building',
-            'CompanyGroup' => 'fas fa-layer-group',
-            'Project' => 'fas fa-project-diagram',
         ];
     }
 }
