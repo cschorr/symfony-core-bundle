@@ -34,7 +34,7 @@ class Company extends AbstractEntity
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'company')]
     private Collection $employees;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: Category::class)]
     private ?Category $category = null;
 
     public function __construct()
