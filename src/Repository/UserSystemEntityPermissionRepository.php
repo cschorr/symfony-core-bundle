@@ -23,15 +23,13 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
      */
     public function findByUserAndSystemEntity(User $user, SystemEntity $systemEntity): ?UserSystemEntityPermission
     {
-        // Workaround: Use entity relationships instead of queries
-        // This works around a potential issue with UUID v7 parameter binding
-        foreach ($user->getSystemEntityPermissions() as $permission) {
-            if ($permission->getSystemEntity()->getId()->equals($systemEntity->getId())) {
-                return $permission;
-            }
-        }
-        
-        return null;
+        return $this->createQueryBuilder('usep')
+            ->andWhere('usep.user = :user')
+            ->andWhere('usep.systemEntity = :systemEntity')
+            ->setParameter('user', $user)
+            ->setParameter('systemEntity', $systemEntity)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
