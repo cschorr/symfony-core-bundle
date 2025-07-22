@@ -23,37 +23,14 @@ class SystemEntityRepository extends ServiceEntityRepository
      */
     public function findSystemEntitiesForUser(User $user): array
     {
-        $userIdHex = str_replace('-', '', $user->getId()->toRfc4122());
-        
-        $sql = 'SELECT HEX(se.id) as id_hex FROM system_entity se 
-                INNER JOIN user_system_entity_permission usep ON se.id = usep.system_entity_id 
-                WHERE usep.user_id = UNHEX(:userIdHex) 
-                AND (usep.can_read = 1 OR usep.can_write = 1) 
-                ORDER BY se.id ASC';
-        
-        $connection = $this->getEntityManager()->getConnection();
-        $stmt = $connection->prepare($sql);
-        $stmt->bindValue('userIdHex', $userIdHex);
-        
-        $results = $stmt->executeQuery()->fetchAllAssociative();
-        
-        // Convert results to entities
-        $systemEntities = [];
-        foreach ($results as $row) {
-            $uuid = \Symfony\Component\Uid\Uuid::fromString(
-                substr($row['id_hex'], 0, 8) . '-' . 
-                substr($row['id_hex'], 8, 4) . '-' . 
-                substr($row['id_hex'], 12, 4) . '-' . 
-                substr($row['id_hex'], 16, 4) . '-' . 
-                substr($row['id_hex'], 20, 12)
-            );
-            $systemEntity = $this->find($uuid);
-            if ($systemEntity) {
-                $systemEntities[] = $systemEntity;
-            }
-        }
-        
-        return $systemEntities;
+        return $this->createQueryBuilder('se')
+            ->join('se.userPermissions', 'up')
+            ->andWhere('up.user = :user')
+            ->andWhere('up.canRead = true OR up.canWrite = true')
+            ->setParameter('user', $user)
+            ->orderBy('se.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -62,38 +39,15 @@ class SystemEntityRepository extends ServiceEntityRepository
      */
     public function findActiveSystemEntitiesForUser(User $user): array
     {
-        $userIdHex = str_replace('-', '', $user->getId()->toRfc4122());
-        
-        $sql = 'SELECT HEX(se.id) as id_hex FROM system_entity se 
-                INNER JOIN user_system_entity_permission usep ON se.id = usep.system_entity_id 
-                WHERE usep.user_id = UNHEX(:userIdHex) 
-                AND (usep.can_read = 1 OR usep.can_write = 1) 
-                AND se.active = 1 
-                ORDER BY se.id ASC';
-        
-        $connection = $this->getEntityManager()->getConnection();
-        $stmt = $connection->prepare($sql);
-        $stmt->bindValue('userIdHex', $userIdHex);
-        
-        $results = $stmt->executeQuery()->fetchAllAssociative();
-        
-        // Convert results to entities
-        $systemEntities = [];
-        foreach ($results as $row) {
-            $uuid = \Symfony\Component\Uid\Uuid::fromString(
-                substr($row['id_hex'], 0, 8) . '-' . 
-                substr($row['id_hex'], 8, 4) . '-' . 
-                substr($row['id_hex'], 12, 4) . '-' . 
-                substr($row['id_hex'], 16, 4) . '-' . 
-                substr($row['id_hex'], 20, 12)
-            );
-            $systemEntity = $this->find($uuid);
-            if ($systemEntity) {
-                $systemEntities[] = $systemEntity;
-            }
-        }
-        
-        return $systemEntities;
+        return $this->createQueryBuilder('se')
+            ->join('se.userPermissions', 'up')
+            ->andWhere('up.user = :user')
+            ->andWhere('up.canRead = true OR up.canWrite = true')
+            ->andWhere('se.active = true')
+            ->setParameter('user', $user)
+            ->orderBy('se.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
