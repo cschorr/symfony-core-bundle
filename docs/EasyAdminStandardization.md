@@ -37,12 +37,12 @@ namespace App\Controller\Admin;
 use App\Entity\Company;
 use App\Service\CrudSchemaBuilder;
 use App\Service\EasyAdminFieldService;
-use App\Controller\Admin\Traits\StandardCrudControllerTrait;
+use App\Controller\Admin\Traits\TabCrudControllerTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 class CompanyCrudController extends AbstractCrudController
 {
-    use StandardCrudControllerTrait;
+    use TabCrudControllerTrait;
 
     public function __construct(
         private CrudSchemaBuilder $schemaBuilder,

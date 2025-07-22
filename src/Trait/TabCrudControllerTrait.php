@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Admin\Traits;
+namespace App\Trait;
 
 use App\Service\CrudSchemaBuilder;
 use App\Service\EasyAdminFieldService;
@@ -10,7 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 /**
  * Comprehensive trait for standardized CRUD controller patterns
  */
-trait StandardCrudControllerTrait
+trait TabCrudControllerTrait
 {
     protected CrudSchemaBuilder $schemaBuilder;
     protected EasyAdminFieldService $fieldService;
@@ -36,7 +36,7 @@ trait StandardCrudControllerTrait
     public function configureFields(string $pageName): iterable
     {
         $fieldSchema = $this->getFieldSchema();
-        
+
         // Handle tab structure for detail page
         if ($pageName === Crud::PAGE_DETAIL && method_exists($this, 'getTabSchema')) {
             $tabSchema = $this->getTabSchema();
@@ -44,7 +44,7 @@ trait StandardCrudControllerTrait
                 return $this->buildTabStructure($tabSchema, $pageName);
             }
         }
-        
+
         // Regular field processing for other pages
         $fields = [];
         foreach ($fieldSchema as $config) {
@@ -55,12 +55,12 @@ trait StandardCrudControllerTrait
                 }
             }
         }
-        
+
         // Apply custom field modifications if method exists
         if (method_exists($this, 'customizeFields')) {
             $fields = $this->customizeFields($fields, $pageName);
         }
-        
+
         return $fields;
     }
 
@@ -70,11 +70,11 @@ trait StandardCrudControllerTrait
     private function buildTabStructure(array $tabSchema, string $pageName): iterable
     {
         $allFields = [];
-        
+
         foreach ($tabSchema as $tabConfig) {
             // Add tab divider
             $allFields[] = FormField::addTab($tabConfig['label']);
-            
+
             // Add fields for this tab
             foreach ($tabConfig['fields'] as $fieldConfig) {
                 if ($this->shouldIncludeField($fieldConfig, $pageName)) {
@@ -85,7 +85,7 @@ trait StandardCrudControllerTrait
                 }
             }
         }
-        
+
         return $allFields;
     }
 
@@ -97,10 +97,10 @@ trait StandardCrudControllerTrait
         if (!isset($fieldConfig['pages'])) {
             return true;
         }
-        
+
         $schemaPages = $fieldConfig['pages'];
         $crudPages = $this->mapCrudPageToSchemaPages($pageName);
-        
+
         return !empty(array_intersect($schemaPages, $crudPages));
     }
 
@@ -131,7 +131,7 @@ trait StandardCrudControllerTrait
                 'required' => true,
                 'linkToShow' => true
             ]),
-            
+
             // Standard timestamps
             $this->schemaBuilder->createField('createdAt', 'datetime', 'Created At', ['index', 'detail']),
             $this->schemaBuilder->createField('updatedAt', 'datetime', 'Updated At', ['detail']),
