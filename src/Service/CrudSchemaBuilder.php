@@ -9,15 +9,16 @@ class CrudSchemaBuilder
 {
     public function __construct(
         private EasyAdminFieldService $fieldService
-    ) {}
+    ) {
+    }
 
     /**
      * Create a standard field configuration array
      */
     public function createField(
-        string $property, 
-        string $type, 
-        string $label, 
+        string $property,
+        string $type,
+        string $label,
         array $pages = ['index', 'detail', 'form'],
         array $options = []
     ): array {

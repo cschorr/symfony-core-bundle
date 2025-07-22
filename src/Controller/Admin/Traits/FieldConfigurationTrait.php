@@ -108,18 +108,18 @@ trait FieldConfigurationTrait
     protected function createContactEntityFields(string $entityLabel): array
     {
         $fields = [];
-        
+
         // Standard fields
         $fields = array_merge($fields, $this->getStandardEntityFields($entityLabel));
-        
+
         // Contact information
         $fields = array_merge($fields, $this->getContactFieldGroups());
-        
+
         // Timestamps (if needed)
         if ($this->shouldIncludeTimestamps()) {
             $fields = array_merge($fields, $this->getTimestampFields());
         }
-        
+
         return $fields;
     }
 
@@ -197,27 +197,27 @@ trait FieldConfigurationTrait
     protected function getAssociationFields(array $associations, array $pages = ['detail', 'form']): array
     {
         $fields = [];
-        
+
         foreach ($associations as $association => $config) {
             $fieldBuilder = $this->fieldService->field($association)
                 ->type('association')
                 ->pages($pages);
-                
+
             if (isset($config['label'])) {
                 $fieldBuilder->label($config['label']);
             }
-            
+
             if (isset($config['autocomplete']) && $config['autocomplete']) {
                 $fieldBuilder->autocomplete(true);
             }
-            
+
             if (isset($config['multiple']) && $config['multiple']) {
                 $fieldBuilder->multiple(true);
             }
-            
+
             $fields[] = $fieldBuilder->build();
         }
-        
+
         return $fields;
     }
 
@@ -269,7 +269,7 @@ trait FieldConfigurationTrait
             ...$this->getNotesField(),
             ...$this->getTimestampFields(),
         ];
-        
+
         return $config;
     }
 
@@ -279,22 +279,22 @@ trait FieldConfigurationTrait
     protected function createFormStructure(array $sections, array $pages = ['form']): array
     {
         $fields = [];
-        
+
         foreach ($sections as $sectionName => $sectionConfig) {
             $icon = $sectionConfig['icon'] ?? 'fas fa-folder';
             $isTab = $sectionConfig['type'] ?? 'panel' === 'tab';
-            
+
             if ($isTab) {
                 $fields[] = $this->fieldService->createTabConfig($sectionName, $sectionConfig['label'] ?? $sectionName);
             } else {
                 $fields[] = $this->fieldService->createPanelConfig($sectionName, $sectionConfig['label'] ?? $sectionName, $pages, $icon);
             }
-            
+
             if (isset($sectionConfig['fields'])) {
                 $fields = array_merge($fields, $sectionConfig['fields']);
             }
         }
-        
+
         return $fields;
     }
 }

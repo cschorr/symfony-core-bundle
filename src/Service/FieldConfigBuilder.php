@@ -119,7 +119,7 @@ class FieldConfigBuilder
 
     /**
      * Make this field link to the show action of the related entity.
-     * 
+     *
      * @param string|null $controllerClass Optional: specific controller class to link to.
      *                                     If null, auto-detects based on entity naming convention.
      * @return self
@@ -205,7 +205,7 @@ class FieldConfigBuilder
 
     private function autoDetectType(): string
     {
-        return match(true) {
+        return match (true) {
             str_contains($this->name, 'email') => 'email',
             str_contains($this->name, 'phone') || str_contains($this->name, 'cell') => 'telephone',
             str_contains($this->name, 'url') || str_contains($this->name, 'website') => 'url',

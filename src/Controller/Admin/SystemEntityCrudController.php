@@ -153,7 +153,6 @@ class SystemEntityCrudController extends AbstractCrudController
 
                 ...$this->getSystemEntityPermissionsSummaryField(),
             ]);
-
         } elseif ($pageName === Crud::PAGE_DETAIL) {
             $config = array_merge($config, [
                 $this->fieldService->field('name')
@@ -179,7 +178,6 @@ class SystemEntityCrudController extends AbstractCrudController
                 ...$this->getSystemEntityPermissionsSummaryField(),
                 ...$this->getSystemEntityPermissionsDetailField(),
             ]);
-
         } else { // FORM pages (NEW/EDIT)
             $config = array_merge($config, [
                 $this->fieldService->field('name')
@@ -255,8 +253,12 @@ class SystemEntityCrudController extends AbstractCrudController
                         $user = $permission->getUser();
                         $userEmail = $user ? $user->getEmail() : $this->translator->trans('Unknown User');
                         $access = [];
-                        if ($permission->canRead()) $access[] = $this->translator->trans('Read');
-                        if ($permission->canWrite()) $access[] = $this->translator->trans('Write');
+                        if ($permission->canRead()) {
+                            $access[] = $this->translator->trans('Read');
+                        }
+                        if ($permission->canWrite()) {
+                            $access[] = $this->translator->trans('Write');
+                        }
                         $accessString = implode(', ', $access);
 
                         $permissions[] = sprintf('%s: %s', $userEmail, $accessString);
