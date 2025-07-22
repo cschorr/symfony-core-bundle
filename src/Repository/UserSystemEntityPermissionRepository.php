@@ -152,17 +152,17 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     public function grantPermissions(User $user, SystemEntity $systemEntity, bool $canRead = false, bool $canWrite = false): UserSystemEntityPermission
     {
         $permission = $this->findByUserAndSystemEntity($user, $systemEntity);
-        
+
         if (!$permission) {
             $permission = new UserSystemEntityPermission();
             $permission->setUser($user);
             $permission->setSystemEntity($systemEntity);
             $this->getEntityManager()->persist($permission);
         }
-        
+
         $permission->setCanRead($canRead);
         $permission->setCanWrite($canWrite);
-        
+
         return $permission;
     }
 
@@ -172,7 +172,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     public function revokePermissions(User $user, SystemEntity $systemEntity): void
     {
         $permission = $this->findByUserAndSystemEntity($user, $systemEntity);
-        
+
         if ($permission) {
             $this->getEntityManager()->remove($permission);
         }

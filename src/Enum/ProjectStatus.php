@@ -12,7 +12,7 @@ enum ProjectStatus: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PLANNING => 'Planning',
             self::IN_PROGRESS => 'In Progress',
             self::ON_HOLD => 'On Hold',
@@ -23,7 +23,7 @@ enum ProjectStatus: string
 
     public function getBadgeClass(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PLANNING => 'secondary',
             self::IN_PROGRESS => 'primary',
             self::ON_HOLD => 'warning',

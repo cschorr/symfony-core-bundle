@@ -11,7 +11,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\LocaleService;
 use App\Service\NavigationService;
-
 use App\Entity\User;
 
 #[AdminDashboard(routePath: '/admin/{_locale}', routeName: 'admin')]
@@ -41,7 +40,7 @@ class DashboardController extends AbstractDashboardController
 
     /**
      * Configure EasyAdmin dashboard settings
-     * 
+     *
      * Locales are automatically synchronized with services.yaml app.locales parameter.
      * To add/remove locales:
      * 1. Update the app.locales parameter in config/services.yaml
@@ -93,7 +92,7 @@ class DashboardController extends AbstractDashboardController
 
         /** @var User $user */
         $user = $this->getUser();
-        
+
         if (!$user instanceof User) {
             return;
         }
@@ -108,20 +107,20 @@ class DashboardController extends AbstractDashboardController
 
         // Generate menu items dynamically based on user permissions and active system entities
         $entityMapping = $this->navigationService->getSystemEntityEntityMapping();
-        
+
         foreach ($accessibleSystemEntities as $systemEntity) {
             $systemEntityCode = $systemEntity->getCode();
-            
+
             // Check if we have an entity mapping for this system entity
             if (isset($entityMapping[$systemEntityCode])) {
                 $entityClass = $entityMapping[$systemEntityCode];
                 $icon = $this->navigationService->getSystemEntityIcon($systemEntity);
-                
+
                 // Use the system entity name (plural form) for navigation labels
                 // This corresponds to the "name" field in the SystemEntity entity (e.g., "Users", "Companies")
                 $systemEntityNamePlural = $systemEntity->getName();
                 $label = $this->translator->trans($systemEntityNamePlural);
-                
+
                 yield MenuItem::linkToCrud($label, $icon, $entityClass);
             }
         }

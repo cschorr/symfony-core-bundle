@@ -18,7 +18,7 @@ class LocalePatternCompilerPass implements CompilerPassInterface
 
         $locales = $container->getParameter('app.locales');
         $pattern = implode('|', $locales);
-        
+
         // Set the generated pattern as a parameter
         $container->setParameter('app.locales.pattern', $pattern);
     }

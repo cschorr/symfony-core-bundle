@@ -17,7 +17,7 @@ class RelationshipSyncService
 
     /**
      * Sync bidirectional one-to-many relationships
-     * 
+     *
      * @param object $owningEntity The entity that owns the relationship (e.g., Company)
      * @param string $collectionProperty The property name of the collection (e.g., 'employees')
      * @param string $inverseProperty The property name on the inverse side (e.g., 'company')
@@ -29,7 +29,7 @@ class RelationshipSyncService
     ): void {
         $owningEntityClass = get_class($owningEntity);
         $collection = $this->getPropertyValue($owningEntity, $collectionProperty);
-        
+
         if (!$collection instanceof Collection) {
             return;
         }
@@ -54,7 +54,7 @@ class RelationshipSyncService
     public function autoSync(object $entity): void
     {
         $class = get_class($entity);
-        
+
         // Common relationship patterns
         $relationshipMappings = [
             'Company' => [
@@ -68,7 +68,7 @@ class RelationshipSyncService
         ];
 
         $entityName = basename(str_replace('\\', '/', $class));
-        
+
         if (isset($relationshipMappings[$entityName])) {
             foreach ($relationshipMappings[$entityName] as $collection => $inverse) {
                 if ($this->hasProperty($entity, $collection)) {
@@ -87,7 +87,7 @@ class RelationshipSyncService
 
         $firstItem = $currentCollection->first();
         $itemClass = get_class($firstItem);
-        
+
         // Find all items that were previously assigned to this entity
         $repository = $this->entityManager->getRepository($itemClass);
         $previousItems = $repository->findBy([$inverseProperty => $owningEntity]);
@@ -106,7 +106,7 @@ class RelationshipSyncService
         if (method_exists($entity, $getter)) {
             return $entity->$getter();
         }
-        
+
         $isGetter = 'is' . ucfirst($property);
         if (method_exists($entity, $isGetter)) {
             return $entity->$isGetter();

@@ -32,7 +32,7 @@ class TestPermissionsCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $demoUser = $this->userRepository->findOneBy(['email' => 'demo@example.com']);
-        
+
         if (!$demoUser) {
             $io->error('Demo user not found');
             return Command::FAILURE;
@@ -47,7 +47,7 @@ class TestPermissionsCommand extends Command
         // Test Company permissions
         $canReadCompany = $this->authorizationChecker->isGranted('read', 'Company');
         $canWriteCompany = $this->authorizationChecker->isGranted('write', 'Company');
-        
+
         // Test User permissions
         $canReadUser = $this->authorizationChecker->isGranted('read', 'User');
         $canWriteUser = $this->authorizationChecker->isGranted('write', 'User');

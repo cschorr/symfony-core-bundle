@@ -76,17 +76,17 @@ class DebugNavigationCommand extends Command
         // Test repository method directly
         $io->section('Repository Test');
         $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\SystemEntity::class);
-        
+
         // Test the original method first
         $allUserSystemEntities = $systemEntityRepo->findSystemEntitiesForUser($user);
         $io->writeln(sprintf('findSystemEntitiesForUser returned %d system entities', count($allUserSystemEntities)));
-        
+
         $testSystemEntities = $systemEntityRepo->findActiveSystemEntitiesForUser($user);
         $io->writeln(sprintf('findActiveSystemEntitiesForUser returned %d system entities', count($testSystemEntities)));
 
         // Debug SQL queries
         $io->section('SQL Debug');
-        
+
         // Test the findActiveSystemEntitiesForUser query
         $queryBuilder = $systemEntityRepo->createQueryBuilder('se')
             ->leftJoin('se.userPermissions', 'up')
@@ -96,13 +96,13 @@ class DebugNavigationCommand extends Command
             ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('canRead', true)
             ->setParameter('canWrite', true);
-            
+
         $sql = $queryBuilder->getQuery()->getSQL();
         $io->writeln('Generated SQL:');
         $io->writeln($sql);
-        
+
         $results = $queryBuilder->getQuery()->getResult();
-        $io->writeln(sprintf('Query returned %d system entities', count($results)));        
+        $io->writeln(sprintf('Query returned %d system entities', count($results)));
         $io->writeln('Parameters:');
         foreach ($queryBuilder->getQuery()->getParameters() as $param) {
             $io->writeln(sprintf('  %s => %s', $param->getName(), $param->getValue()));
@@ -112,9 +112,10 @@ class DebugNavigationCommand extends Command
         if (!empty($allUserSystemEntities)) {
             $io->writeln('All user system entities:');
             foreach ($allUserSystemEntities as $systemEntity) {
-                $io->writeln(sprintf('  - %s (%s) - Active: %s', 
-                    $systemEntity->getName(), 
-                    $systemEntity->getCode(), 
+                $io->writeln(sprintf(
+                    '  - %s (%s) - Active: %s',
+                    $systemEntity->getName(),
+                    $systemEntity->getCode(),
                     $systemEntity->isActive() ? 'Yes' : 'No'
                 ));
             }
