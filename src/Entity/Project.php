@@ -15,7 +15,7 @@ class Project extends AbstractEntity
     use StringNameTrait;
     use SetStartEndTrait;
 
-    #[ORM\Column(enumType: ProjectStatus::class, nullable: false, options: ['default' => 0])]
+    #[ORM\Column(type: 'string', enumType: ProjectStatus::class, nullable: false)]
     private ProjectStatus $status = ProjectStatus::PLANNING;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
