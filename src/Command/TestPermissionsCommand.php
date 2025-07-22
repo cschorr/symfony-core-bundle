@@ -47,12 +47,18 @@ class TestPermissionsCommand extends Command
         // Test Company permissions
         $canReadCompany = $this->authorizationChecker->isGranted('read', 'Company');
         $canWriteCompany = $this->authorizationChecker->isGranted('write', 'Company');
+        
+        // Test User permissions
+        $canReadUser = $this->authorizationChecker->isGranted('read', 'User');
+        $canWriteUser = $this->authorizationChecker->isGranted('write', 'User');
 
         $io->table(
             ['Resource', 'Permission', 'Granted'],
             [
                 ['Company', 'read', $canReadCompany ? 'YES' : 'NO'],
                 ['Company', 'write', $canWriteCompany ? 'YES' : 'NO'],
+                ['User', 'read', $canReadUser ? 'YES' : 'NO'],
+                ['User', 'write', $canWriteUser ? 'YES' : 'NO'],
             ]
         );
 

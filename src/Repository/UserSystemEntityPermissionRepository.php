@@ -26,8 +26,8 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('usep')
             ->andWhere('usep.user = :user')
             ->andWhere('usep.systemEntity = :systemEntity')
-            ->setParameter('user', $user)
-            ->setParameter('systemEntity', $systemEntity)
+            ->setParameter('user', $user->getId(), 'uuid')
+            ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -40,7 +40,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('usep')
             ->andWhere('usep.user = :user')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->orderBy('usep.systemEntity', 'ASC')
             ->getQuery()
             ->getResult();
@@ -54,7 +54,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('usep')
             ->andWhere('usep.systemEntity = :systemEntity')
-            ->setParameter('systemEntity', $systemEntity)
+            ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->orderBy('usep.user', 'ASC')
             ->getQuery()
             ->getResult();
@@ -71,7 +71,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
             ->join('usep.systemEntity', 'se')
             ->andWhere('usep.user = :user')
             ->andWhere('usep.canRead = :canRead')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('canRead', true)
             ->getQuery()
             ->getResult();
@@ -88,7 +88,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
             ->join('usep.systemEntity', 'se')
             ->andWhere('usep.user = :user')
             ->andWhere('usep.canWrite = :canWrite')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid')
             ->setParameter('canWrite', true)
             ->getQuery()
             ->getResult();
@@ -105,7 +105,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
             ->join('usep.user', 'u')
             ->andWhere('usep.systemEntity = :systemEntity')
             ->andWhere('usep.canRead = :canRead')
-            ->setParameter('systemEntity', $systemEntity)
+            ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->setParameter('canRead', true)
             ->getQuery()
             ->getResult();
@@ -122,7 +122,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
             ->join('usep.user', 'u')
             ->andWhere('usep.systemEntity = :systemEntity')
             ->andWhere('usep.canWrite = :canWrite')
-            ->setParameter('systemEntity', $systemEntity)
+            ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->setParameter('canWrite', true)
             ->getQuery()
             ->getResult();
@@ -187,7 +187,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
             ->select('COUNT(DISTINCT usep.user)')
             ->andWhere('usep.systemEntity = :systemEntity')
             ->andWhere('(usep.canRead = :canRead OR usep.canWrite = :canWrite)')
-            ->setParameter('systemEntity', $systemEntity)
+            ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->setParameter('canRead', true)
             ->setParameter('canWrite', true)
             ->getQuery()
