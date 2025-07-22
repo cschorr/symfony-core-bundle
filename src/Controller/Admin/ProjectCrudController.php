@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Project;
+use App\Entity\User;
+use App\Enum\ProjectStatus;
 use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
@@ -36,11 +38,6 @@ class ProjectCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return Project::class;
-    }
-
-    protected function getModuleCode(): string
-    {
-        return 'Project';
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -95,48 +92,44 @@ class ProjectCrudController extends AbstractCrudController
         return [
             // Active field first, enabled for all views
             ...$this->getActiveField(),
-            
+
             // Standard fields
             $this->fieldService->createIdField(),
-            
+
             $this->fieldService->field('name')
                 ->type('text')
-                ->label('Project Name')
+                ->label('Name')
                 ->help('The name of the project')
                 ->linkToShow() // Add link to show action
                 ->build(),
-                
+
             $this->fieldService->field('description')
                 ->type('textarea')
                 ->label('Description')
                 ->help('Detailed description of the project')
                 ->pages(['detail', 'form'])
                 ->build(),
-                
+
             $this->fieldService->field('status')
                 ->type('choice')
                 ->label('Status')
                 ->help('Current status of the project')
                 ->pages(['index', 'detail', 'form'])  // Include index page for better visibility
                 ->choices([
-                    $this->translator->trans('Planning') => 0,
-                    $this->translator->trans('In Progress') => 1,
-                    $this->translator->trans('On Hold') => 2,
-                    $this->translator->trans('Completed') => 3,
-                    $this->translator->trans('Cancelled') => 4,
+                    $this->translator->trans('Planning') => ProjectStatus::PLANNING,
+                    $this->translator->trans('In Progress') => ProjectStatus::IN_PROGRESS,
+                    $this->translator->trans('On Hold') => ProjectStatus::ON_HOLD,
+                    $this->translator->trans('Completed') => ProjectStatus::COMPLETED,
+                    $this->translator->trans('Cancelled') => ProjectStatus::CANCELLED,
                 ])
                 ->formatValue(function ($value, $entity) {
-                    $statusNames = [
-                        0 => $this->translator->trans('Planning'),
-                        1 => $this->translator->trans('In Progress'), 
-                        2 => $this->translator->trans('On Hold'),
-                        3 => $this->translator->trans('Completed'),
-                        4 => $this->translator->trans('Cancelled')
-                    ];
-                    return $statusNames[$value] ?? $this->translator->trans('Unknown');
+                    if ($value instanceof ProjectStatus) {
+                        return $value->getLabel();
+                    }
+                    return $this->translator->trans('Unknown');
                 })
                 ->build(),
-                
+
             $this->fieldService->field('assignee')
                 ->type('association')
                 ->label('Assignee')
@@ -148,7 +141,7 @@ class ProjectCrudController extends AbstractCrudController
                     return $value->getEmail();
                 })
                 ->build(),
-                
+
             $this->fieldService->field('client')
                 ->type('association')
                 ->label('Client')
@@ -160,14 +153,14 @@ class ProjectCrudController extends AbstractCrudController
                     return $value->getName();
                 })
                 ->build(),
-                
+
             $this->fieldService->field('startedAt')
                 ->type('date')
                 ->label('Start Date')
                 ->help('Project start date')
                 ->pages(['detail', 'form'])
                 ->build(),
-                
+
             $this->fieldService->field('endedAt')
                 ->type('date')
                 ->label('End Date')
@@ -185,15 +178,15 @@ class ProjectCrudController extends AbstractCrudController
     protected function canCreateEntity(): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && 
-               (in_array('ROLE_ADMIN', $user->getRoles()) || 
+        return $user instanceof User &&
+               (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 in_array('ROLE_USER', $user->getRoles()));
     }
 
     protected function canEditEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && 
+        return $user instanceof User &&
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()));
     }
@@ -201,13 +194,13 @@ class ProjectCrudController extends AbstractCrudController
     protected function canDeleteEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && in_array('ROLE_ADMIN', $user->getRoles());
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     protected function canViewEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && 
+        return $user instanceof User &&
                (in_array('ROLE_ADMIN', $user->getRoles()) ||
                 ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()) ||
                 in_array('ROLE_USER', $user->getRoles()));
@@ -218,8 +211,8 @@ class ProjectCrudController extends AbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if ($entityInstance instanceof Project && $entityInstance->getStatus() === 0) {
-            $entityInstance->setStatus(0); // Ensure Planning status is set
+        if ($entityInstance instanceof Project && $entityInstance->getStatus() === ProjectStatus::PLANNING) {
+            $entityInstance->setStatus(ProjectStatus::PLANNING); // Ensure Planning status is set
         }
         parent::persistEntity($entityManager, $entityInstance);
     }

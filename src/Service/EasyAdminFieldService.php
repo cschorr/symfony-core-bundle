@@ -31,7 +31,8 @@ class EasyAdminFieldService
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private AdminUrlGenerator $adminUrlGenerator
+        private AdminUrlGenerator $adminUrlGenerator,
+        private ?EmbeddedTableService $embeddedTableService = null
     ) {
     }
 
@@ -84,8 +85,9 @@ class EasyAdminFieldService
                 $pageType = $this->getPageType($pageName);
                 return in_array($pageType, $fieldConfig['collapsible'] ?? []);
             }
-            // Tabs are only shown on form pages
-            return $this->getPageType($pageName) === 'form';
+            // Tabs are shown on form and detail pages
+            $pageType = $this->getPageType($pageName);
+            return in_array($pageType, ['form', 'detail']);
         }
         
         $pageType = $this->getPageType($pageName);
@@ -738,5 +740,224 @@ class EasyAdminFieldService
         }
         
         return null;
+    }
+
+    /**
+     * Create field based on schema configuration
+     */
+    public function createFieldFromSchema(array $config): mixed
+    {
+        $field = match ($config['type']) {
+            'id' => IdField::new($config['property'], $config['label']),
+            'text' => TextField::new($config['property'], $config['label']),
+            'textarea' => TextareaField::new($config['property'], $config['label']),
+            'email' => EmailField::new($config['property'], $config['label']),
+            'telephone' => TelephoneField::new($config['property'], $config['label']),
+            'url' => UrlField::new($config['property'], $config['label']),
+            'boolean' => BooleanField::new($config['property'], $config['label']),
+            'datetime' => DateTimeField::new($config['property'], $config['label']),
+            'date' => DateField::new($config['property'], $config['label']),
+            'time' => TimeField::new($config['property'], $config['label']),
+            'country' => CountryField::new($config['property'], $config['label']),
+            'association' => AssociationField::new($config['property'], $config['label']),
+            'number' => NumberField::new($config['property'], $config['label']),
+            'integer' => IntegerField::new($config['property'], $config['label']),
+            'money' => MoneyField::new($config['property'], $config['label']),
+            'percent' => PercentField::new($config['property'], $config['label']),
+            'choice' => ChoiceField::new($config['property'], $config['label']),
+            'image' => ImageField::new($config['property'], $config['label']),
+            default => TextField::new($config['property'], $config['label'])
+        };
+
+        return $this->applySchemaOptions($field, $config);
+    }
+
+    /**
+     * Apply field options based on schema configuration
+     */
+    private function applySchemaOptions(mixed $field, array $config): mixed
+    {
+        // Standard options
+        if (isset($config['required']) && $config['required']) {
+            $field->setRequired(true);
+        }
+
+        if (isset($config['help'])) {
+            $field->setHelp($config['help']);
+        }
+
+        if (isset($config['linkToShow']) && $config['linkToShow']) {
+            $field->setTemplateName('admin/field/text_link.html.twig');
+        }
+
+        // Page visibility
+        if (isset($config['pages'])) {
+            $this->applyPageVisibility($field, $config['pages']);
+        }
+
+        // Association specific options
+        if ($config['type'] === 'association') {
+            if (isset($config['multiple'])) {
+                $field->setFormTypeOption('multiple', $config['multiple']);
+            }
+
+            if (isset($config['autocomplete']) && $config['autocomplete']) {
+                $field->autocomplete();
+            }
+
+            // Handle embedded table
+            if (isset($config['embedded_table']) && $this->embeddedTableService) {
+                $field->formatValue(
+                    $this->embeddedTableService->createEmbeddedTableFormatter(
+                        $config['embedded_table']['columns'],
+                        $config['embedded_table']['title'],
+                        $config['embedded_table']['empty_message'] ?? null
+                    )
+                );
+            }
+        }
+
+        // Boolean specific options
+        if ($config['type'] === 'boolean') {
+            $field->renderAsSwitch(false);
+        }
+
+        // DateTime specific options
+        if (in_array($config['type'], ['datetime', 'date', 'time'])) {
+            if (isset($config['format'])) {
+                $field->setFormat($config['format']);
+            } elseif ($config['type'] === 'datetime') {
+                $field->setFormat('dd/MM/yyyy HH:mm');
+            }
+        }
+
+        // Text specific options
+        if (in_array($config['type'], ['text', 'textarea'])) {
+            if (isset($config['truncate'])) {
+                $field->setMaxLength($config['truncate']);
+            }
+        }
+
+        // Choice specific options
+        if ($config['type'] === 'choice' && isset($config['choices'])) {
+            $field->setChoices($config['choices']);
+        }
+
+        return $field;
+    }
+
+    /**
+     * Apply page visibility to field
+     */
+    private function applyPageVisibility(mixed $field, array $pages): void
+    {
+        $allPages = ['index', 'detail', 'form', 'edit', 'new'];
+        $hiddenPages = array_diff($allPages, $pages);
+
+        foreach ($hiddenPages as $page) {
+            switch ($page) {
+                case 'index':
+                    $field->hideOnIndex();
+                    break;
+                case 'detail':
+                    $field->hideOnDetail();
+                    break;
+                case 'form':
+                    $field->hideOnForm();
+                    break;
+                case 'edit':
+                    $field->onlyWhenCreating();
+                    break;
+                case 'new':
+                    $field->onlyWhenUpdating();
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Create a standard set of fields from schema configuration
+     */
+    public function createFieldsFromSchema(array $fieldSchema, string $page = null): array
+    {
+        $fields = [];
+
+        foreach ($fieldSchema as $fieldConfig) {
+            // Skip if page filter is specified and field is not for this page
+            if ($page && !in_array($page, $fieldConfig['pages'])) {
+                continue;
+            }
+
+            $fields[] = $this->createFieldFromSchema($fieldConfig);
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Create tab structure with fields
+     */
+    public function createTabsFromSchema(array $tabSchema): array
+    {
+        $tabs = [];
+
+        foreach ($tabSchema as $tabConfig) {
+            $tabFields = $this->createFieldsFromSchema($tabConfig['fields'], 'detail');
+            
+            if (!empty($tabFields)) {
+                $tabs[] = [
+                    'id' => $tabConfig['id'],
+                    'label' => $tabConfig['label'],
+                    'fields' => $tabFields
+                ];
+            }
+        }
+
+        return $tabs;
+    }
+
+    /**
+     * Quick method for standard entity fields
+     */
+    public function createStandardEntityFields(string $entityName): array
+    {
+        return [
+            IdField::new('id', 'ID')->onlyOnDetail(),
+            BooleanField::new('active', 'Active')->renderAsSwitch(false),
+            TextField::new('name', ucfirst($entityName) . ' Name')
+                ->setRequired(true),
+            DateTimeField::new('createdAt', 'Created At')
+                ->setFormat('dd/MM/yyyy HH:mm')
+                ->onlyOnDetail(),
+            DateTimeField::new('updatedAt', 'Updated At')
+                ->setFormat('dd/MM/yyyy HH:mm')
+                ->onlyOnDetail(),
+        ];
+    }
+
+    /**
+     * Create address field group
+     */
+    public function createAddressFieldsGroup(): array
+    {
+        return [
+            TextField::new('street', 'Street Address'),
+            TextField::new('zip', 'ZIP/Postal Code'),
+            TextField::new('city', 'City'),
+            CountryField::new('countryCode', 'Country'),
+        ];
+    }
+
+    /**
+     * Create contact field group
+     */
+    public function createContactFieldsGroup(): array
+    {
+        return [
+            EmailField::new('email', 'Email Address'),
+            TelephoneField::new('phone', 'Phone Number'),
+            TelephoneField::new('cell', 'Mobile/Cell Phone'),
+            UrlField::new('url', 'Website'),
+        ];
     }
 }

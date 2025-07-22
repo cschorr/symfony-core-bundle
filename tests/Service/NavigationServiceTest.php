@@ -2,10 +2,10 @@
 
 namespace App\Tests\Service;
 
-use App\Entity\Module;
+use App\Entity\SystemEntity;
 use App\Entity\User;
-use App\Entity\UserModulePermission;
-use App\Repository\ModuleRepository;
+use App\Entity\UserSystemEntityPermission;
+use App\Repository\SystemEntityRepository;
 use App\Service\NavigationService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -13,17 +13,17 @@ use PHPUnit\Framework\TestCase;
 class NavigationServiceTest extends TestCase
 {
     private NavigationService $navigationService;
-    private ModuleRepository $moduleRepository;
+    private SystemEntityRepository $systemEntityRepository;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
-        $this->moduleRepository = $this->createMock(ModuleRepository::class);
+        $this->systemEntityRepository = $this->createMock(SystemEntityRepository::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         
         $this->navigationService = new NavigationService(
-            $this->moduleRepository,
-            $this->entityManager
+            $this->entityManager,
+            $this->systemEntityRepository
         );
     }
 
@@ -39,28 +39,28 @@ class NavigationServiceTest extends TestCase
         $this->assertFalse($this->navigationService->isUserAdmin($regularUser));
     }
 
-    public function testGetModuleEntityMapping(): void
+    public function testGetSystemEntityEntityMapping(): void
     {
-        $mapping = $this->navigationService->getModuleEntityMapping();
+        $mapping = $this->navigationService->getSystemEntityEntityMapping();
         
         $this->assertIsArray($mapping);
-        $this->assertArrayHasKey('Module', $mapping);
+        $this->assertArrayHasKey('SystemEntity', $mapping);
         $this->assertArrayHasKey('User', $mapping);
         $this->assertArrayHasKey('Company', $mapping);
         $this->assertArrayHasKey('CompanyGroup', $mapping);
-        $this->assertEquals(\App\Entity\Module::class, $mapping['Module']);
+        $this->assertEquals(\App\Entity\SystemEntity::class, $mapping['SystemEntity']);
         $this->assertEquals(\App\Entity\User::class, $mapping['User']);
     }
 
-    public function testGetModuleIconMapping(): void
+    public function testGetSystemEntityIconMapping(): void
     {
-        $mapping = $this->navigationService->getModuleIconMapping();
+        $mapping = $this->navigationService->getSystemEntityIconMapping();
         
         $this->assertIsArray($mapping);
-        $this->assertArrayHasKey('Module', $mapping);
+        $this->assertArrayHasKey('SystemEntity', $mapping);
         $this->assertArrayHasKey('User', $mapping);
         $this->assertArrayHasKey('Company', $mapping);
         $this->assertArrayHasKey('CompanyGroup', $mapping);
-        $this->assertStringContainsString('fa', $mapping['Module']);
+        $this->assertStringContainsString('fa', $mapping['SystemEntity']);
     }
 }

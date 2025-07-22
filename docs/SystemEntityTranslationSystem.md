@@ -1,21 +1,21 @@
-# Module Translation System
+# SystemEntity Translation System
 
 ## Overview
 
-This project uses a simple, direct translation approach for module navigation and UI elements.
+This project uses a simple, direct translation approach for systemEntity navigation and UI elements.
 
 ## How it works
 
-### 1. Module Entity Structure
+### 1. SystemEntity Entity Structure
 - **`code` field**: Singular form (e.g., "User", "Company", "Project")  
 - **`name` field**: Plural form (e.g., "Users", "Companies", "Projects")
 
 ### 2. Navigation Translation
-The DashboardController uses the module's `name` field directly as translation key:
+The DashboardController uses the systemEntity's `name` field directly as translation key:
 
 ```php
-$moduleNamePlural = $module->getName();  // e.g., "Users"
-$label = $this->translator->trans($moduleNamePlural);
+$systemEntityNamePlural = $systemEntity->getName();  // e.g., "Users"
+$label = $this->translator->trans($systemEntityNamePlural);
 ```
 
 ### 3. Translation Files
@@ -48,10 +48,10 @@ Projects: "Projects"
 
 ### 4. Fixtures Configuration
 
-The AppFixtures defines modules with correct singular/plural forms:
+The AppFixtures defines systemEntitys with correct singular/plural forms:
 
 ```php
-$modules = [
+$systemEntitys = [
     ['name' => 'Users', 'code' => 'User', 'text' => '...', 'icon' => '...'],
     ['name' => 'Companies', 'code' => 'Company', 'text' => '...', 'icon' => '...'],
     ['name' => 'Projects', 'code' => 'Project', 'text' => '...', 'icon' => '...'],
@@ -61,14 +61,14 @@ $modules = [
 ## Benefits
 
 ✅ **Simple**: No complex translation service needed  
-✅ **Direct**: Module data directly drives translations  
+✅ **Direct**: SystemEntity data directly drives translations  
 ✅ **Consistent**: Singular/plural forms clearly separated  
-✅ **Maintainable**: Easy to add new modules  
+✅ **Maintainable**: Easy to add new systemEntitys  
 ✅ **Multilingual**: Easy to extend for new languages  
 
-## Adding New Modules
+## Adding New SystemEntitys
 
-1. Add module to `AppFixtures.php` with correct `name` (plural) and `code` (singular)
+1. Add systemEntity to `AppFixtures.php` with correct `name` (plural) and `code` (singular)
 2. Add translations for both forms in all translation files
 3. The navigation will automatically use the plural form
 
