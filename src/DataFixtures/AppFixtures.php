@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Entity\UserSystemEntityPermission;
 use App\Entity\Company;
 use App\Entity\Project;
+use App\Enum\ProjectStatus;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
@@ -144,9 +145,9 @@ class AppFixtures extends Fixture
     {
         // Example project data
         $projects = [
-            ['name' => 'Project Alpha', 'status' => 1, 'description' => 'First project description'],
-            ['name' => 'Project Beta', 'status' => 2, 'description' => 'Second project description'],
-            ['name' => 'Project Gamma', 'status' => 0, 'description' => 'Third project description'],
+            ['name' => 'Project Alpha', 'status' => ProjectStatus::IN_PROGRESS, 'description' => 'First project description'],
+            ['name' => 'Project Beta', 'status' => ProjectStatus::ON_HOLD, 'description' => 'Second project description'],
+            ['name' => 'Project Gamma', 'status' => ProjectStatus::PLANNING, 'description' => 'Third project description'],
         ];
 
         // Create and persist project entities here

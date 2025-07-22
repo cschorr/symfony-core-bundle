@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Traits\Set\SetStartEndTrait;
 use App\Entity\Traits\Single\StringNameTrait;
+use App\Enum\ProjectStatus;
 use App\Repository\ProjectRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,15 +15,8 @@ class Project extends AbstractEntity
     use StringNameTrait;
     use SetStartEndTrait;
 
-    // Status constants for better readability
-    public const STATUS_PLANNING = 0;
-    public const STATUS_IN_PROGRESS = 1;
-    public const STATUS_ON_HOLD = 2;
-    public const STATUS_COMPLETED = 3;
-    public const STATUS_CANCELLED = 4;
-
-    #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['default' => 0])]
-    private int $status = self::STATUS_PLANNING;
+    #[ORM\Column(enumType: ProjectStatus::class, nullable: false, options: ['default' => 0])]
+    private ProjectStatus $status = ProjectStatus::PLANNING;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?User $assignee = null;
@@ -33,12 +27,12 @@ class Project extends AbstractEntity
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    public function getStatus(): int
+    public function getStatus(): ProjectStatus
     {
         return $this->status;
     }
 
-    public function setStatus(int $status): static
+    public function setStatus(ProjectStatus $status): static
     {
         $this->status = $status;
 
@@ -84,27 +78,27 @@ class Project extends AbstractEntity
     // Status helper methods
     public function isInProgress(): bool
     {
-        return $this->status === self::STATUS_IN_PROGRESS;
+        return $this->status === ProjectStatus::IN_PROGRESS;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === self::STATUS_COMPLETED;
+        return $this->status === ProjectStatus::COMPLETED;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === self::STATUS_CANCELLED;
+        return $this->status === ProjectStatus::CANCELLED;
     }
 
     public function isPlanning(): bool
     {
-        return $this->status === self::STATUS_PLANNING;
+        return $this->status === ProjectStatus::PLANNING;
     }
 
     public function isOnHold(): bool
     {
-        return $this->status === self::STATUS_ON_HOLD;
+        return $this->status === ProjectStatus::ON_HOLD;
     }
 
     public function __toString(): string
