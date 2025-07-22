@@ -35,7 +35,7 @@ class Company extends AbstractEntity
     private Collection $employees;
 
     #[ORM\ManyToOne]
-    private ?Category $categories = null;
+    private ?Category $category = null;
 
     public function __construct()
     {
@@ -121,14 +121,14 @@ class Company extends AbstractEntity
         return $this;
     }
 
-    public function getCategories(): ?Category
+    public function getCategory(): ?Category
     {
-        return $this->categories;
+        return $this->category;
     }
 
-    public function setCategories(?Category $categories): static
+    public function setCategory(?Category $category): static
     {
-        $this->categories = $categories;
+        $this->category = $category;
 
         return $this;
     }

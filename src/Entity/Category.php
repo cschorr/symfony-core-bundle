@@ -3,9 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Entity\Traits\Single\StringNameTrait;
-use App\Entity\Traits\Single\UuidTrait;
 use App\Repository\CategoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,11 +17,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
     shortName: 'Category',
     description: 'Nested categories.',
 )]
-class Category
+class Category extends AbstractEntity
 {
-    use UuidTrait;
-    use StringNameTrait;
-
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', type: Types::INTEGER)]
     private ?int $lft;
@@ -49,12 +45,18 @@ class Category
     #[ORM\OrderBy(['lft' => 'ASC'])]
     private Collection $children;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->children = new ArrayCollection();
+    }
+
     public function getRoot(): ?self
     {
         return $this->root;
     }
 
-    public function setParent(self $parent = null): void
+    public function setParent(?self $parent = null): void
     {
         $this->parent = $parent;
     }
@@ -62,5 +64,15 @@ class Category
     public function getParent(): ?self
     {
         return $this->parent;
+    }
+
+    public function getChildren(): Collection
+    {
+        return $this->children;
+    }
+
+    public function setChildren(Collection $children): void
+    {
+        $this->children = $children;
     }
 }
