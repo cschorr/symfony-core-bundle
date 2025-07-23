@@ -315,7 +315,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                 ->generateUrl();
 
             return $this->redirect($url);
-
         } catch (\Exception $e) {
             // Add error message
             $this->addFlash('danger', $this->translator->trans('Error duplicating entity: ') . $e->getMessage());
@@ -429,7 +428,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                         foreach ($toAdd as $entityToAdd) {
                             $value->add($entityToAdd);
                         }
-
                     } elseif (is_object($value) && !$this->entityManager->contains($value)) {
                         // Handle single associations - this is the key fix for the proxy issue
                         $managedEntity = $this->findManagedEntity($value);
@@ -490,7 +488,6 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                     }
                 }
             }
-
         } catch (\Exception $e) {
             // If anything fails, return null
         }

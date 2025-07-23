@@ -45,7 +45,7 @@ class MigrateEasyAdminFieldsCommand extends Command
         $analyze = $input->getOption('analyze');
 
         $controllersDir = $this->projectDir . '/src/Controller/Admin';
-        
+
         if (!is_dir($controllersDir)) {
             $io->error('Admin controllers directory not found: ' . $controllersDir);
             return Command::FAILURE;
@@ -56,14 +56,14 @@ class MigrateEasyAdminFieldsCommand extends Command
         }
 
         $controllers = $this->findControllers($controllersDir, $controller);
-        
+
         if (empty($controllers)) {
             $io->warning('No controllers found to migrate.');
             return Command::SUCCESS;
         }
 
         $io->title('EasyAdmin Field System Migration');
-        
+
         if ($dryRun) {
             $io->note('Running in dry-run mode - no files will be modified');
         }
@@ -73,7 +73,7 @@ class MigrateEasyAdminFieldsCommand extends Command
         }
 
         $io->success('Migration completed!');
-        
+
         if (!$dryRun) {
             $io->section('Next Steps:');
             $io->listing([
@@ -116,7 +116,7 @@ class MigrateEasyAdminFieldsCommand extends Command
         foreach ($controllers as $controllerFile) {
             $content = file_get_contents($controllerFile);
             $className = basename($controllerFile, '.php');
-            
+
             $info = [
                 'file' => $controllerFile,
                 'class' => $className,
@@ -129,12 +129,12 @@ class MigrateEasyAdminFieldsCommand extends Command
                 'has_panels' => strpos($content, 'FormField::addPanel') !== false,
                 'complexity' => $this->calculateComplexity($content)
             ];
-            
+
             $analysis[] = $info;
         }
 
         $io->title('EasyAdmin Controllers Analysis');
-        
+
         $migrated = array_filter($analysis, fn($a) => $a['uses_trait'] && $a['uses_field_service']);
         $needsMigration = array_filter($analysis, fn($a) => !$a['uses_trait'] || !$a['uses_field_service']);
 
@@ -144,7 +144,7 @@ class MigrateEasyAdminFieldsCommand extends Command
 
         if (!empty($needsMigration)) {
             $io->section('Controllers Needing Migration');
-            
+
             $tableData = [];
             foreach ($needsMigration as $controller) {
                 $priority = $this->getMigrationPriority($controller);
@@ -157,7 +157,7 @@ class MigrateEasyAdminFieldsCommand extends Command
                     $controller['has_panels'] ? '✓' : ''
                 ];
             }
-            
+
             $io->table(
                 ['Controller', 'Fields', 'Complexity', 'Priority', 'Tabs', 'Panels'],
                 $tableData
@@ -165,7 +165,7 @@ class MigrateEasyAdminFieldsCommand extends Command
 
             $io->section('Recommended Migration Order');
             usort($needsMigration, fn($a, $b) => $this->getMigrationPriorityScore($a) <=> $this->getMigrationPriorityScore($b));
-            
+
             $io->listing(array_map(fn($c) => $c['class'] . ' (' . $this->getMigrationPriority($c) . ')', $needsMigration));
         }
 
@@ -175,7 +175,7 @@ class MigrateEasyAdminFieldsCommand extends Command
     private function calculateComplexity(string $content): string
     {
         $score = 0;
-        
+
         // Count various complexity indicators
         $score += substr_count($content, '::new(') * 1;           // Basic fields
         $score += substr_count($content, 'FormField::') * 2;      // Form structure
@@ -184,30 +184,38 @@ class MigrateEasyAdminFieldsCommand extends Command
         $score += substr_count($content, 'if (') * 1;             // Conditional logic
         $score += substr_count($content, 'switch (') * 3;         // Complex conditionals
 
-        if ($score < 10) return 'Low';
-        if ($score < 25) return 'Medium';
+        if ($score < 10) {
+            return 'Low';
+        }
+        if ($score < 25) {
+            return 'Medium';
+        }
         return 'High';
     }
 
     private function getMigrationPriority(array $controller): string
     {
         $score = $this->getMigrationPriorityScore($controller);
-        
-        if ($score <= 10) return 'High';
-        if ($score <= 20) return 'Medium';
+
+        if ($score <= 10) {
+            return 'High';
+        }
+        if ($score <= 20) {
+            return 'Medium';
+        }
         return 'Low';
     }
 
     private function getMigrationPriorityScore(array $controller): int
     {
         $score = 0;
-        
+
         // Lower score = higher priority
         $score += $controller['field_count']; // More fields = easier to benefit
         $score += $controller['has_tabs'] ? -5 : 0; // Tabs benefit from new system
         $score += $controller['has_panels'] ? -3 : 0; // Panels benefit too
         $score += $controller['complexity'] === 'High' ? 10 : 0; // Complex = lower priority
-        
+
         return $score;
     }
 
@@ -231,7 +239,7 @@ class MigrateEasyAdminFieldsCommand extends Command
         }
 
         $changes = $this->generateMigrationChanges($content, $className);
-        
+
         if ($dryRun) {
             $io->text('Would make the following changes:');
             foreach ($changes['summary'] as $change) {
@@ -240,7 +248,7 @@ class MigrateEasyAdminFieldsCommand extends Command
         } else {
             $newContent = $this->applyMigrationChanges($content, $changes);
             file_put_contents($file, $newContent);
-            
+
             $io->text('✅ Migration completed');
             foreach ($changes['summary'] as $change) {
                 $io->text('  • ' . $change);
@@ -303,8 +311,11 @@ class MigrateEasyAdminFieldsCommand extends Command
 
         // Add trait
         if ($changes['add_trait']) {
-            $newContent = preg_replace('/class \w+CrudController extends AbstractCrudController\s*{/', 
-                "$0\n    use FieldConfigurationTrait;\n", $newContent);
+            $newContent = preg_replace(
+                '/class \w+CrudController extends AbstractCrudController\s*{/',
+                "$0\n    use FieldConfigurationTrait;\n",
+                $newContent
+            );
         }
 
         // Note: For a production tool, you'd implement proper AST manipulation

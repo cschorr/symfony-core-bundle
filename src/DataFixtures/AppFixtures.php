@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-
 use App\Entity\SystemEntity;
 use App\Entity\User;
 use App\Entity\UserSystemEntityPermission;
@@ -82,7 +81,7 @@ class AppFixtures extends Fixture
         // Get users and system entities from the database
         $adminUser = $manager->getRepository(User::class)->findOneBy(['email' => 'admin@example.com']);
         $demoUser = $manager->getRepository(User::class)->findOneBy(['email' => 'demo@example.com']);
-        
+
         $userSystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'User']);
         $companySystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'Company']);
         $systemEntitySystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'SystemEntity']);
@@ -90,13 +89,15 @@ class AppFixtures extends Fixture
         $projectSystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'Project']);
 
         // Helper function to create permission if it doesn't exist
-        $createPermissionIfNotExists = function($user, $systemEntity, $canRead, $canWrite) use ($manager) {
-            if (!$user || !$systemEntity) return;
-            
+        $createPermissionIfNotExists = function ($user, $systemEntity, $canRead, $canWrite) use ($manager) {
+            if (!$user || !$systemEntity) {
+                return;
+            }
+
             // Check if permission already exists
             $existingPermission = $manager->getRepository(UserSystemEntityPermission::class)
                 ->findOneBy(['user' => $user, 'systemEntity' => $systemEntity]);
-            
+
             if (!$existingPermission) {
                 $permission = new UserSystemEntityPermission();
                 $permission->setUser($user);

@@ -61,7 +61,7 @@ class DebugUuidCommand extends Command
             ->andWhere('usep.systemEntity = :systemEntity')
             ->setParameter('user', $demoUser)
             ->setParameter('systemEntity', $companyEntity);
-        
+
         $doctrineCount = $qb->getQuery()->getSingleScalarResult();
         $io->writeln("2. Doctrine QueryBuilder with entities: Found $doctrineCount records");
 
@@ -72,7 +72,7 @@ class DebugUuidCommand extends Command
             ->andWhere('usep.systemEntity = :systemEntityId')
             ->setParameter('userId', $demoUser->getId(), 'uuid')
             ->setParameter('systemEntityId', $companyEntity->getId(), 'uuid');
-        
+
         $doctrineStringCount = $qb2->getQuery()->getSingleScalarResult();
         $io->writeln("3. Doctrine QueryBuilder with 'uuid' parameter type (CLEAN SOLUTION): Found $doctrineStringCount records");
 
@@ -93,7 +93,7 @@ class DebugUuidCommand extends Command
             ->andWhere('usep.systemEntity = UNHEX(REPLACE(:systemEntityId, \'-\', \'\'))')
             ->setParameter('userId', $demoUser->getId()->__toString())
             ->setParameter('systemEntityId', $companyEntity->getId()->__toString());
-        
+
         try {
             $doctrineBinaryCount = $qb3->getQuery()->getSingleScalarResult();
             $io->writeln("6. Doctrine QueryBuilder with UNHEX in DQL: Found $doctrineBinaryCount records");
@@ -109,19 +109,19 @@ class DebugUuidCommand extends Command
 
         // Test 8: Test our repository methods that use the clean UUID solution
         $io->writeln("\n8. Testing our fixed repository methods:");
-        
+
         // Test UserSystemEntityPermissionRepository
         $userPermissionRepo = $this->entityManager->getRepository(\App\Entity\UserSystemEntityPermission::class);
         $readPermissions = $userPermissionRepo->findBy(['user' => $demoUser, 'canRead' => true]);
         $writePermissions = $userPermissionRepo->findBy(['user' => $demoUser, 'canWrite' => true]);
         $io->writeln("UserSystemEntityPermissionRepository READ permissions: " . count($readPermissions));
         $io->writeln("UserSystemEntityPermissionRepository WRITE permissions: " . count($writePermissions));
-        
-        // Test SystemEntityRepository  
+
+        // Test SystemEntityRepository
         $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\SystemEntity::class);
         $readableEntities = $systemEntityRepo->findReadableByUser($demoUser);
         $io->writeln("SystemEntityRepository->findReadableByUser: Found " . count($readableEntities) . " entities");
-        
+
         $writableEntities = $systemEntityRepo->findWritableByUser($demoUser);
         $io->writeln("SystemEntityRepository->findWritableByUser: Found " . count($writableEntities) . " entities");
 

@@ -52,7 +52,7 @@ class MakeEasyAdminCrudCommand extends Command
         }
 
         $controllerPath = $this->generateControllerPath($entityName);
-        
+
         if (file_exists($controllerPath)) {
             $io->warning("Controller already exists at {$controllerPath}");
             if (!$io->confirm('Overwrite existing controller?', false)) {
@@ -200,9 +200,9 @@ class MakeEasyAdminCrudCommand extends Command
     private function suggestMenuEntry(SymfonyStyle $io, string $entityName): void
     {
         $pluralName = $this->inflector->pluralize($entityName)[0] ?? $entityName . 's';
-        
+
         $menuEntry = "MenuItem::linkToCrud('{$pluralName}', 'fas fa-list', {$entityName}::class),";
-        
+
         $io->note([
             'Add this menu item to your DashboardController:',
             '',

@@ -42,21 +42,21 @@ class EasyAdminFieldService
     public function generateFields(array $fieldConfigurations, string $pageName, ?callable $activeFieldCallback = null): array
     {
         $fields = [];
-        
+
         foreach ($fieldConfigurations as $fieldConfig) {
             // Handle direct field objects (for backward compatibility)
             if (is_object($fieldConfig)) {
                 $fields[] = $fieldConfig;
                 continue;
             }
-            
+
             // Handle configuration arrays
             if (is_array($fieldConfig)) {
                 // Skip fields not meant for this page
                 if (!$this->shouldShowField($fieldConfig, $pageName)) {
                     continue;
                 }
-                
+
                 // Create the field based on configuration
                 $field = $this->createField($fieldConfig, $pageName);
                 if ($field) {
@@ -89,7 +89,7 @@ class EasyAdminFieldService
             $pageType = $this->getPageType($pageName);
             return in_array($pageType, ['form', 'detail']);
         }
-        
+
         $pageType = $this->getPageType($pageName);
         return in_array($pageType, $fieldConfig['pages'] ?? []);
     }
@@ -99,7 +99,7 @@ class EasyAdminFieldService
      */
     private function getPageType(string $pageName): string
     {
-        return match($pageName) {
+        return match ($pageName) {
             Crud::PAGE_INDEX => 'index',
             Crud::PAGE_DETAIL => 'detail',
             Crud::PAGE_NEW, Crud::PAGE_EDIT => 'form',
@@ -113,7 +113,7 @@ class EasyAdminFieldService
     private function createField(array $config, string $pageName): ?object
     {
         $pageType = $this->getPageType($pageName);
-        
+
         // Handle panels
         if ($config['type'] === 'panel') {
             $isCollapsible = in_array($pageType, $config['collapsible'] ?? []);
@@ -145,7 +145,7 @@ class EasyAdminFieldService
      */
     private function createFieldByType(array $config): ?object
     {
-        return match($config['type']) {
+        return match ($config['type']) {
             'id' => IdField::new($config['name']),
             'text' => TextField::new($config['name']),
             'textarea' => TextareaField::new($config['name']),
@@ -172,8 +172,8 @@ class EasyAdminFieldService
     private function applyFieldConfiguration(object $field, array $config, string $pageType): void
     {
         // Set label (use indexLabel for index page if available)
-        $label = $pageType === 'index' && isset($config['indexLabel']) 
-            ? $config['indexLabel'] 
+        $label = $pageType === 'index' && isset($config['indexLabel'])
+            ? $config['indexLabel']
             : ($config['label'] ?? $config['name']);
         $field->setLabel($this->translator->trans($label));
 
@@ -194,7 +194,7 @@ class EasyAdminFieldService
         // Set required
         if (isset($config['required'])) {
             $field->setRequired($config['required']);
-        } else if ($pageType === 'form') {
+        } elseif ($pageType === 'form') {
             $field->setRequired(false);
         }
 
@@ -375,12 +375,12 @@ class EasyAdminFieldService
         if (isset($config['choices'])) {
             $field->setChoices($config['choices']);
         }
-        
+
         // Set multiple selection if specified
         if (isset($config['multiple']) && $config['multiple']) {
             $field->allowMultipleChoices(true);
         }
-        
+
         // Set expanded if specified (renders as radio buttons or checkboxes)
         if (isset($config['expanded']) && $config['expanded']) {
             $field->renderExpanded(true);
@@ -456,7 +456,7 @@ class EasyAdminFieldService
         $panelLabel = $options['panelLabel'] ?? $this->translator->trans('Address Information');
         $panelIcon = $options['panelIcon'] ?? 'fas fa-map-marker-alt';
         $collapsible = $options['collapsible'] ?? ['form'];
-        
+
         return [
             $this->createPanelConfig($panelName, $panelLabel, $pages, $panelIcon, $collapsible),
             $this->createFieldConfig('street', 'text', $pages, $this->translator->trans('Street Address')),
@@ -475,7 +475,7 @@ class EasyAdminFieldService
         $panelLabel = $options['panelLabel'] ?? $this->translator->trans('Communication');
         $panelIcon = $options['panelIcon'] ?? 'fas fa-phone';
         $collapsible = $options['collapsible'] ?? ['form'];
-        
+
         return [
             $this->createPanelConfig($panelName, $panelLabel, $pages, $panelIcon, $collapsible),
             $this->createFieldConfig('email', 'email', array_merge($pages, ['index']), $this->translator->trans('Email Address'), [
@@ -583,7 +583,7 @@ class EasyAdminFieldService
      */
     private function autoDetectField(string $fieldName): array
     {
-        $type = match(true) {
+        $type = match (true) {
             str_contains($fieldName, 'email') => 'email',
             str_contains($fieldName, 'phone') || str_contains($fieldName, 'cell') => 'telephone',
             str_contains($fieldName, 'url') || str_contains($fieldName, 'website') => 'url',
@@ -595,11 +595,11 @@ class EasyAdminFieldService
             default => 'text',
         };
 
-        $pages = $fieldName === 'id' 
-            ? ['detail'] 
+        $pages = $fieldName === 'id'
+            ? ['detail']
             : ['index', 'detail', 'form'];
 
-        $options = $fieldName === 'id' 
+        $options = $fieldName === 'id'
             ? ['hideOnForm' => true, 'hideOnIndex' => true]
             : [];
 
@@ -612,27 +612,27 @@ class EasyAdminFieldService
     public function validateFieldConfiguration(array $config): array
     {
         $errors = [];
-        
+
         // Check required fields
         if (!isset($config['name']) || empty($config['name'])) {
             $errors[] = "Field configuration must include a 'name' property";
         }
-        
+
         if (!isset($config['type']) || empty($config['type'])) {
             $errors[] = "Field configuration must include a 'type' property";
         }
-        
+
         // Validate field type
         if (isset($config['type'])) {
-            $validTypes = ['id', 'text', 'textarea', 'email', 'telephone', 'url', 'country', 
-                          'association', 'boolean', 'integer', 'number', 'money', 'date', 
+            $validTypes = ['id', 'text', 'textarea', 'email', 'telephone', 'url', 'country',
+                          'association', 'boolean', 'integer', 'number', 'money', 'date',
                           'datetime', 'time', 'choice', 'image', 'panel'];
-            
+
             if (!in_array($config['type'], $validTypes)) {
                 $errors[] = "Invalid field type '{$config['type']}'. Valid types: " . implode(', ', $validTypes);
             }
         }
-        
+
         // Validate pages
         if (isset($config['pages'])) {
             $validPages = ['index', 'detail', 'form'];
@@ -641,19 +641,19 @@ class EasyAdminFieldService
                 $errors[] = "Invalid page(s): " . implode(', ', $invalidPages) . ". Valid pages: " . implode(', ', $validPages);
             }
         }
-        
+
         // Validate columns
         if (isset($config['columns']) && ($config['columns'] < 1 || $config['columns'] > 12)) {
             $errors[] = "Column width must be between 1 and 12, got: {$config['columns']}";
         }
-        
+
         // Association-specific validation
         if ($config['type'] === 'association' && isset($config['multiple']) && $config['multiple']) {
             if (!isset($config['targetEntity'])) {
                 $errors[] = "Association field with multiple=true requires 'targetEntity' option";
             }
         }
-        
+
         return $errors;
     }
 
@@ -663,7 +663,7 @@ class EasyAdminFieldService
     public function generateFieldsWithValidation(array $fieldConfigurations, string $pageName, ?callable $activeFieldCallback = null): array
     {
         $allErrors = [];
-        
+
         // Validate all configurations first
         foreach ($fieldConfigurations as $index => $config) {
             if (is_array($config)) {
@@ -674,7 +674,7 @@ class EasyAdminFieldService
                 }
             }
         }
-        
+
         // If there are validation errors, throw exception with details
         if (!empty($allErrors)) {
             $errorMessage = "Field configuration errors:\n";
@@ -683,7 +683,7 @@ class EasyAdminFieldService
             }
             throw new \InvalidArgumentException($errorMessage);
         }
-        
+
         // If validation passes, generate fields normally
         return $this->generateFields($fieldConfigurations, $pageName, $activeFieldCallback);
     }
@@ -694,17 +694,17 @@ class EasyAdminFieldService
     private function configureLinkToShow(object $field, array $config): void
     {
         $controllerClass = $config['linkToShowController'] ?? null;
-        
+
         $field->formatValue(function ($value, $entity) use ($controllerClass) {
             if (empty($value)) {
                 return $value;
             }
-            
+
             // If no specific controller is provided, try to auto-detect from entity
             if (!$controllerClass) {
                 $controllerClass = $this->getControllerClassFromEntity($entity);
             }
-            
+
             if ($controllerClass) {
                 try {
                     $showUrl = $this->adminUrlGenerator
@@ -712,14 +712,14 @@ class EasyAdminFieldService
                         ->setAction(Action::DETAIL)
                         ->setEntityId($entity->getId())
                         ->generateUrl();
-                    
+
                     return sprintf('<a href="%s" class="text-decoration-none">%s</a>', $showUrl, $value);
                 } catch (\Exception $e) {
                     // If URL generation fails, return the original value
                     return $value;
                 }
             }
-            
+
             return $value;
         })->renderAsHtml();
     }
@@ -731,14 +731,14 @@ class EasyAdminFieldService
     {
         $entityClass = get_class($entity);
         $entityName = substr($entityClass, strrpos($entityClass, '\\') + 1);
-        
+
         // Convention: App\Controller\Admin\{EntityName}CrudController
         $controllerClass = "App\\Controller\\Admin\\{$entityName}CrudController";
-        
+
         if (class_exists($controllerClass)) {
             return $controllerClass;
         }
-        
+
         return null;
     }
 
@@ -903,7 +903,7 @@ class EasyAdminFieldService
 
         foreach ($tabSchema as $tabConfig) {
             $tabFields = $this->createFieldsFromSchema($tabConfig['fields'], 'detail');
-            
+
             if (!empty($tabFields)) {
                 $tabs[] = [
                     'id' => $tabConfig['id'],
