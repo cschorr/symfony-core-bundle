@@ -20,8 +20,11 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 )]
 class TestPermissionsCommand
 {
-    public function __construct(private readonly UserRepository $userRepository, private readonly AuthorizationCheckerInterface $authorizationChecker, private readonly TokenStorageInterface $tokenStorage)
-    {
+    public function __construct(
+        private readonly UserRepository $userRepository,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly TokenStorageInterface $tokenStorage,
+    ) {
     }
 
     public function __invoke(OutputInterface $output): int
