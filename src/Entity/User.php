@@ -62,6 +62,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[Groups(['user:read'])]
     private Collection $systemEntityPermissions;
 
+    #[ORM\ManyToOne]
+    private ?Category $category = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -277,5 +280,17 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         }
 
         return $systemEntities;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+
+        return $this;
     }
 }

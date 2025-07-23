@@ -19,10 +19,11 @@ class AppFixtures extends Fixture
 {
     private const DEFAULT_PASSWORD = 'pass_1234';
 
-    // Referenzen für später verwendete Entities
+    // References for later used entities
     private array $users = [];
     private array $systemEntities = [];
     private array $categories = [];
+    private array $companies = [];
 
     public function __construct(private readonly UserPasswordHasherInterface $hasher)
     {
@@ -30,11 +31,11 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Reihenfolge ist wichtig für Abhängigkeiten
+        // Order is important for dependencies
         $this->createSystemEntityFixtures($manager);
+        $this->createCategoryFixtures($manager);
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
-        $this->createCategoryFixtures($manager);
         $this->createCompanyFixtures($manager);
         $this->createProjectFixtures($manager);
     }
@@ -49,28 +50,28 @@ class AppFixtures extends Fixture
             ],
             'User' => [
                 'name' => 'Users',
-                'text' => 'Benutzerverwaltung',
+                'text' => 'User management',
                 'icon' => 'fas fa-users',
             ],
             'Company' => [
                 'name' => 'Companies',
-                'text' => 'Kunden, Lieferanten, Partner etc.',
+                'text' => 'Clients, suppliers, partners etc.',
                 'icon' => 'fas fa-building',
             ],
             'CompanyGroup' => [
                 'name' => 'CompanyGroups',
-                'text' => 'Gruppen von Unternehmen',
+                'text' => 'Groups of companies',
                 'icon' => 'fas fa-layer-group',
             ],
             'Project' => [
                 'name' => 'Projects',
-                'text' => 'Projekte verwalten',
+                'text' => 'Manage projects',
                 'icon' => 'fas fa-project-diagram',
             ],
             'Category' => [
                 'name' => 'Category',
-                'text' => 'Kategorien verwalten',
-                'icon' => 'fas fa-project-diagram',
+                'text' => 'Manage categories',
+                'icon' => 'fas fa-tags',
             ],
         ];
 
@@ -88,88 +89,6 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 
-    private function createUserFixtures(ObjectManager $manager): void
-    {
-        $usersData = [
-            'admin' => [
-                'email' => 'admin@example.com',
-                'roles' => ['ROLE_ADMIN'],
-                'active' => true,
-                'notes' => 'Administrator user with full access',
-            ],
-            'demo' => [
-                'email' => 'demo@example.com',
-                'roles' => ['ROLE_USER'],
-                'active' => true,
-                'notes' => 'Demo user with limited access',
-            ],
-        ];
-
-        foreach ($usersData as $key => $userData) {
-            $user = new User();
-            $user->setEmail($userData['email'])
-                ->setPassword($this->hasher->hashPassword($user, self::DEFAULT_PASSWORD))
-                ->setRoles($userData['roles'])
-                ->setActive($userData['active'])
-                ->setNotes($userData['notes']);
-
-            $manager->persist($user);
-            $this->users[$key] = $user;
-        }
-
-        $manager->flush();
-    }
-
-    private function createPermissionFixtures(ObjectManager $manager): void
-    {
-        // Permissions für Admin (alle Rechte)
-        $adminPermissions = [
-            'User' => ['read' => true, 'write' => true],
-            'Company' => ['read' => true, 'write' => true],
-            'SystemEntity' => ['read' => true, 'write' => true],
-            'CompanyGroup' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => true],
-            'Category' => ['read' => true, 'write' => true],
-        ];
-
-        // Permissions für Demo User (begrenzte Rechte)
-        $demoPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => false],
-            'Category' => ['read' => true, 'write' => true],
-        ];
-
-        $this->createUserPermissions($manager, $this->users['admin'], $adminPermissions);
-        $this->createUserPermissions($manager, $this->users['demo'], $demoPermissions);
-
-        $manager->flush();
-    }
-
-    private function createUserPermissions(ObjectManager $manager, User $user, array $permissions): void
-    {
-        foreach ($permissions as $entityCode => $rights) {
-            $systemEntity = $this->systemEntities[$entityCode] ?? null;
-            if (!$systemEntity) {
-                continue;
-            }
-
-            // Prüfen ob Permission bereits existiert
-            $existingPermission = $manager->getRepository(UserSystemEntityPermission::class)
-                ->findOneBy(['user' => $user, 'systemEntity' => $systemEntity]);
-
-            if (!$existingPermission) {
-                $permission = (new UserSystemEntityPermission())
-                    ->setUser($user)
-                    ->setSystemEntity($systemEntity)
-                    ->setCanRead($rights['read'])
-                    ->setCanWrite($rights['write']);
-
-                $manager->persist($permission);
-            }
-        }
-    }
-
     private function createCategoryFixtures(ObjectManager $manager): void
     {
         $categoriesData = [
@@ -179,18 +98,23 @@ class AppFixtures extends Fixture
                 'icon' => 'fas fa-laptop-code',
             ],
             'main2' => [
-                'name' => 'Business',
+                'name' => 'Business Services',
                 'color' => 'red',
                 'icon' => 'fas fa-briefcase',
             ],
             'main3' => [
-                'name' => 'Marketing',
+                'name' => 'Marketing & Sales',
                 'color' => 'green',
                 'icon' => 'fas fa-bullhorn',
             ],
+            'main4' => [
+                'name' => 'Consulting',
+                'color' => 'purple',
+                'icon' => 'fas fa-user-tie',
+            ],
         ];
 
-        // Erst die Hauptkategorien erstellen
+        // Create main categories first
         foreach ($categoriesData as $key => $data) {
             $category = (new Category())
                 ->setName($data['name'])
@@ -203,7 +127,7 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
-        // Dann Unterkategorien
+        // Then create subcategories
         $subCategoriesData = [
             'sub1' => [
                 'name' => 'Web Development',
@@ -218,10 +142,34 @@ class AppFixtures extends Fixture
                 'parent' => 'main1',
             ],
             'sub3' => [
-                'name' => 'Sales',
+                'name' => 'Software Solutions',
+                'color' => 'lightblue',
+                'icon' => 'fas fa-code',
+                'parent' => 'main1',
+            ],
+            'sub4' => [
+                'name' => 'Financial Services',
                 'color' => 'lightred',
-                'icon' => 'fas fa-chart-line',
+                'icon' => 'fas fa-coins',
                 'parent' => 'main2',
+            ],
+            'sub5' => [
+                'name' => 'Legal Services',
+                'color' => 'lightred',
+                'icon' => 'fas fa-gavel',
+                'parent' => 'main2',
+            ],
+            'sub6' => [
+                'name' => 'Digital Marketing',
+                'color' => 'lightgreen',
+                'icon' => 'fas fa-chart-line',
+                'parent' => 'main3',
+            ],
+            'sub7' => [
+                'name' => 'Content Creation',
+                'color' => 'lightgreen',
+                'icon' => 'fas fa-pen-fancy',
+                'parent' => 'main3',
             ],
         ];
 
@@ -238,6 +186,139 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
+    }
+
+    private function createUserFixtures(ObjectManager $manager): void
+    {
+        $usersData = [
+            'admin' => [
+                'email' => 'admin@example.com',
+                'roles' => ['ROLE_ADMIN'],
+                'active' => true,
+                'notes' => 'Administrator user with full access',
+                'category' => 'main2', // Business Services
+            ],
+            'demo' => [
+                'email' => 'demo@example.com',
+                'roles' => ['ROLE_USER'],
+                'active' => true,
+                'notes' => 'Demo user with limited access',
+                'category' => 'sub1', // Web Development
+            ],
+            'developer' => [
+                'email' => 'dev@example.com',
+                'roles' => ['ROLE_USER'],
+                'active' => true,
+                'notes' => 'Senior developer specializing in mobile apps',
+                'category' => 'sub2', // Mobile Development
+            ],
+            'marketing' => [
+                'email' => 'marketing@example.com',
+                'roles' => ['ROLE_USER'],
+                'active' => true,
+                'notes' => 'Marketing specialist for digital campaigns',
+                'category' => 'sub6', // Digital Marketing
+            ],
+            'consultant' => [
+                'email' => 'consultant@example.com',
+                'roles' => ['ROLE_USER'],
+                'active' => true,
+                'notes' => 'Business consultant for process optimization',
+                'category' => 'main4', // Consulting
+            ],
+        ];
+
+        foreach ($usersData as $key => $userData) {
+            $category = $this->categories[$userData['category']] ?? null;
+
+            $user = new User();
+            $user->setEmail($userData['email'])
+                ->setPassword($this->hasher->hashPassword($user, self::DEFAULT_PASSWORD))
+                ->setRoles($userData['roles'])
+                ->setActive($userData['active'])
+                ->setNotes($userData['notes'])
+                ->setCategory($category);
+
+            $manager->persist($user);
+            $this->users[$key] = $user;
+        }
+
+        $manager->flush();
+    }
+
+    private function createPermissionFixtures(ObjectManager $manager): void
+    {
+        // Permissions for admin (full rights)
+        $adminPermissions = [
+            'User' => ['read' => true, 'write' => true],
+            'Company' => ['read' => true, 'write' => true],
+            'SystemEntity' => ['read' => true, 'write' => true],
+            'CompanyGroup' => ['read' => true, 'write' => true],
+            'Project' => ['read' => true, 'write' => true],
+            'Category' => ['read' => true, 'write' => true],
+        ];
+
+        // Permissions for demo user (limited rights)
+        $demoPermissions = [
+            'User' => ['read' => true, 'write' => false],
+            'Company' => ['read' => true, 'write' => true],
+            'Project' => ['read' => true, 'write' => false],
+            'Category' => ['read' => true, 'write' => true],
+        ];
+
+        // Permissions for developer (Mobile Development)
+        $developerPermissions = [
+            'User' => ['read' => true, 'write' => false],
+            'Company' => ['read' => true, 'write' => false],
+            'Project' => ['read' => true, 'write' => true],
+        ];
+
+        // Permissions for marketing (Digital Marketing)
+        $marketingPermissions = [
+            'User' => ['read' => true, 'write' => false],
+            'Company' => ['read' => true, 'write' => true],
+            'Project' => ['read' => true, 'write' => true],
+        ];
+
+        // Permissions for consultant (Business Consulting)
+        $consultantPermissions = [
+            'User' => ['read' => true, 'write' => false],
+            'Company' => ['read' => true, 'write' => true],
+            'Project' => ['read' => true, 'write' => true],
+            'CompanyGroup' => ['read' => true, 'write' => false],
+        ];
+
+        $this->createUserPermissions($manager, $this->users['admin'], $adminPermissions);
+        $this->createUserPermissions($manager, $this->users['demo'], $demoPermissions);
+        $this->createUserPermissions($manager, $this->users['developer'], $developerPermissions);
+        $this->createUserPermissions($manager, $this->users['marketing'], $marketingPermissions);
+        $this->createUserPermissions($manager, $this->users['consultant'], $consultantPermissions);
+
+        $manager->flush();
+    }
+
+    private function createUserPermissions(ObjectManager $manager, User $user, array $permissions): void
+    {
+        foreach ($permissions as $entityCode => $rights) {
+            $systemEntity = $this->systemEntities[$entityCode] ?? null;
+            if (!$systemEntity) {
+                continue;
+            }
+
+            // Check if permission already exists
+            $existingPermission = $manager->getRepository(UserSystemEntityPermission::class)
+                ->findOneBy(['user' => $user, 'systemEntity' => $systemEntity]);
+
+            if (!$existingPermission) {
+                $permission = (new UserSystemEntityPermission())
+                    ->setUser($user)
+                    ->setSystemEntity($systemEntity)
+                    ->setCanRead($rights['read'])
+                    ->setCanWrite($rights['write']);
+
+                $manager->persist($permission);
+            }
+        }
     }
 
     private function createCompanyFixtures(ObjectManager $manager): void
@@ -258,7 +339,7 @@ class AppFixtures extends Fixture
                 'name' => 'Global Solutions Ltd',
                 'email' => 'info@globalsolutions.com',
                 'country' => 'UK',
-                'category' => 'main2', // Business
+                'category' => 'main2', // Business Services
                 'phone' => '+44 20 7946 0958',
                 'url' => 'https://globalsolutions.co.uk',
                 'street' => '123 Business Street',
@@ -280,7 +361,7 @@ class AppFixtures extends Fixture
                 'name' => 'Digital Marketing Pro',
                 'email' => 'contact@digitalmarketing.com',
                 'country' => 'DE',
-                'category' => 'main3', // Marketing
+                'category' => 'main3', // Marketing & Sales
                 'phone' => '+49 40 11223344',
                 'url' => 'https://digitalmarketing.com',
                 'street' => 'Marketingplatz 7',
@@ -300,7 +381,7 @@ class AppFixtures extends Fixture
             ],
         ];
 
-        foreach ($companiesData as $companyData) {
+        foreach ($companiesData as $index => $companyData) {
             $category = $this->categories[$companyData['category']] ?? null;
 
             $company = (new Company())
@@ -315,6 +396,7 @@ class AppFixtures extends Fixture
                 ->setZip($companyData['zipCode']);
 
             $manager->persist($company);
+            $this->companies["company_{$index}"] = $company; // Store reference
         }
 
         $manager->flush();
@@ -327,29 +409,80 @@ class AppFixtures extends Fixture
                 'name' => 'E-Commerce Platform',
                 'status' => ProjectStatus::IN_PROGRESS,
                 'description' => 'Modern e-commerce platform with advanced features',
+                'client' => 'company_0', // Acme Corporation
+                'assignee' => 'demo', // Web Development specialist
+                'category' => 'sub1', // Web Development
             ],
             [
-                'name' => 'Mobile App Development',
+                'name' => 'Mobile Banking App',
                 'status' => ProjectStatus::PLANNING,
-                'description' => 'Cross-platform mobile application for client management',
+                'description' => 'Secure mobile banking application with biometric authentication',
+                'client' => 'company_4', // Mobile Innovations Inc
+                'assignee' => 'developer', // Mobile Development specialist
+                'category' => 'sub2', // Mobile Development
             ],
             [
-                'name' => 'Data Migration Project',
-                'status' => ProjectStatus::ON_HOLD,
-                'description' => 'Legacy system data migration to new infrastructure',
-            ],
-            [
-                'name' => 'API Integration',
+                'name' => 'Digital Marketing Campaign',
                 'status' => ProjectStatus::IN_PROGRESS,
-                'description' => 'Third-party API integration and documentation',
+                'description' => 'Comprehensive digital marketing strategy implementation',
+                'client' => 'company_3', // Digital Marketing Pro
+                'assignee' => 'marketing', // Marketing specialist
+                'category' => 'sub6', // Digital Marketing
+            ],
+            [
+                'name' => 'Business Process Optimization',
+                'status' => ProjectStatus::ON_HOLD,
+                'description' => 'Analysis and optimization of business workflows',
+                'client' => 'company_1', // Global Solutions Ltd
+                'assignee' => 'consultant', // Business consultant
+                'category' => 'main4', // Consulting
+            ],
+            [
+                'name' => 'Financial Dashboard',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Real-time financial reporting and analytics dashboard',
+                'client' => 'company_1', // Global Solutions Ltd
+                'assignee' => 'demo', // Web Development
+                'category' => 'sub4', // Financial Services
+            ],
+            [
+                'name' => 'Content Management System',
+                'status' => ProjectStatus::COMPLETED,
+                'description' => 'Custom CMS for blog and article management',
+                'client' => 'company_3', // Digital Marketing Pro
+                'assignee' => 'demo', // Web Development
+                'category' => 'sub7', // Content Creation
+            ],
+            [
+                'name' => 'Mobile Game Development',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Casual mobile game with social features',
+                'client' => 'company_4', // Mobile Innovations Inc
+                'assignee' => 'developer', // Mobile Development
+                'category' => 'sub2', // Mobile Development
+            ],
+            [
+                'name' => 'ERP System Integration',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Integration of existing systems with new ERP solution',
+                'client' => 'company_0', // Acme Corporation
+                'assignee' => 'admin', // Business Services
+                'category' => 'sub3', // Software Solutions
             ],
         ];
 
         foreach ($projectsData as $projectData) {
+            $client = $this->companies[$projectData['client']] ?? null;
+            $assignee = $this->users[$projectData['assignee']] ?? null;
+            $category = $this->categories[$projectData['category']] ?? null;
+
             $project = (new Project())
                 ->setName($projectData['name'])
                 ->setStatus($projectData['status'])
-                ->setDescription($projectData['description']);
+                ->setDescription($projectData['description'])
+                ->setClient($client)
+                ->setAssignee($assignee)
+                ->setCategory($category);
 
             $manager->persist($project);
         }
