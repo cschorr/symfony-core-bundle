@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Entity\Traits\Single\StringNameTrait;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,6 +22,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 )]
 class Category extends AbstractEntity
 {
+    use StringNameTrait;
+
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', type: Types::INTEGER)]
     private ?int $lft = null;
@@ -46,6 +49,12 @@ class Category extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['lft' => 'ASC'])]
     private Collection $children;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $color = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $icon = null;
 
     public function __construct()
     {
@@ -76,5 +85,29 @@ class Category extends AbstractEntity
     public function setChildren(Collection $children): void
     {
         $this->children = $children;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): static
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): static
+    {
+        $this->icon = $icon;
+
+        return $this;
     }
 }

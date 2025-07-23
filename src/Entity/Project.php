@@ -29,6 +29,9 @@ class Project extends AbstractEntity
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\ManyToOne]
+    private ?Category $category = null;
+
     public function getStatus(): ProjectStatus
     {
         return ProjectStatus::from($this->status);
@@ -107,5 +110,17 @@ class Project extends AbstractEntity
     public function __toString(): string
     {
         return $this->getName() ?? 'Unnamed Project';
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+
+        return $this;
     }
 }
