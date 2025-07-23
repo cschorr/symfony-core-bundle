@@ -34,6 +34,9 @@ class Company extends AbstractEntity
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'company')]
     private Collection $employees;
 
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    private ?Category $category = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -114,6 +117,18 @@ class Company extends AbstractEntity
                 $employee->setCompany(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
 
         return $this;
     }

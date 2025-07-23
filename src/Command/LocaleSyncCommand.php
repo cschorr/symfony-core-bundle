@@ -24,41 +24,41 @@ class LocaleSyncCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        
+
         $io->title('Locale Configuration Synchronization');
-        
+
         $supportedLocales = $this->localeService->getSupportedLocales();
         $routePattern = $this->localeService->getLocaleRoutePattern();
-        
+
         $io->section('Current Configuration');
         $io->text("Supported locales: <info>" . implode(', ', $supportedLocales) . "</info>");
         $io->text("Route pattern (auto-generated): <info>$routePattern</info>");
-        
+
         $io->section('EasyAdmin Locale Mapping');
         foreach ($supportedLocales as $locale) {
             $displayName = $this->localeService->getLocaleDisplayName($locale);
             $io->text("• <info>$locale</info> → $displayName");
         }
-        
+
         $io->section('Translation Files Status');
         $translationsDir = dirname(__DIR__, 2) . '/translations';
         $files = [];
-        
+
         foreach ($supportedLocales as $locale) {
             $messagesFile = "$translationsDir/messages.$locale.yaml";
             $easyAdminFile = "$translationsDir/EasyAdminBundle.$locale.yaml";
-            
+
             $files[] = [
                 $locale,
                 file_exists($messagesFile) ? '✅' : '❌',
                 file_exists($easyAdminFile) ? '✅' : '❌'
             ];
         }
-        
+
         $io->table(['Locale', 'messages.*.yaml', 'EasyAdminBundle.*.yaml'], $files);
-        
+
         $io->success('✅ Route pattern automatically generated from app.locales!');
-        
+
         $io->note([
             'Adding/removing locales is now super simple:',
             '1. Edit app.locales in config/services.yaml',
@@ -68,7 +68,7 @@ class LocaleSyncCommand extends Command
             '',
             '✨ No manual pattern updates needed - everything is automatic!'
         ]);
-        
+
         return Command::SUCCESS;
     }
 }

@@ -15,7 +15,8 @@ class EmbeddedTableService
     public function __construct(
         private AdminUrlGenerator $adminUrlGenerator,
         private TranslatorInterface $translator
-    ) {}
+    ) {
+    }
 
     /**
      * Create a formatted value function for embedding tables in EasyAdmin fields
@@ -28,11 +29,11 @@ class EmbeddedTableService
             $defaultKey = "No " . strtolower($title) . " assigned";
             $emptyMessage = $this->translator->trans($defaultKey);
         }
-        
+
         return function ($value, $entity) use ($columns, $title, $emptyMessage) {
             if ($value instanceof Collection && $value->count() > 0) {
-                return '<div class="w-100" style="width: 100% !important; max-width: 100% !important;">' . 
-                       $this->renderNativeEasyAdminTable($value, $columns, $title) . 
+                return '<div class="w-100" style="width: 100% !important; max-width: 100% !important;">' .
+                       $this->renderNativeEasyAdminTable($value, $columns, $title) .
                        '</div>';
             }
             return '<em class="text-muted">' . $emptyMessage . '</em>';
@@ -59,7 +60,7 @@ class EmbeddedTableService
         $html = '<div class="content-section-body without-header without-footer w-100 p-0 m-0" style="width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; overflow-x: auto !important;">';
         $html .= '<div class="table-responsive w-100 p-0 m-0" style="width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important;">';
         $html .= '<table class="table datagrid w-100 m-0" data-ea-selector="table" style="width: 100% !important; max-width: 100% !important; margin: 0 !important; table-layout: fixed !important;">';
-        
+
         // Table header - exactly like EasyAdmin index pages
         $html .= '<thead>';
         $html .= '<tr>';
@@ -73,7 +74,7 @@ class EmbeddedTableService
         }
         $html .= '</tr>';
         $html .= '</thead>';
-        
+
         // Table body with native EasyAdmin styling
         $html .= '<tbody>';
         $columnCount = count($columns);
@@ -91,14 +92,14 @@ class EmbeddedTableService
         $html .= '</tbody>';
         $html .= '</table>';
         $html .= '</div>'; // Close table-responsive
-        
+
         // Add count info like native EasyAdmin
         $html .= '<div class="list-pagination-counter text-muted">';
         $html .= $this->translator->trans('Showing') . ' <strong>' . $items->count() . '</strong> ' . $this->translator->trans($title);
         $html .= '</div>';
-        
+
         $html .= '</div>'; // Close content-section-body
-        
+
         return $html;
     }
 
@@ -143,28 +144,28 @@ class EmbeddedTableService
                     $value = $value->value;
                 }
                 return '<span class="field-id text-truncate">' . htmlspecialchars((string)$value) . '</span>';
-                
+
             case 'active':
                 $isActive = (bool)$value;
-                return '<span class="badge badge-boolean badge-boolean-' . ($isActive ? 'true' : 'false') . '">' 
-                     . '<i class="fa fa-' . ($isActive ? 'check' : 'times') . '"></i>' 
+                return '<span class="badge badge-boolean badge-boolean-' . ($isActive ? 'true' : 'false') . '">'
+                     . '<i class="fa fa-' . ($isActive ? 'check' : 'times') . '"></i>'
                      . '</span>';
-                     
+
             case 'status':
                 if (empty($value) || $value === '-') {
                     return '<span class="text-muted text-truncate">-</span>';
                 }
-                
+
                 // Handle ProjectStatus enum directly
                 if ($value instanceof ProjectStatus) {
                     return '<span class="badge bg-' . $value->getBadgeClass() . ' text-truncate">' . $value->getLabel() . '</span>';
                 }
-                
+
                 // Convert any other value to enum (handles both legacy int and string values)
                 $enum = null;
                 if (is_numeric($value)) {
                     // Legacy numeric conversion
-                    $enum = match((int)$value) {
+                    $enum = match ((int)$value) {
                         0 => ProjectStatus::PLANNING,
                         1 => ProjectStatus::IN_PROGRESS,
                         2 => ProjectStatus::ON_HOLD,
@@ -176,14 +177,14 @@ class EmbeddedTableService
                     // String to enum conversion
                     $enum = ProjectStatus::tryFrom($value);
                 }
-                
+
                 // Use enum if found, otherwise show unknown
                 if ($enum) {
                     return '<span class="badge bg-' . $enum->getBadgeClass() . ' text-truncate">' . $enum->getLabel() . '</span>';
                 }
-                
+
                 return '<span class="badge bg-secondary text-truncate">' . $this->translator->trans('Unknown') . '</span>';
-                
+
             case 'email':
                 if (empty($value)) {
                     return '<span class="text-muted text-truncate">-</span>';
@@ -199,12 +200,12 @@ class EmbeddedTableService
                 } catch (\Exception $e) {
                     return '<span class="text-truncate">' . htmlspecialchars($value) . '</span>';
                 }
-                
+
             case 'name':
                 if (empty($value)) {
                     return '<span class="text-muted text-truncate">-</span>';
                 }
-                // Create link to project detail page  
+                // Create link to project detail page
                 try {
                     $showUrl = $this->adminUrlGenerator
                         ->setController(ProjectCrudController::class)
@@ -215,26 +216,26 @@ class EmbeddedTableService
                 } catch (\Exception $e) {
                     return '<span class="text-truncate">' . htmlspecialchars($value) . '</span>';
                 }
-                
+
             case 'createdAt':
                 if ($value instanceof \DateTimeInterface) {
-                    return '<span class="field-datetime text-truncate" title="' . $value->format('Y-m-d H:i:s') . '">' 
+                    return '<span class="field-datetime text-truncate" title="' . $value->format('Y-m-d H:i:s') . '">'
                          . $value->format('M j, Y') . '</span>';
                 }
                 return '<span class="text-muted text-truncate">-</span>';
-                
+
             default:
                 if (empty($value)) {
                     return '<span class="text-muted text-truncate">-</span>';
                 }
-                
+
                 // Handle enum values
                 if ($value instanceof \BackedEnum) {
                     $value = $value->value;
                 } elseif ($value instanceof \UnitEnum) {
                     $value = $value->name;
                 }
-                
+
                 return '<span class="text-truncate">' . htmlspecialchars((string)$value) . '</span>';
         }
     }

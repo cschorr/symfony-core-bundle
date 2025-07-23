@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Service for managing application locales
- * 
+ *
  * This service centralizes locale management and ensures synchronization
  * between services.yaml configuration and route requirements.
  */

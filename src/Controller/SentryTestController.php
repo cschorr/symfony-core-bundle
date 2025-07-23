@@ -7,11 +7,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class SentryTestController extends AbstractController {
-
+class SentryTestController extends AbstractController
+{
     public function __construct(
-        private readonly LoggerInterface $logger)
-    {
+        private readonly LoggerInterface $logger
+    ) {
     }
 
     #[Route(path: "/_sentry-test", name: "sentry_test")]

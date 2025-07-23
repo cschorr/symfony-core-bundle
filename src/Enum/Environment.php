@@ -13,7 +13,7 @@ enum Environment: string
      */
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DEV => 'Development',
             self::STAGE => 'Staging',
             self::PROD => 'Production',
@@ -30,7 +30,7 @@ enum Environment: string
     {
         $normalized = strtolower(trim($value));
 
-        return match($normalized) {
+        return match ($normalized) {
             'dev', 'development' => self::DEV,
             'stage', 'staging' => self::STAGE,
             'prod', 'production' => self::PROD,
