@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Service for managing application locales
+ * Service for managing application locales.
  *
  * This service centralizes locale management and ensures synchronization
  * between services.yaml configuration and route requirements.
@@ -13,12 +15,13 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class LocaleService
 {
     public function __construct(
-        #[Autowire(param: 'app.locales')] private array $appLocales
+        #[Autowire(param: 'app.locales')]
+        private readonly array $appLocales,
     ) {
     }
 
     /**
-     * Get all supported locales
+     * Get all supported locales.
      */
     public function getSupportedLocales(): array
     {
@@ -26,7 +29,7 @@ class LocaleService
     }
 
     /**
-     * Generate route pattern for locale requirements
+     * Generate route pattern for locale requirements.
      */
     public function getLocaleRoutePattern(): string
     {
@@ -34,7 +37,7 @@ class LocaleService
     }
 
     /**
-     * Check if a locale is supported
+     * Check if a locale is supported.
      */
     public function isLocaleSupported(string $locale): bool
     {
@@ -42,19 +45,19 @@ class LocaleService
     }
 
     /**
-     * Get display name and flag for locale
+     * Get display name and flag for locale.
      */
     public function getLocaleDisplayName(string $locale): string
     {
         return match ($locale) {
             'en' => '🇺🇸 English',
             'de' => '🇩🇪 Deutsch',
-            default => strtoupper($locale)
+            default => strtoupper($locale),
         };
     }
 
     /**
-     * Generate EasyAdmin locale mapping
+     * Generate EasyAdmin locale mapping.
      */
     public function getEasyAdminLocales(): array
     {
@@ -62,6 +65,7 @@ class LocaleService
         foreach ($this->appLocales as $locale) {
             $localeMap[$locale] = $this->getLocaleDisplayName($locale);
         }
+
         return $localeMap;
     }
 }

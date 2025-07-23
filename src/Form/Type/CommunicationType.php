@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -23,9 +25,7 @@ class CommunicationType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'constraints' => [
-                    new Assert\Email([
-                        'message' => 'Please enter a valid email address.',
-                    ]),
+                    new Assert\Email(message: 'Please enter a valid email address.'),
                 ],
             ])
             ->add('phone', TelType::class, [
@@ -52,9 +52,7 @@ class CommunicationType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'constraints' => [
-                    new Assert\Url([
-                        'message' => 'Please enter a valid URL.',
-                    ]),
+                    new Assert\Url(message: 'Please enter a valid URL.'),
                 ],
             ]);
     }

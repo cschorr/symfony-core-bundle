@@ -1,33 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * Service to handle bidirectional entity relationships automatically
+ * Service to handle bidirectional entity relationships automatically.
  */
 class RelationshipSyncService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
     /**
-     * Sync bidirectional one-to-many relationships
+     * Sync bidirectional one-to-many relationships.
      *
-     * @param object $owningEntity The entity that owns the relationship (e.g., Company)
+     * @param object $owningEntity       The entity that owns the relationship (e.g., Company)
      * @param string $collectionProperty The property name of the collection (e.g., 'employees')
-     * @param string $inverseProperty The property name on the inverse side (e.g., 'company')
+     * @param string $inverseProperty    The property name on the inverse side (e.g., 'company')
      */
     public function syncOneToMany(
         object $owningEntity,
         string $collectionProperty,
-        string $inverseProperty
+        string $inverseProperty,
     ): void {
-        $owningEntityClass = get_class($owningEntity);
+        $owningEntityClass = $owningEntity::class;
         $collection = $this->getPropertyValue($owningEntity, $collectionProperty);
 
         if (!$collection instanceof Collection) {
@@ -49,11 +51,11 @@ class RelationshipSyncService
     }
 
     /**
-     * Auto-detect and sync common bidirectional relationships
+     * Auto-detect and sync common bidirectional relationships.
      */
     public function autoSync(object $entity): void
     {
-        $class = get_class($entity);
+        $class = $entity::class;
 
         // Common relationship patterns
         $relationshipMappings = [
@@ -86,7 +88,7 @@ class RelationshipSyncService
         }
 
         $firstItem = $currentCollection->first();
-        $itemClass = get_class($firstItem);
+        $itemClass = $firstItem::class;
 
         // Find all items that were previously assigned to this entity
         $repository = $this->entityManager->getRepository($itemClass);
@@ -112,7 +114,7 @@ class RelationshipSyncService
             return $entity->$isGetter();
         }
 
-        throw new \InvalidArgumentException("No getter method found for property '{$property}' on " . get_class($entity));
+        throw new \InvalidArgumentException(sprintf("No getter method found for property '%s' on ", $property) . $entity::class);
     }
 
     private function setPropertyValue(object $entity, string $property, mixed $value): void
@@ -120,10 +122,11 @@ class RelationshipSyncService
         $setter = 'set' . ucfirst($property);
         if (method_exists($entity, $setter)) {
             $entity->$setter($value);
+
             return;
         }
 
-        throw new \InvalidArgumentException("No setter method found for property '{$property}' on " . get_class($entity));
+        throw new \InvalidArgumentException(sprintf("No setter method found for property '%s' on ", $property) . $entity::class);
     }
 
     private function getEntityId(object $entity): mixed
@@ -131,12 +134,14 @@ class RelationshipSyncService
         if (method_exists($entity, 'getId')) {
             return $entity->getId();
         }
+
         return null;
     }
 
     private function hasProperty(object $entity, string $property): bool
     {
         $getter = 'get' . ucfirst($property);
+
         return method_exists($entity, $getter);
     }
 }

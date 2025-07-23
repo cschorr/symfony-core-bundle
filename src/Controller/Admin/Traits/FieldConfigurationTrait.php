@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin\Traits;
 
 /**
  * Trait for common field configuration patterns
- * Note: Requires the controller to have EasyAdminFieldService $fieldService property
+ * Note: Requires the controller to have EasyAdminFieldService $fieldService property.
  */
 trait FieldConfigurationTrait
 {
     /**
      * Get standard entity field configuration (Active, ID, name, timestamps)
-     * Active field is first for better visibility in index view
+     * Active field is first for better visibility in index view.
      */
     protected function getStandardEntityFields(string $entityLabel = 'Entity'): array
     {
@@ -22,18 +24,19 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get address and communication field groups
+     * Get address and communication field groups.
      */
     protected function getContactFieldGroups(array $pages = ['detail', 'form']): array
     {
         $fields = [];
         $fields = array_merge($fields, $this->fieldService->createCommunicationFieldGroup($pages));
         $fields = array_merge($fields, $this->fieldService->createAddressFieldGroup($pages));
+
         return $fields;
     }
 
     /**
-     * Get timestamp fields (created, updated)
+     * Get timestamp fields (created, updated).
      */
     protected function getTimestampFields(array $pages = ['detail']): array
     {
@@ -53,16 +56,16 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get user association field with smart defaults
+     * Get user association field with smart defaults.
      */
     protected function getUserAssociationField(
         string $fieldName = 'user',
         string $label = 'User',
         array $pages = ['index', 'detail', 'form'],
-        bool $multiple = false
+        bool $multiple = false,
     ): array {
         $field = $this->fieldService->field($fieldName)
-            ->association(\App\Entity\User::class, fn($user) => $user->getEmail())
+            ->association(\App\Entity\User::class, fn ($user) => $user->getEmail())
             ->label($label)
             ->pages($pages);
 
@@ -74,12 +77,12 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get company association field with smart defaults
+     * Get company association field with smart defaults.
      */
     protected function getCompanyAssociationField(
         string $fieldName = 'company',
         string $label = 'Company',
-        array $pages = ['index', 'detail', 'form']
+        array $pages = ['index', 'detail', 'form'],
     ): array {
         return $this->fieldService->field($fieldName)
             ->association(\App\Entity\Company::class, 'name')
@@ -89,11 +92,11 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get status field with common options
+     * Get status field with common options.
      */
     protected function getStatusField(
         array $statusOptions = ['active' => 'Active', 'inactive' => 'Inactive'],
-        array $pages = ['index', 'detail', 'form']
+        array $pages = ['index', 'detail', 'form'],
     ): array {
         return $this->fieldService->field('status')
             ->choices($statusOptions)
@@ -103,7 +106,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Create a complete CRUD field set for entities with contact info
+     * Create a complete CRUD field set for entities with contact info.
      */
     protected function createContactEntityFields(string $entityLabel): array
     {
@@ -117,14 +120,14 @@ trait FieldConfigurationTrait
 
         // Timestamps (if needed)
         if ($this->shouldIncludeTimestamps()) {
-            $fields = array_merge($fields, $this->getTimestampFields());
+            return array_merge($fields, $this->getTimestampFields());
         }
 
         return $fields;
     }
 
     /**
-     * Override this in controllers to include timestamps
+     * Override this in controllers to include timestamps.
      */
     protected function shouldIncludeTimestamps(): bool
     {
@@ -132,7 +135,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get user/employee related fields
+     * Get user/employee related fields.
      */
     protected function getUserFields(array $pages = ['detail', 'form']): array
     {
@@ -156,7 +159,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get project-related fields
+     * Get project-related fields.
      */
     protected function getProjectFields(array $pages = ['detail', 'form']): array
     {
@@ -184,7 +187,7 @@ trait FieldConfigurationTrait
                     'Active' => 'active',
                     'On Hold' => 'on_hold',
                     'Completed' => 'completed',
-                    'Cancelled' => 'cancelled'
+                    'Cancelled' => 'cancelled',
                 ])
                 ->pages($pages)
                 ->build(),
@@ -192,7 +195,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get common association fields
+     * Get common association fields.
      */
     protected function getAssociationFields(array $associations, array $pages = ['detail', 'form']): array
     {
@@ -222,7 +225,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get notes/description field
+     * Get notes/description field.
      */
     protected function getNotesField(array $pages = ['detail', 'form'], string $label = 'Notes'): array
     {
@@ -236,7 +239,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get active/status field for all pages by default
+     * Get active/status field for all pages by default.
      */
     protected function getActiveField(array $pages = ['index', 'detail', 'form']): array
     {
@@ -250,7 +253,8 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Get active field specifically for first position in index view
+     * Get active field specifically for first position in index view.
+     *
      * @deprecated Use getActiveField() instead - it now defaults to all pages
      */
     protected function getActiveFieldFirst(array $pages = ['index', 'detail', 'form']): array
@@ -259,7 +263,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Create a complete basic entity configuration
+     * Create a complete basic entity configuration.
      */
     protected function getBasicEntityConfiguration(string $entityLabel, array $additionalFields = []): array
     {
@@ -274,7 +278,7 @@ trait FieldConfigurationTrait
     }
 
     /**
-     * Create a panel/tab structure for form organization
+     * Create a panel/tab structure for form organization.
      */
     protected function createFormStructure(array $sections, array $pages = ['form']): array
     {

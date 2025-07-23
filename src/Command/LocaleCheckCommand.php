@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Service\LocaleService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -13,15 +14,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'app:locale:check',
     description: 'Check locale configuration synchronization'
 )]
-class LocaleCheckCommand extends Command
+class LocaleCheckCommand
 {
-    public function __construct(
-        private LocaleService $localeService
-    ) {
-        parent::__construct();
+    public function __construct(private readonly LocaleService $localeService)
+    {
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -35,7 +34,7 @@ class LocaleCheckCommand extends Command
         $io->section('EasyAdmin Locale Mapping');
         foreach ($appLocales as $locale) {
             $displayName = $this->localeService->getLocaleDisplayName($locale);
-            $io->text("• <info>$locale</info> → $displayName");
+            $io->text(sprintf('• <info>%s</info> → %s', $locale, $displayName));
         }
 
         $io->section('Available Translation Files');
@@ -43,13 +42,13 @@ class LocaleCheckCommand extends Command
         $files = [];
 
         foreach ($appLocales as $locale) {
-            $messagesFile = "$translationsDir/messages.$locale.yaml";
-            $easyAdminFile = "$translationsDir/EasyAdminBundle.$locale.yaml";
+            $messagesFile = sprintf('%s/messages.%s.yaml', $translationsDir, $locale);
+            $easyAdminFile = sprintf('%s/EasyAdminBundle.%s.yaml', $translationsDir, $locale);
 
             $files[] = [
                 $locale,
                 file_exists($messagesFile) ? '✅' : '❌',
-                file_exists($easyAdminFile) ? '✅' : '❌'
+                file_exists($easyAdminFile) ? '✅' : '❌',
             ];
         }
 

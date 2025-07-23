@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Service\LocaleService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -13,15 +14,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'app:locale:sync',
     description: 'Synchronize locale configuration and generate route patterns'
 )]
-class LocaleSyncCommand extends Command
+class LocaleSyncCommand
 {
-    public function __construct(
-        private LocaleService $localeService
-    ) {
-        parent::__construct();
+    public function __construct(private readonly LocaleService $localeService)
+    {
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -31,13 +30,13 @@ class LocaleSyncCommand extends Command
         $routePattern = $this->localeService->getLocaleRoutePattern();
 
         $io->section('Current Configuration');
-        $io->text("Supported locales: <info>" . implode(', ', $supportedLocales) . "</info>");
-        $io->text("Route pattern (auto-generated): <info>$routePattern</info>");
+        $io->text('Supported locales: <info>' . implode(', ', $supportedLocales) . '</info>');
+        $io->text(sprintf('Route pattern (auto-generated): <info>%s</info>', $routePattern));
 
         $io->section('EasyAdmin Locale Mapping');
         foreach ($supportedLocales as $locale) {
             $displayName = $this->localeService->getLocaleDisplayName($locale);
-            $io->text("• <info>$locale</info> → $displayName");
+            $io->text(sprintf('• <info>%s</info> → %s', $locale, $displayName));
         }
 
         $io->section('Translation Files Status');
@@ -45,13 +44,13 @@ class LocaleSyncCommand extends Command
         $files = [];
 
         foreach ($supportedLocales as $locale) {
-            $messagesFile = "$translationsDir/messages.$locale.yaml";
-            $easyAdminFile = "$translationsDir/EasyAdminBundle.$locale.yaml";
+            $messagesFile = sprintf('%s/messages.%s.yaml', $translationsDir, $locale);
+            $easyAdminFile = sprintf('%s/EasyAdminBundle.%s.yaml', $translationsDir, $locale);
 
             $files[] = [
                 $locale,
                 file_exists($messagesFile) ? '✅' : '❌',
-                file_exists($easyAdminFile) ? '✅' : '❌'
+                file_exists($easyAdminFile) ? '✅' : '❌',
             ];
         }
 
@@ -66,7 +65,7 @@ class LocaleSyncCommand extends Command
             '3. Create missing translation files if needed',
             '4. Clear cache: bin/console cache:clear',
             '',
-            '✨ No manual pattern updates needed - everything is automatic!'
+            '✨ No manual pattern updates needed - everything is automatic!',
         ]);
 
         return Command::SUCCESS;

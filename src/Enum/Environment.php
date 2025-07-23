@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enum;
 
 enum Environment: string
@@ -9,7 +11,7 @@ enum Environment: string
     case PROD = 'prod';
 
     /**
-     * Returns a human-readable label for the environment
+     * Returns a human-readable label for the environment.
      */
     public function getLabel(): string
     {
@@ -21,9 +23,8 @@ enum Environment: string
     }
 
     /**
-     * Get Environment from string value
+     * Get Environment from string value.
      *
-     * @param string $value
      * @return self|null Returns null if no matching environment is found
      */
     public static function fromString(string $value): ?self
@@ -39,7 +40,7 @@ enum Environment: string
     }
 
     /**
-     * Try to determine the current environment
+     * Try to determine the current environment.
      */
     public static function getCurrent(): self
     {
@@ -47,7 +48,7 @@ enum Environment: string
 
         if ($appEnv) {
             $env = self::fromString($appEnv);
-            if ($env) {
+            if (null !== $env) {
                 return $env;
             }
         }

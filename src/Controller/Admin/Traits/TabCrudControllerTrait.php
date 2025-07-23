@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin\Traits;
 
 use App\Service\CrudSchemaBuilder;
@@ -8,22 +10,23 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 
 /**
- * Comprehensive trait for standardized CRUD controller patterns
+ * Comprehensive trait for standardized CRUD controller patterns.
  */
 trait TabCrudControllerTrait
 {
     protected CrudSchemaBuilder $schemaBuilder;
+
     protected EasyAdminFieldService $fieldService;
 
     /**
      * Abstract method to be implemented by controllers
-     * Define your field schema here
+     * Define your field schema here.
      */
     abstract protected function getFieldSchema(): array;
 
     /**
      * Optional method for tab-based detail views
-     * Override in controllers that need tabs
+     * Override in controllers that need tabs.
      */
     protected function getTabSchema(): array
     {
@@ -31,14 +34,14 @@ trait TabCrudControllerTrait
     }
 
     /**
-     * Configure fields using the field schema
+     * Configure fields using the field schema.
      */
     public function configureFields(string $pageName): iterable
     {
         $fieldSchema = $this->getFieldSchema();
 
         // Handle tab structure for detail page
-        if ($pageName === Crud::PAGE_DETAIL && method_exists($this, 'getTabSchema')) {
+        if (Crud::PAGE_DETAIL === $pageName && method_exists($this, 'getTabSchema')) {
             $tabSchema = $this->getTabSchema();
             if (!empty($tabSchema)) {
                 return $this->buildTabStructure($tabSchema, $pageName);
@@ -58,14 +61,14 @@ trait TabCrudControllerTrait
 
         // Apply custom field modifications if method exists
         if (method_exists($this, 'customizeFields')) {
-            $fields = $this->customizeFields($fields, $pageName);
+            return $this->customizeFields($fields, $pageName);
         }
 
         return $fields;
     }
 
     /**
-     * Build tab structure for detail view
+     * Build tab structure for detail view.
      */
     private function buildTabStructure(array $tabSchema, string $pageName): iterable
     {
@@ -90,7 +93,7 @@ trait TabCrudControllerTrait
     }
 
     /**
-     * Determine if field should be included for the current page
+     * Determine if field should be included for the current page.
      */
     private function shouldIncludeField(array $fieldConfig, string $pageName): bool
     {
@@ -101,11 +104,11 @@ trait TabCrudControllerTrait
         $schemaPages = $fieldConfig['pages'];
         $crudPages = $this->mapCrudPageToSchemaPages($pageName);
 
-        return !empty(array_intersect($schemaPages, $crudPages));
+        return [] !== array_intersect($schemaPages, $crudPages);
     }
 
     /**
-     * Map CRUD page names to schema page names
+     * Map CRUD page names to schema page names.
      */
     private function mapCrudPageToSchemaPages(string $crudPage): array
     {
@@ -114,12 +117,12 @@ trait TabCrudControllerTrait
             Crud::PAGE_DETAIL => ['detail'],
             Crud::PAGE_NEW => ['form', 'new'],
             Crud::PAGE_EDIT => ['form', 'edit'],
-            default => ['index', 'detail', 'form']
+            default => ['index', 'detail', 'form'],
         };
     }
 
     /**
-     * Helper method to create standard entity configuration
+     * Helper method to create standard entity configuration.
      */
     protected function getStandardEntityConfig(string $entityName): array
     {
@@ -129,7 +132,7 @@ trait TabCrudControllerTrait
             $this->schemaBuilder->createField('active', 'boolean', 'Active'),
             $this->schemaBuilder->createField('name', 'text', $entityName . ' Name', ['index', 'detail', 'form'], [
                 'required' => true,
-                'linkToShow' => true
+                'linkToShow' => true,
             ]),
 
             // Standard timestamps
@@ -139,7 +142,7 @@ trait TabCrudControllerTrait
     }
 
     /**
-     * Helper method to create address field group
+     * Helper method to create address field group.
      */
     protected function getAddressFieldConfig(array $pages = ['detail', 'form']): array
     {
@@ -147,7 +150,7 @@ trait TabCrudControllerTrait
     }
 
     /**
-     * Helper method to create contact field group
+     * Helper method to create contact field group.
      */
     protected function getContactFieldConfig(array $pages = ['detail', 'form']): array
     {
@@ -155,7 +158,7 @@ trait TabCrudControllerTrait
     }
 
     /**
-     * Quick method to create a standard information tab
+     * Quick method to create a standard information tab.
      */
     protected function createInfoTab(string $entityName, array $additionalFields = []): array
     {
@@ -163,13 +166,13 @@ trait TabCrudControllerTrait
     }
 
     /**
-     * Quick method to create a relationship tab
+     * Quick method to create a relationship tab.
      */
     protected function createRelationshipTab(
         string $property,
         string $label,
         array $columns,
-        bool $includeFormField = true
+        bool $includeFormField = true,
     ): array {
         return $this->schemaBuilder->createRelationshipTab($property, $label, $columns, $includeFormField);
     }

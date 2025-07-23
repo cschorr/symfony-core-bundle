@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -9,29 +11,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DuplicateService
 {
-    private EntityManagerInterface $entityManager;
-    private PropertyAccessorInterface $propertyAccessor;
-    private PropertyInfoExtractorInterface $propertyInfo;
-    private TranslatorInterface $translator;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        PropertyAccessorInterface $propertyAccessor,
-        PropertyInfoExtractorInterface $propertyInfo,
-        TranslatorInterface $translator
-    ) {
-        $this->entityManager = $entityManager;
-        $this->propertyAccessor = $propertyAccessor;
-        $this->propertyInfo = $propertyInfo;
-        $this->translator = $translator;
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly PropertyAccessorInterface $propertyAccessor, private readonly PropertyInfoExtractorInterface $propertyInfo, private readonly TranslatorInterface $translator)
+    {
     }
 
     /**
-     * Duplicate an entity with all its properties except ID and unique constraints
+     * Duplicate an entity with all its properties except ID and unique constraints.
      */
     public function duplicate(object $entity): object
     {
-        $entityClass = get_class($entity);
+        $entityClass = $entity::class;
         $metadata = $this->entityManager->getClassMetadata($entityClass);
 
         // Create a new instance of the same class
@@ -54,10 +43,10 @@ class DuplicateService
                 $duplicatedValue = $this->processDuplicatedValue($value, $property, $entity);
 
                 // Set the value on the duplicated entity
-                if ($duplicatedValue !== null || $this->propertyAccessor->isWritable($duplicatedEntity, $property)) {
+                if (null !== $duplicatedValue || $this->propertyAccessor->isWritable($duplicatedEntity, $property)) {
                     $this->propertyAccessor->setValue($duplicatedEntity, $property, $duplicatedValue);
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // Skip properties that cannot be accessed or set
                 continue;
             }
@@ -75,23 +64,23 @@ class DuplicateService
     }
 
     /**
-     * Check if a property should be skipped during duplication
+     * Check if a property should be skipped during duplication.
      */
     private function shouldSkipProperty(string $property, $metadata): bool
     {
         // Skip ID field
-        if (in_array($property, $metadata->getIdentifier())) {
+        if (in_array($property, $metadata->getIdentifier(), true)) {
             return true;
         }
 
         // Skip timestamp fields that should be auto-generated
         $timestampFields = ['createdAt', 'updatedAt', 'created_at', 'updated_at'];
-        if (in_array($property, $timestampFields)) {
+        if (in_array($property, $timestampFields, true)) {
             return true;
         }
 
         // Skip version fields for optimistic locking
-        if ($property === 'version') {
+        if ('version' === $property) {
             return true;
         }
 
@@ -102,7 +91,7 @@ class DuplicateService
 
             // For OneToMany relationships, we might want to skip the inverse side
             // to avoid issues with bidirectional relationships during duplication
-            if ($associationMapping['type'] === \Doctrine\ORM\Mapping\ClassMetadata::ONE_TO_MANY) {
+            if (\Doctrine\ORM\Mapping\ClassMetadata::ONE_TO_MANY === $associationMapping['type']) {
                 // For now, we'll include OneToMany relationships but handle them carefully
                 // They will be processed by processDuplicatedValue
             }
@@ -112,7 +101,7 @@ class DuplicateService
     }
 
     /**
-     * Process the value for duplication (handle special cases)
+     * Process the value for duplication (handle special cases).
      */
     private function processDuplicatedValue($value, string $property, object $originalEntity)
     {
@@ -149,7 +138,7 @@ class DuplicateService
     }
 
     /**
-     * Ensure an entity is managed by the EntityManager
+     * Ensure an entity is managed by the EntityManager.
      */
     private function ensureManagedEntity($entity)
     {
@@ -164,10 +153,10 @@ class DuplicateService
 
         try {
             // Try to get the entity class and ID
-            $entityClass = get_class($entity);
+            $entityClass = $entity::class;
 
             // Handle Doctrine proxies - get the real class name
-            if (strpos($entityClass, 'Proxies\\__CG__\\') === 0) {
+            if (str_starts_with($entityClass, 'Proxies\\__CG__\\')) {
                 $entityClass = substr($entityClass, strlen('Proxies\\__CG__\\'));
             }
 
@@ -177,10 +166,10 @@ class DuplicateService
             // Try to get the identifier values
             $identifier = $metadata->getIdentifierValues($entity);
 
-            if (!empty($identifier)) {
+            if ([] !== $identifier) {
                 // Find the managed entity by ID
                 $managedEntity = $this->entityManager->find($entityClass, $identifier);
-                if ($managedEntity) {
+                if (null !== $managedEntity) {
                     return $managedEntity;
                 }
             }
@@ -188,7 +177,7 @@ class DuplicateService
             // If we couldn't find a managed entity, return the original entity
             // It's better to return the original than fail completely
             return $entity;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // If anything fails, return the original entity
             // This ensures we don't break the duplication process
             return $entity;
@@ -196,7 +185,7 @@ class DuplicateService
     }
 
     /**
-     * Handle special naming for duplicated entities
+     * Handle special naming for duplicated entities.
      */
     private function handleDuplicateNaming(object $duplicatedEntity, object $originalEntity): void
     {
@@ -205,8 +194,8 @@ class DuplicateService
 
         foreach ($nameFields as $field) {
             if (
-                $this->propertyAccessor->isReadable($originalEntity, $field) &&
-                $this->propertyAccessor->isWritable($duplicatedEntity, $field)
+                $this->propertyAccessor->isReadable($originalEntity, $field)
+                && $this->propertyAccessor->isWritable($duplicatedEntity, $field)
             ) {
                 $originalValue = $this->propertyAccessor->getValue($originalEntity, $field);
                 if ($originalValue && is_string($originalValue)) {
@@ -220,7 +209,7 @@ class DuplicateService
     }
 
     /**
-     * Persist the duplicated entity
+     * Persist the duplicated entity.
      */
     public function persistDuplicate(object $duplicatedEntity): void
     {
@@ -229,7 +218,7 @@ class DuplicateService
     }
 
     /**
-     * Duplicate and persist an entity in one operation
+     * Duplicate and persist an entity in one operation.
      */
     public function duplicateAndPersist(object $entity): object
     {

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Compiler Pass to automatically generate locale patterns from app.locales
+ * Compiler Pass to automatically generate locale patterns from app.locales.
  */
 class LocalePatternCompilerPass implements CompilerPassInterface
 {

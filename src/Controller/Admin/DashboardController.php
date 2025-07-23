@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
+use App\Entity\User;
+use App\Service\LocaleService;
+use App\Service\NavigationService;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -9,17 +14,14 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use App\Service\LocaleService;
-use App\Service\NavigationService;
-use App\Entity\User;
 
 #[AdminDashboard(routePath: '/admin/{_locale}', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private LocaleService $localeService,
-        private NavigationService $navigationService
+        private readonly TranslatorInterface $translator,
+        private readonly LocaleService $localeService,
+        private readonly NavigationService $navigationService,
     ) {
     }
 
@@ -31,6 +33,7 @@ class DashboardController extends AbstractDashboardController
     }
 
     #[Route('/admin/{_locale}', name: 'admin', requirements: ['_locale' => '%app.locales.pattern%'])]
+    #[\Override]
     public function index(): Response
     {
         // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
@@ -39,7 +42,7 @@ class DashboardController extends AbstractDashboardController
     }
 
     /**
-     * Configure EasyAdmin dashboard settings
+     * Configure EasyAdmin dashboard settings.
      *
      * Locales are automatically synchronized with services.yaml app.locales parameter.
      * To add/remove locales:
@@ -50,6 +53,7 @@ class DashboardController extends AbstractDashboardController
      * 5. Clear cache: bin/console cache:clear
      * 6. Check synchronization: bin/console app:locale:check
      */
+    #[\Override]
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
@@ -59,7 +63,8 @@ class DashboardController extends AbstractDashboardController
     }
 
     /**
-     * Generate EasyAdmin locale configuration from services.yaml app.locales parameter
+     * Generate EasyAdmin locale configuration from services.yaml app.locales parameter.
+     *
      * @deprecated Use LocaleService::getEasyAdminLocales() instead
      */
     private function getEasyAdminLocales(): array
@@ -68,7 +73,8 @@ class DashboardController extends AbstractDashboardController
     }
 
     /**
-     * Get display name and flag for locale
+     * Get display name and flag for locale.
+     *
      * @deprecated Use LocaleService::getLocaleDisplayName() instead
      */
     private function getLocaleDisplayName(string $locale): string
@@ -77,7 +83,8 @@ class DashboardController extends AbstractDashboardController
     }
 
     /**
-     * Get route requirements pattern for locales
+     * Get route requirements pattern for locales.
+     *
      * @deprecated Use LocaleService::getLocaleRoutePattern() instead
      */
     private function getLocaleRoutePattern(): string
@@ -85,6 +92,7 @@ class DashboardController extends AbstractDashboardController
         return $this->localeService->getLocaleRoutePattern();
     }
 
+    #[\Override]
     public function configureMenuItems(): iterable
     {
         // Always show dashboard

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\User;
@@ -7,7 +9,6 @@ use App\Service\NavigationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -15,16 +16,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'app:debug:navigation',
     description: 'Debug navigation for demo user',
 )]
-class DebugNavigationCommand extends Command
+class DebugNavigationCommand
 {
-    public function __construct(
-        private NavigationService $navigationService,
-        private EntityManagerInterface $entityManager
-    ) {
-        parent::__construct();
+    public function __construct(private readonly NavigationService $navigationService, private readonly EntityManagerInterface $entityManager)
+    {
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -32,8 +30,9 @@ class DebugNavigationCommand extends Command
         $user = $this->entityManager->getRepository(User::class)
             ->findOneBy(['email' => 'demo@example.com']);
 
-        if (!$user) {
+        if (null === $user) {
             $io->error('Demo user not found');
+
             return Command::FAILURE;
         }
 
@@ -127,7 +126,7 @@ class DebugNavigationCommand extends Command
             $rows[] = [
                 $systemEntity->getCode(),
                 $systemEntity->getName(),
-                $systemEntity->isActive() ? 'Yes' : 'No'
+                $systemEntity->isActive() ? 'Yes' : 'No',
             ];
         }
 
@@ -146,7 +145,7 @@ class DebugNavigationCommand extends Command
         foreach ($systemEntities as $systemEntity) {
             $systemEntityCode = $systemEntity->getCode();
             if (isset($entityMapping[$systemEntityCode])) {
-                $navigationCount++;
+                ++$navigationCount;
                 $io->writeln(sprintf('✓ %s (%s)', $systemEntity->getName(), $systemEntityCode));
             } else {
                 $io->writeln(sprintf('✗ %s (%s) - No entity mapping', $systemEntity->getName(), $systemEntityCode));
