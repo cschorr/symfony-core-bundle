@@ -20,7 +20,7 @@ class LocaleSyncCommand
     {
     }
 
-    public function __invoke(OutputInterface $output): int
+    public function __invoke(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
