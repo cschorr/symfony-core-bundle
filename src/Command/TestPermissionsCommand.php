@@ -65,6 +65,7 @@ class TestPermissionsCommand
 
             return Command::SUCCESS;
         }
+
         $io->error('Demo user is missing Company permissions');
 
         return Command::FAILURE;

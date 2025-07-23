@@ -29,7 +29,7 @@ class SystemEntityVoter extends Voter
         // Support both SystemEntity entities and system entity codes/names (strings)
         $validAttributes = array_map(fn (SystemEntityPermission $case) => $case->value, SystemEntityPermission::cases());
 
-        return in_array($attribute, $validAttributes)
+        return in_array($attribute, $validAttributes, true)
             && ($subject instanceof SystemEntity || is_string($subject));
     }
 
@@ -43,7 +43,7 @@ class SystemEntityVoter extends Voter
         }
 
         // Admin users have all permissions
-        if ($user instanceof User && in_array('ROLE_ADMIN', $user->getRoles())) {
+        if ($user instanceof User && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
             return true;
         }
 

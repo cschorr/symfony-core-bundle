@@ -361,20 +361,20 @@ class SystemEntityCrudController extends AbstractCrudController
     {
         $user = $this->getUser();
 
-        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles(), true);
     }
 
     protected function canEditEntity($entity): bool
     {
         $user = $this->getUser();
 
-        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles(), true);
     }
 
     protected function canDeleteEntity($entity): bool
     {
         $user = $this->getUser();
 
-        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles(), true);
     }
 }

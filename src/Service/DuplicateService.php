@@ -69,13 +69,13 @@ class DuplicateService
     private function shouldSkipProperty(string $property, $metadata): bool
     {
         // Skip ID field
-        if (in_array($property, $metadata->getIdentifier())) {
+        if (in_array($property, $metadata->getIdentifier(), true)) {
             return true;
         }
 
         // Skip timestamp fields that should be auto-generated
         $timestampFields = ['createdAt', 'updatedAt', 'created_at', 'updated_at'];
-        if (in_array($property, $timestampFields)) {
+        if (in_array($property, $timestampFields, true)) {
             return true;
         }
 
