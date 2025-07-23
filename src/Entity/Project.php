@@ -15,8 +15,8 @@ class Project extends AbstractEntity
     use StringNameTrait;
     use SetStartEndTrait;
 
-    #[ORM\Column(type: 'string', enumType: ProjectStatus::class, nullable: false)]
-    private ProjectStatus $status = ProjectStatus::PLANNING;
+    #[ORM\Column(type: Types::STRING, nullable: false)]
+    private string $status = ProjectStatus::PLANNING->value;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?User $assignee = null;
@@ -29,12 +29,12 @@ class Project extends AbstractEntity
 
     public function getStatus(): ProjectStatus
     {
-        return $this->status;
+        return ProjectStatus::from($this->status);
     }
 
     public function setStatus(ProjectStatus $status): static
     {
-        $this->status = $status;
+        $this->status = $status->value;
 
         return $this;
     }
