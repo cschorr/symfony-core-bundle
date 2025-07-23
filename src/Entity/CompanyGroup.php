@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Traits\Single\StringCodeTrait;
@@ -57,8 +59,9 @@ class CompanyGroup extends AbstractEntity
         return $this;
     }
 
+    #[\Override]
     public function __toString(): string
     {
-        return $this->getName() ?: 'Unnamed Group';
+        return !in_array($this->getName(), ['', '0'], true) ? $this->getName() : 'Unnamed Group';
     }
 }

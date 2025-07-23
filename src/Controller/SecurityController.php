@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Service\LocaleService;
@@ -12,23 +14,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SecurityController extends AbstractController
 {
     public function __construct(
-        private LocaleService $localeService,
-        private TranslatorInterface $translator
+        private readonly LocaleService $localeService,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
     #[Route(path: '/login', name: 'app_login')]
     #[Route(path: '/login/{_locale}', name: 'app_login_locale', requirements: ['_locale' => '%app.locales.pattern%'])]
-    public function login(AuthenticationUtils $authenticationUtils, string $_locale = null): Response
+    public function login(AuthenticationUtils $authenticationUtils, ?string $_locale = null): Response
     {
         // Use default locale if none provided
-        if ($_locale === null) {
+        if (null === $_locale) {
             $supportedLocales = $this->localeService->getSupportedLocales();
             $_locale = $supportedLocales[0] ?? 'de'; // fallback to 'de' if no locales configured
         }
 
         // redirect to easyadmin dashboard if logged on
-        if ($this->getUser()) {
+        if (null !== $this->getUser()) {
             return $this->redirectToRoute('admin', ['_locale' => $_locale]);
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\SystemEntity;
@@ -18,7 +20,8 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all system entities that a user has any permission for
+     * Find all system entities that a user has any permission for.
+     *
      * @return SystemEntity[]
      */
     public function findSystemEntitiesForUser(User $user): array
@@ -34,7 +37,8 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all active system entities that a user has any permission for
+     * Find all active system entities that a user has any permission for.
+     *
      * @return SystemEntity[]
      */
     public function findActiveSystemEntitiesForUser(User $user): array
@@ -52,7 +56,8 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all active system entities (for admin users)
+     * Find all active system entities (for admin users).
+     *
      * @return SystemEntity[]
      */
     public function findAllActive(): array
@@ -66,7 +71,7 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Check if system entity exists by code
+     * Check if system entity exists by code.
      */
     public function existsByCode(string $code): bool
     {
@@ -79,7 +84,7 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find system entity by code
+     * Find system entity by code.
      */
     public function findOneByCode(string $code): ?SystemEntity
     {
@@ -91,7 +96,8 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find system entities with users having read access
+     * Find system entities with users having read access.
+     *
      * @return SystemEntity[]
      */
     public function findWithReadUsers(): array
@@ -105,7 +111,8 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find system entities with users having write access
+     * Find system entities with users having write access.
+     *
      * @return SystemEntity[]
      */
     public function findWithWriteUsers(): array
@@ -119,7 +126,8 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find system entities that a specific user can read
+     * Find system entities that a specific user can read.
+     *
      * @return SystemEntity[]
      */
     public function findReadableByUser(User $user): array
@@ -135,7 +143,8 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find system entities that a specific user can write to
+     * Find system entities that a specific user can write to.
+     *
      * @return SystemEntity[]
      */
     public function findWritableByUser(User $user): array
@@ -151,7 +160,7 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get count of users with access to a system entity
+     * Get count of users with access to a system entity.
      */
     public function getUserAccessCount(SystemEntity $systemEntity): int
     {
@@ -163,7 +172,7 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Check if user has read access to system entity
+     * Check if user has read access to system entity.
      */
     public function userHasReadAccess(User $user, SystemEntity $systemEntity): bool
     {
@@ -176,7 +185,7 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Check if user has write access to system entity
+     * Check if user has write access to system entity.
      */
     public function userHasWriteAccess(User $user, SystemEntity $systemEntity): bool
     {
@@ -189,7 +198,7 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Check if user has any access to system entity
+     * Check if user has any access to system entity.
      */
     public function userHasAnyAccess(User $user, SystemEntity $systemEntity): bool
     {

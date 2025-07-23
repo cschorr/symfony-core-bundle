@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use App\Entity\CompanyGroup;
-use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
-use App\Controller\Admin\Traits\FieldConfigurationTrait;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use App\Service\PermissionService;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,7 +27,7 @@ class CompanyGroupCrudController extends AbstractCrudController
         PermissionService $permissionService,
         DuplicateService $duplicateService,
         RequestStack $requestStack,
-        private EasyAdminFieldService $fieldService
+        private EasyAdminFieldService $fieldService,
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -36,35 +37,41 @@ class CompanyGroupCrudController extends AbstractCrudController
         return CompanyGroup::class;
     }
 
+    #[\Override]
     protected function hasPermissionManagement(): bool
     {
         return false;
     }
 
     #[IsGranted('read', subject: 'CompanyGroup')]
-    public function index(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $CompanyGroup = 'CompanyGroup'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function index(AdminContext $context, string $CompanyGroup = 'CompanyGroup'): KeyValueStore|Response
     {
         return parent::index($context);
     }
 
     #[IsGranted('read', subject: 'CompanyGroup')]
-    public function detail(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $CompanyGroup = 'CompanyGroup'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function detail(AdminContext $context, string $CompanyGroup = 'CompanyGroup'): KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
     #[IsGranted('write', subject: 'CompanyGroup')]
-    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $CompanyGroup = 'CompanyGroup'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function edit(AdminContext $context, string $CompanyGroup = 'CompanyGroup'): KeyValueStore|Response
     {
         return parent::edit($context);
     }
 
     #[IsGranted('write', subject: 'CompanyGroup')]
-    public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $CompanyGroup = 'CompanyGroup'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function delete(AdminContext $context, string $CompanyGroup = 'CompanyGroup'): KeyValueStore|Response
     {
         return parent::delete($context);
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         return $this->fieldService->generateFields(
@@ -74,7 +81,7 @@ class CompanyGroupCrudController extends AbstractCrudController
     }
 
     /**
-     * Define field configurations for CompanyGroup entity
+     * Define field configurations for CompanyGroup entity.
      */
     private function getFieldConfigurations(): array
     {

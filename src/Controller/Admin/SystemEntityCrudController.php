@@ -1,25 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use App\Entity\SystemEntity;
 use App\Entity\User;
 use App\Entity\UserSystemEntityPermission;
 use App\Repository\UserSystemEntityPermissionRepository;
-use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
+use App\Service\PermissionService;
 use App\Service\RelationshipSyncService;
-use App\Controller\Admin\Traits\FieldConfigurationTrait;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
-use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
-use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use Symfony\Component\HttpFoundation\Response;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -35,7 +36,7 @@ class SystemEntityCrudController extends AbstractCrudController
         RequestStack $requestStack,
         private EasyAdminFieldService $fieldService,
         private RelationshipSyncService $relationshipSyncService,
-        private UserSystemEntityPermissionRepository $userSystemEntityPermissionRepository
+        private UserSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -45,6 +46,7 @@ class SystemEntityCrudController extends AbstractCrudController
         return SystemEntity::class;
     }
 
+    #[\Override]
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
@@ -55,37 +57,43 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     #[IsGranted('read', subject: 'SystemEntity')]
-    public function index(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $SystemEntity = 'SystemEntity'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function index(AdminContext $context, string $SystemEntity = 'SystemEntity'): KeyValueStore|Response
     {
         return parent::index($context);
     }
 
     #[IsGranted('read', subject: 'SystemEntity')]
-    public function detail(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $SystemEntity = 'SystemEntity'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function detail(AdminContext $context, string $SystemEntity = 'SystemEntity'): KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
     #[IsGranted('write', subject: 'SystemEntity')]
-    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $SystemEntity = 'SystemEntity'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function edit(AdminContext $context, string $SystemEntity = 'SystemEntity'): KeyValueStore|Response
     {
         return parent::edit($context);
     }
 
     #[IsGranted('write', subject: 'SystemEntity')]
-    public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $SystemEntity = 'SystemEntity'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function delete(AdminContext $context, string $SystemEntity = 'SystemEntity'): KeyValueStore|Response
     {
         return parent::delete($context);
     }
 
+    #[\Override]
     public function configureActions(Actions $actions): Actions
     {
         return parent::configureActions($actions);
     }
 
     /**
-     * Get field configuration for SystemEntity entity
+     * Get field configuration for SystemEntity entity.
      */
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         // Get base configuration from our new system
@@ -93,7 +101,7 @@ class SystemEntityCrudController extends AbstractCrudController
         $fields = $this->fieldService->generateFields($config, $pageName);
 
         // Add permission tab for form pages
-        if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
+        if (Crud::PAGE_EDIT === $pageName || Crud::PAGE_NEW === $pageName) {
             // Get the current entity from context if available
             $entity = null;
             $context = $this->getContext();
@@ -127,7 +135,7 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     /**
-     * Get field configuration for SystemEntity entity
+     * Get field configuration for SystemEntity entity.
      */
     private function getFieldConfiguration(string $pageName): array
     {
@@ -138,7 +146,7 @@ class SystemEntityCrudController extends AbstractCrudController
         ];
 
         // Page-specific field configurations
-        if ($pageName === Crud::PAGE_INDEX) {
+        if (Crud::PAGE_INDEX === $pageName) {
             $config = array_merge($config, [
                 $this->fieldService->field('name')
                     ->type('text')
@@ -153,7 +161,7 @@ class SystemEntityCrudController extends AbstractCrudController
 
                 ...$this->getSystemEntityPermissionsSummaryField(),
             ]);
-        } elseif ($pageName === Crud::PAGE_DETAIL) {
+        } elseif (Crud::PAGE_DETAIL === $pageName) {
             $config = array_merge($config, [
                 $this->fieldService->field('name')
                     ->type('text')
@@ -212,7 +220,7 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     /**
-     * Get system entity permissions summary field configuration
+     * Get system entity permissions summary field configuration.
      */
     private function getSystemEntityPermissionsSummaryField(): array
     {
@@ -227,6 +235,7 @@ class SystemEntityCrudController extends AbstractCrudController
                     }
 
                     $count = $entity->getUserPermissions()->count();
+
                     return sprintf($this->translator->trans('%d permission(s) assigned'), $count);
                 })
                 ->build(),
@@ -234,7 +243,7 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     /**
-     * Get system entity permissions detail field configuration
+     * Get system entity permissions detail field configuration.
      */
     private function getSystemEntityPermissionsDetailField(): array
     {
@@ -256,9 +265,11 @@ class SystemEntityCrudController extends AbstractCrudController
                         if ($permission->canRead()) {
                             $access[] = $this->translator->trans('Read');
                         }
+
                         if ($permission->canWrite()) {
                             $access[] = $this->translator->trans('Write');
                         }
+
                         $accessString = implode(', ', $access);
 
                         $permissions[] = sprintf('%s: %s', $userEmail, $accessString);
@@ -272,8 +283,9 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to use the new relationship sync service and handle permissions
+     * Override to use the new relationship sync service and handle permissions.
      */
+    #[\Override]
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->processSystemEntityPermissions($entityInstance);
@@ -282,8 +294,9 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to use the new relationship sync service and handle permissions
+     * Override to use the new relationship sync service and handle permissions.
      */
+    #[\Override]
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->processSystemEntityPermissions($entityInstance);
@@ -292,7 +305,7 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     /**
-     * Process system entity permission checkboxes from form
+     * Process system entity permission checkboxes from form.
      */
     private function processSystemEntityPermissions($systemEntity): void
     {
@@ -301,7 +314,7 @@ class SystemEntityCrudController extends AbstractCrudController
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        if (!$request) {
+        if (null === $request) {
             return;
         }
 
@@ -314,18 +327,18 @@ class SystemEntityCrudController extends AbstractCrudController
             $readFieldName = 'userPermission_read_' . $user->getId();
             $writeFieldName = 'userPermission_write_' . $user->getId();
 
-            $canRead = isset($formData[$readFieldName]) && $formData[$readFieldName] === '1';
-            $canWrite = isset($formData[$writeFieldName]) && $formData[$writeFieldName] === '1';
+            $canRead = isset($formData[$readFieldName]) && '1' === $formData[$readFieldName];
+            $canWrite = isset($formData[$writeFieldName]) && '1' === $formData[$writeFieldName];
 
             // Find or create permission entity
             $permission = $this->userSystemEntityPermissionRepository
                 ->findOneBy([
                     'user' => $user,
-                    'systemEntity' => $systemEntity
+                    'systemEntity' => $systemEntity,
                 ]);
 
             if ($canRead || $canWrite) {
-                if (!$permission) {
+                if (null === $permission) {
                     $permission = new UserSystemEntityPermission();
                     $permission->setUser($user);
                     $permission->setSystemEntity($systemEntity);
@@ -347,18 +360,21 @@ class SystemEntityCrudController extends AbstractCrudController
     protected function canCreateEntity(): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && in_array('ROLE_ADMIN', $user->getRoles());
+
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     protected function canEditEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && in_array('ROLE_ADMIN', $user->getRoles());
+
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     protected function canDeleteEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof \App\Entity\User && in_array('ROLE_ADMIN', $user->getRoles());
+
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 }

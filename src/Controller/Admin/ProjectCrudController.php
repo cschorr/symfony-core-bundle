@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use App\Entity\Project;
 use App\Entity\User;
 use App\Enum\ProjectStatus;
-use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
-use App\Controller\Admin\Traits\FieldConfigurationTrait;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use App\Service\PermissionService;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
-use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -30,7 +32,7 @@ class ProjectCrudController extends AbstractCrudController
         PermissionService $permissionService,
         DuplicateService $duplicateService,
         RequestStack $requestStack,
-        private EasyAdminFieldService $fieldService
+        private EasyAdminFieldService $fieldService,
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -40,6 +42,7 @@ class ProjectCrudController extends AbstractCrudController
         return Project::class;
     }
 
+    #[\Override]
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
@@ -47,35 +50,41 @@ class ProjectCrudController extends AbstractCrudController
     }
 
     #[IsGranted('read', subject: 'Project')]
-    public function index(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Project = 'Project'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function index(AdminContext $context, string $Project = 'Project'): KeyValueStore|Response
     {
         return parent::index($context);
     }
 
     #[IsGranted('read', subject: 'Project')]
-    public function detail(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Project = 'Project'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function detail(AdminContext $context, string $Project = 'Project'): KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
     #[IsGranted('write', subject: 'Project')]
-    public function new(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Project = 'Project'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function new(AdminContext $context, string $Project = 'Project'): KeyValueStore|Response
     {
         return parent::new($context);
     }
 
     #[IsGranted('write', subject: 'Project')]
-    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Project = 'Project'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function edit(AdminContext $context, string $Project = 'Project'): KeyValueStore|Response
     {
         return parent::edit($context);
     }
 
     #[IsGranted('write', subject: 'Project')]
-    public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Project = 'Project'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function delete(AdminContext $context, string $Project = 'Project'): KeyValueStore|Response
     {
         return parent::delete($context);
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         return $this->fieldService->generateFields(
@@ -85,7 +94,7 @@ class ProjectCrudController extends AbstractCrudController
     }
 
     /**
-     * Define field configurations for Project entity
+     * Define field configurations for Project entity.
      */
     private function getFieldConfigurations(): array
     {
@@ -126,6 +135,7 @@ class ProjectCrudController extends AbstractCrudController
                     if ($value instanceof ProjectStatus) {
                         return $value->getLabel();
                     }
+
                     return $this->translator->trans('Unknown');
                 })
                 ->build(),
@@ -138,6 +148,7 @@ class ProjectCrudController extends AbstractCrudController
                     if (!$value) {
                         return $this->translator->trans('Keine Zuordnung');
                     }
+
                     return $value->getEmail();
                 })
                 ->build(),
@@ -150,6 +161,7 @@ class ProjectCrudController extends AbstractCrudController
                     if (!$value) {
                         return $this->translator->trans('Keine Zuordnung');
                     }
+
                     return $value->getName();
                 })
                 ->build(),
@@ -170,6 +182,7 @@ class ProjectCrudController extends AbstractCrudController
         ];
     }
 
+    #[\Override]
     public function configureActions(Actions $actions): Actions
     {
         return parent::configureActions($actions);
@@ -178,42 +191,48 @@ class ProjectCrudController extends AbstractCrudController
     protected function canCreateEntity(): bool
     {
         $user = $this->getUser();
-        return $user instanceof User &&
-               (in_array('ROLE_ADMIN', $user->getRoles()) ||
-                in_array('ROLE_USER', $user->getRoles()));
+
+        return $user instanceof User
+               && (in_array('ROLE_ADMIN', $user->getRoles())
+                || in_array('ROLE_USER', $user->getRoles()));
     }
 
     protected function canEditEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof User &&
-               (in_array('ROLE_ADMIN', $user->getRoles()) ||
-                ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()));
+
+        return $user instanceof User
+               && (in_array('ROLE_ADMIN', $user->getRoles())
+                || ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()));
     }
 
     protected function canDeleteEntity($entity): bool
     {
         $user = $this->getUser();
+
         return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
     }
 
     protected function canViewEntity($entity): bool
     {
         $user = $this->getUser();
-        return $user instanceof User &&
-               (in_array('ROLE_ADMIN', $user->getRoles()) ||
-                ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()) ||
-                in_array('ROLE_USER', $user->getRoles()));
+
+        return $user instanceof User
+               && (in_array('ROLE_ADMIN', $user->getRoles())
+                || ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId())
+                || in_array('ROLE_USER', $user->getRoles()));
     }
 
     /**
-     * Override to set default status for new projects
+     * Override to set default status for new projects.
      */
+    #[\Override]
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if ($entityInstance instanceof Project && $entityInstance->getStatus() === ProjectStatus::PLANNING) {
+        if ($entityInstance instanceof Project && ProjectStatus::PLANNING === $entityInstance->getStatus()) {
             $entityInstance->setStatus(ProjectStatus::PLANNING); // Ensure Planning status is set
         }
+
         parent::persistEntity($entityManager, $entityInstance);
     }
 }

@@ -1,24 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use App\Entity\User;
-use App\Entity\Company;
-use App\Controller\Admin\ProjectCrudController;
-use App\Service\PermissionService;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
-use App\Service\RelationshipSyncService;
 use App\Service\EmbeddedTableService;
-use App\Controller\Admin\Traits\FieldConfigurationTrait;
+use App\Service\PermissionService;
+use App\Service\RelationshipSyncService;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -37,7 +35,7 @@ class UserCrudController extends AbstractCrudController
         private EasyAdminFieldService $fieldService,
         private RelationshipSyncService $relationshipSyncService,
         private AdminUrlGenerator $adminUrlGenerator,
-        private EmbeddedTableService $embeddedTableService
+        private EmbeddedTableService $embeddedTableService,
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -47,35 +45,41 @@ class UserCrudController extends AbstractCrudController
         return User::class;
     }
 
+    #[\Override]
     protected function hasPermissionManagement(): bool
     {
         return true;
     }
 
+    #[\Override]
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud);
     }
 
+    #[\Override]
     public function configureActions(Actions $actions): Actions
     {
         return parent::configureActions($actions);
     }
 
     #[IsGranted('read', subject: 'User')]
-    public function index(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function index(AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::index($context);
     }
 
     #[IsGranted('read', subject: 'User')]
-    public function detail(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function detail(AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
     #[IsGranted('write', subject: 'User')]
-    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function edit(AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         // Get the current user entity
         $user = $context->getEntity()->getInstance();
@@ -102,17 +106,20 @@ class UserCrudController extends AbstractCrudController
     }
 
     #[IsGranted('write', subject: 'User')]
-    public function new(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function new(AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::new($context);
     }
 
     #[IsGranted('write', subject: 'User')]
-    public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function delete(AdminContext $context, string $User = 'User'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
     {
         return parent::delete($context);
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         $fields = $this->fieldService->generateFields(
@@ -121,7 +128,7 @@ class UserCrudController extends AbstractCrudController
         );
 
         // Add permission fields for edit/new pages with proper tabbed structure
-        if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
+        if (Crud::PAGE_EDIT === $pageName || Crud::PAGE_NEW === $pageName) {
             // Get the current entity from context if available
             $entity = null;
             $context = $this->getContext();
@@ -134,7 +141,7 @@ class UserCrudController extends AbstractCrudController
 
             // Add permission tabs with entity data
             $fields = $this->permissionService->addPermissionTabToFields($fields, $entity);
-        } elseif ($pageName === Crud::PAGE_INDEX || $pageName === Crud::PAGE_DETAIL) {
+        } elseif (Crud::PAGE_INDEX === $pageName || Crud::PAGE_DETAIL === $pageName) {
             // Add permission summary field for index and detail pages
             $fields = $this->addPermissionSummaryField($fields);
         }
@@ -143,7 +150,7 @@ class UserCrudController extends AbstractCrudController
     }
 
     /**
-     * Define all field configurations for the User entity using enhanced approach
+     * Define all field configurations for the User entity using enhanced approach.
      */
     private function getFieldConfigurations(): array
     {
@@ -159,7 +166,7 @@ class UserCrudController extends AbstractCrudController
     }
 
     /**
-     * Get fields specifically for index page (outside of any tabs)
+     * Get fields specifically for index page (outside of any tabs).
      */
     private function getIndexPageFields(): array
     {
@@ -208,7 +215,7 @@ class UserCrudController extends AbstractCrudController
     }
 
     /**
-     * Get all fields organized into tabs for detail and form pages
+     * Get all fields organized into tabs for detail and form pages.
      */
     private function getTabOrganizedFields(): array
     {
@@ -250,7 +257,7 @@ class UserCrudController extends AbstractCrudController
             ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
                 'name' => 'Project Name',
                 'status' => 'Status',
-                'createdAt' => 'Created'
+                'createdAt' => 'Created',
             ], 'Projects', 'No projects assigned'))
             ->renderAsHtml(true)
             ->build();
@@ -267,8 +274,9 @@ class UserCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to use the new relationship sync service
+     * Override to use the new relationship sync service.
      */
+    #[\Override]
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->relationshipSyncService->autoSync($entityInstance);
@@ -276,8 +284,9 @@ class UserCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to use the new relationship sync service
+     * Override to use the new relationship sync service.
      */
+    #[\Override]
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->relationshipSyncService->autoSync($entityInstance);

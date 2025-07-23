@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use App\Entity\Traits\Set\SetCommunicationTrait;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use App\Entity\Traits\Set\SetCommunicationTrait;
-use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -32,7 +34,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     /**
      * @var list<string> The user roles
      */
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::JSON)]
     #[Groups(['user:read', 'user:write'])]
     private array $roles = [];
 
@@ -67,6 +69,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->systemEntityPermissions = new ArrayCollection();
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->email ?? '';
@@ -215,7 +218,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * Check if user has read access to a system entity
+     * Check if user has read access to a system entity.
      */
     public function hasReadAccessToSystemEntity(SystemEntity $systemEntity): bool
     {
@@ -224,11 +227,12 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Check if user has write access to a system entity
+     * Check if user has write access to a system entity.
      */
     public function hasWriteAccessToSystemEntity(SystemEntity $systemEntity): bool
     {
@@ -237,11 +241,13 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Get all system entities user has read access to
+     * Get all system entities user has read access to.
+     *
      * @return SystemEntity[]
      */
     public function getReadableSystemEntities(): array
@@ -252,11 +258,13 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
                 $systemEntities[] = $permission->getSystemEntity();
             }
         }
+
         return $systemEntities;
     }
 
     /**
-     * Get all system entities user has write access to
+     * Get all system entities user has write access to.
+     *
      * @return SystemEntity[]
      */
     public function getWritableSystemEntities(): array
@@ -267,6 +275,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
                 $systemEntities[] = $permission->getSystemEntity();
             }
         }
+
         return $systemEntities;
     }
 }

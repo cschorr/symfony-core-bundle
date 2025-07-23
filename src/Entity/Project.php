@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Traits\Set\SetStartEndTrait;
@@ -78,29 +80,30 @@ class Project extends AbstractEntity
     // Status helper methods
     public function isInProgress(): bool
     {
-        return $this->status === ProjectStatus::IN_PROGRESS;
+        return ProjectStatus::IN_PROGRESS === $this->status;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === ProjectStatus::COMPLETED;
+        return ProjectStatus::COMPLETED === $this->status;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === ProjectStatus::CANCELLED;
+        return ProjectStatus::CANCELLED === $this->status;
     }
 
     public function isPlanning(): bool
     {
-        return $this->status === ProjectStatus::PLANNING;
+        return ProjectStatus::PLANNING === $this->status;
     }
 
     public function isOnHold(): bool
     {
-        return $this->status === ProjectStatus::ON_HOLD;
+        return ProjectStatus::ON_HOLD === $this->status;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->getName() ?? 'Unnamed Project';

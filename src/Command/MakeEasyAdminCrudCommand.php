@@ -1,60 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\String\Inflector\EnglishInflector;
 
-#[AsCommand(
-    name: 'make:easyadmin-crud',
-    description: 'Generate a standardized EasyAdmin CRUD controller',
-)]
-class MakeEasyAdminCrudCommand extends Command
+#[AsCommand(name: 'make:easyadmin-crud', description: 'Generate a standardized EasyAdmin CRUD controller', help: <<<'TXT'
+Generate a standardized EasyAdmin CRUD controller with best practices
+TXT)]
+class MakeEasyAdminCrudCommand
 {
-    private EnglishInflector $inflector;
+    private readonly EnglishInflector $inflector;
 
     public function __construct()
     {
-        parent::__construct();
         $this->inflector = new EnglishInflector();
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('entity', InputArgument::REQUIRED, 'The entity class name')
-            ->addOption('no-relationships', null, InputOption::VALUE_NONE, 'Skip relationship fields')
-            ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'Template type (basic|advanced)', 'basic')
-            ->addOption('with-tabs', null, InputOption::VALUE_NONE, 'Include tab structure')
-            ->setHelp('Generate a standardized EasyAdmin CRUD controller with best practices')
-        ;
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Argument(name: 'entity', description: 'The entity class name')]
+        string $entity, #[\Symfony\Component\Console\Attribute\Option]
+        $no_relationships, #[\Symfony\Component\Console\Attribute\Option]
+        $template, #[\Symfony\Component\Console\Attribute\Option]
+        $with_tabs, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $entityName = $input->getArgument('entity');
-        $template = $input->getOption('template');
-        $withTabs = $input->getOption('with-tabs');
-        $noRelationships = $input->getOption('no-relationships');
+        $entityName = $entity;
+        $template = $template;
+        $withTabs = $with_tabs;
+        $noRelationships = $no_relationships;
 
         // Validate entity exists
-        $entityClass = "App\\Entity\\{$entityName}";
+        $entityClass = 'App\Entity\\' . $entityName;
         if (!class_exists($entityClass)) {
-            $io->error("Entity class {$entityClass} does not exist.");
+            $io->error(sprintf('Entity class %s does not exist.', $entityClass));
+
             return Command::FAILURE;
         }
 
         $controllerPath = $this->generateControllerPath($entityName);
 
         if (file_exists($controllerPath)) {
-            $io->warning("Controller already exists at {$controllerPath}");
+            $io->warning('Controller already exists at ' . $controllerPath);
             if (!$io->confirm('Overwrite existing controller?', false)) {
                 return Command::SUCCESS;
             }
@@ -69,7 +60,7 @@ class MakeEasyAdminCrudCommand extends Command
 
         file_put_contents($controllerPath, $controllerContent);
 
-        $io->success("Generated CRUD controller for {$entityName} at {$controllerPath}");
+        $io->success(sprintf('Generated CRUD controller for %s at %s', $entityName, $controllerPath));
 
         // Offer to add to menu
         if ($io->confirm('Add to EasyAdmin menu?', true)) {
@@ -81,12 +72,12 @@ class MakeEasyAdminCrudCommand extends Command
 
     private function generateControllerPath(string $entityName): string
     {
-        return "src/Controller/Admin/{$entityName}CrudController.php";
+        return sprintf('src/Controller/Admin/%sCrudController.php', $entityName);
     }
 
     private function generateControllerContent(string $entityName, string $template, bool $withTabs, bool $noRelationships): string
     {
-        $entityClass = "App\\Entity\\{$entityName}";
+        $entityClass = 'App\Entity\\' . $entityName;
         $pluralName = $this->inflector->pluralize($entityName)[0] ?? $entityName . 's';
 
         $content = "<?php\n\n";
@@ -201,7 +192,7 @@ class MakeEasyAdminCrudCommand extends Command
     {
         $pluralName = $this->inflector->pluralize($entityName)[0] ?? $entityName . 's';
 
-        $menuEntry = "MenuItem::linkToCrud('{$pluralName}', 'fas fa-list', {$entityName}::class),";
+        $menuEntry = sprintf("MenuItem::linkToCrud('%s', 'fas fa-list', %s::class),", $pluralName, $entityName);
 
         $io->note([
             'Add this menu item to your DashboardController:',

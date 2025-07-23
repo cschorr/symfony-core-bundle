@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Project;
@@ -16,11 +18,12 @@ class ProjectController extends AbstractController
         Project $project,
         string $transition,
         WorkflowInterface $projectStatusStateMachine,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ): Response {
         // Prüfen, ob die Transition möglich ist
         if (!$projectStatusStateMachine->can($project, $transition)) {
             $this->addFlash('error', 'Transition nicht möglich');
+
             return $this->redirectToRoute('project_show', ['id' => $project->getId()]);
         }
 

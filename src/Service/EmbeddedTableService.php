@@ -1,32 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
-use App\Controller\Admin\UserCrudController;
 use App\Controller\Admin\ProjectCrudController;
+use App\Controller\Admin\UserCrudController;
 use App\Enum\ProjectStatus;
+use Doctrine\Common\Collections\Collection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Doctrine\Common\Collections\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmbeddedTableService
 {
     public function __construct(
-        private AdminUrlGenerator $adminUrlGenerator,
-        private TranslatorInterface $translator
+        private readonly AdminUrlGenerator $adminUrlGenerator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
     /**
      * Create a formatted value function for embedding tables in EasyAdmin fields
-     * This is a convenience method that returns a closure for use in field configurations
+     * This is a convenience method that returns a closure for use in field configurations.
      */
-    public function createEmbeddedTableFormatter(array $columns, string $title, string $emptyMessage = null): \Closure
+    public function createEmbeddedTableFormatter(array $columns, string $title, ?string $emptyMessage = null): \Closure
     {
         // Use translator for empty message if not provided
-        if ($emptyMessage === null) {
-            $defaultKey = "No " . strtolower($title) . " assigned";
+        if (null === $emptyMessage) {
+            $defaultKey = 'No ' . strtolower($title) . ' assigned';
             $emptyMessage = $this->translator->trans($defaultKey);
         }
 
@@ -36,17 +38,18 @@ class EmbeddedTableService
                        $this->renderNativeEasyAdminTable($value, $columns, $title) .
                        '</div>';
             }
+
             return '<em class="text-muted">' . $emptyMessage . '</em>';
         };
     }
 
     /**
      * Render embedded table using native EasyAdmin table structure and classes
-     * This mimics exactly how EasyAdmin renders its own index tables
+     * This mimics exactly how EasyAdmin renders its own index tables.
      */
     public function renderNativeEasyAdminTable(Collection $items, array $columns, string $title): string
     {
-        if ($items->count() === 0) {
+        if (0 === $items->count()) {
             return '<div class="empty-collection">
                         <div class="empty-collection-icon">
                             <i class="far fa-folder-open"></i>
@@ -72,6 +75,7 @@ class EmbeddedTableService
             $html .= '<span class="text-truncate">' . htmlspecialchars($translatedLabel) . '</span>';
             $html .= '</th>';
         }
+
         $html .= '</tr>';
         $html .= '</thead>';
 
@@ -87,8 +91,10 @@ class EmbeddedTableService
                 $html .= $this->formatTableCellValue($value, $property, $item);
                 $html .= '</td>';
             }
+
             $html .= '</tr>';
         }
+
         $html .= '</tbody>';
         $html .= '</table>';
         $html .= '</div>'; // Close table-responsive
@@ -104,7 +110,7 @@ class EmbeddedTableService
     }
 
     /**
-     * Get property value from entity using getter methods or toString
+     * Get property value from entity using getter methods or toString.
      */
     private function getEntityPropertyValue(object $entity, string $property): mixed
     {
@@ -113,7 +119,7 @@ class EmbeddedTableService
             case 'id':
                 return method_exists($entity, 'getId') ? $entity->getId() : '-';
             case 'name':
-                return method_exists($entity, 'getName') ? $entity->getName() : (string)$entity;
+                return method_exists($entity, 'getName') ? $entity->getName() : (string) $entity;
             case 'email':
                 return method_exists($entity, 'getEmail') ? $entity->getEmail() : '-';
             case 'active':
@@ -128,12 +134,13 @@ class EmbeddedTableService
                 if (method_exists($entity, $getter)) {
                     return $entity->$getter();
                 }
+
                 return '-';
         }
     }
 
     /**
-     * Format table cell values with proper EasyAdmin styling
+     * Format table cell values with proper EasyAdmin styling.
      */
     private function formatTableCellValue(mixed $value, string $property, object $entity): string
     {
@@ -143,16 +150,18 @@ class EmbeddedTableService
                 if ($value instanceof \BackedEnum) {
                     $value = $value->value;
                 }
-                return '<span class="field-id text-truncate">' . htmlspecialchars((string)$value) . '</span>';
+
+                return '<span class="field-id text-truncate">' . htmlspecialchars((string) $value) . '</span>';
 
             case 'active':
-                $isActive = (bool)$value;
+                $isActive = (bool) $value;
+
                 return '<span class="badge badge-boolean badge-boolean-' . ($isActive ? 'true' : 'false') . '">'
                      . '<i class="fa fa-' . ($isActive ? 'check' : 'times') . '"></i>'
                      . '</span>';
 
             case 'status':
-                if (empty($value) || $value === '-') {
+                if (empty($value) || '-' === $value) {
                     return '<span class="text-muted text-truncate">-</span>';
                 }
 
@@ -165,13 +174,13 @@ class EmbeddedTableService
                 $enum = null;
                 if (is_numeric($value)) {
                     // Legacy numeric conversion
-                    $enum = match ((int)$value) {
+                    $enum = match ((int) $value) {
                         0 => ProjectStatus::PLANNING,
                         1 => ProjectStatus::IN_PROGRESS,
                         2 => ProjectStatus::ON_HOLD,
                         3 => ProjectStatus::COMPLETED,
                         4 => ProjectStatus::CANCELLED,
-                        default => null
+                        default => null,
                     };
                 } elseif (is_string($value)) {
                     // String to enum conversion
@@ -189,6 +198,7 @@ class EmbeddedTableService
                 if (empty($value)) {
                     return '<span class="text-muted text-truncate">-</span>';
                 }
+
                 // Create link to user detail page
                 try {
                     $showUrl = $this->adminUrlGenerator
@@ -196,15 +206,17 @@ class EmbeddedTableService
                         ->setAction(Action::DETAIL)
                         ->setEntityId($entity->getId())
                         ->generateUrl();
-                    return '<a href="' . $showUrl . '" class="text-decoration-none text-truncate">' . htmlspecialchars($value) . '</a>';
-                } catch (\Exception $e) {
-                    return '<span class="text-truncate">' . htmlspecialchars($value) . '</span>';
+
+                    return '<a href="' . $showUrl . '" class="text-decoration-none text-truncate">' . htmlspecialchars((string) $value) . '</a>';
+                } catch (\Exception) {
+                    return '<span class="text-truncate">' . htmlspecialchars((string) $value) . '</span>';
                 }
 
             case 'name':
                 if (empty($value)) {
                     return '<span class="text-muted text-truncate">-</span>';
                 }
+
                 // Create link to project detail page
                 try {
                     $showUrl = $this->adminUrlGenerator
@@ -212,9 +224,10 @@ class EmbeddedTableService
                         ->setAction(Action::DETAIL)
                         ->setEntityId($entity->getId())
                         ->generateUrl();
-                    return '<a href="' . $showUrl . '" class="text-decoration-none text-truncate">' . htmlspecialchars($value) . '</a>';
-                } catch (\Exception $e) {
-                    return '<span class="text-truncate">' . htmlspecialchars($value) . '</span>';
+
+                    return '<a href="' . $showUrl . '" class="text-decoration-none text-truncate">' . htmlspecialchars((string) $value) . '</a>';
+                } catch (\Exception) {
+                    return '<span class="text-truncate">' . htmlspecialchars((string) $value) . '</span>';
                 }
 
             case 'createdAt':
@@ -222,6 +235,7 @@ class EmbeddedTableService
                     return '<span class="field-datetime text-truncate" title="' . $value->format('Y-m-d H:i:s') . '">'
                          . $value->format('M j, Y') . '</span>';
                 }
+
                 return '<span class="text-muted text-truncate">-</span>';
 
             default:
@@ -236,7 +250,7 @@ class EmbeddedTableService
                     $value = $value->name;
                 }
 
-                return '<span class="text-truncate">' . htmlspecialchars((string)$value) . '</span>';
+                return '<span class="text-truncate">' . htmlspecialchars((string) $value) . '</span>';
         }
     }
 }
