@@ -17,8 +17,15 @@ security:
             pattern: ^/api/
             stateless: true
             provider: app_user_provider
-            # You can add API authentication here later (JWT, API keys, etc.)
+            jwt: ~
+
         main:
+            json_login:
+                check_path: /auth # The name in routes.yaml is enough for mapping
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
             lazy: true
             provider: app_user_provider
             form_login:
@@ -39,9 +46,12 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # API routes - allow public access for now (you can secure these later)
-        - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Swagger documentation
-        - { path: ^/api/, roles: PUBLIC_ACCESS } # API endpoints
+        # API routes
+        - { path: ^/api/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing API documentations and Swagger UI docs
+        - { path: ^/api/contexts, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI contexts
+        - { path: ^/api/auth, roles: PUBLIC_ACCESS }
+        - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
         # grant access to /admin to both ROLE_ADMIN and ROLE_USER
         - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_USER] }
         # grant access to /profile to ROLE_USER
