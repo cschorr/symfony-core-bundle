@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\SystemEntity;
 use App\Entity\User;
-use App\Service\PermissionService;
 use App\Service\DuplicateService;
+use App\Service\PermissionService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -16,32 +18,14 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController as EasyAdminAbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 {
-    protected EntityManagerInterface $entityManager;
-    protected TranslatorInterface $translator;
-    protected PermissionService $permissionService;
-    protected DuplicateService $duplicateService;
-    protected RequestStack $requestStack;
-
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        TranslatorInterface $translator,
-        PermissionService $permissionService,
-        DuplicateService $duplicateService,
-        RequestStack $requestStack
-    ) {
-        $this->entityManager = $entityManager;
-        $this->translator = $translator;
-        $this->permissionService = $permissionService;
-        $this->duplicateService = $duplicateService;
-        $this->requestStack = $requestStack;
+    public function __construct(protected EntityManagerInterface $entityManager, protected TranslatorInterface $translator, protected PermissionService $permissionService, protected DuplicateService $duplicateService, protected RequestStack $requestStack)
+    {
     }
 
     /**
@@ -49,12 +33,13 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
      */
     protected function getSystemEntityCode(): string
     {
-        $reflection = new ReflectionClass($this->getEntityFqcn());
+        $reflection = new \ReflectionClass($this->getEntityFqcn());
+
         return $reflection->getShortName();
     }
 
     /**
-     * Get the translated system entity name for display (singular)
+     * Get the translated system entity name for display (singular).
      */
     protected function getSystemEntityName(): string
     {
@@ -62,7 +47,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Get the translated system entity name for display (plural)
+     * Get the translated system entity name for display (plural).
      */
     protected function getSystemEntityNamePlural(): string
     {
@@ -72,15 +57,17 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             'Company' => 'Companies',
             'SystemEntity' => 'System Entities',
             'CompanyGroup' => 'CompanyGroups',
-            'Project' => 'Projects'
+            'Project' => 'Projects',
         ];
 
         $entityCode = $this->getSystemEntityCode();
         $pluralKey = $pluralMap[$entityCode] ?? $entityCode . 's';
 
         return $this->translator->trans($pluralKey);
-    }    /**
-     * Get the system entity for permission checking
+    }
+
+    /**
+     * Get the system entity for permission checking.
      */
     protected function getSystemEntity(): SystemEntity
     {
@@ -88,8 +75,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Configure CRUD with permission-based actions
+     * Configure CRUD with permission-based actions.
      */
+    #[\Override]
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
@@ -103,8 +91,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Configure assets to include the EasyAdmin theme CSS and admin.js on all CRUD pages
+     * Configure assets to include the EasyAdmin theme CSS and admin.js on all CRUD pages.
      */
+    #[\Override]
     public function configureAssets(Assets $assets): Assets
     {
         return $assets
@@ -113,8 +102,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Configure actions based on permissions
+     * Configure actions based on permissions.
      */
+    #[\Override]
     public function configureActions(Actions $actions): Actions
     {
         // Create the duplicate action
@@ -123,7 +113,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             ->linkToCrudAction('duplicateAction')
             ->setHtmlAttributes([
                 'title' => $this->translator->trans('Duplicate this record'),
-                'data-bs-toggle' => 'tooltip'
+                'data-bs-toggle' => 'tooltip',
             ]);
 
         $actions = $actions
@@ -160,7 +150,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Add active field to pages with EasyAdmin's native boolean display
+     * Add active field to pages with EasyAdmin's native boolean display.
      */
     protected function addActiveField(array $fields, string $pageName = Crud::PAGE_INDEX): array
     {
@@ -171,7 +161,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Get a human-readable label for an entity
+     * Get a human-readable label for an entity.
      */
     protected function getEntityLabel($entity): string
     {
@@ -185,7 +175,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Check if this controller should show the user permission management UI
+     * Check if this controller should show the user permission management UI.
      */
     protected function hasPermissionManagement(): bool
     {
@@ -193,7 +183,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Create system entity permission fields for entities that support permission management
+     * Create system entity permission fields for entities that support permission management.
      */
     protected function createSystemEntityPermissionFields(): array
     {
@@ -215,7 +205,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Add permission tab to form fields for entities that support permission management
+     * Add permission tab to form fields for entities that support permission management.
      */
     protected function addPermissionTabToFields(array $fields): array
     {
@@ -237,7 +227,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Add permission summary field for index pages
+     * Add permission summary field for index pages.
      */
     protected function addPermissionSummaryField(array $fields): array
     {
@@ -249,8 +239,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Override to handle permissions on entity creation
+     * Override to handle permissions on entity creation.
      */
+    #[\Override]
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         parent::persistEntity($entityManager, $entityInstance);
@@ -264,8 +255,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Override to handle permissions on entity update
+     * Override to handle permissions on entity update.
      */
+    #[\Override]
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         parent::updateEntity($entityManager, $entityInstance);
@@ -279,9 +271,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Duplicate action for entities with permission check
+     * Duplicate action for entities with permission check.
      */
-    public function duplicateAction(AdminContext $context): Response
+    public function duplicate(AdminContext $context): Response
     {
         // Check permissions manually
         if (!$this->isGranted('write', $this->getSystemEntity())) {
@@ -301,7 +293,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             // Use a simpler approach - just store the entity ID and duplicate it fresh when needed
             $entityData = [
                 'original_id' => $entity->getId(),
-                'entity_class' => get_class($entity)
+                'entity_class' => null !== $entity ? $entity::class : self::class,
             ];
 
             $session->set($sessionKey, $entityData);
@@ -315,9 +307,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                 ->generateUrl();
 
             return $this->redirect($url);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             // Add error message
-            $this->addFlash('danger', $this->translator->trans('Error duplicating entity: ') . $e->getMessage());
+            $this->addFlash('danger', $this->translator->trans('Error duplicating entity: ') . $exception->getMessage());
 
             // Redirect back to the index page
             $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
@@ -331,8 +323,9 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Override edit action to handle entity associations
+     * Override edit action to handle entity associations.
      */
+    #[\Override]
     public function edit(AdminContext $context): KeyValueStore|Response
     {
         $entity = $context->getEntity()->getInstance();
@@ -345,13 +338,14 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 
     /**
      * Override createEntity to handle duplicated entities
-     * This method is called by EasyAdmin when creating a new entity instance
+     * This method is called by EasyAdmin when creating a new entity instance.
      */
+    #[\Override]
     public function createEntity(string $entityFqcn)
     {
         // Check if this is a duplicate request
         $request = $this->requestStack->getCurrentRequest();
-        $isDuplicate = $request && $request->query->get('duplicate') === '1';
+        $isDuplicate = $request && '1' === $request->query->get('duplicate');
 
         if ($isDuplicate) {
             $sessionKey = 'duplicated_entity_' . static::class;
@@ -365,7 +359,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                 // Find the original entity by ID
                 $originalEntity = $this->entityManager->find($entityData['entity_class'], $entityData['original_id']);
 
-                if ($originalEntity) {
+                if (null !== $originalEntity) {
                     try {
                         // Use DuplicateService to create a fresh duplicate
                         $duplicatedEntity = $this->duplicateService->duplicate($originalEntity);
@@ -388,15 +382,15 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Ensure all associations in the entity are managed by the EntityManager
+     * Ensure all associations in the entity are managed by the EntityManager.
      */
     private function ensureEntityAssociationsAreManaged(object $entity): void
     {
         try {
-            $entityClass = get_class($entity);
+            $entityClass = $entity::class;
 
             // Handle Doctrine proxies - extract the real class name
-            if (strpos($entityClass, 'Proxies\\__CG__\\') === 0) {
+            if (str_starts_with($entityClass, 'Proxies\\__CG__\\')) {
                 $entityClass = substr($entityClass, strlen('Proxies\\__CG__\\'));
             }
 
@@ -425,25 +419,26 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                         foreach ($toRemove as $entityToRemove) {
                             $value->removeElement($entityToRemove);
                         }
+
                         foreach ($toAdd as $entityToAdd) {
                             $value->add($entityToAdd);
                         }
                     } elseif (is_object($value) && !$this->entityManager->contains($value)) {
                         // Handle single associations - this is the key fix for the proxy issue
                         $managedEntity = $this->findManagedEntity($value);
-                        if ($managedEntity) {
+                        if (null !== $managedEntity) {
                             $metadata->setFieldValue($entity, $fieldName, $managedEntity);
                         }
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // If anything fails, don't break the application
         }
     }
 
     /**
-     * Find the managed version of an entity
+     * Find the managed version of an entity.
      */
     private function findManagedEntity(object $entity): ?object
     {
@@ -453,20 +448,20 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         }
 
         try {
-            $entityClass = get_class($entity);
+            $entityClass = $entity::class;
 
             // Handle Doctrine proxies - extract the real class name
-            if (strpos($entityClass, 'Proxies\\__CG__\\') === 0) {
+            if (str_starts_with($entityClass, 'Proxies\\__CG__\\')) {
                 $entityClass = substr($entityClass, strlen('Proxies\\__CG__\\'));
             }
 
             $metadata = $this->entityManager->getClassMetadata($entityClass);
             $identifier = $metadata->getIdentifierValues($entity);
 
-            if (!empty($identifier)) {
+            if ([] !== $identifier) {
                 // Find the managed entity by ID
                 $managedEntity = $this->entityManager->find($entityClass, $identifier);
-                if ($managedEntity) {
+                if (null !== $managedEntity) {
                     return $managedEntity;
                 }
             }
@@ -476,19 +471,21 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
                 if (!$entity->__isInitialized()) {
                     $entity->__load();
                 }
+
                 // After loading, the entity might be managed now
                 if ($this->entityManager->contains($entity)) {
                     return $entity;
                 }
+
                 // Try to find it again after loading
-                if (!empty($identifier)) {
+                if ([] !== $identifier) {
                     $managedEntity = $this->entityManager->find($entityClass, $identifier);
-                    if ($managedEntity) {
+                    if (null !== $managedEntity) {
                         return $managedEntity;
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // If anything fails, return null
         }
 
@@ -496,15 +493,16 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Override to handle foreign key constraint violations
+     * Override to handle foreign key constraint violations.
      */
+    #[\Override]
     public function delete(AdminContext $context): KeyValueStore|Response
     {
         $entity = $context->getEntity()->getInstance();
         $request = $this->requestStack->getCurrentRequest();
 
         // Check if entity can be deleted (implemented by child classes)
-        if (method_exists($this, 'canDeleteEntity') && !call_user_func([$this, 'canDeleteEntity'], $entity)) {
+        if (method_exists($this, 'canDeleteEntity') && !$this->canDeleteEntity($entity)) {
             $this->addFlash('danger', $this->translator->trans('Cannot delete record. It has related records that prevent deletion.'));
 
             // Redirect back to the referer page or fallback to detail page
@@ -526,7 +524,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 
         try {
             return parent::delete($context);
-        } catch (\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException $e) {
+        } catch (\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException) {
             // Handle foreign key constraint violations
             $this->addFlash('danger', $this->translator->trans('Cannot delete record. It has related records that prevent deletion. Please remove all related records first.'));
 
@@ -549,7 +547,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Auto-sync bidirectional relationships using RelationshipSyncService
+     * Auto-sync bidirectional relationships using RelationshipSyncService.
      */
     protected function autoSyncRelationships(object $entity): void
     {
@@ -557,7 +555,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Get common field validation rules
+     * Get common field validation rules.
      */
     protected function getFieldValidationRules(): array
     {
@@ -570,7 +568,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Apply common business logic before persist
+     * Apply common business logic before persist.
      */
     protected function beforePersist(object $entity): void
     {
@@ -578,7 +576,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     }
 
     /**
-     * Apply common business logic before update
+     * Apply common business logic before update.
      */
     protected function beforeUpdate(object $entity): void
     {

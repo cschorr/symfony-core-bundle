@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\UserSystemEntityPermissionRepository;
@@ -18,10 +20,10 @@ class UserSystemEntityPermission extends AbstractEntity
     #[ORM\JoinColumn(name: 'system_entity_id', nullable: false)]
     private ?SystemEntity $systemEntity = null;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::BOOLEAN, options: ['default' => false])]
     private bool $canRead = false;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::BOOLEAN, options: ['default' => false])]
     private bool $canWrite = false;
 
     public function __construct()
@@ -31,6 +33,7 @@ class UserSystemEntityPermission extends AbstractEntity
         $this->canWrite = false;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return sprintf(
@@ -50,6 +53,7 @@ class UserSystemEntityPermission extends AbstractEntity
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -61,6 +65,7 @@ class UserSystemEntityPermission extends AbstractEntity
     public function setSystemEntity(?SystemEntity $systemEntity): static
     {
         $this->systemEntity = $systemEntity;
+
         return $this;
     }
 
@@ -72,6 +77,7 @@ class UserSystemEntityPermission extends AbstractEntity
     public function setCanRead(bool $canRead): static
     {
         $this->canRead = $canRead;
+
         return $this;
     }
 
@@ -83,6 +89,7 @@ class UserSystemEntityPermission extends AbstractEntity
     public function setCanWrite(bool $canWrite): static
     {
         $this->canWrite = $canWrite;
+
         return $this;
     }
 

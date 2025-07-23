@@ -1,39 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
-use App\Entity\Company;
-use App\Entity\User;
-use App\Controller\Admin\UserCrudController;
-use App\Controller\Admin\ProjectCrudController;
-use App\Service\EasyAdminFieldService;
-use App\Service\PermissionService;
-use App\Service\DuplicateService;
-use App\Service\RelationshipSyncService;
-use App\Service\EmbeddedTableService;
 use App\Controller\Admin\Traits\FieldConfigurationTrait;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use App\Entity\Company;
+use App\Service\DuplicateService;
+use App\Service\EasyAdminFieldService;
+use App\Service\EmbeddedTableService;
+use App\Service\PermissionService;
+use App\Service\RelationshipSyncService;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use App\Form\Type\AddressType;
-use App\Form\Type\CommunicationType;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 
 class CompanyCrudController extends AbstractCrudController
 {
@@ -48,7 +34,7 @@ class CompanyCrudController extends AbstractCrudController
         private EasyAdminFieldService $fieldService,
         private RelationshipSyncService $relationshipSyncService,
         private AdminUrlGenerator $adminUrlGenerator,
-        private EmbeddedTableService $embeddedTableService
+        private EmbeddedTableService $embeddedTableService,
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -58,42 +44,48 @@ class CompanyCrudController extends AbstractCrudController
         return Company::class;
     }
 
+    #[\Override]
     protected function hasPermissionManagement(): bool
     {
         return false;
     }
 
+    #[\Override]
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud);
     }
 
     #[IsGranted('read', subject: 'Company')]
-    public function index(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Company = 'Company'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function index(AdminContext $context, string $Company = 'Company'): KeyValueStore|Response
     {
         return parent::index($context);
     }
 
     #[IsGranted('read', subject: 'Company')]
-    public function detail(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Company = 'Company'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function detail(AdminContext $context, string $Company = 'Company'): KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
     #[IsGranted('write', subject: 'Company')]
-    public function edit(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Company = 'Company'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function edit(AdminContext $context, string $Company = 'Company'): KeyValueStore|Response
     {
         return parent::edit($context);
     }
 
     #[IsGranted('write', subject: 'Company')]
-    public function delete(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context, string $Company = 'Company'): \EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore|Response
+    #[\Override]
+    public function delete(AdminContext $context, string $Company = 'Company'): KeyValueStore|Response
     {
         return parent::delete($context);
     }
 
     /**
-     * Check if a company can be deleted (no related records)
+     * Check if a company can be deleted (no related records).
      */
     protected function canDeleteEntity($entity): bool
     {
@@ -114,6 +106,7 @@ class CompanyCrudController extends AbstractCrudController
         return true;
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         return $this->fieldService->generateFields(
@@ -123,7 +116,7 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Define all field configurations for the Company entity using enhanced approach
+     * Define all field configurations for the Company entity using enhanced approach.
      */
     private function getFieldConfigurations(): array
     {
@@ -139,7 +132,7 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Get fields specifically for index page (outside of any tabs)
+     * Get fields specifically for index page (outside of any tabs).
      */
     private function getIndexPageFields(): array
     {
@@ -170,7 +163,7 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Get all fields organized into tabs for detail and form pages
+     * Get all fields organized into tabs for detail and form pages.
      */
     private function getTabOrganizedFields(): array
     {
@@ -215,7 +208,7 @@ class CompanyCrudController extends AbstractCrudController
             ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
                 'email' => 'Email',
                 'active' => 'Active',
-                'createdAt' => 'Created'
+                'createdAt' => 'Created',
             ], 'Users', 'No users assigned'))
             ->renderAsHtml(true)
             ->build();
@@ -229,7 +222,7 @@ class CompanyCrudController extends AbstractCrudController
             ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
                 'name' => 'Project Name',
                 'status' => 'Status',
-                'createdAt' => 'Created'
+                'createdAt' => 'Created',
             ], 'Projects', 'No projects assigned'))
             ->renderAsHtml(true)
             ->build();
@@ -238,7 +231,7 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Get contact fields for use inside tabs (without panels)
+     * Get contact fields for use inside tabs (without panels).
      */
     private function getContactFieldsForTabs(): array
     {
@@ -258,8 +251,9 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Auto-sync relationships using the service
+     * Auto-sync relationships using the service.
      */
+    #[\Override]
     protected function autoSyncRelationships(object $entity): void
     {
         if ($entity instanceof Company) {
@@ -268,8 +262,9 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to use the new relationship sync service
+     * Override to use the new relationship sync service.
      */
+    #[\Override]
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->beforePersist($entityInstance);
@@ -277,8 +272,9 @@ class CompanyCrudController extends AbstractCrudController
     }
 
     /**
-     * Override to use the new relationship sync service
+     * Override to use the new relationship sync service.
      */
+    #[\Override]
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->beforeUpdate($entityInstance);

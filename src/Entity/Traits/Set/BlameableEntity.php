@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity\Traits\Set;
 
 use App\Entity\User;
@@ -18,17 +20,17 @@ trait BlameableEntity
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id')]
     #[Gedmo\Blameable(on: 'create')]
-    private $createdBy;
+    private ?User $createdBy = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'updated_by', referencedColumnName: 'id')]
     #[Gedmo\Blameable(on: 'update')]
-    private $updatedBy;
+    private ?User $updatedBy = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'deleted_by', referencedColumnName: 'id')]
     #[Gedmo\Blameable(on: 'delete')]
-    private $deletedBy;
+    private ?User $deletedBy = null;
 
     public function getCreatedBy()
     {

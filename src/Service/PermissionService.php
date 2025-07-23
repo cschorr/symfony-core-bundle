@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\SystemEntity;
@@ -7,26 +9,24 @@ use App\Entity\User;
 use App\Entity\UserSystemEntityPermission;
 use App\Repository\SystemEntityRepository;
 use App\Repository\UserSystemEntityPermissionRepository;
-use App\Service\EasyAdminFieldService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PermissionService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private SystemEntityRepository $systemEntityRepository,
-        private UserSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
-        private TranslatorInterface $translator,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly SystemEntityRepository $systemEntityRepository,
+        private readonly UserSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
     /**
-     * Get system entity by code
+     * Get system entity by code.
      */
     public function getSystemEntityByCode(string $code): ?SystemEntity
     {
@@ -34,8 +34,7 @@ class PermissionService
     }
 
     /**
-     * Create system entity permission form fields organized in a tab
-     * @return array
+     * Create system entity permission form fields organized in a tab.
      */
     public function createSystemEntityPermissionFields(?User $entity = null): array
     {
@@ -48,7 +47,7 @@ class PermissionService
             if ($entity && $entity->getId()) {
                 $permission = $this->userSystemEntityPermissionRepository->findOneBy([
                     'user' => $entity,
-                    'systemEntity' => $systemEntity
+                    'systemEntity' => $systemEntity,
                 ]);
             }
 
@@ -61,7 +60,7 @@ class PermissionService
                 ->setFormTypeOption('required', false)
                 ->setFormTypeOption('mapped', false); // Don't map to entity property
 
-            if ($permission) {
+            if (null !== $permission) {
                 $readField->setFormTypeOption('data', $permission->canRead());
             }
 
@@ -74,7 +73,7 @@ class PermissionService
                 ->setFormTypeOption('required', false)
                 ->setFormTypeOption('mapped', false); // Don't map to entity property
 
-            if ($permission) {
+            if (null !== $permission) {
                 $writeField->setFormTypeOption('data', $permission->canWrite());
             }
 
@@ -86,13 +85,13 @@ class PermissionService
     }
 
     /**
-     * Add permission tab to form fields for entities that support permission management
+     * Add permission tab to form fields for entities that support permission management.
      */
     public function addPermissionTabToFields(array $fields, ?User $entity = null): array
     {
         $permissionFields = $this->createSystemEntityPermissionFields($entity);
 
-        if (empty($permissionFields)) {
+        if ([] === $permissionFields) {
             return $fields;
         }
 
@@ -107,7 +106,7 @@ class PermissionService
     }
 
     /**
-     * Handle system entity permissions when saving user
+     * Handle system entity permissions when saving user.
      */
     public function handleSystemEntityPermissions(User $user, array $formData): void
     {
@@ -121,16 +120,16 @@ class PermissionService
             $hasReadPermission = false;
             $hasWritePermission = false;
 
-            foreach ($formData as $key => $value) {
+            foreach ($formData as $value) {
                 if (
-                    is_array($value) &&
-                    isset($value['data-system-entity-id']) &&
-                    $value['data-system-entity-id'] === $systemEntityId
+                    is_array($value)
+                    && isset($value['data-system-entity-id'])
+                    && $value['data-system-entity-id'] === $systemEntityId
                 ) {
                     if (isset($value['data-permission-type'])) {
-                        if ($value['data-permission-type'] === 'read') {
+                        if ('read' === $value['data-permission-type']) {
                             $hasReadPermission = (bool) $value;
-                        } elseif ($value['data-permission-type'] === 'write') {
+                        } elseif ('write' === $value['data-permission-type']) {
                             $hasWritePermission = (bool) $value;
                         }
                     }
@@ -140,12 +139,12 @@ class PermissionService
             // Find existing permission
             $permission = $this->userSystemEntityPermissionRepository->findOneBy([
                 'user' => $user,
-                'systemEntity' => $systemEntity
+                'systemEntity' => $systemEntity,
             ]);
 
             // Create or update permission
             if ($hasReadPermission || $hasWritePermission) {
-                if (!$permission) {
+                if (null === $permission) {
                     $permission = new UserSystemEntityPermission();
                     $permission->setUser($user);
                     $permission->setSystemEntity($systemEntity);
@@ -163,33 +162,33 @@ class PermissionService
     }
 
     /**
-     * Check if user can read system entity
+     * Check if user can read system entity.
      */
     public function canUserReadSystemEntity(User $user, SystemEntity $systemEntity): bool
     {
         $permission = $this->userSystemEntityPermissionRepository->findOneBy([
             'user' => $user,
-            'systemEntity' => $systemEntity
+            'systemEntity' => $systemEntity,
         ]);
 
         return $permission && $permission->canRead();
     }
 
     /**
-     * Check if user can write system entity
+     * Check if user can write system entity.
      */
     public function canUserWriteSystemEntity(User $user, SystemEntity $systemEntity): bool
     {
         $permission = $this->userSystemEntityPermissionRepository->findOneBy([
             'user' => $user,
-            'systemEntity' => $systemEntity
+            'systemEntity' => $systemEntity,
         ]);
 
         return $permission && $permission->canWrite();
     }
 
     /**
-     * Add permission tab to fields for SystemEntity (shows user permissions for this system entity)
+     * Add permission tab to fields for SystemEntity (shows user permissions for this system entity).
      */
     public function addSystemEntityPermissionTabToFields(array $fields): array
     {
@@ -200,7 +199,7 @@ class PermissionService
         $permissionFields = [
             FormField::addTab($this->translator->trans('User Permissions'))
                 ->setHelp($this->translator->trans('Manage user permissions for this system entity'))
-                ->collapsible()
+                ->collapsible(),
         ];
 
         foreach ($users as $user) {
@@ -231,7 +230,7 @@ class PermissionService
     }
 
     /**
-     * Create SystemEntity permission fields with proper data binding
+     * Create SystemEntity permission fields with proper data binding.
      */
     public function addSystemEntityPermissionTabToFieldsWithEntity(array $fields, ?SystemEntity $entity = null): array
     {
@@ -242,17 +241,17 @@ class PermissionService
         $permissionFields = [
             FormField::addTab($this->translator->trans('User Permissions'))
                 ->setHelp($this->translator->trans('Manage user permissions for this system entity'))
-                ->collapsible()
+                ->collapsible(),
         ];
 
         foreach ($users as $user) {
             // Find existing permission
             $permission = null;
-            if ($entity) {
+            if (null !== $entity) {
                 $permission = $this->userSystemEntityPermissionRepository
                     ->findOneBy([
                         'user' => $user,
-                        'systemEntity' => $entity
+                        'systemEntity' => $entity,
                     ]);
             }
 
@@ -265,7 +264,7 @@ class PermissionService
                 ->setFormTypeOption('required', false)
                 ->setFormTypeOption('mapped', false); // Don't map to entity property
 
-            if ($permission) {
+            if (null !== $permission) {
                 $userReadField->setFormTypeOption('data', $permission->canRead());
             }
 
@@ -278,7 +277,7 @@ class PermissionService
                 ->setFormTypeOption('required', false)
                 ->setFormTypeOption('mapped', false); // Don't map to entity property
 
-            if ($permission) {
+            if (null !== $permission) {
                 $userWriteField->setFormTypeOption('data', $permission->canWrite());
             }
 
@@ -291,9 +290,7 @@ class PermissionService
     }
 
     /**
-     * Add permission summary field for index pages
-     * @param array $fields
-     * @return array
+     * Add permission summary field for index pages.
      */
     public function addPermissionSummaryField(array $fields): array
     {
@@ -314,6 +311,7 @@ class PermissionService
                 }
 
                 $count = $permissions->count();
+
                 return sprintf($this->translator->trans('%d permission(s) assigned'), $count);
             });
 

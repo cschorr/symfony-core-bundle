@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity\Traits\Single;
 
 use Doctrine\ORM\Mapping as ORM;
 
 trait BoolActiveTrait
 {
-    #[ORM\Column(type: 'boolean')]
-    private bool $active = true; # TODO: default true?
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
+    private bool $active = true; // TODO: default true?
 
     public function isActive(): bool
     {

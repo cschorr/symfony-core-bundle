@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Entity\Traits\Set\SetAddressTrait;
@@ -44,6 +46,7 @@ class Company extends AbstractEntity
         $this->employees = new ArrayCollection();
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->getName() ?? 'Unnamed Company';

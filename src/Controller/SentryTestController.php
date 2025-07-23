@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Enum\Environment;
@@ -10,16 +12,16 @@ use Symfony\Component\Routing\Annotation\Route;
 class SentryTestController extends AbstractController
 {
     public function __construct(
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 
-    #[Route(path: "/_sentry-test", name: "sentry_test")]
+    #[Route(path: '/_sentry-test', name: 'sentry_test')]
     public function testLog()
     {
         // Restrict access to development and staging environments
         $environment = $this->getParameter('kernel.environment');
-        if ($environment !== Environment::DEV && $environment !== Environment::STAGE) {
+        if (Environment::DEV !== $environment && Environment::STAGE !== $environment) {
             throw $this->createAccessDeniedException('This endpoint is not accessible in the current environment.');
         }
 
