@@ -11,7 +11,6 @@
     <rule ref="PSR12"/>
 
     <file>bin/</file>
-    <file>config/</file>
     <file>src/</file>
 
 </ruleset>
