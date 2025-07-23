@@ -193,8 +193,8 @@ class ProjectCrudController extends AbstractCrudController
         $user = $this->getUser();
 
         return $user instanceof User
-               && (in_array('ROLE_ADMIN', $user->getRoles())
-                || in_array('ROLE_USER', $user->getRoles()));
+               && (in_array('ROLE_ADMIN', $user->getRoles(), true)
+                || in_array('ROLE_USER', $user->getRoles(), true));
     }
 
     protected function canEditEntity($entity): bool
@@ -202,7 +202,7 @@ class ProjectCrudController extends AbstractCrudController
         $user = $this->getUser();
 
         return $user instanceof User
-               && (in_array('ROLE_ADMIN', $user->getRoles())
+               && (in_array('ROLE_ADMIN', $user->getRoles(), true)
                 || ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId()));
     }
 
@@ -210,7 +210,7 @@ class ProjectCrudController extends AbstractCrudController
     {
         $user = $this->getUser();
 
-        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles());
+        return $user instanceof User && in_array('ROLE_ADMIN', $user->getRoles(), true);
     }
 
     protected function canViewEntity($entity): bool
@@ -218,9 +218,9 @@ class ProjectCrudController extends AbstractCrudController
         $user = $this->getUser();
 
         return $user instanceof User
-               && (in_array('ROLE_ADMIN', $user->getRoles())
+               && (in_array('ROLE_ADMIN', $user->getRoles(), true)
                 || ($entity->getAssignee() && $entity->getAssignee()->getId() === $user->getId())
-                || in_array('ROLE_USER', $user->getRoles()));
+                || in_array('ROLE_USER', $user->getRoles(), true));
     }
 
     /**

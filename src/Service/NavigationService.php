@@ -56,7 +56,7 @@ class NavigationService
      */
     public function isUserAdmin(User $user): bool
     {
-        return in_array('ROLE_ADMIN', $user->getRoles());
+        return in_array('ROLE_ADMIN', $user->getRoles(), true);
     }
 
     /**
@@ -86,6 +86,6 @@ class NavigationService
         $activeCodes = array_map(fn ($entity) => $entity->getCode(), $activeSystemEntities);
 
         // Return only mappings for active system entities
-        return array_filter($classMapping, fn ($key) => in_array($key, $activeCodes), ARRAY_FILTER_USE_KEY);
+        return array_filter($classMapping, fn ($key) => in_array($key, $activeCodes, true), ARRAY_FILTER_USE_KEY);
     }
 }

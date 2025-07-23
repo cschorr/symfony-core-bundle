@@ -81,23 +81,23 @@ class EasyAdminFieldService
     private function shouldShowField(array $fieldConfig, string $pageName): bool
     {
         // Handle special field types that should always be shown (tabs, panels)
-        if (isset($fieldConfig['type']) && in_array($fieldConfig['type'], ['tab', 'panel'])) {
+        if (isset($fieldConfig['type']) && in_array($fieldConfig['type'], ['tab', 'panel'], true)) {
             // For panels, check if they should be shown on this page
             if ('panel' === $fieldConfig['type']) {
                 $pageType = $this->getPageType($pageName);
 
-                return in_array($pageType, $fieldConfig['collapsible'] ?? []);
+                return in_array($pageType, $fieldConfig['collapsible'] ?? [], true);
             }
 
             // Tabs are shown on form and detail pages
             $pageType = $this->getPageType($pageName);
 
-            return in_array($pageType, ['form', 'detail']);
+            return in_array($pageType, ['form', 'detail'], true);
         }
 
         $pageType = $this->getPageType($pageName);
 
-        return in_array($pageType, $fieldConfig['pages'] ?? []);
+        return in_array($pageType, $fieldConfig['pages'] ?? [], true);
     }
 
     /**
@@ -122,7 +122,7 @@ class EasyAdminFieldService
 
         // Handle panels
         if ('panel' === $config['type']) {
-            $isCollapsible = in_array($pageType, $config['collapsible'] ?? []);
+            $isCollapsible = in_array($pageType, $config['collapsible'] ?? [], true);
 
             return FormField::addPanel($this->translator->trans($config['label']))
                 ->setIcon($config['icon'] ?? '')
@@ -507,7 +507,7 @@ class EasyAdminFieldService
             ->type('country')
             ->label($this->translator->trans($label))
             ->pages($pages)
-            ->option('showFlagOnly', in_array('index', $pages)) // Custom option to show flag only in index
+            ->option('showFlagOnly', in_array('index', $pages, true)) // Custom option to show flag only in index
             ->build();
     }
 
@@ -640,7 +640,7 @@ class EasyAdminFieldService
                 'association', 'boolean', 'integer', 'number', 'money', 'date',
                 'datetime', 'time', 'choice', 'image', 'panel'];
 
-            if (!in_array($config['type'], $validTypes)) {
+            if (!in_array($config['type'], $validTypes, true)) {
                 $errors[] = sprintf("Invalid field type '%s'. Valid types: ", $config['type']) . implode(', ', $validTypes);
             }
         }
@@ -836,7 +836,7 @@ class EasyAdminFieldService
         }
 
         // DateTime specific options
-        if (in_array($config['type'], ['datetime', 'date', 'time'])) {
+        if (in_array($config['type'], ['datetime', 'date', 'time'], true)) {
             if (isset($config['format'])) {
                 $field->setFormat($config['format']);
             } elseif ('datetime' === $config['type']) {
@@ -845,7 +845,7 @@ class EasyAdminFieldService
         }
 
         // Text specific options
-        if (in_array($config['type'], ['text', 'textarea'])) {
+        if (in_array($config['type'], ['text', 'textarea'], true)) {
             if (isset($config['truncate'])) {
                 $field->setMaxLength($config['truncate']);
             }
@@ -897,7 +897,7 @@ class EasyAdminFieldService
 
         foreach ($fieldSchema as $fieldConfig) {
             // Skip if page filter is specified and field is not for this page
-            if ($page && !in_array($page, $fieldConfig['pages'])) {
+            if ($page && !in_array($page, $fieldConfig['pages'], true)) {
                 continue;
             }
 
