@@ -1,26 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 /**
- * Service to help build standardized CRUD controller configurations
+ * Service to help build standardized CRUD controller configurations.
  */
 class CrudSchemaBuilder
 {
     public function __construct(
-        private EasyAdminFieldService $fieldService
+        private readonly EasyAdminFieldService $fieldService,
     ) {
     }
 
     /**
-     * Create a standard field configuration array
+     * Create a standard field configuration array.
      */
     public function createField(
         string $property,
         string $type,
         string $label,
         array $pages = ['index', 'detail', 'form'],
-        array $options = []
+        array $options = [],
     ): array {
         return array_merge([
             'property' => $property,
@@ -31,7 +33,7 @@ class CrudSchemaBuilder
     }
 
     /**
-     * Create standard index fields for most entities
+     * Create standard index fields for most entities.
      */
     public function createStandardIndexFields(string $entityName, array $customFields = []): array
     {
@@ -39,7 +41,7 @@ class CrudSchemaBuilder
             $this->createField('active', 'boolean', 'Active', ['index']),
             $this->createField('name', 'text', ucfirst($entityName) . ' Name', ['index'], [
                 'required' => true,
-                'linkToShow' => true
+                'linkToShow' => true,
             ]),
             $this->createField('createdAt', 'datetime', 'Created', ['index']),
         ];
@@ -48,19 +50,19 @@ class CrudSchemaBuilder
     }
 
     /**
-     * Create a tab configuration
+     * Create a tab configuration.
      */
     public function createTab(string $id, string $label, array $fields): array
     {
         return [
             'id' => $id,
             'label' => $label,
-            'fields' => $fields
+            'fields' => $fields,
         ];
     }
 
     /**
-     * Create standard information tab
+     * Create standard information tab.
      */
     public function createInfoTab(string $entityName, array $customFields = []): array
     {
@@ -68,7 +70,7 @@ class CrudSchemaBuilder
             $this->createField('active', 'boolean', 'Active', ['detail', 'form']),
             $this->createField('id', 'id', 'ID', ['detail']),
             $this->createField('name', 'text', ucfirst($entityName) . ' Name', ['detail', 'form'], [
-                'required' => true
+                'required' => true,
             ]),
             $this->createField('createdAt', 'datetime', 'Created At', ['detail']),
             $this->createField('updatedAt', 'datetime', 'Updated At', ['detail']),
@@ -82,41 +84,41 @@ class CrudSchemaBuilder
     }
 
     /**
-     * Create embedded table field configuration
+     * Create embedded table field configuration.
      */
     public function createEmbeddedTableField(
         string $property,
         string $label,
         array $columns,
         string $tableTitle,
-        string $emptyMessage = null
+        ?string $emptyMessage = null,
     ): array {
         return $this->createField($property, 'association', $label, ['detail'], [
             'embedded_table' => [
                 'columns' => $columns,
                 'title' => $tableTitle,
-                'empty_message' => $emptyMessage ?? "No " . strtolower($tableTitle) . " assigned"
-            ]
+                'empty_message' => $emptyMessage ?? 'No ' . strtolower($tableTitle) . ' assigned',
+            ],
         ]);
     }
 
     /**
-     * Create association field for forms
+     * Create association field for forms.
      */
     public function createAssociationField(
         string $property,
         string $label,
         bool $multiple = false,
-        bool $autocomplete = true
+        bool $autocomplete = true,
     ): array {
         return $this->createField($property, 'association', $label, ['form'], [
             'multiple' => $multiple,
-            'autocomplete' => $autocomplete
+            'autocomplete' => $autocomplete,
         ]);
     }
 
     /**
-     * Create standard address fields
+     * Create standard address fields.
      */
     public function createAddressFields(array $pages = ['detail', 'form']): array
     {
@@ -129,7 +131,7 @@ class CrudSchemaBuilder
     }
 
     /**
-     * Create standard contact fields
+     * Create standard contact fields.
      */
     public function createContactFields(array $pages = ['detail', 'form']): array
     {
@@ -142,13 +144,13 @@ class CrudSchemaBuilder
     }
 
     /**
-     * Quick builder for relationship tabs
+     * Quick builder for relationship tabs.
      */
     public function createRelationshipTab(
         string $property,
         string $entityName,
         array $tableColumns,
-        bool $includeFormField = true
+        bool $includeFormField = true,
     ): array {
         $tab = $this->createTab(
             $property . '_tab',
@@ -159,7 +161,7 @@ class CrudSchemaBuilder
                     ucfirst($entityName),
                     $tableColumns,
                     ucfirst($entityName)
-                )
+                ),
             ]
         );
 

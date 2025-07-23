@@ -1,24 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Persistence\ObjectManager;
+use App\Entity\Company;
+use App\Entity\Project;
 use App\Entity\SystemEntity;
 use App\Entity\User;
 use App\Entity\UserSystemEntityPermission;
-use App\Entity\Company;
-use App\Entity\Project;
 use App\Enum\ProjectStatus;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    private UserPasswordHasherInterface $hasher;
-
-    public function __construct(UserPasswordHasherInterface $hasher)
+    public function __construct(private readonly UserPasswordHasherInterface $hasher)
     {
-        $this->hasher = $hasher;
     }
 
     public function load(ObjectManager $manager): void
@@ -48,6 +47,7 @@ class AppFixtures extends Fixture
 
             $manager->persist($user);
         }
+
         $manager->flush();
     }
 
@@ -73,6 +73,7 @@ class AppFixtures extends Fixture
             $systemEntity->setIcon($systemEntityData['icon']);
             $manager->persist($systemEntity);
         }
+
         $manager->flush();
     }
 
@@ -89,7 +90,7 @@ class AppFixtures extends Fixture
         $projectSystemEntity = $manager->getRepository(SystemEntity::class)->findOneBy(['code' => 'Project']);
 
         // Helper function to create permission if it doesn't exist
-        $createPermissionIfNotExists = function ($user, $systemEntity, $canRead, $canWrite) use ($manager) {
+        $createPermissionIfNotExists = function ($user, $systemEntity, $canRead, $canWrite) use ($manager): void {
             if (!$user || !$systemEntity) {
                 return;
             }
@@ -139,6 +140,7 @@ class AppFixtures extends Fixture
             $company->setCountryCode($companyData['country']);
             $manager->persist($company);
         }
+
         $manager->flush();
     }
 
@@ -159,6 +161,7 @@ class AppFixtures extends Fixture
             $project->setDescription($projectData['description']);
             $manager->persist($project);
         }
+
         $manager->flush();
     }
 }

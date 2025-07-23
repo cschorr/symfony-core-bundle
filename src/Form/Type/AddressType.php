@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -17,22 +19,22 @@ class AddressType extends AbstractType
                 'label' => 'Street Address',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Enter street address'
-                ]
+                    'placeholder' => 'Enter street address',
+                ],
             ])
             ->add('zip', TextType::class, [
                 'label' => 'ZIP/Postal Code',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Enter ZIP/postal code'
-                ]
+                    'placeholder' => 'Enter ZIP/postal code',
+                ],
             ])
             ->add('city', TextType::class, [
                 'label' => 'City',
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Enter city'
-                ]
+                    'placeholder' => 'Enter city',
+                ],
             ])
             ->add('countryCode', CountryType::class, [
                 'label' => 'Country',

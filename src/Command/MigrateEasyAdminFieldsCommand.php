@@ -1,53 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[AsCommand(
     name: 'easyadmin:migrate-fields',
     description: 'Migrate EasyAdmin CRUD controllers to use the new field configuration system'
 )]
-class MigrateEasyAdminFieldsCommand extends Command
+class MigrateEasyAdminFieldsCommand
 {
-    private string $projectDir;
-
-    public function __construct(string $projectDir)
+    public function __construct(private readonly string $projectDir)
     {
-        $this->projectDir = $projectDir;
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('controller', InputArgument::OPTIONAL, 'Specific controller to migrate (e.g., UserCrudController)')
-            ->addOption('dry-run', 'd', InputOption::VALUE_NONE, 'Show what would be changed without making changes')
-            ->addOption('backup', 'b', InputOption::VALUE_NONE, 'Create backup of original files')
-            ->addOption('analyze', 'a', InputOption::VALUE_NONE, 'Analyze controllers and suggest migration strategy')
-        ;
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Argument(name: 'controller', description: 'Specific controller to migrate (e.g., UserCrudController)')]
+        ?string $controller, #[\Symfony\Component\Console\Attribute\Option]
+        $dry_run, #[\Symfony\Component\Console\Attribute\Option]
+        $backup, #[\Symfony\Component\Console\Attribute\Option]
+        $analyze, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $controller = $input->getArgument('controller');
-        $dryRun = $input->getOption('dry-run');
-        $backup = $input->getOption('backup');
-        $analyze = $input->getOption('analyze');
+        $controller = $controller;
+        $dryRun = $dry_run;
+        $backup = $backup;
+        $analyze = $analyze;
 
         $controllersDir = $this->projectDir . '/src/Controller/Admin';
 
         if (!is_dir($controllersDir)) {
             $io->error('Admin controllers directory not found: ' . $controllersDir);
+
             return Command::FAILURE;
         }
 
@@ -57,8 +46,9 @@ class MigrateEasyAdminFieldsCommand extends Command
 
         $controllers = $this->findControllers($controllersDir, $controller);
 
-        if (empty($controllers)) {
+        if ([] === $controllers) {
             $io->warning('No controllers found to migrate.');
+
             return Command::SUCCESS;
         }
 
@@ -81,7 +71,7 @@ class MigrateEasyAdminFieldsCommand extends Command
                 'Update any custom field configurations',
                 'Add relationship sync if needed',
                 'Run your test suite',
-                'Clear Symfony cache: bin/console cache:clear'
+                'Clear Symfony cache: bin/console cache:clear',
             ]);
         }
 
@@ -96,7 +86,7 @@ class MigrateEasyAdminFieldsCommand extends Command
             ->name('*CrudController.php')
             ->notName('AbstractCrudController.php');
 
-        if ($specific) {
+        if (null !== $specific && '' !== $specific && '0' !== $specific) {
             $finder->name($specific);
         }
 
@@ -115,19 +105,19 @@ class MigrateEasyAdminFieldsCommand extends Command
 
         foreach ($controllers as $controllerFile) {
             $content = file_get_contents($controllerFile);
-            $className = basename($controllerFile, '.php');
+            $className = basename((string) $controllerFile, '.php');
 
             $info = [
                 'file' => $controllerFile,
                 'class' => $className,
-                'has_configure_fields' => strpos($content, 'configureFields') !== false,
-                'uses_trait' => strpos($content, 'FieldConfigurationTrait') !== false,
-                'uses_field_service' => strpos($content, 'EasyAdminFieldService') !== false,
-                'has_relationship_sync' => strpos($content, 'RelationshipSyncService') !== false,
+                'has_configure_fields' => str_contains($content, 'configureFields'),
+                'uses_trait' => str_contains($content, 'FieldConfigurationTrait'),
+                'uses_field_service' => str_contains($content, 'EasyAdminFieldService'),
+                'has_relationship_sync' => str_contains($content, 'RelationshipSyncService'),
                 'field_count' => substr_count($content, '::new('),
-                'has_tabs' => strpos($content, 'FormField::addTab') !== false,
-                'has_panels' => strpos($content, 'FormField::addPanel') !== false,
-                'complexity' => $this->calculateComplexity($content)
+                'has_tabs' => str_contains($content, 'FormField::addTab'),
+                'has_panels' => str_contains($content, 'FormField::addPanel'),
+                'complexity' => $this->calculateComplexity($content),
             ];
 
             $analysis[] = $info;
@@ -135,14 +125,14 @@ class MigrateEasyAdminFieldsCommand extends Command
 
         $io->title('EasyAdmin Controllers Analysis');
 
-        $migrated = array_filter($analysis, fn($a) => $a['uses_trait'] && $a['uses_field_service']);
-        $needsMigration = array_filter($analysis, fn($a) => !$a['uses_trait'] || !$a['uses_field_service']);
+        $migrated = array_filter($analysis, fn ($a) => $a['uses_trait'] && $a['uses_field_service']);
+        $needsMigration = array_filter($analysis, fn ($a) => !$a['uses_trait'] || !$a['uses_field_service']);
 
         $io->section('Migration Status');
         $io->text('✅ Already migrated: ' . count($migrated));
         $io->text('🔄 Needs migration: ' . count($needsMigration));
 
-        if (!empty($needsMigration)) {
+        if ([] !== $needsMigration) {
             $io->section('Controllers Needing Migration');
 
             $tableData = [];
@@ -154,7 +144,7 @@ class MigrateEasyAdminFieldsCommand extends Command
                     $controller['complexity'],
                     $priority,
                     $controller['has_tabs'] ? '✓' : '',
-                    $controller['has_panels'] ? '✓' : ''
+                    $controller['has_panels'] ? '✓' : '',
                 ];
             }
 
@@ -164,9 +154,9 @@ class MigrateEasyAdminFieldsCommand extends Command
             );
 
             $io->section('Recommended Migration Order');
-            usort($needsMigration, fn($a, $b) => $this->getMigrationPriorityScore($a) <=> $this->getMigrationPriorityScore($b));
+            usort($needsMigration, fn ($a, $b) => $this->getMigrationPriorityScore($a) <=> $this->getMigrationPriorityScore($b));
 
-            $io->listing(array_map(fn($c) => $c['class'] . ' (' . $this->getMigrationPriority($c) . ')', $needsMigration));
+            $io->listing(array_map(fn ($c) => $c['class'] . ' (' . $this->getMigrationPriority($c) . ')', $needsMigration));
         }
 
         return Command::SUCCESS;
@@ -187,9 +177,11 @@ class MigrateEasyAdminFieldsCommand extends Command
         if ($score < 10) {
             return 'Low';
         }
+
         if ($score < 25) {
             return 'Medium';
         }
+
         return 'High';
     }
 
@@ -200,9 +192,11 @@ class MigrateEasyAdminFieldsCommand extends Command
         if ($score <= 10) {
             return 'High';
         }
+
         if ($score <= 20) {
             return 'Medium';
         }
+
         return 'Low';
     }
 
@@ -214,7 +208,7 @@ class MigrateEasyAdminFieldsCommand extends Command
         $score += $controller['field_count']; // More fields = easier to benefit
         $score += $controller['has_tabs'] ? -5 : 0; // Tabs benefit from new system
         $score += $controller['has_panels'] ? -3 : 0; // Panels benefit too
-        $score += $controller['complexity'] === 'High' ? 10 : 0; // Complex = lower priority
+        $score += 'High' === $controller['complexity'] ? 10 : 0; // Complex = lower priority
 
         return $score;
     }
@@ -227,8 +221,9 @@ class MigrateEasyAdminFieldsCommand extends Command
         $io->section('Migrating: ' . $className);
 
         // Check if already migrated
-        if (strpos($content, 'FieldConfigurationTrait') !== false) {
+        if (str_contains($content, 'FieldConfigurationTrait')) {
             $io->text('✅ Already uses FieldConfigurationTrait - skipping');
+
             return;
         }
 
@@ -266,29 +261,29 @@ class MigrateEasyAdminFieldsCommand extends Command
             'add_constructor_params' => [],
             'replace_configure_fields' => false,
             'add_relationship_sync' => false,
-            'summary' => []
+            'summary' => [],
         ];
 
         // Check what needs to be added
-        if (strpos($content, 'EasyAdminFieldService') === false) {
+        if (!str_contains($content, 'EasyAdminFieldService')) {
             $changes['add_use_statements'][] = 'use App\Service\EasyAdminFieldService;';
             $changes['add_constructor_params'][] = 'private EasyAdminFieldService $fieldService';
             $changes['summary'][] = 'Add EasyAdminFieldService dependency';
         }
 
-        if (strpos($content, 'FieldConfigurationTrait') === false) {
+        if (!str_contains($content, 'FieldConfigurationTrait')) {
             $changes['add_use_statements'][] = 'use App\Controller\Admin\Traits\FieldConfigurationTrait;';
             $changes['add_trait'] = true;
             $changes['summary'][] = 'Add FieldConfigurationTrait';
         }
 
-        if (strpos($content, 'configureFields') !== false) {
+        if (str_contains($content, 'configureFields')) {
             $changes['replace_configure_fields'] = true;
             $changes['summary'][] = 'Replace configureFields method with new pattern';
         }
 
         // Check if entity likely has relationships (basic heuristic)
-        if (strpos($content, 'AssociationField') !== false && strpos($content, 'RelationshipSyncService') === false) {
+        if (str_contains($content, 'AssociationField') && !str_contains($content, 'RelationshipSyncService')) {
             $changes['add_use_statements'][] = 'use App\Service\RelationshipSyncService;';
             $changes['add_constructor_params'][] = 'private RelationshipSyncService $relationshipSyncService';
             $changes['add_relationship_sync'] = true;
@@ -306,15 +301,16 @@ class MigrateEasyAdminFieldsCommand extends Command
         // Add use statements
         if (!empty($changes['add_use_statements'])) {
             $useStatements = implode("\n", $changes['add_use_statements']);
-            $newContent = preg_replace('/^(use [^;]+;)$/m', "$1\n$useStatements", $newContent, 1);
+            $newContent = preg_replace('/^(use [^;]+;)$/m', '$1
+' . $useStatements, $newContent, 1);
         }
 
         // Add trait
         if ($changes['add_trait']) {
-            $newContent = preg_replace(
+            return preg_replace(
                 '/class \w+CrudController extends AbstractCrudController\s*{/',
                 "$0\n    use FieldConfigurationTrait;\n",
-                $newContent
+                (string) $newContent
             );
         }
 
