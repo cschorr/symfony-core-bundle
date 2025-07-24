@@ -17,6 +17,11 @@ trait SetNamePersonTrait
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $nameBirth = null;
 
+    public function getFullName(): ?string
+    {
+        return $this->nameLast . ', ' . $this->nameFirst;
+    }
+
     public function getNameLast(): ?string
     {
         return $this->nameLast;
