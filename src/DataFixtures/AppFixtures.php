@@ -77,7 +77,7 @@ class AppFixtures extends Fixture
                 'icon' => 'fas fa-project-diagram',
             ],
             'Category' => [
-                'name' => 'Category',
+                'name' => 'Categories',
                 'text' => 'Manage categories',
                 'icon' => 'fas fa-tags',
             ],

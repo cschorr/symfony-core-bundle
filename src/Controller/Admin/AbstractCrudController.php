@@ -55,7 +55,8 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         $pluralMap = [
             'User' => 'Users',
             'Company' => 'Companies',
-            'SystemEntity' => 'System Entities',
+            'Category' => 'Categories',
+            'SystemEntity' => 'SystemEntities',
             'CompanyGroup' => 'CompanyGroups',
             'Project' => 'Projects',
         ];

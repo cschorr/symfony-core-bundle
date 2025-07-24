@@ -56,30 +56,30 @@ class CategoryCrudController extends AbstractCrudController
         return parent::configureCrud($crud);
     }
 
-    #[IsGranted('read', subject: 'Company')]
+    #[IsGranted('read', subject: 'Category')]
     #[\Override]
-    public function index(AdminContext $context, string $Company = 'Company'): KeyValueStore|Response
+    public function index(AdminContext $context, string $Category = 'Category'): KeyValueStore|Response
     {
         return parent::index($context);
     }
 
-    #[IsGranted('read', subject: 'Company')]
+    #[IsGranted('read', subject: 'Category')]
     #[\Override]
-    public function detail(AdminContext $context, string $Company = 'Company'): KeyValueStore|Response
+    public function detail(AdminContext $context, string $Category = 'Category'): KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
-    #[IsGranted('write', subject: 'Company')]
+    #[IsGranted('write', subject: 'Category')]
     #[\Override]
-    public function edit(AdminContext $context, string $Company = 'Company'): KeyValueStore|Response
+    public function edit(AdminContext $context, string $Category = 'Category'): KeyValueStore|Response
     {
         return parent::edit($context);
     }
 
-    #[IsGranted('write', subject: 'Company')]
+    #[IsGranted('write', subject: 'Category')]
     #[\Override]
-    public function delete(AdminContext $context, string $Company = 'Company'): KeyValueStore|Response
+    public function delete(AdminContext $context, string $Category = 'Category'): KeyValueStore|Response
     {
         return parent::delete($context);
     }
@@ -92,17 +92,6 @@ class CategoryCrudController extends AbstractCrudController
         if (!$entity instanceof Company) {
             return true;
         }
-
-        // Check if company has employees
-        if ($entity->getEmployees()->count() > 0) {
-            return false;
-        }
-
-        // Check if company has projects
-        if ($entity->getProjects()->count() > 0) {
-            return false;
-        }
-
         return true;
     }
 
