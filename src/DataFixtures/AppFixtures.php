@@ -69,7 +69,7 @@ class AppFixtures extends Fixture
             'Contact' => [
                 'name' => 'Contacts',
                 'text' => 'Ansprechpartner etc.',
-                'icon' => 'fas fa-contact',
+                'icon' => 'fas fa-users',
             ],
             'Project' => [
                 'name' => 'Projects',

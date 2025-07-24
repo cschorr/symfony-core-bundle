@@ -77,6 +77,7 @@ class NavigationService
             'SystemEntity' => SystemEntity::class,
             'User' => User::class,
             'Company' => \App\Entity\Company::class,
+            'Contact' => \App\Entity\Contact::class,
             'CompanyGroup' => \App\Entity\CompanyGroup::class,
             'Project' => \App\Entity\Project::class,
         ];
