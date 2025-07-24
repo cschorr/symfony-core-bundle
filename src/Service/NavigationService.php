@@ -76,8 +76,9 @@ class NavigationService
         $classMapping = [
             'SystemEntity' => SystemEntity::class,
             'User' => User::class,
-            'Company' => \App\Entity\Company::class,
+            'Category' => \App\Entity\Category::class,
             'Contact' => \App\Entity\Contact::class,
+            'Company' => \App\Entity\Company::class,
             'CompanyGroup' => \App\Entity\CompanyGroup::class,
             'Project' => \App\Entity\Project::class,
         ];
