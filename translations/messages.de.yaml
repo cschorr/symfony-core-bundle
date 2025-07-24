@@ -21,6 +21,8 @@ Logout: "Abmelden"
 # Navigation uses the plural forms automatically via $systemEntity->getName()
 User: "Benutzer"
 Users: "Benutzer"
+Contact: "Kontakt"
+Contacts: "Kontakte"
 Company: "Unternehmen"
 Companies: "Unternehmen"
 SystemEntity: "System-Entität"
