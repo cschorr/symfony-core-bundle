@@ -181,41 +181,6 @@ class CategoryCrudController extends AbstractCrudController
             ->pages(['detail', 'form']) // Show on detail and form pages inside tab
             ->build();
 
-        $fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
-        $fields[] = $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group');
-
-        // Contact Information Tab
-        $fields[] = $this->fieldService->createTabConfig('contact_tab', 'Contact Information');
-        $fields = array_merge($fields, $this->getContactFieldsForTabs());
-
-        // Users Tab
-        $fields[] = $this->fieldService->createTabConfig('users_tab', 'Users');
-        $fields[] = $this->fieldService->field('employees')
-            ->type('association')
-            ->label('Users/Employees')
-            ->pages(['detail']) // Only show on detail page, not form
-            ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
-                'email' => 'Email',
-                'active' => 'Active',
-                'createdAt' => 'Created',
-            ], 'Users', 'No users assigned'))
-            ->renderAsHtml(true)
-            ->build();
-
-        // Projects Tab
-        $fields[] = $this->fieldService->createTabConfig('projects_tab', 'Projects');
-        $fields[] = $this->fieldService->field('projects')
-            ->type('association')
-            ->label('Projects')
-            ->pages(['detail']) // Only show on detail page, not form
-            ->formatValue($this->embeddedTableService->createEmbeddedTableFormatter([
-                'name' => 'Project Name',
-                'status' => 'Status',
-                'createdAt' => 'Created',
-            ], 'Projects', 'No projects assigned'))
-            ->renderAsHtml(true)
-            ->build();
-
         return $fields;
     }
 
