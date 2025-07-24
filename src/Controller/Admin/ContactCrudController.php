@@ -135,7 +135,7 @@ class ContactCrudController extends AbstractCrudController
                 ->build(),
 
             // Company name with link to detail for index page
-            $this->fieldService->field('name')
+            $this->fieldService->field('nameLast')
                 ->type('text')
                 ->label('Name')
                 ->required(true)
@@ -182,8 +182,12 @@ class ContactCrudController extends AbstractCrudController
             ->pages(['detail', 'form']) // Show on detail and form pages inside tab
             ->build();
 
-        #$fields[] = $this->fieldService->createFieldConfig('nameExtension', 'text', ['detail', 'form'], 'Name Extension');
-        #$fields[] = $this->fieldService->createFieldConfig('companyGroup', 'association', ['detail', 'form'], 'Company Group');
+        $fields[] = $this->fieldService->field('nameFirst')
+            ->type('text')
+            ->label('First Name')
+            ->required(true)
+            ->pages(['detail', 'form']) // Show on detail and form pages inside tab
+            ->build();
 
         // Contact Information Tab
         $fields[] = $this->fieldService->createTabConfig('contact_tab', 'Contact Information');

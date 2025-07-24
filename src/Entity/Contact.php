@@ -22,6 +22,6 @@ class Contact extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->getId() ?? 'Unnamed Contact';
+        return $this->getFullName() ?? 'Unnamed Contact';
     }
 }
