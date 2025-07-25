@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Set\SetAddressTrait;
 use App\Entity\Traits\Set\SetCommunicationTrait;
 use App\Entity\Traits\Single\StringNameExtensionTrait;
@@ -14,6 +15,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
+#[ApiResource]
 class Company extends AbstractEntity
 {
     use StringNameTrait;
