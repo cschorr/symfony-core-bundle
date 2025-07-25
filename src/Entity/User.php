@@ -32,13 +32,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private ?string $email = null;
 
     /**
-     * @var list<string> The user roles
-     */
-    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::JSON)]
-    #[Groups(['user:read', 'user:write'])]
-    private array $roles = [];
-
-    /**
      * @var string The hashed password
      */
     #[ORM\Column]
@@ -65,11 +58,18 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\ManyToOne]
     private ?Category $category = null;
 
+    /**
+     * @var Collection<int, UserGroup>
+     */
+    #[ORM\ManyToMany(targetEntity: UserGroup::class, inversedBy: 'users')]
+    private Collection $userGroups;
+
     public function __construct()
     {
         parent::__construct();
         $this->projects = new ArrayCollection();
         $this->systemEntityPermissions = new ArrayCollection();
+        $this->userGroups = new ArrayCollection();
     }
 
     #[\Override]
@@ -107,21 +107,15 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        $roles = [];
+        $userGroups = $this->getUserGroups();
+        foreach ($userGroups as $userGroup) {
+            $roles = array_merge($roles, $userGroup->getRoles());
+        }
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
-    }
-
-    /**
-     * @param list<string> $roles
-     */
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-
-        return $this;
     }
 
     /**
@@ -290,6 +284,30 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserGroup>
+     */
+    public function getUserGroups(): Collection
+    {
+        return $this->userGroups;
+    }
+
+    public function addUserGroup(UserGroup $userGroup): static
+    {
+        if (!$this->userGroups->contains($userGroup)) {
+            $this->userGroups->add($userGroup);
+        }
+
+        return $this;
+    }
+
+    public function removeUserGroup(UserGroup $userGroup): static
+    {
+        $this->userGroups->removeElement($userGroup);
 
         return $this;
     }
