@@ -13,8 +13,10 @@ dh_auditor:
 
             # audited entities
             entities:
+                App\Entity\Category: ~
                 App\Entity\Company: ~
                 App\Entity\CompanyGroup: ~
+                App\Entity\Contact: ~
                 App\Entity\SystemEntity: ~
                 App\Entity\Project: ~
                 App\Entity\User: ~
