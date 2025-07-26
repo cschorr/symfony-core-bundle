@@ -10,3 +10,7 @@ api_platform:
             JWT:
                 name: Authorization
                 type: header
+    graphql:
+        enabled: true
+    formats:
+        graphql: [ 'application/graphql' ]
