@@ -10,6 +10,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "api-platform/doctrine-orm": "*",
+        "api-platform/graphql": "^4.1",
         "api-platform/symfony": "*",
         "damienharper/auditor-bundle": "^6.2",
         "doctrine/dbal": "^3",
