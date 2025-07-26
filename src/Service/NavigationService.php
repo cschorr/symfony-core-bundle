@@ -6,6 +6,10 @@ namespace App\Service;
 
 use App\Entity\SystemEntity;
 use App\Entity\User;
+use App\Entity\Company;
+use App\Entity\CompanyGroup;
+use App\Entity\Contact;
+use App\Entity\Project;
 use App\Repository\SystemEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -76,11 +80,10 @@ class NavigationService
         $classMapping = [
             'SystemEntity' => SystemEntity::class,
             'User' => User::class,
-            'Category' => \App\Entity\Category::class,
-            'Contact' => \App\Entity\Contact::class,
-            'Company' => \App\Entity\Company::class,
-            'CompanyGroup' => \App\Entity\CompanyGroup::class,
-            'Project' => \App\Entity\Project::class,
+            'Company' => Company::class,
+            'CompanyGroup' => CompanyGroup::class,
+            'Contact' => Contact::class,
+            'Project' => Project::class,
         ];
 
         // Get only active system entities from database
