@@ -10,6 +10,7 @@ use App\Entity\Company;
 use App\Entity\CompanyGroup;
 use App\Entity\Contact;
 use App\Entity\Project;
+use App\Entity\Category;
 use App\Repository\SystemEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -84,6 +85,7 @@ class NavigationService
             'CompanyGroup' => CompanyGroup::class,
             'Contact' => Contact::class,
             'Project' => Project::class,
+            'Category' => Category::class,
         ];
 
         // Get only active system entities from database
