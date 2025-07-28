@@ -21,9 +21,9 @@ class UserGroup extends AbstractEntity
     private ?array $roles = null;
 
     /**
-     * @var Collection<int, UserGroup>
+     * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: UserGroup::class, mappedBy: 'userGroups')]
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'userGroups')]
     private Collection $users;
 
     public function __construct()
