@@ -85,7 +85,7 @@ class ContactCrudController extends AbstractCrudController
     }
 
     /**
-     * Check if a company can be deleted (no related records).
+     * Check if a contact can be deleted (no related records).
      */
     protected function canDeleteEntity($entity): bool
     {
@@ -106,7 +106,7 @@ class ContactCrudController extends AbstractCrudController
     }
 
     /**
-     * Define all field configurations for the Company entity using enhanced approach.
+     * Define all field configurations for the Contact entity using enhanced approach.
      */
     private function getFieldConfigurations(): array
     {
@@ -134,12 +134,12 @@ class ContactCrudController extends AbstractCrudController
                 ->pages(['index'])
                 ->build(),
 
-            // Company name with link to detail for index page
+            // Contact name with link to detail for index page
             $this->fieldService->field('nameLast')
                 ->type('text')
                 ->label('Name')
                 ->required(true)
-                ->linkToShow() // This will auto-detect the CompanyCrudController
+                ->linkToShow() // This will auto-detect the ContactCrudController
                 ->pages(['index'])
                 ->build(),
 
@@ -159,8 +159,8 @@ class ContactCrudController extends AbstractCrudController
     {
         $fields = [];
 
-        // Company Information Tab
-        $fields[] = $this->fieldService->createTabConfig('company_info_tab', 'Contact');
+        // Contact Information Tab
+        $fields[] = $this->fieldService->createTabConfig('contact_info_tab', 'Contact');
 
         // Active field for detail and form pages
         $fields[] = $this->fieldService->field('active')
@@ -222,7 +222,7 @@ class ContactCrudController extends AbstractCrudController
     #[\Override]
     protected function autoSyncRelationships(object $entity): void
     {
-        if ($entity instanceof Company) {
+        if ($entity instanceof Contact) {
             $this->relationshipSyncService->autoSync($entity);
         }
     }
