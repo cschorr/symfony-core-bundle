@@ -15,10 +15,22 @@ trait SetNamePersonTrait
     private ?string $nameFirst = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $nameBirth = null;
+    private ?string $academicTitle = null;
 
+    // helper methods for name variants
     public function getFullName(): ?string
     {
+        if ($this->academicTitle) {
+            return $this->academicTitle . ' ' . $this->nameFirst . ' ' . $this->nameLast;
+        }
+        return $this->nameFirst . ' ' . $this->nameLast;
+    }
+
+    public function getFormalFullName(): ?string
+    {
+        if ($this->academicTitle) {
+            return $this->academicTitle . ' ' . $this->nameLast . ', ' . $this->nameFirst;
+        }
         return $this->nameLast . ', ' . $this->nameFirst;
     }
 
@@ -46,14 +58,14 @@ trait SetNamePersonTrait
         return $this;
     }
 
-    public function getNameBirth(): ?string
+    public function getAcademicTitle(): ?string
     {
-        return $this->nameBirth;
+        return $this->academicTitle;
     }
 
-    public function setNameBirth(?string $nameBirth): static
+    public function setAcademicTitle(?string $academicTitle): static
     {
-        $this->nameBirth = $nameBirth;
+        $this->academicTitle = $academicTitle;
 
         return $this;
     }
