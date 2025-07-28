@@ -85,11 +85,11 @@ class CategoryCrudController extends AbstractCrudController
     }
 
     /**
-     * Check if a company can be deleted (no related records).
+     * Check if a category can be deleted (no related records).
      */
     protected function canDeleteEntity($entity): bool
     {
-        if (!$entity instanceof Company) {
+        if (!$entity instanceof Category) {
             return true;
         }
         return true;
@@ -105,7 +105,7 @@ class CategoryCrudController extends AbstractCrudController
     }
 
     /**
-     * Define all field configurations for the Company entity using enhanced approach.
+     * Define all field configurations for the Category entity using enhanced approach.
      */
     private function getFieldConfigurations(): array
     {
@@ -133,12 +133,12 @@ class CategoryCrudController extends AbstractCrudController
                 ->pages(['index'])
                 ->build(),
 
-            // Company name with link to detail for index page
+            // Category name with link to detail for index page
             $this->fieldService->field('name')
                 ->type('text')
                 ->label('Name')
                 ->required(true)
-                ->linkToShow() // This will auto-detect the CompanyCrudController
+                ->linkToShow() // This will auto-detect the CategoryCrudController
                 ->pages(['index'])
                 ->build(),
 
@@ -158,8 +158,8 @@ class CategoryCrudController extends AbstractCrudController
     {
         $fields = [];
 
-        // Company Information Tab
-        $fields[] = $this->fieldService->createTabConfig('company_info_tab', 'Company Information');
+        // Category Information Tab
+        $fields[] = $this->fieldService->createTabConfig('category_info_tab', 'Category Information');
 
         // Active field for detail and form pages
         $fields[] = $this->fieldService->field('active')
@@ -210,7 +210,7 @@ class CategoryCrudController extends AbstractCrudController
     #[\Override]
     protected function autoSyncRelationships(object $entity): void
     {
-        if ($entity instanceof Company) {
+        if ($entity instanceof Category) {
             $this->relationshipSyncService->autoSync($entity);
         }
     }
