@@ -19,8 +19,12 @@ Logout: "Abmelden"
 # - Singular forms (code field): User, Company, SystemEntity, CompanyGroup, Project
 # - Plural forms (name field): Users, Companies, System Entities, CompanyGroups, Projects
 # Navigation uses the plural forms automatically via $systemEntity->getName()
+Category: "Kategorie"
+Categories: "Kategorien"
 User: "Benutzer"
 Users: "Benutzer"
+Contact: "Kontakt"
+Contacts: "Kontakte"
 Company: "Unternehmen"
 Companies: "Unternehmen"
 SystemEntity: "System-Entität"

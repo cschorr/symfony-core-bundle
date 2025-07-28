@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Single\StringCodeTrait;
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Repository\CompanyGroupRepository;
@@ -12,6 +13,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CompanyGroupRepository::class)]
+#[ApiResource]
 class CompanyGroup extends AbstractEntity
 {
     use StringNameTrait;

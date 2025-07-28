@@ -6,6 +6,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Category;
 use App\Entity\Company;
+use App\Entity\Contact;
 use App\Entity\Project;
 use App\Entity\SystemEntity;
 use App\Entity\User;
@@ -24,6 +25,7 @@ class AppFixtures extends Fixture
     private array $systemEntities = [];
     private array $categories = [];
     private array $companies = [];
+    private array $contacts = [];
 
     public function __construct(private readonly UserPasswordHasherInterface $hasher)
     {
@@ -37,6 +39,7 @@ class AppFixtures extends Fixture
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
         $this->createCompanyFixtures($manager);
+        $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
     }
 
@@ -63,13 +66,18 @@ class AppFixtures extends Fixture
                 'text' => 'Groups of companies',
                 'icon' => 'fas fa-layer-group',
             ],
+            'Contact' => [
+                'name' => 'Contacts',
+                'text' => 'Ansprechpartner etc.',
+                'icon' => 'fas fa-users',
+            ],
             'Project' => [
                 'name' => 'Projects',
                 'text' => 'Manage projects',
                 'icon' => 'fas fa-project-diagram',
             ],
             'Category' => [
-                'name' => 'Category',
+                'name' => 'Categories',
                 'text' => 'Manage categories',
                 'icon' => 'fas fa-tags',
             ],
@@ -397,6 +405,39 @@ class AppFixtures extends Fixture
 
             $manager->persist($company);
             $this->companies["company_{$index}"] = $company; // Store reference
+        }
+
+        $manager->flush();
+    }
+
+    private function createContactFixtures(ObjectManager $manager): void
+    {
+        $contactsData = [
+            [
+                'firstName' => 'John',
+                'lastName' => 'Doe',
+                'email' => 'john.doe@example.com',
+            ],
+            [
+                'firstName' => 'Jane',
+                'lastName' => 'Smith',
+                'email' => 'jane.smith@example.com',
+            ],
+            [
+                'firstName' => 'Alice',
+                'lastName' => 'Johnson',
+                'email' => 'alice.johnson@example.com',
+            ],
+        ];
+
+        foreach ($contactsData as $index => $contactData) {
+            $contact = (new Contact())
+                ->setNameFirst($contactData['firstName'])
+                ->setNameLast($contactData['lastName'])
+                ->setEmail($contactData['email']);
+
+            $manager->persist($contact);
+            $this->contacts["contact_{$index}"] = $contact; // Store reference
         }
 
         $manager->flush();

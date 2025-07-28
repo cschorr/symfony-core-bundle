@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Set\SetStartEndTrait;
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Enum\ProjectStatus;
@@ -12,6 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
+#[ApiResource]
 class Project extends AbstractEntity
 {
     use StringNameTrait;
