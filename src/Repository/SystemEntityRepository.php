@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\SystemEntity;
 use App\Entity\User;
+use App\Entity\UserGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -20,35 +21,35 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all system entities that a user has any permission for.
+     * Find all system entities that a user group has any permission for.
      *
      * @return SystemEntity[]
      */
-    public function findSystemEntitiesForUser(User $user): array
+    public function findSystemEntitiesForUser(UserGroup $userGroup): array
     {
         return $this->createQueryBuilder('se')
-            ->join('se.userPermissions', 'up')
-            ->andWhere('up.user = :user')
+            ->join('se.userGroupPermissions', 'up')
+            ->andWhere('up.userGroup = :userGroup')
             ->andWhere('up.canRead = true OR up.canWrite = true')
-            ->setParameter('user', $user->getId(), 'uuid')
+            ->setParameter('userGroup', $userGroup->getId(), 'uuid')
             ->orderBy('se.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Find all active system entities that a user has any permission for.
+     * Find all active system entities that a user group has any permission for.
      *
      * @return SystemEntity[]
      */
-    public function findActiveSystemEntitiesForUser(User $user): array
+    public function findActiveSystemEntitiesForUser(UserGroup $userGroup): array
     {
         return $this->createQueryBuilder('se')
-            ->join('se.userPermissions', 'up')
-            ->andWhere('up.user = :user')
+            ->join('se.userGroupPermissions', 'up')
+            ->andWhere('up.userGroup = :userGroup')
             ->andWhere('se.active = :active')
             ->andWhere('up.canRead = true OR up.canWrite = true')
-            ->setParameter('user', $user->getId(), 'uuid')
+            ->setParameter('userGroup', $userGroup->getId(), 'uuid')
             ->setParameter('active', true)
             ->orderBy('se.id', 'ASC')
             ->getQuery()
@@ -96,14 +97,14 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find system entities with users having read access.
+     * Find system entities with user groups having read access.
      *
      * @return SystemEntity[]
      */
     public function findWithReadUsers(): array
     {
         return $this->createQueryBuilder('se')
-            ->join('se.userPermissions', 'up')
+            ->join('se.userGroupPermissions', 'up')
             ->andWhere('up.canRead = :canRead')
             ->setParameter('canRead', true)
             ->getQuery()
@@ -111,14 +112,14 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find system entities with users having write access.
+     * Find system entities with user groups having write access.
      *
      * @return SystemEntity[]
      */
     public function findWithWriteUsers(): array
     {
         return $this->createQueryBuilder('se')
-            ->join('se.userPermissions', 'up')
+            ->join('se.userGroupPermissions', 'up')
             ->andWhere('up.canWrite = :canWrite')
             ->setParameter('canWrite', true)
             ->getQuery()
@@ -126,86 +127,86 @@ class SystemEntityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find system entities that a specific user can read.
+     * Find system entities that a specific user group can read.
      *
      * @return SystemEntity[]
      */
-    public function findReadableByUser(User $user): array
+    public function findReadableByUser(UserGroup $userGroup): array
     {
         return $this->createQueryBuilder('se')
-            ->join('se.userPermissions', 'up')
-            ->andWhere('up.user = :user')
+            ->join('se.userGroupPermissions', 'up')
+            ->andWhere('up.userGroup = :userGroup')
             ->andWhere('up.canRead = :canRead')
-            ->setParameter('user', $user->getId(), 'uuid')
+            ->setParameter('userGroup', $userGroup->getId(), 'uuid')
             ->setParameter('canRead', true)
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Find system entities that a specific user can write to.
+     * Find system entities that a specific user group can write to.
      *
      * @return SystemEntity[]
      */
-    public function findWritableByUser(User $user): array
+    public function findWritableByUser(UserGroup $userGroup): array
     {
         return $this->createQueryBuilder('se')
-            ->join('se.userPermissions', 'up')
-            ->andWhere('up.user = :user')
+            ->join('se.userGroupPermissions', 'up')
+            ->andWhere('up.userGroup = :userGroup')
             ->andWhere('up.canWrite = :canWrite')
-            ->setParameter('user', $user->getId(), 'uuid')
+            ->setParameter('userGroup', $userGroup->getId(), 'uuid')
             ->setParameter('canWrite', true)
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Get count of users with access to a system entity.
+     * Get count of user groups with access to a system entity.
      */
     public function getUserAccessCount(SystemEntity $systemEntity): int
     {
         return (int) $this->getEntityManager()
-            ->createQuery('SELECT COUNT(DISTINCT up.user) FROM App\Entity\UserSystemEntityPermission up 
+            ->createQuery('SELECT COUNT(DISTINCT up.userGroup) FROM App\Entity\UserGroupSystemEntityPermission up
                           WHERE up.systemEntity = :systemEntity AND (up.canRead = true OR up.canWrite = true)')
             ->setParameter('systemEntity', $systemEntity)
             ->getSingleScalarResult();
     }
 
     /**
-     * Check if user has read access to system entity.
+     * Check if user group has read access to system entity.
      */
-    public function userHasReadAccess(User $user, SystemEntity $systemEntity): bool
+    public function userHasReadAccess(UserGroup $userGroup, SystemEntity $systemEntity): bool
     {
         return (bool) $this->getEntityManager()
-            ->createQuery('SELECT 1 FROM App\Entity\UserSystemEntityPermission up 
-                          WHERE up.user = :user AND up.systemEntity = :systemEntity AND up.canRead = true')
-            ->setParameter('user', $user->getId(), 'uuid')
+            ->createQuery('SELECT 1 FROM App\Entity\UserGroupSystemEntityPermission up
+                          WHERE up.userGroup = :userGroup AND up.systemEntity = :systemEntity AND up.canRead = true')
+            ->setParameter('userGroup', $userGroup->getId(), 'uuid')
             ->setParameter('systemEntity', $systemEntity)
             ->getOneOrNullResult();
     }
 
     /**
-     * Check if user has write access to system entity.
+     * Check if user group has write access to system entity.
      */
-    public function userHasWriteAccess(User $user, SystemEntity $systemEntity): bool
+    public function userHasWriteAccess(UserGroup $userGroup, SystemEntity $systemEntity): bool
     {
         return (bool) $this->getEntityManager()
-            ->createQuery('SELECT 1 FROM App\Entity\UserSystemEntityPermission up 
-                          WHERE up.user = :user AND up.systemEntity = :systemEntity AND up.canWrite = true')
-            ->setParameter('user', $user->getId(), 'uuid')
+            ->createQuery('SELECT 1 FROM App\Entity\UserGroupSystemEntityPermission up
+                          WHERE up.userGroup = :userGroup AND up.systemEntity = :systemEntity AND up.canWrite = true')
+            ->setParameter('userGroup', $userGroup->getId(), 'uuid')
             ->setParameter('systemEntity', $systemEntity)
             ->getOneOrNullResult();
     }
 
     /**
-     * Check if user has any access to system entity.
+     * Check if user group has any access to system entity.
      */
-    public function userHasAnyAccess(User $user, SystemEntity $systemEntity): bool
+    public function userHasAnyAccess(UserGroup $userGroup, SystemEntity $systemEntity): bool
     {
         return (bool) $this->getEntityManager()
-            ->createQuery('SELECT 1 FROM App\Entity\UserSystemEntityPermission up 
-                          WHERE up.user = :user AND up.systemEntity = :systemEntity AND (up.canRead = true OR up.canWrite = true)')
-            ->setParameter('user', $user->getId(), 'uuid')
+            ->createQuery('SELECT 1 FROM App\Entity\UserGroupSystemEntityPermission up
+                          WHERE up.userGroup = :userGroup AND up.systemEntity = :systemEntity AND (up.canRead = true OR up.canWrite = true)')
+            ->setParameter('userGroup', $userGroup->getId(), 'uuid')
             ->setParameter('systemEntity', $systemEntity)
             ->getOneOrNullResult();
     }

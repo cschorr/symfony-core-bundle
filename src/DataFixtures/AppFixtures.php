@@ -10,7 +10,8 @@ use App\Entity\Contact;
 use App\Entity\Project;
 use App\Entity\SystemEntity;
 use App\Entity\User;
-use App\Entity\UserSystemEntityPermission;
+use App\Entity\UserGroup;
+use App\Entity\UserGroupSystemEntityPermission;
 use App\Enum\ProjectStatus;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -19,9 +20,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class AppFixtures extends Fixture
 {
     private const DEFAULT_PASSWORD = 'pass_1234';
-
-    // References for later used entities
     private array $users = [];
+    private array $userGroups = [];
     private array $systemEntities = [];
     private array $categories = [];
     private array $companies = [];
@@ -36,6 +36,7 @@ class AppFixtures extends Fixture
         // Order is important for dependencies
         $this->createSystemEntityFixtures($manager);
         $this->createCategoryFixtures($manager);
+        $this->createUserGroupFixtures($manager);
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
         $this->createCompanyFixtures($manager);
@@ -56,6 +57,11 @@ class AppFixtures extends Fixture
                 'text' => 'User management',
                 'icon' => 'fas fa-users',
             ],
+            'UserGroup' => [
+                'name' => 'Usergroups',
+                'text' => 'Usergroup management',
+                'icon' => 'fas fa-users',
+            ],
             'Company' => [
                 'name' => 'Companies',
                 'text' => 'Clients, suppliers, partners etc.',
@@ -68,7 +74,7 @@ class AppFixtures extends Fixture
             ],
             'Contact' => [
                 'name' => 'Contacts',
-                'text' => 'Ansprechpartner etc.',
+                'text' => 'Contact persons',
                 'icon' => 'fas fa-users',
             ],
             'Project' => [
@@ -196,40 +202,80 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 
+    private function createUserGroupFixtures(ObjectManager $manager): void
+    {
+        $usersData = [
+            'external' => [
+                'name' => 'External Users',
+                'roles' => ['ROLE_EXTERNAL'],
+                'active' => true,
+            ],
+            'basic' => [
+                'name' => 'Editor',
+                'roles' => ['ROLE_EDITOR'],
+                'active' => true,
+            ],
+            'advanced' => [
+                'name' => 'Teamlead',
+                'roles' => ['ROLE_TEAMLEAD'],
+                'active' => true,
+            ],
+            'manager' => [
+                'name' => 'Manager',
+                'roles' => ['ROLE_MANAGER'],
+                'active' => true,
+            ],
+            'admin' => [
+                'name' => 'Admin',
+                'roles' => ['ROLE_ADMIN'],
+                'active' => true,
+            ],
+        ];
+
+        foreach ($usersData as $key => $userData) {
+            $userGroup = new UserGroup();
+            $userGroup
+                ->setName($userData['name'])
+                ->setRoles($userData['roles'])
+                ->setActive($userData['active'])
+            ;
+
+            $manager->persist($userGroup);
+            $this->userGroups[$key] = $userGroup;
+        }
+
+        $manager->flush();
+    }
+
     private function createUserFixtures(ObjectManager $manager): void
     {
         $usersData = [
             'admin' => [
                 'email' => 'admin@example.com',
-                'roles' => ['ROLE_ADMIN'],
                 'active' => true,
                 'notes' => 'Administrator user with full access',
                 'category' => 'main2', // Business Services
             ],
             'demo' => [
                 'email' => 'demo@example.com',
-                'roles' => ['ROLE_USER'],
                 'active' => true,
                 'notes' => 'Demo user with limited access',
                 'category' => 'sub1', // Web Development
             ],
             'developer' => [
                 'email' => 'dev@example.com',
-                'roles' => ['ROLE_USER'],
                 'active' => true,
                 'notes' => 'Senior developer specializing in mobile apps',
                 'category' => 'sub2', // Mobile Development
             ],
             'marketing' => [
                 'email' => 'marketing@example.com',
-                'roles' => ['ROLE_USER'],
                 'active' => true,
                 'notes' => 'Marketing specialist for digital campaigns',
                 'category' => 'sub6', // Digital Marketing
             ],
             'consultant' => [
                 'email' => 'consultant@example.com',
-                'roles' => ['ROLE_USER'],
                 'active' => true,
                 'notes' => 'Business consultant for process optimization',
                 'category' => 'main4', // Consulting
@@ -242,7 +288,6 @@ class AppFixtures extends Fixture
             $user = new User();
             $user->setEmail($userData['email'])
                 ->setPassword($this->hasher->hashPassword($user, self::DEFAULT_PASSWORD))
-                ->setRoles($userData['roles'])
                 ->setActive($userData['active'])
                 ->setNotes($userData['notes'])
                 ->setCategory($category);
@@ -259,6 +304,7 @@ class AppFixtures extends Fixture
         // Permissions for admin (full rights)
         $adminPermissions = [
             'User' => ['read' => true, 'write' => true],
+            'UserGroup' => ['read' => true, 'write' => true],
             'Company' => ['read' => true, 'write' => true],
             'SystemEntity' => ['read' => true, 'write' => true],
             'CompanyGroup' => ['read' => true, 'write' => true],
@@ -269,6 +315,7 @@ class AppFixtures extends Fixture
         // Permissions for demo user (limited rights)
         $demoPermissions = [
             'User' => ['read' => true, 'write' => false],
+            'UserGroup' => ['read' => true, 'write' => false],
             'Company' => ['read' => true, 'write' => true],
             'Project' => ['read' => true, 'write' => false],
             'Category' => ['read' => true, 'write' => true],
@@ -284,6 +331,7 @@ class AppFixtures extends Fixture
         // Permissions for marketing (Digital Marketing)
         $marketingPermissions = [
             'User' => ['read' => true, 'write' => false],
+            'UserGroup' => ['read' => true, 'write' => false],
             'Company' => ['read' => true, 'write' => true],
             'Project' => ['read' => true, 'write' => true],
         ];
@@ -291,21 +339,22 @@ class AppFixtures extends Fixture
         // Permissions for consultant (Business Consulting)
         $consultantPermissions = [
             'User' => ['read' => true, 'write' => false],
+            'UserGroup' => ['read' => true, 'write' => false],
             'Company' => ['read' => true, 'write' => true],
             'Project' => ['read' => true, 'write' => true],
             'CompanyGroup' => ['read' => true, 'write' => false],
         ];
 
-        $this->createUserPermissions($manager, $this->users['admin'], $adminPermissions);
-        $this->createUserPermissions($manager, $this->users['demo'], $demoPermissions);
-        $this->createUserPermissions($manager, $this->users['developer'], $developerPermissions);
-        $this->createUserPermissions($manager, $this->users['marketing'], $marketingPermissions);
-        $this->createUserPermissions($manager, $this->users['consultant'], $consultantPermissions);
+        $this->createUserGroupPermissions($manager, $this->userGroups['external'], $adminPermissions);
+        $this->createUserGroupPermissions($manager, $this->userGroups['basic'], $demoPermissions);
+        $this->createUserGroupPermissions($manager, $this->userGroups['advanced'], $developerPermissions);
+        $this->createUserGroupPermissions($manager, $this->userGroups['manager'], $marketingPermissions);
+        $this->createUserGroupPermissions($manager, $this->userGroups['admin'], $consultantPermissions);
 
         $manager->flush();
     }
 
-    private function createUserPermissions(ObjectManager $manager, User $user, array $permissions): void
+    private function createUserGroupPermissions(ObjectManager $manager, UserGroup $userGroup, array $permissions): void
     {
         foreach ($permissions as $entityCode => $rights) {
             $systemEntity = $this->systemEntities[$entityCode] ?? null;
@@ -314,12 +363,12 @@ class AppFixtures extends Fixture
             }
 
             // Check if permission already exists
-            $existingPermission = $manager->getRepository(UserSystemEntityPermission::class)
-                ->findOneBy(['user' => $user, 'systemEntity' => $systemEntity]);
+            $existingPermission = $manager->getRepository(UserGroupSystemEntityPermission::class)
+                ->findOneBy(['userGroup' => $userGroup, 'systemEntity' => $systemEntity]);
 
             if (!$existingPermission) {
-                $permission = (new UserSystemEntityPermission())
-                    ->setUser($user)
+                $permission = (new UserGroupSystemEntityPermission())
+                    ->setUserGroup($userGroup)
                     ->setSystemEntity($systemEntity)
                     ->setCanRead($rights['read'])
                     ->setCanWrite($rights['write']);

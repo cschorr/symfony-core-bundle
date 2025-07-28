@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\SystemEntity;
-use App\Entity\User;
 use App\Entity\Company;
 use App\Entity\CompanyGroup;
-use App\Entity\Contact;
 use App\Entity\Project;
+use App\Entity\SystemEntity;
+use App\Entity\User;
+use App\Entity\Contact;
 use App\Entity\Category;
+use App\Entity\UserGroup;
 use App\Repository\SystemEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -81,6 +82,7 @@ class NavigationService
         $classMapping = [
             'SystemEntity' => SystemEntity::class,
             'User' => User::class,
+            'UserGroup' => UserGroup::class,
             'Company' => Company::class,
             'CompanyGroup' => CompanyGroup::class,
             'Contact' => Contact::class,

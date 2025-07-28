@@ -31,9 +31,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
 
@@ -49,9 +46,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private ?Company $company = null;
 
     /**
-     * @var Collection<int, UserSystemEntityPermission>
+     * @var Collection<int, UserGroupSystemEntityPermission>
      */
-    #[ORM\OneToMany(targetEntity: UserSystemEntityPermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: UserGroupSystemEntityPermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     #[Groups(['user:read'])]
     private Collection $systemEntityPermissions;
 
@@ -185,29 +182,29 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * @return Collection<int, UserSystemEntityPermission>
+     * @return Collection<int, UserGroupSystemEntityPermission>
      */
     public function getSystemEntityPermissions(): Collection
     {
         return $this->systemEntityPermissions;
     }
 
-    public function addSystemEntityPermission(UserSystemEntityPermission $systemEntityPermission): static
+    public function addSystemEntityPermission(UserGroupSystemEntityPermission $systemEntityPermission): static
     {
         if (!$this->systemEntityPermissions->contains($systemEntityPermission)) {
             $this->systemEntityPermissions->add($systemEntityPermission);
-            $systemEntityPermission->setUser($this);
+            $systemEntityPermission->setUserGroup($this);
         }
 
         return $this;
     }
 
-    public function removeSystemEntityPermission(UserSystemEntityPermission $systemEntityPermission): static
+    public function removeSystemEntityPermission(UserGroupSystemEntityPermission $systemEntityPermission): static
     {
         if ($this->systemEntityPermissions->removeElement($systemEntityPermission)) {
             // set the owning side to null (unless already changed)
-            if ($systemEntityPermission->getUser() === $this) {
-                $systemEntityPermission->setUser(null);
+            if ($systemEntityPermission->getUserGroup() === $this) {
+                $systemEntityPermission->setUserGroup(null);
             }
         }
 
