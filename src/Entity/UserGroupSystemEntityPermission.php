@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserSystemEntityPermissionRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserSystemEntityPermissionRepository::class)]
@@ -20,10 +21,10 @@ class UserGroupSystemEntityPermission extends AbstractEntity
     #[ORM\JoinColumn(name: 'system_entity_id', nullable: false)]
     private ?SystemEntity $systemEntity = null;
 
-    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::BOOLEAN, options: ['default' => false])]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
     private bool $canRead = false;
 
-    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::BOOLEAN, options: ['default' => false])]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
     private bool $canWrite = false;
 
     public function __construct()
@@ -38,7 +39,7 @@ class UserGroupSystemEntityPermission extends AbstractEntity
     {
         return sprintf(
             '%s - %s (R:%s, W:%s)',
-            $this->userGroup?->getEmail() ?? 'Unknown User',
+            $this->userGroup?->getName() ?? 'Unknown UserGroup',
             $this->systemEntity?->getName() ?? 'Unknown SystemEntity',
             $this->canRead ? 'Y' : 'N',
             $this->canWrite ? 'Y' : 'N'

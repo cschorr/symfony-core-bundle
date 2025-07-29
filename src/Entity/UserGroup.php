@@ -17,8 +17,15 @@ class UserGroup extends AbstractEntity
 {
     use StringNameTrait;
 
+    /**
+     * @var array<string>|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $roles = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $category = null;
 
     /**
      * @var Collection<int, User>
@@ -32,11 +39,18 @@ class UserGroup extends AbstractEntity
         $this->users = new ArrayCollection();
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getRoles(): ?array
     {
         return $this->roles;
     }
 
+    /**
+     * @param array<string>|null $roles
+     * @return $this
+     */
     public function setRoles(?array $roles): static
     {
         $this->roles = $roles;
@@ -44,15 +58,27 @@ class UserGroup extends AbstractEntity
         return $this;
     }
 
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
     /**
-     * @return Collection<int, UserGroup>
+     * @return Collection<int, User>
      */
     public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(UserGroup $user): static
+    public function addUser(User $user): static
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
@@ -62,7 +88,7 @@ class UserGroup extends AbstractEntity
         return $this;
     }
 
-    public function removeUser(UserGroup $user): static
+    public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
             $user->removeUserGroup($this);
