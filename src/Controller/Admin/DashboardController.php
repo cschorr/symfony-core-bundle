@@ -38,7 +38,7 @@ class DashboardController extends AbstractDashboardController
     {
         // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
         // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        return $this->render('admin/dashboard.html.twig');
+        return $this->render('body/admin/dashboard/dashboard.html.twig');
     }
 
     /**
@@ -97,6 +97,12 @@ class DashboardController extends AbstractDashboardController
     {
         // Always show dashboard
         yield MenuItem::linkToDashboard($this->translator->trans('Dashboard'), 'fa fa-home');
+
+
+        // custom dashboard links
+        yield MenuItem::linkToRoute('Dashboard Editor', 'fa fa-home text-info', 'app_admin_dashboard_editor');
+        yield MenuItem::linkToRoute('Dashboard Manager', 'fa fa-home text-info', 'app_admin_dashboard_manager');
+
 
         /** @var User $user */
         $user = $this->getUser();
