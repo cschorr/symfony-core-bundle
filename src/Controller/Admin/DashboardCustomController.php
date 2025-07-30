@@ -21,6 +21,10 @@ final class DashboardCustomController extends AbstractController
         // only select projects where i am assigned
         $user = $this->getUser();
 
+        if ($user === null) {
+            return $this->redirectToRoute('admin');
+        }
+
         $projects = $this->projectRepository->findBy(['assignee' => $user]);
 
         // Render the dashboard template
