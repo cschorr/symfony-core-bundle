@@ -111,7 +111,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
         // Create the duplicate action
         $duplicateAction = Action::new('duplicate', $this->translator->trans('Duplicate'))
             ->setIcon('fa fa-copy')
-            ->linkToCrudAction('duplicateAction')
+            ->linkToCrudAction('duplicate')
             ->setHtmlAttributes([
                 'title' => $this->translator->trans('Duplicate this record'),
                 'data-bs-toggle' => 'tooltip',
