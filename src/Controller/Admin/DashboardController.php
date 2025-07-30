@@ -98,11 +98,9 @@ class DashboardController extends AbstractDashboardController
         // Always show dashboard
         yield MenuItem::linkToDashboard($this->translator->trans('Dashboard'), 'fa fa-home');
 
-
         // custom dashboard links
         yield MenuItem::linkToRoute('Dashboard Editor', 'fa fa-home text-info', 'app_admin_dashboard_editor');
         yield MenuItem::linkToRoute('Dashboard Manager', 'fa fa-home text-info', 'app_admin_dashboard_manager');
-
 
         /** @var User $user */
         $user = $this->getUser();
