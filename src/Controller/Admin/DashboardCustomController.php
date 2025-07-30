@@ -16,7 +16,7 @@ final class DashboardCustomController extends AbstractController
     }
 
     #[Route('/admin/{_locale}/dashboard/editor', name: 'app_admin_dashboard_editor')]
-    public function dashboard1(): Response
+    public function dashboardEditor(): Response
     {
         // only select projects where i am assigned
         $user = $this->getUser();
@@ -34,7 +34,7 @@ final class DashboardCustomController extends AbstractController
     }
 
     #[Route('/admin/{_locale}/dashboard/manager', name: 'app_admin_dashboard_manager')]
-    public function dashboard2(): Response
+    public function dashboardManager(): Response
     {
         $projects = $this->projectRepository->findAll();
 
