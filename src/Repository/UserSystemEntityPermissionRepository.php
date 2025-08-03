@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\SystemEntity;
-use App\Entity\User;
-use App\Entity\UserSystemEntityPermission;
+use App\Entity\UserGroup;
+use App\Entity\UserGroupSystemEntityPermission;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<UserSystemEntityPermission>
+ * @extends ServiceEntityRepository<UserGroupSystemEntityPermission>
  */
 class UserSystemEntityPermissionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UserSystemEntityPermission::class);
+        parent::__construct($registry, UserGroupSystemEntityPermission::class);
     }
 
     /**
      * Find permission for a specific user and system entity.
      */
-    public function findByUserAndSystemEntity(User $user, SystemEntity $systemEntity): ?UserSystemEntityPermission
+    public function findByUserAndSystemEntity(UserGroup $user, SystemEntity $systemEntity): ?UserGroupSystemEntityPermission
     {
         return $this->createQueryBuilder('usep')
             ->andWhere('usep.user = :user')
@@ -37,9 +37,9 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Find all permissions for a specific user.
      *
-     * @return UserSystemEntityPermission[]
+     * @return UserGroupSystemEntityPermission[]
      */
-    public function findByUser(User $user): array
+    public function findByUser(UserGroup $user): array
     {
         return $this->createQueryBuilder('usep')
             ->andWhere('usep.user = :user')
@@ -52,7 +52,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Find all permissions for a specific system entity.
      *
-     * @return UserSystemEntityPermission[]
+     * @return UserGroupSystemEntityPermission[]
      */
     public function findBySystemEntity(SystemEntity $systemEntity): array
     {
@@ -69,7 +69,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
      *
      * @return SystemEntity[]
      */
-    public function findSystemEntitiesWithReadAccess(User $user): array
+    public function findSystemEntitiesWithReadAccess(UserGroup $user): array
     {
         return $this->createQueryBuilder('usep')
             ->select('se')
@@ -87,7 +87,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
      *
      * @return SystemEntity[]
      */
-    public function findSystemEntitiesWithWriteAccess(User $user): array
+    public function findSystemEntitiesWithWriteAccess(UserGroup $user): array
     {
         return $this->createQueryBuilder('usep')
             ->select('se')
@@ -103,7 +103,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Find users with read access to a system entity.
      *
-     * @return User[]
+     * @return UserGroup[]
      */
     public function findUsersWithReadAccess(SystemEntity $systemEntity): array
     {
@@ -121,7 +121,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Find users with write access to a system entity.
      *
-     * @return User[]
+     * @return UserGroup[]
      */
     public function findUsersWithWriteAccess(SystemEntity $systemEntity): array
     {
@@ -139,7 +139,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Check if user has read access to a system entity.
      */
-    public function userHasReadAccess(User $user, SystemEntity $systemEntity): bool
+    public function userHasReadAccess(UserGroup $user, SystemEntity $systemEntity): bool
     {
         $permission = $this->findByUserAndSystemEntity($user, $systemEntity);
 
@@ -149,7 +149,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Check if user has write access to a system entity.
      */
-    public function userHasWriteAccess(User $user, SystemEntity $systemEntity): bool
+    public function userHasWriteAccess(UserGroup $user, SystemEntity $systemEntity): bool
     {
         $permission = $this->findByUserAndSystemEntity($user, $systemEntity);
 
@@ -159,13 +159,13 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Grant or update permissions for a user on a system entity.
      */
-    public function grantPermissions(User $user, SystemEntity $systemEntity, bool $canRead = false, bool $canWrite = false): UserSystemEntityPermission
+    public function grantPermissions(UserGroup $user, SystemEntity $systemEntity, bool $canRead = false, bool $canWrite = false): UserGroupSystemEntityPermission
     {
         $permission = $this->findByUserAndSystemEntity($user, $systemEntity);
 
         if (null === $permission) {
-            $permission = new UserSystemEntityPermission();
-            $permission->setUser($user);
+            $permission = new UserGroupSystemEntityPermission();
+            $permission->setUserGroup($user);
             $permission->setSystemEntity($systemEntity);
             $this->getEntityManager()->persist($permission);
         }
@@ -179,7 +179,7 @@ class UserSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Revoke all permissions for a user on a system entity.
      */
-    public function revokePermissions(User $user, SystemEntity $systemEntity): void
+    public function revokePermissions(UserGroup $user, SystemEntity $systemEntity): void
     {
         $permission = $this->findByUserAndSystemEntity($user, $systemEntity);
 

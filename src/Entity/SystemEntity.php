@@ -23,15 +23,15 @@ class SystemEntity extends AbstractEntity
     private ?string $icon = null;
 
     /**
-     * @var Collection<int, UserSystemEntityPermission>
+     * @var Collection<int, UserGroupSystemEntityPermission>
      */
-    #[ORM\OneToMany(targetEntity: UserSystemEntityPermission::class, mappedBy: 'systemEntity', cascade: ['persist', 'remove'])]
-    private Collection $userPermissions;
+    #[ORM\OneToMany(targetEntity: UserGroupSystemEntityPermission::class, mappedBy: 'systemEntity', cascade: ['persist', 'remove'])]
+    private Collection $userGroupPermissions;
 
     public function __construct()
     {
         parent::__construct();
-        $this->userPermissions = new ArrayCollection();
+        $this->userGroupPermissions = new ArrayCollection();
     }
 
     #[\Override]
@@ -41,29 +41,29 @@ class SystemEntity extends AbstractEntity
     }
 
     /**
-     * @return Collection<int, UserSystemEntityPermission>
+     * @return Collection<int, UserGroupSystemEntityPermission>
      */
-    public function getUserPermissions(): Collection
+    public function getUserGroupPermissions(): Collection
     {
-        return $this->userPermissions;
+        return $this->userGroupPermissions;
     }
 
-    public function addUserPermission(UserSystemEntityPermission $userPermission): static
+    public function addUserPermission(UserGroupSystemEntityPermission $userGroupPermission): static
     {
-        if (!$this->userPermissions->contains($userPermission)) {
-            $this->userPermissions->add($userPermission);
-            $userPermission->setSystemEntity($this);
+        if (!$this->userGroupPermissions->contains($userGroupPermission)) {
+            $this->userGroupPermissions->add($userGroupPermission);
+            $userGroupPermission->setSystemEntity($this);
         }
 
         return $this;
     }
 
-    public function removeUserPermission(UserSystemEntityPermission $userPermission): static
+    public function removeUserPermission(UserGroupSystemEntityPermission $userGroupPermission): static
     {
-        if ($this->userPermissions->removeElement($userPermission)) {
+        if ($this->userGroupPermissions->removeElement($userGroupPermission)) {
             // set the owning side to null (unless already changed)
-            if ($userPermission->getSystemEntity() === $this) {
-                $userPermission->setSystemEntity(null);
+            if ($userGroupPermission->getSystemEntity() === $this) {
+                $userGroupPermission->setSystemEntity(null);
             }
         }
 
@@ -73,14 +73,14 @@ class SystemEntity extends AbstractEntity
     /**
      * Get all users who have read access to this system entity.
      *
-     * @return User[]
+     * @return UserGroup[]
      */
     public function getUsersWithReadAccess(): array
     {
         $users = [];
-        foreach ($this->userPermissions as $permission) {
+        foreach ($this->userGroupPermissions as $permission) {
             if ($permission->canRead()) {
-                $users[] = $permission->getUser();
+                $users[] = $permission->getUserGroup();
             }
         }
 
@@ -90,14 +90,14 @@ class SystemEntity extends AbstractEntity
     /**
      * Get all users who have write access to this system entity.
      *
-     * @return User[]
+     * @return UserGroup[]
      */
     public function getUsersWithWriteAccess(): array
     {
         $users = [];
-        foreach ($this->userPermissions as $permission) {
+        foreach ($this->userGroupPermissions as $permission) {
             if ($permission->canWrite()) {
-                $users[] = $permission->getUser();
+                $users[] = $permission->getUserGroup();
             }
         }
 
@@ -107,10 +107,10 @@ class SystemEntity extends AbstractEntity
     /**
      * Check if a user has read access to this system entity.
      */
-    public function userHasReadAccess(User $user): bool
+    public function userHasReadAccess(UserGroup $user): bool
     {
-        foreach ($this->userPermissions as $permission) {
-            if ($permission->getUser() === $user && $permission->canRead()) {
+        foreach ($this->userGroupPermissions as $permission) {
+            if ($permission->getUserGroup() === $user && $permission->canRead()) {
                 return true;
             }
         }
@@ -121,10 +121,10 @@ class SystemEntity extends AbstractEntity
     /**
      * Check if a user has write access to this system entity.
      */
-    public function userHasWriteAccess(User $user): bool
+    public function userHasWriteAccess(UserGroup $user): bool
     {
-        foreach ($this->userPermissions as $permission) {
-            if ($permission->getUser() === $user && $permission->canWrite()) {
+        foreach ($this->userGroupPermissions as $permission) {
+            if ($permission->getUserGroup() === $user && $permission->canWrite()) {
                 return true;
             }
         }

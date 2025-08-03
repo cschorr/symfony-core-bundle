@@ -31,16 +31,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
-    /**
-     * @var list<string> The user roles
-     */
-    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::JSON)]
-    #[Groups(['user:read', 'user:write'])]
-    private array $roles = [];
-
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
 
@@ -56,20 +46,27 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private ?Company $company = null;
 
     /**
-     * @var Collection<int, UserSystemEntityPermission>
+     * @var Collection<int, UserGroupSystemEntityPermission>
      */
-    #[ORM\OneToMany(targetEntity: UserSystemEntityPermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: UserGroupSystemEntityPermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     #[Groups(['user:read'])]
     private Collection $systemEntityPermissions;
 
     #[ORM\ManyToOne]
     private ?Category $category = null;
 
+    /**
+     * @var Collection<int, UserGroup>
+     */
+    #[ORM\ManyToMany(targetEntity: UserGroup::class, inversedBy: 'users')]
+    private Collection $userGroups;
+
     public function __construct()
     {
         parent::__construct();
         $this->projects = new ArrayCollection();
         $this->systemEntityPermissions = new ArrayCollection();
+        $this->userGroups = new ArrayCollection();
     }
 
     #[\Override]
@@ -107,21 +104,15 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        $roles = [];
+        $userGroups = $this->getUserGroups();
+        foreach ($userGroups as $userGroup) {
+            $roles = array_merge($roles, $userGroup->getRoles());
+        }
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
-    }
-
-    /**
-     * @param list<string> $roles
-     */
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-
-        return $this;
     }
 
     /**
@@ -191,29 +182,29 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * @return Collection<int, UserSystemEntityPermission>
+     * @return Collection<int, UserGroupSystemEntityPermission>
      */
     public function getSystemEntityPermissions(): Collection
     {
         return $this->systemEntityPermissions;
     }
 
-    public function addSystemEntityPermission(UserSystemEntityPermission $systemEntityPermission): static
+    public function addSystemEntityPermission(UserGroupSystemEntityPermission $systemEntityPermission): static
     {
         if (!$this->systemEntityPermissions->contains($systemEntityPermission)) {
             $this->systemEntityPermissions->add($systemEntityPermission);
-            $systemEntityPermission->setUser($this);
+            $systemEntityPermission->setUserGroup($this);
         }
 
         return $this;
     }
 
-    public function removeSystemEntityPermission(UserSystemEntityPermission $systemEntityPermission): static
+    public function removeSystemEntityPermission(UserGroupSystemEntityPermission $systemEntityPermission): static
     {
         if ($this->systemEntityPermissions->removeElement($systemEntityPermission)) {
             // set the owning side to null (unless already changed)
-            if ($systemEntityPermission->getUser() === $this) {
-                $systemEntityPermission->setUser(null);
+            if ($systemEntityPermission->getUserGroup() === $this) {
+                $systemEntityPermission->setUserGroup(null);
             }
         }
 
@@ -290,6 +281,30 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserGroup>
+     */
+    public function getUserGroups(): Collection
+    {
+        return $this->userGroups;
+    }
+
+    public function addUserGroup(UserGroup $userGroup): static
+    {
+        if (!$this->userGroups->contains($userGroup)) {
+            $this->userGroups->add($userGroup);
+        }
+
+        return $this;
+    }
+
+    public function removeUserGroup(UserGroup $userGroup): static
+    {
+        $this->userGroups->removeElement($userGroup);
 
         return $this;
     }
