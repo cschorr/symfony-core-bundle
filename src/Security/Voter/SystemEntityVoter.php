@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Security\Voter;
 
 use App\Entity\SystemEntity;
-use App\Entity\User;
+use App\Entity\UserGroup;
 use App\Enum\SystemEntityPermission;
 use App\Repository\SystemEntityRepository;
 use App\Repository\UserSystemEntityPermissionRepository;
@@ -43,7 +43,7 @@ class SystemEntityVoter extends Voter
         }
 
         // Admin users have all permissions
-        if ($user instanceof User && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        if ($user instanceof UserGroup && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
             return true;
         }
 
@@ -83,12 +83,12 @@ class SystemEntityVoter extends Voter
         };
     }
 
-    private function canRead(SystemEntity $systemEntity, User $user): bool
+    private function canRead(SystemEntity $systemEntity, UserGroup $user): bool
     {
         return $this->permissionRepository->userHasReadAccess($user, $systemEntity);
     }
 
-    private function canWrite(SystemEntity $systemEntity, User $user): bool
+    private function canWrite(SystemEntity $systemEntity, UserGroup $user): bool
     {
         return $this->permissionRepository->userHasWriteAccess($user, $systemEntity);
     }

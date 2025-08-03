@@ -225,7 +225,7 @@ class SystemEntityCrudController extends AbstractCrudController
     private function getSystemEntityPermissionsSummaryField(): array
     {
         return [
-            $this->fieldService->field('userPermissions')
+            $this->fieldService->field('userGroupPermissions')
                 ->type('association')
                 ->label('User Permissions')
                 ->pages(['index', 'detail'])

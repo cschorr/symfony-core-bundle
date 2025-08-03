@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\SystemEntity;
-use App\Entity\User;
-use App\Entity\UserSystemEntityPermission;
+use App\Entity\UserGroup;
+use App\Entity\UserGroupSystemEntityPermission;
 use App\Repository\SystemEntityRepository;
 use App\Repository\UserSystemEntityPermissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,7 +36,7 @@ class PermissionService
     /**
      * Create system entity permission form fields organized in a tab.
      */
-    public function createSystemEntityPermissionFields(?User $entity = null): array
+    public function createSystemEntityPermissionFields(?UserGroup $entity = null): array
     {
         $permissionFields = [];
         $systemEntities = $this->systemEntityRepository->findBy(['active' => true], ['name' => 'ASC']);
@@ -87,7 +87,7 @@ class PermissionService
     /**
      * Add permission tab to form fields for entities that support permission management.
      */
-    public function addPermissionTabToFields(array $fields, ?User $entity = null): array
+    public function addPermissionTabToFields(array $fields, ?UserGroup $entity = null): array
     {
         $permissionFields = $this->createSystemEntityPermissionFields($entity);
 
@@ -108,7 +108,7 @@ class PermissionService
     /**
      * Handle system entity permissions when saving user.
      */
-    public function handleSystemEntityPermissions(User $user, array $formData): void
+    public function handleSystemEntityPermissions(UserGroup $user, array $formData): void
     {
         // Get all active system entities
         $systemEntities = $this->systemEntityRepository->findBy(['active' => true]);
@@ -145,8 +145,8 @@ class PermissionService
             // Create or update permission
             if ($hasReadPermission || $hasWritePermission) {
                 if (null === $permission) {
-                    $permission = new UserSystemEntityPermission();
-                    $permission->setUser($user);
+                    $permission = new UserGroupSystemEntityPermission();
+                    $permission->setUserGroup($user);
                     $permission->setSystemEntity($systemEntity);
                 }
 
@@ -164,7 +164,7 @@ class PermissionService
     /**
      * Check if user can read system entity.
      */
-    public function canUserReadSystemEntity(User $user, SystemEntity $systemEntity): bool
+    public function canUserReadSystemEntity(UserGroup $user, SystemEntity $systemEntity): bool
     {
         $permission = $this->userSystemEntityPermissionRepository->findOneBy([
             'user' => $user,
@@ -177,7 +177,7 @@ class PermissionService
     /**
      * Check if user can write system entity.
      */
-    public function canUserWriteSystemEntity(User $user, SystemEntity $systemEntity): bool
+    public function canUserWriteSystemEntity(UserGroup $user, SystemEntity $systemEntity): bool
     {
         $permission = $this->userSystemEntityPermissionRepository->findOneBy([
             'user' => $user,
@@ -193,7 +193,7 @@ class PermissionService
     public function addSystemEntityPermissionTabToFields(array $fields): array
     {
         // Get all users to create permission fields
-        $users = $this->entityManager->getRepository(User::class)->findAll();
+        $users = $this->entityManager->getRepository(UserGroup::class)->findAll();
 
         // Create tab for permissions
         $permissionFields = [
@@ -235,7 +235,7 @@ class PermissionService
     public function addSystemEntityPermissionTabToFieldsWithEntity(array $fields, ?SystemEntity $entity = null): array
     {
         // Get all users to create permission fields
-        $users = $this->entityManager->getRepository(User::class)->findAll();
+        $users = $this->entityManager->getRepository(UserGroup::class)->findAll();
 
         // Create tab for permissions
         $permissionFields = [
@@ -300,7 +300,7 @@ class PermissionService
             ->setHelp($this->translator->trans('Count of system entity permissions for this user'))
             ->onlyOnIndex()
             ->formatValue(function ($value, $entity) {
-                if (!$entity instanceof User) {
+                if (!$entity instanceof UserGroup) {
                     return $this->translator->trans('No User');
                 }
 
