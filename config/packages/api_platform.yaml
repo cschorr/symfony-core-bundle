@@ -13,4 +13,6 @@ api_platform:
     graphql:
         enabled: true
     formats:
+        json: [ 'application/json' ]
+        jsonld: [ 'application/ld+json' ]
         graphql: [ 'application/graphql' ]
