@@ -24,7 +24,7 @@ class UserGroup extends AbstractEntity
     private ?array $roles = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Category $category = null;
 
     /**

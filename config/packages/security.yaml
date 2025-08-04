@@ -46,16 +46,15 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # API routes
+        # API routes - öffentliche Endpunkte
         - { path: ^/api/graphql/(graphiql|playground), roles: PUBLIC_ACCESS, methods: [ GET ] }
-        - { path: ^/api/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
-        - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing API documentations and Swagger UI docs
-        - { path: ^/api/contexts, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI contexts
+        - { path: ^/api/(index\.(jsonld|json|html|yaml|jsonopenapi|yamlopenapi))?$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/(docs|contexts)/, roles: PUBLIC_ACCESS }
         - { path: ^/auth, roles: PUBLIC_ACCESS }
+        # Alle anderen API-Routen erfordern Authentifizierung
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
-        # grant access to /admin to both ROLE_ADMIN and ROLE_USER
-        - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_USER] }
-        # grant access to /profile to ROLE_USER
+        # Admin und Profil-Bereiche
+        - { path: ^/admin, roles: [ ROLE_ADMIN, ROLE_USER ] }
         - { path: ^/profile, roles: ROLE_USER }
 
     #custom
