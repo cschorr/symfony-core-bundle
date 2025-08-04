@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Set\SetCommunicationTrait;
+use App\Entity\Traits\Set\SetNamePersonTrait;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use SetCommunicationTrait;
+    use SetNamePersonTrait;
 
     #[ORM\Column(length: 180)]
     #[Groups(['user:read', 'user:write'])]
@@ -53,6 +55,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private Collection $systemEntityPermissions;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
     private ?Category $category = null;
 
     /**
@@ -60,6 +63,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     #[ORM\ManyToMany(targetEntity: UserGroup::class, inversedBy: 'users')]
     private Collection $userGroups;
+
+    #[ORM\Column(nullable: false, options: ['default' => false])]
+    private ?bool $locked = false;
 
     public function __construct()
     {
@@ -305,6 +311,18 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function removeUserGroup(UserGroup $userGroup): static
     {
         $this->userGroups->removeElement($userGroup);
+
+        return $this;
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked;
+    }
+
+    public function setLocked(bool $locked): static
+    {
+        $this->locked = $locked;
 
         return $this;
     }
