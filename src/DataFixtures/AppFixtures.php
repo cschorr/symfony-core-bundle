@@ -255,41 +255,64 @@ class AppFixtures extends Fixture
                 'active' => true,
                 'notes' => 'Administrator user with full access',
                 'category' => 'main2', // Business Services
+                'nameLast' => 'Admin',
+                'nameFirst' => 'User',
             ],
             'demo' => [
                 'email' => 'demo@example.com',
                 'active' => true,
                 'notes' => 'Demo user with limited access',
                 'category' => 'sub1', // Web Development
+                'nameLast' => 'Demo',
+                'nameFirst' => 'User',
             ],
             'developer' => [
                 'email' => 'dev@example.com',
                 'active' => true,
                 'notes' => 'Senior developer specializing in mobile apps',
                 'category' => 'sub2', // Mobile Development
+                'nameLast' => 'Developer',
+                'nameFirst' => 'User',
             ],
             'marketing' => [
                 'email' => 'marketing@example.com',
                 'active' => true,
                 'notes' => 'Marketing specialist for digital campaigns',
                 'category' => 'sub6', // Digital Marketing
+                'nameLast' => 'Marketing',
+                'nameFirst' => 'User',
             ],
             'consultant' => [
                 'email' => 'consultant@example.com',
                 'active' => true,
                 'notes' => 'Business consultant for process optimization',
                 'category' => 'main4', // Consulting
+                'nameLast' => 'Consultant',
+                'nameFirst' => 'User',
             ],
         ];
 
         foreach ($usersData as $key => $userData) {
             $category = $this->categories[$userData['category']] ?? null;
 
+            // Add error handling to debug missing categories
+            if (!$category) {
+                throw new \Exception(
+                    sprintf('Category "%s" not found for user "%s". Available categories: %s',
+                        $userData['category'],
+                        $key,
+                        implode(', ', array_keys($this->categories))
+                    )
+                );
+            }
+
             $user = new User();
             $user->setEmail($userData['email'])
                 ->setPassword($this->hasher->hashPassword($user, self::DEFAULT_PASSWORD))
                 ->setActive($userData['active'])
                 ->setNotes($userData['notes'])
+                ->setNameLast($userData['nameLast'])
+                ->setNameFirst($userData['nameFirst'])
                 ->setCategory($category);
 
             $manager->persist($user);
