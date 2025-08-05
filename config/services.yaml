@@ -32,6 +32,11 @@ services:
         arguments:
             $projectDir: '%kernel.project_dir%'
 
+    App\OpenApi\UserInfoDecorator:
+        decorates: 'api_platform.openapi.factory'
+        arguments: [ '@App\OpenApi\UserInfoDecorator.inner' ]
+        autoconfigure: false
+
 # Twig configuration
 twig:
     globals:
