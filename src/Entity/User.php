@@ -111,7 +111,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function getRoles(): array
     {
         $roles = [];
-        $userGroups = $this->getUserGroups();
+        $userGroups = $this->getUserGroups()->toArray();
         foreach ($userGroups as $userGroup) {
             $roles = array_merge($roles, $userGroup->getRoles());
         }
