@@ -19,20 +19,6 @@ final class UserInfoDecorator implements OpenApiFactoryInterface
             post: new Model\Operation(
                 operationId: 'postUserInfo',
                 tags: ['Login Check'],
-                summary: 'Get user information from JWT token',
-                description: 'Retrieve user information using a JWT token from Authorization header',
-                parameters: [
-                    new Model\Parameter(
-                        name: 'Authorization',
-                        in: 'header',
-                        required: true,
-                        description: 'Bearer JWT token',
-                        schema: [
-                            'type' => 'string',
-                            'example' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...'
-                        ]
-                    )
-                ],
                 responses: [
                     '200' => new Model\Response(
                         description: 'User information retrieved successfully',
@@ -110,6 +96,20 @@ final class UserInfoDecorator implements OpenApiFactoryInterface
                             ]
                         ])
                     ),
+                ],
+                summary: 'Get user information from JWT token',
+                description: 'Retrieve user information using a JWT token from Authorization header',
+                parameters: [
+                    new Model\Parameter(
+                        name: 'Authorization',
+                        in: 'header',
+                        description: 'Bearer JWT token',
+                        required: true,
+                        schema: [
+                            'type' => 'string',
+                            'example' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...'
+                        ]
+                    )
                 ]
             )
         );

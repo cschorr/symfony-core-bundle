@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Security\Voter;
 
 use App\Entity\SystemEntity;
-use App\Entity\UserGroup;
+use App\Entity\User;
 use App\Enum\SystemEntityPermission;
 use App\Repository\SystemEntityRepository;
 use App\Repository\UserSystemEntityPermissionRepository;
@@ -33,8 +33,13 @@ class SystemEntityVoter extends Voter
             && ($subject instanceof SystemEntity || is_string($subject));
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
-    {
+    protected function voteOnAttribute(
+        string $attribute,
+        mixed $subject,
+        TokenInterface $token,
+        ?Vote $vote = null,
+    ): bool {
+        /** @var User $user */
         $user = $token->getUser();
 
         // User must be logged in
@@ -43,7 +48,7 @@ class SystemEntityVoter extends Voter
         }
 
         // Admin users have all permissions
-        if ($user instanceof UserGroup && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        if ($user instanceof UserInterface && in_array('ROLE_ADMIN', $user->getRoles(), true)) {
             return true;
         }
 
@@ -83,12 +88,12 @@ class SystemEntityVoter extends Voter
         };
     }
 
-    private function canRead(SystemEntity $systemEntity, UserGroup $user): bool
+    private function canRead(SystemEntity $systemEntity, User $user): bool
     {
         return $this->permissionRepository->userHasReadAccess($user, $systemEntity);
     }
 
-    private function canWrite(SystemEntity $systemEntity, UserGroup $user): bool
+    private function canWrite(SystemEntity $systemEntity, User $user): bool
     {
         return $this->permissionRepository->userHasWriteAccess($user, $systemEntity);
     }

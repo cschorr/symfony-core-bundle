@@ -30,7 +30,7 @@ class NavigationService
      */
     public function getAccessibleSystemEntitiesForUser(User $user): array
     {
-        return $this->systemEntityRepository->findActiveSystemEntitiesForUser($user);
+        return $this->systemEntityRepository->findActiveSystemEntitiesForUser($user->getUserGroups()->toArray());
     }
 
     /**
