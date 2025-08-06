@@ -8,7 +8,7 @@ use App\Controller\Admin\Traits\FieldConfigurationTrait;
 use App\Entity\SystemEntity;
 use App\Entity\User;
 use App\Entity\UserSystemEntityPermission;
-use App\Repository\UserSystemEntityPermissionRepository;
+use App\Repository\UserGroupSystemEntityPermissionRepository;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
 use App\Service\PermissionService;
@@ -29,14 +29,14 @@ class SystemEntityCrudController extends AbstractCrudController
     use FieldConfigurationTrait;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        TranslatorInterface $translator,
-        PermissionService $permissionService,
-        DuplicateService $duplicateService,
-        RequestStack $requestStack,
-        private EasyAdminFieldService $fieldService,
-        private RelationshipSyncService $relationshipSyncService,
-        private UserSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
+        EntityManagerInterface                            $entityManager,
+        TranslatorInterface                               $translator,
+        PermissionService                                 $permissionService,
+        DuplicateService                                  $duplicateService,
+        RequestStack                                      $requestStack,
+        private EasyAdminFieldService                     $fieldService,
+        private RelationshipSyncService                   $relationshipSyncService,
+        private UserGroupSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
@@ -230,11 +230,11 @@ class SystemEntityCrudController extends AbstractCrudController
                 ->label('User Permissions')
                 ->pages(['index', 'detail'])
                 ->formatValue(function ($value, $entity) {
-                    if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
+                    if (!$entity || !$entity->getUserGroupPermissions() || $entity->getUserGroupPermissions()->isEmpty()) {
                         return $this->translator->trans('No permissions assigned');
                     }
 
-                    $count = $entity->getUserPermissions()->count();
+                    $count = $entity->getUserGroupPermissions()->count();
 
                     return sprintf($this->translator->trans('%d permission(s) assigned'), $count);
                 })
@@ -253,12 +253,12 @@ class SystemEntityCrudController extends AbstractCrudController
                 ->label('Permission Details')
                 ->pages(['detail'])
                 ->formatValue(function ($value, $entity) {
-                    if (!$entity || !$entity->getUserPermissions() || $entity->getUserPermissions()->isEmpty()) {
+                    if (!$entity || !$entity->getUserGroupPermissions() || $entity->getUserGroupPermissions()->isEmpty()) {
                         return $this->translator->trans('No permissions assigned');
                     }
 
                     $permissions = [];
-                    foreach ($entity->getUserPermissions() as $permission) {
+                    foreach ($entity->getUserGroupPermissions() as $permission) {
                         $user = $permission->getUser();
                         $userEmail = $user ? $user->getEmail() : $this->translator->trans('Unknown User');
                         $access = [];
