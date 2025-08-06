@@ -8,7 +8,7 @@ use App\Entity\SystemEntity;
 use App\Entity\User;
 use App\Enum\SystemEntityPermission;
 use App\Repository\SystemEntityRepository;
-use App\Repository\UserSystemEntityPermissionRepository;
+use App\Repository\UserGroupSystemEntityPermissionRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -18,9 +18,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SystemEntityVoter extends Voter
 {
     public function __construct(
-        private readonly UserSystemEntityPermissionRepository $permissionRepository,
-        private readonly SystemEntityRepository $systemEntityRepository,
-        private readonly LoggerInterface $logger,
+        private readonly UserGroupSystemEntityPermissionRepository $permissionRepository,
+        private readonly SystemEntityRepository                    $systemEntityRepository,
+        private readonly LoggerInterface                           $logger,
     ) {
     }
 

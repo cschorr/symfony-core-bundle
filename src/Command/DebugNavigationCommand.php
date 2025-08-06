@@ -28,7 +28,7 @@ class DebugNavigationCommand
 
         // Get demo user
         $user = $this->entityManager->getRepository(User::class)
-            ->findOneBy(['email' => 'demo@example.com']);
+            ->findOneBy(['email' => 'editor@example.com']);
 
         if (null === $user) {
             $io->error('Demo user not found');
@@ -36,7 +36,7 @@ class DebugNavigationCommand
             return Command::FAILURE;
         }
 
-        $io->title('Navigation Debug for demo@example.com');
+        $io->title('Navigation Debug for editor@example.com');
 
         // Check if user is admin
         $isAdmin = $this->navigationService->isUserAdmin($user);

@@ -8,7 +8,7 @@ use App\Entity\SystemEntity;
 use App\Entity\UserGroup;
 use App\Entity\UserGroupSystemEntityPermission;
 use App\Repository\SystemEntityRepository;
-use App\Repository\UserSystemEntityPermissionRepository;
+use App\Repository\UserGroupSystemEntityPermissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -18,10 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PermissionService
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly SystemEntityRepository $systemEntityRepository,
-        private readonly UserSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
-        private readonly TranslatorInterface $translator,
+        private readonly EntityManagerInterface                    $entityManager,
+        private readonly SystemEntityRepository                    $systemEntityRepository,
+        private readonly UserGroupSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
+        private readonly TranslatorInterface                       $translator,
     ) {
     }
 
@@ -46,7 +46,7 @@ class PermissionService
             $permission = null;
             if ($entity && $entity->getId()) {
                 $permission = $this->userSystemEntityPermissionRepository->findOneBy([
-                    'user' => $entity,
+                    'userGroup' => $entity,
                     'systemEntity' => $systemEntity,
                 ]);
             }
@@ -108,7 +108,7 @@ class PermissionService
     /**
      * Handle system entity permissions when saving user.
      */
-    public function handleSystemEntityPermissions(UserGroup $user, array $formData): void
+    public function handleSystemEntityPermissions(UserGroup $userGroup, array $formData): void
     {
         // Get all active system entities
         $systemEntities = $this->systemEntityRepository->findBy(['active' => true]);
@@ -138,7 +138,7 @@ class PermissionService
 
             // Find existing permission
             $permission = $this->userSystemEntityPermissionRepository->findOneBy([
-                'user' => $user,
+                'userGroup' => $userGroup,
                 'systemEntity' => $systemEntity,
             ]);
 
@@ -146,7 +146,7 @@ class PermissionService
             if ($hasReadPermission || $hasWritePermission) {
                 if (null === $permission) {
                     $permission = new UserGroupSystemEntityPermission();
-                    $permission->setUserGroup($user);
+                    $permission->setUserGroup($userGroup);
                     $permission->setSystemEntity($systemEntity);
                 }
 
@@ -164,10 +164,10 @@ class PermissionService
     /**
      * Check if user can read system entity.
      */
-    public function canUserReadSystemEntity(UserGroup $user, SystemEntity $systemEntity): bool
+    public function canUserReadSystemEntity(UserGroup $userGroup, SystemEntity $systemEntity): bool
     {
         $permission = $this->userSystemEntityPermissionRepository->findOneBy([
-            'user' => $user,
+            'userGroup' => $userGroup,
             'systemEntity' => $systemEntity,
         ]);
 
@@ -177,10 +177,10 @@ class PermissionService
     /**
      * Check if user can write system entity.
      */
-    public function canUserWriteSystemEntity(UserGroup $user, SystemEntity $systemEntity): bool
+    public function canUserWriteSystemEntity(UserGroup $userGroup, SystemEntity $systemEntity): bool
     {
         $permission = $this->userSystemEntityPermissionRepository->findOneBy([
-            'user' => $user,
+            'userGroup' => $userGroup,
             'systemEntity' => $systemEntity,
         ]);
 
@@ -193,7 +193,7 @@ class PermissionService
     public function addSystemEntityPermissionTabToFields(array $fields): array
     {
         // Get all users to create permission fields
-        $users = $this->entityManager->getRepository(UserGroup::class)->findAll();
+        $userGroups = $this->entityManager->getRepository(UserGroup::class)->findAll();
 
         // Create tab for permissions
         $permissionFields = [
@@ -202,21 +202,21 @@ class PermissionService
                 ->collapsible(),
         ];
 
-        foreach ($users as $user) {
+        foreach ($userGroups as $userGroup) {
             // Create read permission field
-            $readFieldName = 'userPermission_read_' . $user->getId();
+            $readFieldName = 'userPermission_read_' . $userGroup->getId();
             $userReadField = BooleanField::new($readFieldName)
-                ->setLabel($user->getEmail() . ' - ' . $this->translator->trans('Can Read'))
-                ->setFormTypeOption('attr', ['data-user-id' => $user->getId()->toString()])
+                ->setLabel($userGroup->getEmail() . ' - ' . $this->translator->trans('Can Read'))
+                ->setFormTypeOption('attr', ['data-user-id' => $userGroup->getId()->toString()])
                 ->setFormTypeOption('attr', ['data-permission-type' => 'read'])
                 ->setFormTypeOption('required', false)
                 ->setFormTypeOption('mapped', false); // Don't map to entity property
 
             // Create write permission field
-            $writeFieldName = 'userPermission_write_' . $user->getId();
+            $writeFieldName = 'userPermission_write_' . $userGroup->getId();
             $userWriteField = BooleanField::new($writeFieldName)
-                ->setLabel($user->getEmail() . ' - ' . $this->translator->trans('Can Write'))
-                ->setFormTypeOption('attr', ['data-user-id' => $user->getId()->toString()])
+                ->setLabel($userGroup->getEmail() . ' - ' . $this->translator->trans('Can Write'))
+                ->setFormTypeOption('attr', ['data-user-id' => $userGroup->getId()->toString()])
                 ->setFormTypeOption('attr', ['data-permission-type' => 'write'])
                 ->setFormTypeOption('required', false)
                 ->setFormTypeOption('mapped', false); // Don't map to entity property
@@ -235,7 +235,7 @@ class PermissionService
     public function addSystemEntityPermissionTabToFieldsWithEntity(array $fields, ?SystemEntity $entity = null): array
     {
         // Get all users to create permission fields
-        $users = $this->entityManager->getRepository(UserGroup::class)->findAll();
+        $userGroups = $this->entityManager->getRepository(UserGroup::class)->findAll();
 
         // Create tab for permissions
         $permissionFields = [
@@ -244,22 +244,22 @@ class PermissionService
                 ->collapsible(),
         ];
 
-        foreach ($users as $user) {
+        foreach ($userGroups as $userGroup) {
             // Find existing permission
             $permission = null;
             if (null !== $entity) {
                 $permission = $this->userSystemEntityPermissionRepository
                     ->findOneBy([
-                        'user' => $user,
+                        'userGroup' => $userGroup,
                         'systemEntity' => $entity,
                     ]);
             }
 
             // Create read permission field
-            $readFieldName = 'userPermission_read_' . $user->getId();
+            $readFieldName = 'userPermission_read_' . $userGroup->getId();
             $userReadField = BooleanField::new($readFieldName)
-                ->setLabel($user->getEmail() . ' (' . $this->translator->trans('Read') . ')')
-                ->setFormTypeOption('attr', ['data-user-id' => $user->getId()->toString()])
+                ->setLabel($userGroup->getEmail() . ' (' . $this->translator->trans('Read') . ')')
+                ->setFormTypeOption('attr', ['data-user-id' => $userGroup->getId()->toString()])
                 ->setFormTypeOption('attr', ['data-permission-type' => 'read'])
                 ->setFormTypeOption('required', false)
                 ->setFormTypeOption('mapped', false); // Don't map to entity property
@@ -269,10 +269,10 @@ class PermissionService
             }
 
             // Create write permission field
-            $writeFieldName = 'userPermission_write_' . $user->getId();
+            $writeFieldName = 'userPermission_write_' . $userGroup->getId();
             $userWriteField = BooleanField::new($writeFieldName)
-                ->setLabel($user->getEmail() . ' (' . $this->translator->trans('Write') . ')')
-                ->setFormTypeOption('attr', ['data-user-id' => $user->getId()->toString()])
+                ->setLabel($userGroup->getEmail() . ' (' . $this->translator->trans('Write') . ')')
+                ->setFormTypeOption('attr', ['data-user-id' => $userGroup->getId()->toString()])
                 ->setFormTypeOption('attr', ['data-permission-type' => 'write'])
                 ->setFormTypeOption('required', false)
                 ->setFormTypeOption('mapped', false); // Don't map to entity property

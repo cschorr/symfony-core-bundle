@@ -298,6 +298,15 @@ class AppFixtures extends Fixture
                 'nameFirst' => 'User',
                 'userGroups' => ['External Users'],
             ],
+            'demo' => [
+                'email' => 'demo@example.com',
+                'active' => true,
+                'notes' => 'Demo user with limited access',
+                'category' => 'sub1', // Web Development
+                'nameLast' => 'Demo',
+                'nameFirst' => 'User',
+                'userGroups' => ['Editor'],
+            ],
         ];
 
         foreach ($usersData as $key => $userData) {
