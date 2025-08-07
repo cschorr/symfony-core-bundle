@@ -1,5 +1,5 @@
 <?php
-// src/Controller/Api/UserInfoController.php
+
 namespace App\Controller\Api;
 
 use App\Service\JWTUserService;
@@ -7,11 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 
+#[Route('/api', name: 'api_')]
 class UserInfoController extends AbstractController
 {
-    #[Route('/api/userinfo', name: 'api_userinfo', methods: ['POST'])]
+    #[Route('/userinfo', name: 'userinfo', methods: ['POST'])]
     public function userInfoFromToken(
         Request $request,
         JWTUserService $jwtUserService
@@ -45,6 +45,5 @@ class UserInfoController extends AbstractController
             'isActive' => method_exists($user, 'isActive') ? $user->isActive() : true,
             'isLocked' => method_exists($user, 'isLocked') ? $user->isLocked() : false,
         ]);
-
     }
 }

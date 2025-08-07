@@ -39,17 +39,24 @@ class SystemEntityRepository extends ServiceEntityRepository
 
     /**
      * Find all active system entities that a user group has any permission for.
-     *
+     * @param array<UserGroup> $userGroups
      * @return SystemEntity[]
      */
-    public function findActiveSystemEntitiesForUser(UserGroup $userGroup): array
+    public function findActiveSystemEntitiesForUser($userGroups): array
     {
+        if (empty($userGroups)) {
+            return [];
+        }
+
+        $userGroupIds = array_map(fn($group) => $group->getId(), $userGroups);
+
         return $this->createQueryBuilder('se')
+            ->distinct()
             ->join('se.userGroupPermissions', 'up')
-            ->andWhere('up.userGroup = :userGroup')
+            ->andWhere('up.userGroup IN (:userGroups)')
             ->andWhere('se.active = :active')
             ->andWhere('up.canRead = true OR up.canWrite = true')
-            ->setParameter('userGroup', $userGroup->getId(), 'uuid')
+            ->setParameter('userGroups', $userGroupIds)
             ->setParameter('active', true)
             ->orderBy('se.id', 'ASC')
             ->getQuery()

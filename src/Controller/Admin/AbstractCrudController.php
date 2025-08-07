@@ -24,8 +24,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractCrudController extends EasyAdminAbstractCrudController
 {
-    public function __construct(protected EntityManagerInterface $entityManager, protected TranslatorInterface $translator, protected PermissionService $permissionService, protected DuplicateService $duplicateService, protected RequestStack $requestStack)
-    {
+    public function __construct(
+        protected EntityManagerInterface $entityManager,
+        protected TranslatorInterface $translator,
+        protected PermissionService $permissionService,
+        protected DuplicateService $duplicateService,
+        protected RequestStack $requestStack,
+    ) {
     }
 
     /**
