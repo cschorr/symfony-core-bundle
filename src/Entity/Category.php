@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Repository\CategoryRepository;
@@ -19,6 +21,18 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ApiResource(
     shortName: 'Category',
     description: 'Nested categories.',
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationEnabled: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'title' => 'ASC',
+        'year' => 'DESC',
+    ],
 )]
 class Category extends AbstractEntity
 {
