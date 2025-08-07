@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\UserSystemEntityPermissionRepository;
+use App\Repository\UserGroupSystemEntityPermissionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserSystemEntityPermissionRepository::class)]
+#[ORM\Entity(repositoryClass: UserGroupSystemEntityPermissionRepository::class)]
 #[ORM\Table(name: 'usergroup_system_entity_permission')]
 #[ORM\UniqueConstraint(name: 'UNIQ_USER_SYSTEM_ENTITY', fields: ['userGroup', 'systemEntity'])]
 class UserGroupSystemEntityPermission extends AbstractEntity

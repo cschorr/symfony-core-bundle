@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Set\SetAddressTrait;
 use App\Entity\Traits\Set\SetCommunicationTrait;
@@ -15,7 +18,30 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationEnabled: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'companyGroup' => 'partial',
+        'projects' => 'partial',
+        'employees' => 'partial',
+        'name' => 'partial',
+        'city' => 'partial',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'title' => 'ASC',
+        'year' => 'DESC',
+    ],
+)]
 class Company extends AbstractEntity
 {
     use StringNameTrait;

@@ -44,6 +44,14 @@ class UserGroup extends AbstractEntity
      */
     public function getRoles(): ?array
     {
+        if ($this->roles === null) {
+            return null;
+        }
+
+        if ($this->roles instanceof Collection) {
+            return $this->roles->toArray();
+        }
+
         return $this->roles;
     }
 
@@ -76,6 +84,14 @@ class UserGroup extends AbstractEntity
     public function getUsers(): Collection
     {
         return $this->users;
+    }
+
+    /**
+     * @return array<int, User>
+     */
+    public function getUsersArray(): array
+    {
+        return $this->users->toArray();
     }
 
     public function addUser(User $user): static

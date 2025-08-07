@@ -13,6 +13,7 @@ use App\Entity\User;
 use App\Entity\UserGroup;
 use App\Entity\UserGroupSystemEntityPermission;
 use App\Enum\ProjectStatus;
+use App\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -27,8 +28,10 @@ class AppFixtures extends Fixture
     private array $companies = [];
     private array $contacts = [];
 
-    public function __construct(private readonly UserPasswordHasherInterface $hasher)
-    {
+    public function __construct(
+        private readonly UserPasswordHasherInterface $hasher,
+        private readonly UserGroupRepository $userGroupRepository,
+    ) {
     }
 
     public function load(ObjectManager $manager): void
@@ -257,6 +260,43 @@ class AppFixtures extends Fixture
                 'category' => 'main2', // Business Services
                 'nameLast' => 'Admin',
                 'nameFirst' => 'User',
+                'userGroups' => ['Admin'],
+            ],
+            'editor' => [
+                'email' => 'editor@example.com',
+                'active' => true,
+                'notes' => 'Demo user with limited access',
+                'category' => 'sub1', // Web Development
+                'nameLast' => 'Demo',
+                'nameFirst' => 'User',
+                'userGroups' => ['Editor'],
+            ],
+            'teamlead' => [
+                'email' => 'teamlead@example.com',
+                'active' => true,
+                'notes' => 'Senior developer specializing in mobile apps',
+                'category' => 'sub2', // Mobile Development
+                'nameLast' => 'Developer',
+                'nameFirst' => 'User',
+                'userGroups' => ['Teamlead'],
+            ],
+            'manager' => [
+                'email' => 'marketing@example.com',
+                'active' => true,
+                'notes' => 'Marketing specialist for digital campaigns',
+                'category' => 'sub6', // Digital Marketing
+                'nameLast' => 'Marketing',
+                'nameFirst' => 'User',
+                'userGroups' => ['Manager'],
+            ],
+            'external' => [
+                'email' => 'external@example.com',
+                'active' => true,
+                'notes' => 'Business consultant for process optimization',
+                'category' => 'main4', // Consulting
+                'nameLast' => 'Consultant',
+                'nameFirst' => 'User',
+                'userGroups' => ['External Users'],
             ],
             'demo' => [
                 'email' => 'demo@example.com',
@@ -265,35 +305,14 @@ class AppFixtures extends Fixture
                 'category' => 'sub1', // Web Development
                 'nameLast' => 'Demo',
                 'nameFirst' => 'User',
-            ],
-            'developer' => [
-                'email' => 'dev@example.com',
-                'active' => true,
-                'notes' => 'Senior developer specializing in mobile apps',
-                'category' => 'sub2', // Mobile Development
-                'nameLast' => 'Developer',
-                'nameFirst' => 'User',
-            ],
-            'marketing' => [
-                'email' => 'marketing@example.com',
-                'active' => true,
-                'notes' => 'Marketing specialist for digital campaigns',
-                'category' => 'sub6', // Digital Marketing
-                'nameLast' => 'Marketing',
-                'nameFirst' => 'User',
-            ],
-            'consultant' => [
-                'email' => 'consultant@example.com',
-                'active' => true,
-                'notes' => 'Business consultant for process optimization',
-                'category' => 'main4', // Consulting
-                'nameLast' => 'Consultant',
-                'nameFirst' => 'User',
+                'userGroups' => ['Editor'],
             ],
         ];
 
         foreach ($usersData as $key => $userData) {
             $category = $this->categories[$userData['category']] ?? null;
+            // get usergroups from entity manager
+            $userGroups = $this->userGroupRepository->findBy(['name' => $userData['userGroups']]);
 
             // Add error handling to debug missing categories
             if (!$category) {
@@ -313,7 +332,11 @@ class AppFixtures extends Fixture
                 ->setNotes($userData['notes'])
                 ->setNameLast($userData['nameLast'])
                 ->setNameFirst($userData['nameFirst'])
-                ->setCategory($category);
+                ->setCategory($category)
+            ;
+            foreach ($userGroups as $userGroup) {
+                $user->addUserGroup($userGroup);
+            }
 
             $manager->persist($user);
             $this->users[$key] = $user;

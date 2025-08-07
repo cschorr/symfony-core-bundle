@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Set\SetStartEndTrait;
 use App\Entity\Traits\Single\StringNameTrait;
@@ -13,7 +15,20 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationEnabled: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'title' => 'ASC',
+        'year' => 'DESC',
+    ],
+)]
 class Project extends AbstractEntity
 {
     use StringNameTrait;
