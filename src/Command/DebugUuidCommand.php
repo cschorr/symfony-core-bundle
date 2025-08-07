@@ -34,7 +34,7 @@ class DebugUuidCommand
         $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\SystemEntity::class);
         $permissionRepo = $this->entityManager->getRepository(\App\Entity\UserSystemEntityPermission::class);
 
-        $demoUser = $userRepo->findOneBy(['email' => 'editor@example.com']);
+        $demoUser = $userRepo->findOneBy(['email' => 'demo@example.com']);
         $companyEntity = $systemEntityRepo->findOneBy(['code' => 'Company']);
 
         if (!$demoUser || !$companyEntity) {
