@@ -53,7 +53,7 @@ security:
         - { path: ^/api/graphql/(graphiql|playground), roles: PUBLIC_ACCESS, methods: [ GET ] }
         - { path: ^/api/(index\.(jsonld|json|html|yaml|jsonopenapi|yamlopenapi))?$, roles: PUBLIC_ACCESS }
         - { path: ^/api/(docs|contexts)/, roles: PUBLIC_ACCESS }
-        - { path: ^/api/auth, roles: PUBLIC_ACCESS,  methods: [ POST ] }
+        - { path: ^/api/auth, roles: PUBLIC_ACCESS, methods: [ POST ] }
         # Alle anderen API-Routen erfordern Authentifizierung
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
         # Admin und Profil-Bereiche
