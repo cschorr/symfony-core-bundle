@@ -37,6 +37,9 @@ services:
         arguments: [ '@App\OpenApi\UserInfoDecorator.inner' ]
         autoconfigure: false
 
+    App\OpenApi\CustomOpenApiFactory:
+        decorates: 'api_platform.openapi.factory'
+
 # Twig configuration
 twig:
     globals:
