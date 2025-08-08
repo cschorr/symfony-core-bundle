@@ -13,19 +13,22 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        api:
-            pattern: ^/api/
+        api_auth:
+            pattern: ^/api/auth
             stateless: true
-            provider: app_user_provider
-            jwt: ~
-
-        main:
             json_login:
-                check_path: /auth # The name in routes.yaml is enough for mapping
+                check_path: /api/auth
                 username_path: email
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
+        main:
             lazy: true
             provider: app_user_provider
             form_login:
@@ -50,7 +53,7 @@ security:
         - { path: ^/api/graphql/(graphiql|playground), roles: PUBLIC_ACCESS, methods: [ GET ] }
         - { path: ^/api/(index\.(jsonld|json|html|yaml|jsonopenapi|yamlopenapi))?$, roles: PUBLIC_ACCESS }
         - { path: ^/api/(docs|contexts)/, roles: PUBLIC_ACCESS }
-        - { path: ^/auth, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth, roles: PUBLIC_ACCESS, methods: [ POST ] }
         # Alle anderen API-Routen erfordern Authentifizierung
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
         # Admin und Profil-Bereiche
