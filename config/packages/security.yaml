@@ -26,7 +26,10 @@ security:
         api:
             pattern: ^/api
             stateless: true
+            entry_point: jwt
             jwt: ~
+            refresh_jwt:
+                check_path: /api/token/refresh
 
         main:
             lazy: true
@@ -53,6 +56,7 @@ security:
         - { path: ^/api/graphql/(graphiql|playground), roles: PUBLIC_ACCESS, methods: [ GET ] }
         - { path: ^/api/(index\.(jsonld|json|html|yaml|jsonopenapi|yamlopenapi))?$, roles: PUBLIC_ACCESS }
         - { path: ^/api/(docs|contexts)/, roles: PUBLIC_ACCESS }
+        - { path: ^/api/(login|token/refresh), roles: PUBLIC_ACCESS }
         - { path: ^/api/auth, roles: PUBLIC_ACCESS, methods: [ POST ] }
         # Alle anderen API-Routen erfordern Authentifizierung
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
