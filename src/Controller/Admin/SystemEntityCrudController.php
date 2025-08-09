@@ -29,13 +29,13 @@ class SystemEntityCrudController extends AbstractCrudController
     use FieldConfigurationTrait;
 
     public function __construct(
-        EntityManagerInterface                            $entityManager,
-        TranslatorInterface                               $translator,
-        PermissionService                                 $permissionService,
-        DuplicateService                                  $duplicateService,
-        RequestStack                                      $requestStack,
-        private EasyAdminFieldService                     $fieldService,
-        private RelationshipSyncService                   $relationshipSyncService,
+        EntityManagerInterface $entityManager,
+        TranslatorInterface $translator,
+        PermissionService $permissionService,
+        DuplicateService $duplicateService,
+        RequestStack $requestStack,
+        private EasyAdminFieldService $fieldService,
+        private RelationshipSyncService $relationshipSyncService,
         private UserGroupSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);

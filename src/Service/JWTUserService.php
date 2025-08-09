@@ -12,7 +12,8 @@ class JWTUserService
     public function __construct(
         private JWTTokenManagerInterface $jwtManager,
         private UserRepository $userRepository
-    ) {}
+    ) {
+    }
 
     public function getUserFromToken(string $token): ?UserInterface
     {
