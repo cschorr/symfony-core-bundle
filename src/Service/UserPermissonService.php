@@ -34,5 +34,4 @@ class UserPermissonService
 
         return $permission && $permission->canWrite();
     }
-
 }

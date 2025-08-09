@@ -19,8 +19,8 @@ class SystemEntityVoter extends Voter
 {
     public function __construct(
         private readonly UserGroupSystemEntityPermissionRepository $permissionRepository,
-        private readonly SystemEntityRepository                    $systemEntityRepository,
-        private readonly LoggerInterface                           $logger,
+        private readonly SystemEntityRepository $systemEntityRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

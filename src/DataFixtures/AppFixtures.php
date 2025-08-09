@@ -317,7 +317,8 @@ class AppFixtures extends Fixture
             // Add error handling to debug missing categories
             if (!$category) {
                 throw new \Exception(
-                    sprintf('Category "%s" not found for user "%s". Available categories: %s',
+                    sprintf(
+                        'Category "%s" not found for user "%s". Available categories: %s',
                         $userData['category'],
                         $key,
                         implode(', ', array_keys($this->categories))

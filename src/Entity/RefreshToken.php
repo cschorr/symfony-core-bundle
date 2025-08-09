@@ -12,5 +12,4 @@ use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken as BaseRefreshToken;
 #[Table(name: "refresh_tokens")]
 class RefreshToken extends BaseRefreshToken
 {
-    //...
 }

@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-enum SystemEntity: string {
-
+enum SystemEntity: string
+{
 }
