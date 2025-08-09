@@ -8,7 +8,9 @@ use ApiPlatform\OpenApi\OpenApi;
 
 final class CustomOpenApiFactory implements OpenApiFactoryInterface
 {
-    public function __construct(private OpenApiFactoryInterface $decorated) {}
+    public function __construct(private OpenApiFactoryInterface $decorated)
+    {
+    }
 
     public function __invoke(array $context = []): OpenApi
     {
