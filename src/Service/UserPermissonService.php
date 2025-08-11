@@ -6,7 +6,7 @@ use App\Entity\DomainEntityPermission;
 use App\Entity\User;
 use App\Repository\UserGroupDomainEntityPermissionRepository;
 
-class UserPermissonService
+class UserPermissionService
 {
     public function __construct(
         private readonly UserGroupDomainEntityPermissionRepository $userGroupSystemEntityPermissionRepository,
