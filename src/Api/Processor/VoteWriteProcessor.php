@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Api\Processor;
+
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProcessorInterface;
+use App\Entity\Vote;
+use App\Repository\VoteRepository;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+
+final class VoteWriteProcessor implements ProcessorInterface
+{
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
+        private ProcessorInterface $persistProcessor,
+        private Security $security,
+        #[Autowire(service: 'limiter.votes_per_10m')]
+        private RateLimiterFactory $votesLimiter,
+        private VoteRepository $votes
+    ) {}
+
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+    {
+        if ($data instanceof Vote) {
+            $user = $this->security->getUser();
+
+            $limit = $this->votesLimiter->create($user->getUserIdentifier())->consume(1);
+            if (!$limit->isAccepted()) {
+                $retry = $limit->getRetryAfter()?->getTimestamp();
+                throw new TooManyRequestsHttpException($retry ? max(1, $retry - time()) : null, 'Vote rate limit exceeded');
+            }
+
+            $data->setVoter($user);
+
+            if (!\in_array($data->getValue(), [-1, 1], true)) {
+                throw new BadRequestHttpException('value must be -1 or 1');
+            }
+
+            // „POST wenn schon vorhanden“ → als Update behandeln
+            $existing = $this->votes->findOneBy(['comment' => $data->getComment(), 'voter' => $user]);
+            if ($existing && $existing !== $data) {
+                $existing->setValue($data->getValue());
+                return $this->persistProcessor->process($existing, $operation, $uriVariables, $context);
+            }
+        }
+
+        return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+    }
+}
