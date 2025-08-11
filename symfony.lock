@@ -126,18 +126,6 @@
             "src/Entity/RefreshToken.php"
         ]
     },
-    "jawira/doctrine-diagram-bundle": {
-        "version": "1.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "1.0",
-            "ref": "85fa28662e332ab5da7a48802517e8313500add5"
-        },
-        "files": [
-            "config/packages/doctrine_diagram.yaml"
-        ]
-    },
     "lexik/jwt-authentication-bundle": {
         "version": "3.1",
         "recipe": {
