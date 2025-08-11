@@ -113,7 +113,6 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "friendsofphp/php-cs-fixer": "^3.84",
-        "jawira/doctrine-diagram-bundle": "^1.0",
         "phpstan/phpstan": "*",
         "phpunit/phpunit": "^12.2",
         "rector/rector": "^2.1",
