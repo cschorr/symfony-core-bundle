@@ -129,7 +129,7 @@ class DashboardController extends AbstractDashboardController
                 $icon = $this->navigationService->getSystemEntityIcon($systemEntity);
 
                 // Use the system entity name (plural form) for navigation labels
-                // This corresponds to the "name" field in the SystemEntity entity (e.g., "Users", "Companies")
+                // This corresponds to the "name" field in the DomainEntityPermission entity (e.g., "Users", "Companies")
                 $systemEntityNamePlural = $systemEntity->getName();
                 $label = $this->translator->trans($systemEntityNamePlural);
 

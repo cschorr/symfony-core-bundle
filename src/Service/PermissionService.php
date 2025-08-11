@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\SystemEntity;
+use App\Entity\DomainEntityPermission;
 use App\Entity\UserGroup;
-use App\Entity\UserGroupSystemEntityPermission;
-use App\Repository\SystemEntityRepository;
-use App\Repository\UserGroupSystemEntityPermissionRepository;
+use App\Entity\UserGroupDomainEntityPermission;
+use App\Repository\DomainEntityRepository;
+use App\Repository\UserGroupDomainEntityPermissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -18,17 +18,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PermissionService
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly SystemEntityRepository $systemEntityRepository,
-        private readonly UserGroupSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
-        private readonly TranslatorInterface $translator,
+        private readonly EntityManagerInterface                    $entityManager,
+        private readonly DomainEntityRepository                    $systemEntityRepository,
+        private readonly UserGroupDomainEntityPermissionRepository $userSystemEntityPermissionRepository,
+        private readonly TranslatorInterface                       $translator,
     ) {
     }
 
     /**
      * Get system entity by code.
      */
-    public function getSystemEntityByCode(string $code): ?SystemEntity
+    public function getSystemEntityByCode(string $code): ?DomainEntityPermission
     {
         return $this->systemEntityRepository->findOneBy(['code' => $code]);
     }
@@ -47,7 +47,7 @@ class PermissionService
             if ($entity && $entity->getId()) {
                 $permission = $this->userSystemEntityPermissionRepository->findOneBy([
                     'userGroup' => $entity,
-                    'systemEntity' => $systemEntity,
+                    'domainEntityPermission' => $systemEntity,
                 ]);
             }
 
@@ -96,7 +96,7 @@ class PermissionService
         }
 
         // Create a tab for permissions using FormField::addTab
-        $permissionTab = FormField::addTab($this->translator->trans('SystemEntity Permissions'), 'fas fa-shield-alt');
+        $permissionTab = FormField::addTab($this->translator->trans('DomainEntityPermission Permissions'), 'fas fa-shield-alt');
 
         // Add the tab first, then the permission fields
         $fields[] = $permissionTab;
@@ -139,15 +139,15 @@ class PermissionService
             // Find existing permission
             $permission = $this->userSystemEntityPermissionRepository->findOneBy([
                 'userGroup' => $userGroup,
-                'systemEntity' => $systemEntity,
+                'domainEntityPermission' => $systemEntity,
             ]);
 
             // Create or update permission
             if ($hasReadPermission || $hasWritePermission) {
                 if (null === $permission) {
-                    $permission = new UserGroupSystemEntityPermission();
+                    $permission = new UserGroupDomainEntityPermission();
                     $permission->setUserGroup($userGroup);
-                    $permission->setSystemEntity($systemEntity);
+                    $permission->setDomainEntityPermission($systemEntity);
                 }
 
                 $permission->setCanRead($hasReadPermission);
@@ -164,11 +164,11 @@ class PermissionService
     /**
      * Check if user can read system entity.
      */
-    public function canUserReadSystemEntity(UserGroup $userGroup, SystemEntity $systemEntity): bool
+    public function canUserReadSystemEntity(UserGroup $userGroup, DomainEntityPermission $systemEntity): bool
     {
         $permission = $this->userSystemEntityPermissionRepository->findOneBy([
             'userGroup' => $userGroup,
-            'systemEntity' => $systemEntity,
+            'domainEntityPermission' => $systemEntity,
         ]);
 
         return $permission && $permission->canRead();
@@ -177,18 +177,18 @@ class PermissionService
     /**
      * Check if user can write system entity.
      */
-    public function canUserWriteSystemEntity(UserGroup $userGroup, SystemEntity $systemEntity): bool
+    public function canUserWriteSystemEntity(UserGroup $userGroup, DomainEntityPermission $systemEntity): bool
     {
         $permission = $this->userSystemEntityPermissionRepository->findOneBy([
             'userGroup' => $userGroup,
-            'systemEntity' => $systemEntity,
+            'domainEntityPermission' => $systemEntity,
         ]);
 
         return $permission && $permission->canWrite();
     }
 
     /**
-     * Add permission tab to fields for SystemEntity (shows user permissions for this system entity).
+     * Add permission tab to fields for DomainEntityPermission (shows user permissions for this system entity).
      */
     public function addSystemEntityPermissionTabToFields(array $fields): array
     {
@@ -230,9 +230,9 @@ class PermissionService
     }
 
     /**
-     * Create SystemEntity permission fields with proper data binding.
+     * Create DomainEntityPermission permission fields with proper data binding.
      */
-    public function addSystemEntityPermissionTabToFieldsWithEntity(array $fields, ?SystemEntity $entity = null): array
+    public function addSystemEntityPermissionTabToFieldsWithEntity(array $fields, ?DomainEntityPermission $entity = null): array
     {
         // Get all users to create permission fields
         $userGroups = $this->entityManager->getRepository(UserGroup::class)->findAll();
@@ -251,7 +251,7 @@ class PermissionService
                 $permission = $this->userSystemEntityPermissionRepository
                     ->findOneBy([
                         'userGroup' => $userGroup,
-                        'systemEntity' => $entity,
+                        'domainEntityPermission' => $entity,
                     ]);
             }
 
@@ -304,7 +304,7 @@ class PermissionService
                     return $this->translator->trans('No User');
                 }
 
-                $permissions = $entity->getSystemEntityPermissions();
+                $permissions = $entity->getUserGroupDomainEntityPermissions();
 
                 if ($permissions->isEmpty()) {
                     return $this->translator->trans('No permissions assigned');

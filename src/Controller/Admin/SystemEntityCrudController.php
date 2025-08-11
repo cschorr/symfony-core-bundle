@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\Admin\Traits\FieldConfigurationTrait;
-use App\Entity\SystemEntity;
+use App\Entity\DomainEntityPermission;
 use App\Entity\User;
 use App\Entity\UserSystemEntityPermission;
-use App\Repository\UserGroupSystemEntityPermissionRepository;
+use App\Repository\UserGroupDomainEntityPermissionRepository;
 use App\Service\DuplicateService;
 use App\Service\EasyAdminFieldService;
 use App\Service\PermissionService;
@@ -29,21 +29,21 @@ class SystemEntityCrudController extends AbstractCrudController
     use FieldConfigurationTrait;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        TranslatorInterface $translator,
-        PermissionService $permissionService,
-        DuplicateService $duplicateService,
-        RequestStack $requestStack,
-        private EasyAdminFieldService $fieldService,
-        private RelationshipSyncService $relationshipSyncService,
-        private UserGroupSystemEntityPermissionRepository $userSystemEntityPermissionRepository,
+        EntityManagerInterface                            $entityManager,
+        TranslatorInterface                               $translator,
+        PermissionService                                 $permissionService,
+        DuplicateService                                  $duplicateService,
+        RequestStack                                      $requestStack,
+        private EasyAdminFieldService                     $fieldService,
+        private RelationshipSyncService                   $relationshipSyncService,
+        private UserGroupDomainEntityPermissionRepository $userSystemEntityPermissionRepository,
     ) {
         parent::__construct($entityManager, $translator, $permissionService, $duplicateService, $requestStack);
     }
 
     public static function getEntityFqcn(): string
     {
-        return SystemEntity::class;
+        return DomainEntityPermission::class;
     }
 
     #[\Override]
@@ -51,35 +51,35 @@ class SystemEntityCrudController extends AbstractCrudController
     {
         return parent::configureCrud($crud)
             ->setPageTitle('index', $this->translator->trans('System Entities'))
-            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('SystemEntity'), $entity->getName()))
+            ->setPageTitle('detail', fn ($entity) => sprintf('%s: %s', $this->translator->trans('DomainEntityPermission'), $entity->getName()))
             ->setPageTitle('new', $this->translator->trans('Create System Entity'))
             ->setHelp('index', $this->translator->trans('Manage system entities and their permissions.'));
     }
 
-    #[IsGranted('read', subject: 'SystemEntity')]
+    #[IsGranted('read', subject: 'DomainEntityPermission')]
     #[\Override]
-    public function index(AdminContext $context, string $SystemEntity = 'SystemEntity'): KeyValueStore|Response
+    public function index(AdminContext $context, string $SystemEntity = 'DomainEntityPermission'): KeyValueStore|Response
     {
         return parent::index($context);
     }
 
-    #[IsGranted('read', subject: 'SystemEntity')]
+    #[IsGranted('read', subject: 'DomainEntityPermission')]
     #[\Override]
-    public function detail(AdminContext $context, string $SystemEntity = 'SystemEntity'): KeyValueStore|Response
+    public function detail(AdminContext $context, string $SystemEntity = 'DomainEntityPermission'): KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
-    #[IsGranted('write', subject: 'SystemEntity')]
+    #[IsGranted('write', subject: 'DomainEntityPermission')]
     #[\Override]
-    public function edit(AdminContext $context, string $SystemEntity = 'SystemEntity'): KeyValueStore|Response
+    public function edit(AdminContext $context, string $SystemEntity = 'DomainEntityPermission'): KeyValueStore|Response
     {
         return parent::edit($context);
     }
 
-    #[IsGranted('write', subject: 'SystemEntity')]
+    #[IsGranted('write', subject: 'DomainEntityPermission')]
     #[\Override]
-    public function delete(AdminContext $context, string $SystemEntity = 'SystemEntity'): KeyValueStore|Response
+    public function delete(AdminContext $context, string $SystemEntity = 'DomainEntityPermission'): KeyValueStore|Response
     {
         return parent::delete($context);
     }
@@ -91,7 +91,7 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     /**
-     * Get field configuration for SystemEntity entity.
+     * Get field configuration for DomainEntityPermission entity.
      */
     #[\Override]
     public function configureFields(string $pageName): iterable
@@ -107,7 +107,7 @@ class SystemEntityCrudController extends AbstractCrudController
             $context = $this->getContext();
             if ($context && $context->getEntity()) {
                 $entityInstance = $context->getEntity()->getInstance();
-                if ($entityInstance instanceof SystemEntity) {
+                if ($entityInstance instanceof DomainEntityPermission) {
                     $entity = $entityInstance;
                 }
             }
@@ -135,7 +135,7 @@ class SystemEntityCrudController extends AbstractCrudController
     }
 
     /**
-     * Get field configuration for SystemEntity entity.
+     * Get field configuration for DomainEntityPermission entity.
      */
     private function getFieldConfiguration(string $pageName): array
     {
@@ -197,8 +197,8 @@ class SystemEntityCrudController extends AbstractCrudController
                 $this->fieldService->field('code')
                     ->type('text')
                     ->label('Code')
-                    ->help('Unique code that matches the entity name (e.g., User, Company, SystemEntity)')
-                    ->formTypeOption('attr', ['placeholder' => 'e.g., User, Company, SystemEntity'])
+                    ->help('Unique code that matches the entity name (e.g., User, Company, DomainEntityPermission)')
+                    ->formTypeOption('attr', ['placeholder' => 'e.g., User, Company, DomainEntityPermission'])
                     ->build(),
 
                 $this->fieldService->field('icon')
@@ -309,7 +309,7 @@ class SystemEntityCrudController extends AbstractCrudController
      */
     private function processSystemEntityPermissions($systemEntity): void
     {
-        if (!$systemEntity instanceof SystemEntity) {
+        if (!$systemEntity instanceof DomainEntityPermission) {
             return;
         }
 
@@ -334,7 +334,7 @@ class SystemEntityCrudController extends AbstractCrudController
             $permission = $this->userSystemEntityPermissionRepository
                 ->findOneBy([
                     'user' => $user,
-                    'systemEntity' => $systemEntity,
+                    'domainEntityPermission' => $systemEntity,
                 ]);
 
             if ($canRead || $canWrite) {

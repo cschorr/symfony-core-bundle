@@ -7,13 +7,13 @@ namespace App\Entity;
 use App\Entity\Traits\Single\StringCodeTrait;
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Entity\Traits\Single\StringTextTrait;
-use App\Repository\SystemEntityRepository;
+use App\Repository\DomainEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SystemEntityRepository::class)]
-class SystemEntity extends AbstractEntity
+#[ORM\Entity(repositoryClass: DomainEntityRepository::class)]
+class DomainEntityPermission extends AbstractEntity
 {
     use StringNameTrait;
     use StringTextTrait;
@@ -23,9 +23,9 @@ class SystemEntity extends AbstractEntity
     private ?string $icon = null;
 
     /**
-     * @var Collection<int, UserGroupSystemEntityPermission>
+     * @var Collection<int, UserGroupDomainEntityPermission>
      */
-    #[ORM\OneToMany(targetEntity: UserGroupSystemEntityPermission::class, mappedBy: 'systemEntity', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: UserGroupDomainEntityPermission::class, mappedBy: 'domainEntityPermission', cascade: ['persist', 'remove'])]
     private Collection $userGroupPermissions;
 
     public function __construct()
@@ -37,33 +37,33 @@ class SystemEntity extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->getName() ?? 'Unnamed SystemEntity';
+        return $this->getName() ?? 'Unnamed DomainEntityPermission';
     }
 
     /**
-     * @return Collection<int, UserGroupSystemEntityPermission>
+     * @return Collection<int, UserGroupDomainEntityPermission>
      */
     public function getUserGroupPermissions(): Collection
     {
         return $this->userGroupPermissions;
     }
 
-    public function addUserPermission(UserGroupSystemEntityPermission $userGroupPermission): static
+    public function addUserPermission(UserGroupDomainEntityPermission $userGroupPermission): static
     {
         if (!$this->userGroupPermissions->contains($userGroupPermission)) {
             $this->userGroupPermissions->add($userGroupPermission);
-            $userGroupPermission->setSystemEntity($this);
+            $userGroupPermission->setDomainEntityPermission($this);
         }
 
         return $this;
     }
 
-    public function removeUserPermission(UserGroupSystemEntityPermission $userGroupPermission): static
+    public function removeUserPermission(UserGroupDomainEntityPermission $userGroupPermission): static
     {
         if ($this->userGroupPermissions->removeElement($userGroupPermission)) {
             // set the owning side to null (unless already changed)
-            if ($userGroupPermission->getSystemEntity() === $this) {
-                $userGroupPermission->setSystemEntity(null);
+            if ($userGroupPermission->getDomainEntityPermission() === $this) {
+                $userGroupPermission->setDomainEntityPermission(null);
             }
         }
 

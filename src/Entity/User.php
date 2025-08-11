@@ -47,13 +47,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[Groups(['user:read', 'user:write'])]
     private ?Company $company = null;
 
-    /**
-     * @var Collection<int, UserGroupSystemEntityPermission>
-     */
-    #[ORM\OneToMany(targetEntity: UserGroupSystemEntityPermission::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
-    #[Groups(['user:read'])]
-    private Collection $systemEntityPermissions;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
     private ?Category $category = null;
@@ -80,7 +73,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         parent::__construct();
         $this->projects = new ArrayCollection();
-        $this->systemEntityPermissions = new ArrayCollection();
         $this->userGroups = new ArrayCollection();
     }
 
@@ -194,98 +186,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->company = $company;
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, UserGroupSystemEntityPermission>
-     */
-    public function getSystemEntityPermissions(): Collection
-    {
-        return $this->systemEntityPermissions;
-    }
-
-    public function addSystemEntityPermission(UserGroupSystemEntityPermission $systemEntityPermission): static
-    {
-        if (!$this->systemEntityPermissions->contains($systemEntityPermission)) {
-            $this->systemEntityPermissions->add($systemEntityPermission);
-            $systemEntityPermission->setUserGroup($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSystemEntityPermission(UserGroupSystemEntityPermission $systemEntityPermission): static
-    {
-        if ($this->systemEntityPermissions->removeElement($systemEntityPermission)) {
-            // set the owning side to null (unless already changed)
-            if ($systemEntityPermission->getUserGroup() === $this) {
-                $systemEntityPermission->setUserGroup(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Check if user has read access to a system entity.
-     */
-    public function hasReadAccessToSystemEntity(SystemEntity $systemEntity): bool
-    {
-        foreach ($this->systemEntityPermissions as $permission) {
-            if ($permission->getSystemEntity() === $systemEntity && $permission->canRead()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if user has write access to a system entity.
-     */
-    public function hasWriteAccessToSystemEntity(SystemEntity $systemEntity): bool
-    {
-        foreach ($this->systemEntityPermissions as $permission) {
-            if ($permission->getSystemEntity() === $systemEntity && $permission->canWrite()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Get all system entities user has read access to.
-     *
-     * @return SystemEntity[]
-     */
-    public function getReadableSystemEntities(): array
-    {
-        $systemEntities = [];
-        foreach ($this->systemEntityPermissions as $permission) {
-            if ($permission->canRead()) {
-                $systemEntities[] = $permission->getSystemEntity();
-            }
-        }
-
-        return $systemEntities;
-    }
-
-    /**
-     * Get all system entities user has write access to.
-     *
-     * @return SystemEntity[]
-     */
-    public function getWritableSystemEntities(): array
-    {
-        $systemEntities = [];
-        foreach ($this->systemEntityPermissions as $permission) {
-            if ($permission->canWrite()) {
-                $systemEntities[] = $permission->getSystemEntity();
-            }
-        }
-
-        return $systemEntities;
     }
 
     public function getCategory(): ?Category
