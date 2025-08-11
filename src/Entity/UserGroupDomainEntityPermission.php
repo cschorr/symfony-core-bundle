@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\UserGroupSystemEntityPermissionRepository;
+use App\Repository\UserGroupDomainEntityPermissionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserGroupSystemEntityPermissionRepository::class)]
+#[ORM\Entity(repositoryClass: UserGroupDomainEntityPermissionRepository::class)]
 #[ORM\Table(name: 'usergroup_system_entity_permission')]
-#[ORM\UniqueConstraint(name: 'UNIQ_USER_SYSTEM_ENTITY', fields: ['userGroup', 'systemEntity'])]
-class UserGroupSystemEntityPermission extends AbstractEntity
+#[ORM\UniqueConstraint(name: 'UNIQ_USER_SYSTEM_ENTITY', fields: ['userGroup', 'domainEntityPermission'])]
+class UserGroupDomainEntityPermission extends AbstractEntity
 {
-    #[ORM\ManyToOne(targetEntity: UserGroup::class, inversedBy: 'systemEntityPermissions')]
+    #[ORM\ManyToOne(targetEntity: UserGroup::class, inversedBy: 'userGroupDomainEntityPermissions')]
     #[ORM\JoinColumn(name: 'usergroup_id', nullable: false)]
     private ?UserGroup $userGroup = null;
 
-    #[ORM\ManyToOne(targetEntity: SystemEntity::class, inversedBy: 'userGroupPermissions')]
+    #[ORM\ManyToOne(targetEntity: DomainEntityPermission::class, inversedBy: 'userGroupPermissions')]
     #[ORM\JoinColumn(name: 'system_entity_id', nullable: false)]
-    private ?SystemEntity $systemEntity = null;
+    private ?DomainEntityPermission $domainEntityPermission = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
     private bool $canRead = false;
@@ -40,7 +40,7 @@ class UserGroupSystemEntityPermission extends AbstractEntity
         return sprintf(
             '%s - %s (R:%s, W:%s)',
             $this->userGroup?->getName() ?? 'Unknown UserGroup',
-            $this->systemEntity?->getName() ?? 'Unknown SystemEntity',
+            $this->domainEntityPermission?->getName() ?? 'Unknown DomainEntityPermission',
             $this->canRead ? 'Y' : 'N',
             $this->canWrite ? 'Y' : 'N'
         );
@@ -58,14 +58,14 @@ class UserGroupSystemEntityPermission extends AbstractEntity
         return $this;
     }
 
-    public function getSystemEntity(): ?SystemEntity
+    public function getDomainEntityPermission(): ?DomainEntityPermission
     {
-        return $this->systemEntity;
+        return $this->domainEntityPermission;
     }
 
-    public function setSystemEntity(?SystemEntity $systemEntity): static
+    public function setDomainEntityPermission(?DomainEntityPermission $domainEntityPermission): static
     {
-        $this->systemEntity = $systemEntity;
+        $this->domainEntityPermission = $domainEntityPermission;
 
         return $this;
     }

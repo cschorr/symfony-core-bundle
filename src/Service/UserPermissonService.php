@@ -2,21 +2,21 @@
 
 namespace App\Service;
 
-use App\Entity\SystemEntity;
+use App\Entity\DomainEntityPermission;
 use App\Entity\User;
-use App\Repository\UserGroupSystemEntityPermissionRepository;
+use App\Repository\UserGroupDomainEntityPermissionRepository;
 
 class UserPermissonService
 {
     public function __construct(
-        private readonly UserGroupSystemEntityPermissionRepository $userGroupSystemEntityPermissionRepository,
+        private readonly UserGroupDomainEntityPermissionRepository $userGroupSystemEntityPermissionRepository,
     ) {
     }
 
     /**
      * Check if user has read access to a system entity.
      */
-    public function userHasReadAccess(User $user, SystemEntity $systemEntity): bool
+    public function userHasReadAccess(User $user, DomainEntityPermission $systemEntity): bool
     {
         foreach ($user->getUserGroups() as $userGroup) {
             $permission[] = $this->userGroupSystemEntityPermissionRepository->findByUserGroupAndSystemEntity($userGroup, $systemEntity);
@@ -28,7 +28,7 @@ class UserPermissonService
     /**
      * Check if user has write access to a system entity.
      */
-    public function userHasWriteAccess(User $user, SystemEntity $systemEntity): bool
+    public function userHasWriteAccess(User $user, DomainEntityPermission $systemEntity): bool
     {
         $permission = $this->userGroupSystemEntityPermissionRepository->findByUserGroupAndSystemEntity($user, $systemEntity);
 

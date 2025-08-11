@@ -10,6 +10,7 @@ use App\Repository\UserGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserGroupRepository::class)]
 #[ApiResource]
@@ -33,9 +34,17 @@ class UserGroup extends AbstractEntity
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'userGroups')]
     private Collection $users;
 
+    /**
+     * @var Collection<int, UserGroupDomainEntityPermission>
+     */
+    #[ORM\OneToMany(targetEntity: UserGroupDomainEntityPermission::class, mappedBy: 'userGroup', cascade: ['persist', 'remove'])]
+    #[Groups(['user:read'])]
+    private Collection $userGroupDomainEntityPermissions;
+
     public function __construct()
     {
         parent::__construct();
+        $this->userGroupDomainEntityPermissions = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
 

@@ -8,10 +8,10 @@ use App\Entity\Category;
 use App\Entity\Company;
 use App\Entity\Contact;
 use App\Entity\Project;
-use App\Entity\SystemEntity;
+use App\Entity\DomainEntityPermission;
 use App\Entity\User;
 use App\Entity\UserGroup;
-use App\Entity\UserGroupSystemEntityPermission;
+use App\Entity\UserGroupDomainEntityPermission;
 use App\Enum\ProjectStatus;
 use App\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -23,7 +23,7 @@ class AppFixtures extends Fixture
     private const DEFAULT_PASSWORD = 'pass_1234';
     private array $users = [];
     private array $userGroups = [];
-    private array $systemEntities = [];
+    private array $domainEntityPermission = [];
     private array $categories = [];
     private array $companies = [];
     private array $contacts = [];
@@ -37,7 +37,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // Order is important for dependencies
-        $this->createSystemEntityFixtures($manager);
+        $this->createDomainEntityFixtures($manager);
         $this->createCategoryFixtures($manager);
         $this->createUserGroupFixtures($manager);
         $this->createUserFixtures($manager);
@@ -47,10 +47,10 @@ class AppFixtures extends Fixture
         $this->createProjectFixtures($manager);
     }
 
-    private function createSystemEntityFixtures(ObjectManager $manager): void
+    private function createDomainEntityFixtures(ObjectManager $manager): void
     {
-        $systemEntitiesData = [
-            'SystemEntity' => [
+        $domainEntityData = [
+            'DomainEntityPermission' => [
                 'name' => 'SystemEntities',
                 'text' => 'System entities and configuration',
                 'icon' => 'fas fa-list',
@@ -92,15 +92,15 @@ class AppFixtures extends Fixture
             ],
         ];
 
-        foreach ($systemEntitiesData as $code => $data) {
-            $systemEntity = (new SystemEntity())
+        foreach ($domainEntityData as $code => $data) {
+            $domainEntityPermission = (new DomainEntityPermission())
                 ->setName($data['name'])
                 ->setCode($code)
                 ->setText($data['text'])
                 ->setIcon($data['icon']);
 
-            $manager->persist($systemEntity);
-            $this->systemEntities[$code] = $systemEntity;
+            $manager->persist($domainEntityPermission);
+            $this->domainEntityPermission[$code] = $domainEntityPermission;
         }
 
         $manager->flush();
@@ -353,7 +353,7 @@ class AppFixtures extends Fixture
             'User' => ['read' => true, 'write' => true],
             'UserGroup' => ['read' => true, 'write' => true],
             'Company' => ['read' => true, 'write' => true],
-            'SystemEntity' => ['read' => true, 'write' => true],
+            'DomainEntityPermission' => ['read' => true, 'write' => true],
             'CompanyGroup' => ['read' => true, 'write' => true],
             'Project' => ['read' => true, 'write' => true],
             'Category' => ['read' => true, 'write' => true],
@@ -404,19 +404,19 @@ class AppFixtures extends Fixture
     private function createUserGroupPermissions(ObjectManager $manager, UserGroup $userGroup, array $permissions): void
     {
         foreach ($permissions as $entityCode => $rights) {
-            $systemEntity = $this->systemEntities[$entityCode] ?? null;
-            if (!$systemEntity) {
+            $domainEntityPermission = $this->domainEntityPermission[$entityCode] ?? null;
+            if (!$domainEntityPermission) {
                 continue;
             }
 
             // Check if permission already exists
-            $existingPermission = $manager->getRepository(UserGroupSystemEntityPermission::class)
-                ->findOneBy(['userGroup' => $userGroup, 'systemEntity' => $systemEntity]);
+            $existingPermission = $manager->getRepository(UserGroupDomainEntityPermission::class)
+                ->findOneBy(['userGroup' => $userGroup, 'domainEntityPermission' => $domainEntityPermission]);
 
             if (!$existingPermission) {
-                $permission = (new UserGroupSystemEntityPermission())
+                $permission = (new UserGroupDomainEntityPermission())
                     ->setUserGroup($userGroup)
-                    ->setSystemEntity($systemEntity)
+                    ->setDomainEntityPermission($domainEntityPermission)
                     ->setCanRead($rights['read'])
                     ->setCanWrite($rights['write']);
 

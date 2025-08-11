@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-enum SystemEntityPermission: string
+enum Permission: string
 {
     case READ = 'read';
     case WRITE = 'write';

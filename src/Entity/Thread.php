@@ -5,7 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata as API;
 use App\Entity\Traits\Single\BoolActiveTrait;
 use App\Entity\Traits\Single\UuidTrait;
-use App\Enum\SystemEntity;
+use App\Enum\DomainEntityType;
 use App\Repository\ThreadRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,10 +30,10 @@ class Thread
     use UuidTrait;
     use BoolActiveTrait;
 
-    #[ORM\Column(type: Types::STRING, enumType: SystemEntity::class)]
+    #[ORM\Column(type: Types::STRING, enumType: DomainEntityType::class)]
     #[Assert\NotBlank]
     #[Groups(['thread:read','thread:write','comment:read'])]
-    private SystemEntity $resourceType;
+    private DomainEntityType $resourceType;
 
     #[ORM\Column(length: 128)]
     #[Groups(['thread:read','thread:write','comment:read'])]
@@ -43,8 +43,8 @@ class Thread
     #[Groups(['thread:read','thread:write'])]
     private ?string $title = null;
 
-    public function getResourceType(): SystemEntity { return $this->resourceType; }
-    public function setResourceType(SystemEntity $v): self { $this->resourceType = $v; return $this; }
+    public function getResourceType(): DomainEntityType { return $this->resourceType; }
+    public function setResourceType(DomainEntityType $v): self { $this->resourceType = $v; return $this; }
     public function getResourceId(): string { return $this->resourceId; }
     public function setResourceId(string $v): self { $this->resourceId = $v; return $this; }
     public function getTitle(): ?string { return $this->title; }
