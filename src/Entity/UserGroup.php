@@ -6,11 +6,14 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Single\StringNameTrait;
+use App\Enum\UserRole;
 use App\Repository\UserGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserGroupRepository::class)]
 #[ApiResource]
@@ -19,9 +22,13 @@ class UserGroup extends AbstractEntity
     use StringNameTrait;
 
     /**
-     * @var array<string>|null
+     * Stored as list of strings in DB; use helper methods to work with enums.
+     *
+     * @var list<string>|null
      */
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Assert\Choice(callback: [UserRole::class, 'values'], multiple: true)]
+    #[Assert\Unique]
     private ?array $roles = null;
 
     #[ORM\ManyToOne]
@@ -49,28 +56,57 @@ class UserGroup extends AbstractEntity
     }
 
     /**
-     * @return string[]|null
+     * String roles (for backward compatibility).
+     *
+     * @return list<string>
      */
-    public function getRoles(): ?array
+    public function getRoles(): array
     {
-        if ($this->roles === null) {
-            return null;
-        }
-
-        if ($this->roles instanceof Collection) {
-            return $this->roles->toArray();
-        }
-
-        return $this->roles;
+        return array_values(array_unique($this->roles ?? []));
     }
 
     /**
-     * @param array<string>|null $roles
-     * @return $this
+     * Accept strings or enums and store as strings.
+     *
+     * @param list<string|UserRole>|null $roles
      */
     public function setRoles(?array $roles): static
     {
-        $this->roles = $roles;
+        if ($roles === null) {
+            $this->roles = null;
+            return $this;
+        }
+
+        $this->roles = array_values(array_unique(array_map(
+            static fn(string|UserRole $r) => $r instanceof UserRole ? $r->value : (string) $r,
+            $roles
+        )));
+
+        return $this;
+    }
+
+    /**
+     * Enum roles access.
+     *
+     * @return list<UserRole>
+     */
+    #[Ignore]
+    public function getRoleEnums(): array
+    {
+        $stored = $this->roles ?? [];
+        return array_values(
+            array_map(static fn(string $r) => UserRole::from($r), $stored)
+        );
+    }
+
+    /**
+     * Replace roles using enums.
+     *
+     * @param list<UserRole> $roles
+     */
+    public function setRolesFromEnums(array $roles): static
+    {
+        $this->roles = array_values(array_unique(array_map(static fn(UserRole $r) => $r->value, $roles)));
 
         return $this;
     }

@@ -7,6 +7,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Set\SetCommunicationTrait;
 use App\Entity\Traits\Set\SetNamePersonTrait;
+use App\Enum\UserRole;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -69,6 +70,10 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $passwordResetTokenExpiresAt = null;
 
+    // Stored as list of strings in DB; use helper methods to work with UserRole enums.
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $roles = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -94,37 +99,74 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
     /**
-     * @see UserInterface
+     * Security-compatible roles as strings.
      *
      * @return list<string>
      */
     public function getRoles(): array
     {
-        $roles = [];
-        $userGroups = $this->getUserGroups()->toArray();
-        foreach ($userGroups as $userGroup) {
-            $roles = array_merge($roles, $userGroup->getRoles());
-        }
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $roles = $this->roles ?? [];
 
-        return array_unique($roles);
+        foreach ($this->getUserGroups() as $userGroup) {
+            $roles = array_merge($roles, $userGroup->getRoles()); // strings
+        }
+
+        $roles[] = UserRole::ROLE_USER->value;
+
+        return array_values(array_unique($roles));
     }
 
     /**
-     * @see PasswordAuthenticatedUserInterface
+     * Replace direct user roles with enums.
+     *
+     * @param list<UserRole> $roles
      */
+    public function setRolesFromEnums(array $roles): static
+    {
+        $this->roles = array_values(array_unique(array_map(static fn(UserRole $r) => $r->value, $roles)));
+
+        return $this;
+    }
+
+    /**
+     * Read direct user roles as enums (does not include roles from groups).
+     *
+     * @return list<UserRole>
+     */
+    public function getRoleEnums(): array
+    {
+        $stored = $this->roles ?? [];
+        return array_values(
+            array_map(static fn(string $r) => UserRole::from($r), $stored)
+        );
+    }
+
+    /**
+     * Backward-compatible setter accepting strings or enums.
+     *
+     * @param list<string|UserRole>|null $roles
+     */
+    public function setRoles(?array $roles): static
+    {
+        if ($roles === null) {
+            $this->roles = null;
+            return $this;
+        }
+
+        $this->roles = array_values(array_unique(array_map(
+            static fn(string|UserRole $r) => $r instanceof UserRole ? $r->value : (string) $r,
+            $roles
+        )));
+
+        return $this;
+    }
+
     public function getPassword(): ?string
     {
         return $this->password;
@@ -137,13 +179,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        // noop
     }
 
     /**
@@ -167,7 +205,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function removeProject(Project $project): static
     {
         if ($this->projects->removeElement($project)) {
-            // set the owning side to null (unless already changed)
             if ($project->getAssignee() === $this) {
                 $project->setAssignee(null);
             }
