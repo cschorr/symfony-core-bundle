@@ -87,19 +87,71 @@ class Comment
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getThread(): ?Thread { return $this->thread; }
-    public function setThread(Thread $t): self { $this->thread = $t; return $this; }
-    public function getParent(): ?self { return $this->parent; }
-    public function setParent(?self $p): self { $this->parent = $p; return $this; }
-    public function getContent(): string { return $this->content; }
-    public function setContent(string $v): self { $this->content = $v; return $this; }
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getAuthor(): ?\App\Entity\User { return $this->author; }
-    public function setAuthor(\App\Entity\User $u): self { $this->author = $u; return $this; }
-    public function getUpCount(): int { return $this->upCount; }
-    public function setUpCount(int $v): self { $this->upCount = $v; return $this; }
-    public function getDownCount(): int { return $this->downCount; }
-    public function setDownCount(int $v): self { $this->downCount = $v; return $this; }
-    public function getScore(): int { return $this->score; }
-    public function setScore(int $v): self { $this->score = $v; return $this; }
+    public function getThread(): ?Thread
+    {
+        return $this->thread;
+    }
+    public function setThread(Thread $t): self
+    {
+        $this->thread = $t;
+        return $this;
+    }
+    public function getParent(): ?self
+    {
+        return $this->parent;
+    }
+    public function setParent(?self $p): self
+    {
+        $this->parent = $p;
+        return $this;
+    }
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+    public function setContent(string $v): self
+    {
+        $this->content = $v;
+        return $this;
+    }
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+    public function getAuthor(): ?\App\Entity\User
+    {
+        return $this->author;
+    }
+    public function setAuthor(\App\Entity\User $u): self
+    {
+        $this->author = $u;
+        return $this;
+    }
+    public function getUpCount(): int
+    {
+        return $this->upCount;
+    }
+    public function setUpCount(int $v): self
+    {
+        $this->upCount = $v;
+        return $this;
+    }
+    public function getDownCount(): int
+    {
+        return $this->downCount;
+    }
+    public function setDownCount(int $v): self
+    {
+        $this->downCount = $v;
+        return $this;
+    }
+    public function getScore(): int
+    {
+        return $this->score;
+    }
+    public function setScore(int $v): self
+    {
+        $this->score = $v;
+        return $this;
+    }
 }

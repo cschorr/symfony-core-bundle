@@ -1,4 +1,5 @@
 <?php
+
 // src/OpenApi/RoleEnumDecorator.php
 namespace App\OpenApi;
 
@@ -8,7 +9,9 @@ use App\Enum\UserRole;
 
 final class RoleEnumDecorator implements OpenApiFactoryInterface
 {
-    public function __construct(private OpenApiFactoryInterface $decorated) {}
+    public function __construct(private OpenApiFactoryInterface $decorated)
+    {
+    }
 
     public function __invoke(array $context = []): OpenApi
     {

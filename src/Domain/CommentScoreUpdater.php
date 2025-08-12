@@ -8,7 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class CommentScoreUpdater
 {
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em)
+    {
+    }
 
     public function recomputeFor(Comment $comment): void
     {

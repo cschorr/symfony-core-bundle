@@ -23,7 +23,6 @@ class DebugNavigationCommand extends Command
     public function __construct(
         private readonly NavigationService $navigationService,
         private readonly EntityManagerInterface $entityManager,
-
     ) {
         parent::__construct('Debug Navigation');
     }

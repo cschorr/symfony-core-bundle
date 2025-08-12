@@ -21,7 +21,8 @@ final class VoteWriteProcessor implements ProcessorInterface
         #[Autowire(service: 'limiter.votes_per_10m')]
         private RateLimiterFactory $votesLimiter,
         private VoteRepository $votes
-    ) {}
+    ) {
+    }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {

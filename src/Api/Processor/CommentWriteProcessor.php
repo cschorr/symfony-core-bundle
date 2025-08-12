@@ -18,7 +18,8 @@ final class CommentWriteProcessor implements ProcessorInterface
         private Security $security,
         #[Autowire(service: 'limiter.comments_per_10m')]
         private RateLimiterFactory $commentsLimiter,
-    ) {}
+    ) {
+    }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
