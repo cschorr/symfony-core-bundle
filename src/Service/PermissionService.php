@@ -18,10 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PermissionService
 {
     public function __construct(
-        private readonly EntityManagerInterface                    $entityManager,
-        private readonly DomainEntityRepository                    $systemEntityRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DomainEntityRepository $systemEntityRepository,
         private readonly UserGroupDomainEntityPermissionRepository $userSystemEntityPermissionRepository,
-        private readonly TranslatorInterface                       $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

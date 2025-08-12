@@ -57,10 +57,31 @@ class Vote
     #[Groups(['vote:read','vote:write'])]
     private int $value = 1;
 
-    public function getComment(): ?Comment { return $this->comment; }
-    public function setComment(Comment $c): self { $this->comment = $c; return $this; }
-    public function getVoter(): ?\App\Entity\User { return $this->voter; }
-    public function setVoter(\App\Entity\User $u): self { $this->voter = $u; return $this; }
-    public function getValue(): int { return $this->value; }
-    public function setValue(int $v): self { $this->value = $v; return $this; }
+    public function getComment(): ?Comment
+    {
+        return $this->comment;
+    }
+    public function setComment(Comment $c): self
+    {
+        $this->comment = $c;
+        return $this;
+    }
+    public function getVoter(): ?\App\Entity\User
+    {
+        return $this->voter;
+    }
+    public function setVoter(\App\Entity\User $u): self
+    {
+        $this->voter = $u;
+        return $this;
+    }
+    public function getValue(): int
+    {
+        return $this->value;
+    }
+    public function setValue(int $v): self
+    {
+        $this->value = $v;
+        return $this;
+    }
 }

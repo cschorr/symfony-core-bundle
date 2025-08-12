@@ -19,8 +19,8 @@ class DomainEntityVoter extends Voter
 {
     public function __construct(
         private readonly UserGroupDomainEntityPermissionRepository $permissionRepository,
-        private readonly DomainEntityRepository                    $domainEntityRepository,
-        private readonly LoggerInterface                           $logger,
+        private readonly DomainEntityRepository $domainEntityRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

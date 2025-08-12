@@ -9,11 +9,13 @@ use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 #[AsEntityListener(event: Events::postPersist, entity: Vote::class)]
-#[AsEntityListener(event: Events::postUpdate,  entity: Vote::class)]
-#[AsEntityListener(event: Events::postRemove,  entity: Vote::class)]
+#[AsEntityListener(event: Events::postUpdate, entity: Vote::class)]
+#[AsEntityListener(event: Events::postRemove, entity: Vote::class)]
 final class VoteScoreListener
 {
-    public function __construct(private CommentScoreUpdater $updater) {}
+    public function __construct(private CommentScoreUpdater $updater)
+    {
+    }
 
     public function postPersist(Vote $vote, LifecycleEventArgs $args): void
     {

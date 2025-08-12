@@ -43,10 +43,31 @@ class Thread
     #[Groups(['thread:read','thread:write'])]
     private ?string $title = null;
 
-    public function getResourceType(): DomainEntityType { return $this->resourceType; }
-    public function setResourceType(DomainEntityType $v): self { $this->resourceType = $v; return $this; }
-    public function getResourceId(): string { return $this->resourceId; }
-    public function setResourceId(string $v): self { $this->resourceId = $v; return $this; }
-    public function getTitle(): ?string { return $this->title; }
-    public function setTitle(?string $v): self { $this->title = $v; return $this; }
+    public function getResourceType(): DomainEntityType
+    {
+        return $this->resourceType;
+    }
+    public function setResourceType(DomainEntityType $v): self
+    {
+        $this->resourceType = $v;
+        return $this;
+    }
+    public function getResourceId(): string
+    {
+        return $this->resourceId;
+    }
+    public function setResourceId(string $v): self
+    {
+        $this->resourceId = $v;
+        return $this;
+    }
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+    public function setTitle(?string $v): self
+    {
+        $this->title = $v;
+        return $this;
+    }
 }
