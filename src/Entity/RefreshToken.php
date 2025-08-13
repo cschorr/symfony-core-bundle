@@ -16,12 +16,11 @@ use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken as BaseRefreshToken;
 #[ApiResource(
     operations: [
         new Post(
-        new Post(
             uriTemplate: '/refresh_tokens',
             openapi: new Operation(
+                tags: ['Login Check'],
                 summary: 'Create a new refresh token',
-                description: 'This endpoint allows clients to obtain a new refresh token for authentication purposes.',
-                tags: ['Login Check']
+                description: 'This endpoint allows clients to obtain a new refresh token for authentication purposes.'
             )
         )
     ]

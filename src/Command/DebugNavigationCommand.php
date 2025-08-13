@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\DomainEntityPermission;
 use App\Entity\User;
 use App\Service\NavigationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -16,13 +18,16 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'app:debug:navigation',
     description: 'Debug navigation for demo user',
 )]
-class DebugNavigationCommand
+class DebugNavigationCommand extends Command
 {
-    public function __construct(private readonly NavigationService $navigationService, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly NavigationService $navigationService,
+        private readonly EntityManagerInterface $entityManager,
+    ) {
+        parent::__construct('Debug Navigation');
     }
 
-    public function __invoke(OutputInterface $output): int
+    public function __invoke(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -61,9 +66,10 @@ class DebugNavigationCommand
 
         // Show user permissions
         $io->section('User Permissions');
+        // @todo: get domain entity permissions from userGroup
         foreach ($user->getSystemEntityPermissions() as $permission) {
             $io->writeln(sprintf(
-                'SystemEntity: %s (%s), Read: %s, Write: %s, Active: %s',
+                'DomainEntityPermission: %s (%s), Read: %s, Write: %s, Active: %s',
                 $permission->getSystemEntity()->getName(),
                 $permission->getSystemEntity()->getCode(),
                 $permission->canRead() ? 'Yes' : 'No',
@@ -74,8 +80,9 @@ class DebugNavigationCommand
 
         // Test repository method directly
         $io->section('Repository Test');
-        $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\SystemEntity::class);
+        $systemEntityRepo = $this->entityManager->getRepository(DomainEntityPermission::class);
 
+        // @todo: using user or userGroup here?
         // Test the original method first
         $allUserSystemEntities = $systemEntityRepo->findSystemEntitiesForUser($user);
         $io->writeln(sprintf('findSystemEntitiesForUser returned %d system entities', count($allUserSystemEntities)));

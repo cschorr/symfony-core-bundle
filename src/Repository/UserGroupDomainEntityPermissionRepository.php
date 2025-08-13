@@ -4,32 +4,31 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\SystemEntity;
-use App\Entity\User;
+use App\Entity\DomainEntityPermission;
 use App\Entity\UserGroup;
-use App\Entity\UserGroupSystemEntityPermission;
+use App\Entity\UserGroupDomainEntityPermission;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<UserGroupSystemEntityPermission>
+ * @extends ServiceEntityRepository<UserGroupDomainEntityPermission>
  */
-class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
+class UserGroupDomainEntityPermissionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UserGroupSystemEntityPermission::class);
+        parent::__construct($registry, UserGroupDomainEntityPermission::class);
     }
 
     /**
      * Find permission for a specific user and system entity.
      */
-    public function findByUserGroupAndSystemEntity(UserGroup $userGroup, SystemEntity $systemEntity): ?UserGroupSystemEntityPermission
+    public function findByUserGroupAndSystemEntity(UserGroup $userGroup, DomainEntityPermission $systemEntity): ?UserGroupDomainEntityPermission
     {
         // get
         return $this->createQueryBuilder('usep')
             ->andWhere('usep.user = :user')
-            ->andWhere('usep.systemEntity = :systemEntity')
+            ->andWhere('usep.domainEntityPermission = :systemEntity')
             ->setParameter('user', $userGroup->getId(), 'uuid')
             ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->getQuery()
@@ -39,14 +38,14 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Find all permissions for a specific user.
      *
-     * @return UserGroupSystemEntityPermission[]
+     * @return UserGroupDomainEntityPermission[]
      */
     public function findByUser(UserGroup $userGroup): array
     {
         return $this->createQueryBuilder('usep')
             ->andWhere('usep.user = :user')
             ->setParameter('user', $userGroup->getId(), 'uuid')
-            ->orderBy('usep.systemEntity', 'ASC')
+            ->orderBy('usep.domainEntityPermission', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -54,12 +53,12 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Find all permissions for a specific system entity.
      *
-     * @return UserGroupSystemEntityPermission[]
+     * @return UserGroupDomainEntityPermission[]
      */
-    public function findBySystemEntity(SystemEntity $systemEntity): array
+    public function findBySystemEntity(DomainEntityPermission $systemEntity): array
     {
         return $this->createQueryBuilder('usep')
-            ->andWhere('usep.systemEntity = :systemEntity')
+            ->andWhere('usep.domainEntityPermission = :systemEntity')
             ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->orderBy('usep.user', 'ASC')
             ->getQuery()
@@ -69,13 +68,13 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Find all system entities that a user has read access to.
      *
-     * @return SystemEntity[]
+     * @return DomainEntityPermission[]
      */
     public function findSystemEntitiesWithReadAccess(UserGroup $userGroup): array
     {
         return $this->createQueryBuilder('usep')
             ->select('se')
-            ->join('usep.systemEntity', 'se')
+            ->join('usep.domainEntityPermission', 'se')
             ->andWhere('usep.user = :user')
             ->andWhere('usep.canRead = :canRead')
             ->setParameter('user', $userGroup->getId(), 'uuid')
@@ -87,13 +86,13 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Find all system entities that a user has write access to.
      *
-     * @return SystemEntity[]
+     * @return DomainEntityPermission[]
      */
     public function findSystemEntitiesWithWriteAccess(UserGroup $userGroup): array
     {
         return $this->createQueryBuilder('usep')
             ->select('se')
-            ->join('usep.systemEntity', 'se')
+            ->join('usep.domainEntityPermission', 'se')
             ->andWhere('usep.user = :user')
             ->andWhere('usep.canWrite = :canWrite')
             ->setParameter('user', $userGroup->getId(), 'uuid')
@@ -107,12 +106,12 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
      *
      * @return UserGroup[]
      */
-    public function findUsersWithReadAccess(SystemEntity $systemEntity): array
+    public function findUsersWithReadAccess(DomainEntityPermission $systemEntity): array
     {
         return $this->createQueryBuilder('usep')
             ->select('u')
             ->join('usep.user', 'u')
-            ->andWhere('usep.systemEntity = :systemEntity')
+            ->andWhere('usep.domainEntityPermission = :systemEntity')
             ->andWhere('usep.canRead = :canRead')
             ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->setParameter('canRead', true)
@@ -125,12 +124,12 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
      *
      * @return UserGroup[]
      */
-    public function findUsersWithWriteAccess(SystemEntity $systemEntity): array
+    public function findUsersWithWriteAccess(DomainEntityPermission $systemEntity): array
     {
         return $this->createQueryBuilder('usep')
             ->select('u')
             ->join('usep.user', 'u')
-            ->andWhere('usep.systemEntity = :systemEntity')
+            ->andWhere('usep.domainEntityPermission = :systemEntity')
             ->andWhere('usep.canWrite = :canWrite')
             ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->setParameter('canWrite', true)
@@ -141,14 +140,14 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Grant or update permissions for a user on a system entity.
      */
-    public function grantPermissions(UserGroup $userGroup, SystemEntity $systemEntity, bool $canRead = false, bool $canWrite = false): UserGroupSystemEntityPermission
+    public function grantPermissions(UserGroup $userGroup, DomainEntityPermission $systemEntity, bool $canRead = false, bool $canWrite = false): UserGroupDomainEntityPermission
     {
         $permission = $this->findByUserGroupAndSystemEntity($user, $systemEntity);
 
         if (null === $permission) {
-            $permission = new UserGroupSystemEntityPermission();
+            $permission = new UserGroupDomainEntityPermission();
             $permission->setUserGroup($user);
-            $permission->setSystemEntity($systemEntity);
+            $permission->setDomainEntityPermission($systemEntity);
             $this->getEntityManager()->persist($permission);
         }
 
@@ -161,7 +160,7 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Revoke all permissions for a user on a system entity.
      */
-    public function revokePermissions(UserGroup $userGroup, SystemEntity $systemEntity): void
+    public function revokePermissions(UserGroup $userGroup, DomainEntityPermission $systemEntity): void
     {
         $permission = $this->findByUserGroupAndSystemEntity($userGroup, $systemEntity);
 
@@ -173,11 +172,11 @@ class UserGroupSystemEntityPermissionRepository extends ServiceEntityRepository
     /**
      * Get count of users with any access to a system entity.
      */
-    public function getUserAccessCount(SystemEntity $systemEntity): int
+    public function getUserAccessCount(DomainEntityPermission $systemEntity): int
     {
         return (int) $this->createQueryBuilder('usep')
             ->select('COUNT(DISTINCT usep.user)')
-            ->andWhere('usep.systemEntity = :systemEntity')
+            ->andWhere('usep.domainEntityPermission = :systemEntity')
             ->andWhere('(usep.canRead = :canRead OR usep.canWrite = :canWrite)')
             ->setParameter('systemEntity', $systemEntity->getId(), 'uuid')
             ->setParameter('canRead', true)

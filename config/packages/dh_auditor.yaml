@@ -17,6 +17,6 @@ dh_auditor:
                 App\Entity\Company: ~
                 App\Entity\CompanyGroup: ~
                 App\Entity\Contact: ~
-                App\Entity\SystemEntity: ~
+                App\Entity\DomainEntityPermission: ~
                 App\Entity\Project: ~
                 App\Entity\User: ~

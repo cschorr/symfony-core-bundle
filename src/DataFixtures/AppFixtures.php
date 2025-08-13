@@ -6,12 +6,13 @@ namespace App\DataFixtures;
 
 use App\Entity\Category;
 use App\Entity\Company;
+use App\Entity\CompanyGroup;
 use App\Entity\Contact;
 use App\Entity\Project;
-use App\Entity\SystemEntity;
+use App\Entity\DomainEntityPermission;
 use App\Entity\User;
 use App\Entity\UserGroup;
-use App\Entity\UserGroupSystemEntityPermission;
+use App\Entity\UserGroupDomainEntityPermission;
 use App\Enum\ProjectStatus;
 use App\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -23,10 +24,11 @@ class AppFixtures extends Fixture
     private const DEFAULT_PASSWORD = 'pass_1234';
     private array $users = [];
     private array $userGroups = [];
-    private array $systemEntities = [];
+    private array $domainEntityPermission = [];
     private array $categories = [];
     private array $companies = [];
     private array $contacts = [];
+    private array $companyGroups = [];
 
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
@@ -37,20 +39,21 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // Order is important for dependencies
-        $this->createSystemEntityFixtures($manager);
+        $this->createDomainEntityFixtures($manager);
         $this->createCategoryFixtures($manager);
         $this->createUserGroupFixtures($manager);
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
+        $this->createCompanyGroupFixtures($manager); // NEW: groups before companies
         $this->createCompanyFixtures($manager);
         $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
     }
 
-    private function createSystemEntityFixtures(ObjectManager $manager): void
+    private function createDomainEntityFixtures(ObjectManager $manager): void
     {
-        $systemEntitiesData = [
-            'SystemEntity' => [
+        $domainEntityData = [
+            'DomainEntityPermission' => [
                 'name' => 'SystemEntities',
                 'text' => 'System entities and configuration',
                 'icon' => 'fas fa-list',
@@ -92,15 +95,15 @@ class AppFixtures extends Fixture
             ],
         ];
 
-        foreach ($systemEntitiesData as $code => $data) {
-            $systemEntity = (new SystemEntity())
+        foreach ($domainEntityData as $code => $data) {
+            $domainEntityPermission = (new DomainEntityPermission())
                 ->setName($data['name'])
                 ->setCode($code)
                 ->setText($data['text'])
                 ->setIcon($data['icon']);
 
-            $manager->persist($systemEntity);
-            $this->systemEntities[$code] = $systemEntity;
+            $manager->persist($domainEntityPermission);
+            $this->domainEntityPermission[$code] = $domainEntityPermission;
         }
 
         $manager->flush();
@@ -220,7 +223,7 @@ class AppFixtures extends Fixture
             ],
             'advanced' => [
                 'name' => 'Teamlead',
-                'roles' => ['ROLE_TEAMLEAD'],
+                'roles' => ['ROLE_TEAMLEAD', 'ROLE_FINANCE', 'ROLE_QUALITY', 'ROLE_PROJECT_MANAGEMENT'],
                 'active' => true,
             ],
             'manager' => [
@@ -257,7 +260,7 @@ class AppFixtures extends Fixture
                 'email' => 'admin@example.com',
                 'active' => true,
                 'notes' => 'Administrator user with full access',
-                'category' => 'main2', // Business Services
+                'category' => 'main2',
                 'nameLast' => 'Admin',
                 'nameFirst' => 'User',
                 'userGroups' => ['Admin'],
@@ -266,7 +269,7 @@ class AppFixtures extends Fixture
                 'email' => 'editor@example.com',
                 'active' => true,
                 'notes' => 'Demo user with limited access',
-                'category' => 'sub1', // Web Development
+                'category' => 'sub1',
                 'nameLast' => 'Demo',
                 'nameFirst' => 'User',
                 'userGroups' => ['Editor'],
@@ -275,16 +278,17 @@ class AppFixtures extends Fixture
                 'email' => 'teamlead@example.com',
                 'active' => true,
                 'notes' => 'Senior developer specializing in mobile apps',
-                'category' => 'sub2', // Mobile Development
+                'category' => 'sub2',
                 'nameLast' => 'Developer',
                 'nameFirst' => 'User',
                 'userGroups' => ['Teamlead'],
+                'roles' => ['ROLE_QUALITY'],
             ],
             'manager' => [
                 'email' => 'marketing@example.com',
                 'active' => true,
                 'notes' => 'Marketing specialist for digital campaigns',
-                'category' => 'sub6', // Digital Marketing
+                'category' => 'sub6',
                 'nameLast' => 'Marketing',
                 'nameFirst' => 'User',
                 'userGroups' => ['Manager'],
@@ -293,7 +297,7 @@ class AppFixtures extends Fixture
                 'email' => 'external@example.com',
                 'active' => true,
                 'notes' => 'Business consultant for process optimization',
-                'category' => 'main4', // Consulting
+                'category' => 'main4',
                 'nameLast' => 'Consultant',
                 'nameFirst' => 'User',
                 'userGroups' => ['External Users'],
@@ -302,7 +306,7 @@ class AppFixtures extends Fixture
                 'email' => 'demo@example.com',
                 'active' => true,
                 'notes' => 'Demo user with limited access',
-                'category' => 'sub1', // Web Development
+                'category' => 'sub1',
                 'nameLast' => 'Demo',
                 'nameFirst' => 'User',
                 'userGroups' => ['Editor'],
@@ -311,10 +315,8 @@ class AppFixtures extends Fixture
 
         foreach ($usersData as $key => $userData) {
             $category = $this->categories[$userData['category']] ?? null;
-            // get usergroups from entity manager
             $userGroups = $this->userGroupRepository->findBy(['name' => $userData['userGroups']]);
 
-            // Add error handling to debug missing categories
             if (!$category) {
                 throw new \Exception(
                     sprintf(
@@ -334,6 +336,7 @@ class AppFixtures extends Fixture
                 ->setNameLast($userData['nameLast'])
                 ->setNameFirst($userData['nameFirst'])
                 ->setCategory($category)
+                ->setRoles($userData['roles'] ?? [])
             ;
             foreach ($userGroups as $userGroup) {
                 $user->addUserGroup($userGroup);
@@ -348,18 +351,16 @@ class AppFixtures extends Fixture
 
     private function createPermissionFixtures(ObjectManager $manager): void
     {
-        // Permissions for admin (full rights)
         $adminPermissions = [
             'User' => ['read' => true, 'write' => true],
             'UserGroup' => ['read' => true, 'write' => true],
             'Company' => ['read' => true, 'write' => true],
-            'SystemEntity' => ['read' => true, 'write' => true],
+            'DomainEntityPermission' => ['read' => true, 'write' => true],
             'CompanyGroup' => ['read' => true, 'write' => true],
             'Project' => ['read' => true, 'write' => true],
             'Category' => ['read' => true, 'write' => true],
         ];
 
-        // Permissions for demo user (limited rights)
         $demoPermissions = [
             'User' => ['read' => true, 'write' => false],
             'UserGroup' => ['read' => true, 'write' => false],
@@ -368,14 +369,12 @@ class AppFixtures extends Fixture
             'Category' => ['read' => true, 'write' => true],
         ];
 
-        // Permissions for developer (Mobile Development)
         $developerPermissions = [
             'User' => ['read' => true, 'write' => false],
             'Company' => ['read' => true, 'write' => false],
             'Project' => ['read' => true, 'write' => true],
         ];
 
-        // Permissions for marketing (Digital Marketing)
         $marketingPermissions = [
             'User' => ['read' => true, 'write' => false],
             'UserGroup' => ['read' => true, 'write' => false],
@@ -383,7 +382,6 @@ class AppFixtures extends Fixture
             'Project' => ['read' => true, 'write' => true],
         ];
 
-        // Permissions for consultant (Business Consulting)
         $consultantPermissions = [
             'User' => ['read' => true, 'write' => false],
             'UserGroup' => ['read' => true, 'write' => false],
@@ -404,19 +402,18 @@ class AppFixtures extends Fixture
     private function createUserGroupPermissions(ObjectManager $manager, UserGroup $userGroup, array $permissions): void
     {
         foreach ($permissions as $entityCode => $rights) {
-            $systemEntity = $this->systemEntities[$entityCode] ?? null;
-            if (!$systemEntity) {
+            $domainEntityPermission = $this->domainEntityPermission[$entityCode] ?? null;
+            if (!$domainEntityPermission) {
                 continue;
             }
 
-            // Check if permission already exists
-            $existingPermission = $manager->getRepository(UserGroupSystemEntityPermission::class)
-                ->findOneBy(['userGroup' => $userGroup, 'systemEntity' => $systemEntity]);
+            $existingPermission = $manager->getRepository(UserGroupDomainEntityPermission::class)
+                ->findOneBy(['userGroup' => $userGroup, 'domainEntityPermission' => $domainEntityPermission]);
 
             if (!$existingPermission) {
-                $permission = (new UserGroupSystemEntityPermission())
+                $permission = (new UserGroupDomainEntityPermission())
                     ->setUserGroup($userGroup)
-                    ->setSystemEntity($systemEntity)
+                    ->setDomainEntityPermission($domainEntityPermission)
                     ->setCanRead($rights['read'])
                     ->setCanWrite($rights['write']);
 
@@ -425,82 +422,124 @@ class AppFixtures extends Fixture
         }
     }
 
+    private function createCompanyGroupFixtures(ObjectManager $manager): void
+    {
+        // Themed groups from comics and motion pictures
+        $groups = [
+            'skynet' => ['name' => 'Skynet Group', 'code' => 'SKYNET'],
+            'marvel' => ['name' => 'Marvel Group', 'code' => 'MARVEL'],
+            'dc' => ['name' => 'DC Group', 'code' => 'DC'],
+            'weyland' => ['name' => 'Weyland-Yutani Group', 'code' => 'WEYLAND'],
+            'umbrella' => ['name' => 'Umbrella Group', 'code' => 'UMBRELLA'],
+        ];
+
+        foreach ($groups as $key => $data) {
+            $group = (new CompanyGroup())
+                ->setName($data['name'])
+                ->setCode($data['code']);
+            $manager->persist($group);
+            $this->companyGroups[$key] = $group;
+        }
+
+        $manager->flush();
+    }
+
     private function createCompanyFixtures(ObjectManager $manager): void
     {
+        // Companies themed from comics/movies, renamed to start with "Macht Group - ..."
         $companiesData = [
             [
-                'name' => 'Acme Corporation',
-                'email' => 'contact@acme.com',
-                'country' => 'DE',
+                'display' => 'Cyberdyne Systems',
+                'email' => 'contact@cyberdyne.example',
+                'country' => 'US',
                 'category' => 'main1', // Technology
-                'phone' => '+49 30 12345678',
-                'url' => 'https://acme-corp.com',
-                'street' => 'Technologiestraße 15',
-                'city' => 'Berlin',
-                'zipCode' => '10117',
+                'phone' => '+1 555 0100',
+                'url' => 'https://cyberdyne.example',
+                'street' => '101 Skynet Blvd',
+                'city' => 'Los Angeles',
+                'zipCode' => '90001',
+                'group' => 'skynet',
             ],
             [
-                'name' => 'Global Solutions Ltd',
-                'email' => 'info@globalsolutions.com',
-                'country' => 'UK',
+                'display' => 'Stark Industries',
+                'email' => 'info@stark.example',
+                'country' => 'US',
+                'category' => 'sub3', // Software Solutions
+                'phone' => '+1 555 0101',
+                'url' => 'https://stark.example',
+                'street' => '1 Avengers Tower',
+                'city' => 'New York',
+                'zipCode' => '10001',
+                'group' => 'marvel',
+            ],
+            [
+                'display' => 'Wayne Enterprises',
+                'email' => 'hello@wayne.example',
+                'country' => 'US',
                 'category' => 'main2', // Business Services
-                'phone' => '+44 20 7946 0958',
-                'url' => 'https://globalsolutions.co.uk',
-                'street' => '123 Business Street',
+                'phone' => '+1 555 0102',
+                'url' => 'https://wayne.example',
+                'street' => '1007 Mountain Drive',
+                'city' => 'Gotham',
+                'zipCode' => '07001',
+                'group' => 'dc',
+            ],
+            [
+                'display' => 'Oscorp',
+                'email' => 'contact@oscorp.example',
+                'country' => 'US',
+                'category' => 'sub1', // Web Development (as a placeholder tech category)
+                'phone' => '+1 555 0103',
+                'url' => 'https://oscorp.example',
+                'street' => '500 Spider Ave',
+                'city' => 'New York',
+                'zipCode' => '10002',
+                'group' => 'marvel',
+            ],
+            [
+                'display' => 'Weyland-Yutani',
+                'email' => 'corp@weyland.example',
+                'country' => 'UK',
+                'category' => 'main4', // Consulting (placeholder)
+                'phone' => '+44 20 7946 0000',
+                'url' => 'https://weyland.example',
+                'street' => '1 Offworld Park',
                 'city' => 'London',
                 'zipCode' => 'SW1A 1AA',
+                'group' => 'weyland',
             ],
             [
-                'name' => 'TechStart GmbH',
-                'email' => 'hello@techstart.de',
+                'display' => 'Umbrella Corporation',
+                'email' => 'hq@umbrella.example',
                 'country' => 'DE',
-                'category' => 'sub1', // Web Development (Subcategory of Technology)
-                'phone' => '+49 89 87654321',
-                'url' => 'https://techstart.de',
-                'street' => 'Startup Allee 42',
-                'city' => 'München',
-                'zipCode' => '80331',
-            ],
-            [
-                'name' => 'Digital Marketing Pro',
-                'email' => 'contact@digitalmarketing.com',
-                'country' => 'DE',
-                'category' => 'main3', // Marketing & Sales
-                'phone' => '+49 40 11223344',
-                'url' => 'https://digitalmarketing.com',
-                'street' => 'Marketingplatz 7',
-                'city' => 'Hamburg',
-                'zipCode' => '20095',
-            ],
-            [
-                'name' => 'Mobile Innovations Inc',
-                'email' => 'info@mobileinnovations.com',
-                'country' => 'US',
-                'category' => 'sub2', // Mobile Development (Subcategory of Technology)
-                'phone' => '+1 555 123 4567',
-                'url' => 'https://mobileinnovations.com',
-                'street' => '456 Innovation Drive',
-                'city' => 'San Francisco',
-                'zipCode' => '94105',
+                'category' => 'main3', // Marketing & Sales (placeholder)
+                'phone' => '+49 30 123456',
+                'url' => 'https://umbrella.example',
+                'street' => '13 Hive Str.',
+                'city' => 'Raccoon City',
+                'zipCode' => '10117',
+                'group' => 'umbrella',
             ],
         ];
 
-        foreach ($companiesData as $index => $companyData) {
-            $category = $this->categories[$companyData['category']] ?? null;
+        foreach ($companiesData as $index => $data) {
+            $category = $this->categories[$data['category']] ?? null;
+            $group = $this->companyGroups[$data['group']] ?? null;
 
             $company = (new Company())
-                ->setName($companyData['name'])
-                ->setEmail($companyData['email'])
-                ->setCountryCode($companyData['country'])
+                ->setName($data['display'])
+                ->setEmail($data['email'])
+                ->setCountryCode($data['country'])
                 ->setCategory($category)
-                ->setPhone($companyData['phone'])
-                ->setUrl($companyData['url'])
-                ->setStreet($companyData['street'])
-                ->setCity($companyData['city'])
-                ->setZip($companyData['zipCode']);
+                ->setPhone($data['phone'])
+                ->setUrl($data['url'])
+                ->setStreet($data['street'])
+                ->setCity($data['city'])
+                ->setZip($data['zipCode'])
+                ->setCompanyGroup($group);
 
             $manager->persist($company);
-            $this->companies["company_{$index}"] = $company; // Store reference
+            $this->companies["company_{$index}"] = $company;
         }
 
         $manager->flush();
@@ -533,7 +572,7 @@ class AppFixtures extends Fixture
                 ->setEmail($contactData['email']);
 
             $manager->persist($contact);
-            $this->contacts["contact_{$index}"] = $contact; // Store reference
+            $this->contacts["contact_{$index}"] = $contact;
         }
 
         $manager->flush();
@@ -546,65 +585,49 @@ class AppFixtures extends Fixture
                 'name' => 'E-Commerce Platform',
                 'status' => ProjectStatus::IN_PROGRESS,
                 'description' => 'Modern e-commerce platform with advanced features',
-                'client' => 'company_0', // Acme Corporation
-                'assignee' => 'demo', // Web Development specialist
-                'category' => 'sub1', // Web Development
+                'client' => 'company_0', // Macht Group - Cyberdyne Systems
+                'assignee' => 'demo',
+                'category' => 'sub1',
             ],
             [
                 'name' => 'Mobile Banking App',
                 'status' => ProjectStatus::PLANNING,
                 'description' => 'Secure mobile banking application with biometric authentication',
-                'client' => 'company_4', // Mobile Innovations Inc
-                'assignee' => 'developer', // Mobile Development specialist
-                'category' => 'sub2', // Mobile Development
+                'client' => 'company_1', // Macht Group - Stark Industries
+                'assignee' => 'teamlead',
+                'category' => 'sub2',
             ],
             [
                 'name' => 'Digital Marketing Campaign',
                 'status' => ProjectStatus::IN_PROGRESS,
                 'description' => 'Comprehensive digital marketing strategy implementation',
-                'client' => 'company_3', // Digital Marketing Pro
-                'assignee' => 'marketing', // Marketing specialist
-                'category' => 'sub6', // Digital Marketing
+                'client' => 'company_5', // Macht Group - Umbrella Corporation
+                'assignee' => 'manager',
+                'category' => 'sub6',
             ],
             [
                 'name' => 'Business Process Optimization',
                 'status' => ProjectStatus::ON_HOLD,
                 'description' => 'Analysis and optimization of business workflows',
-                'client' => 'company_1', // Global Solutions Ltd
-                'assignee' => 'consultant', // Business consultant
-                'category' => 'main4', // Consulting
+                'client' => 'company_2', // Macht Group - Wayne Enterprises
+                'assignee' => 'external',
+                'category' => 'main4',
             ],
             [
-                'name' => 'Financial Dashboard',
+                'name' => 'R&D Dashboard',
                 'status' => ProjectStatus::IN_PROGRESS,
-                'description' => 'Real-time financial reporting and analytics dashboard',
-                'client' => 'company_1', // Global Solutions Ltd
-                'assignee' => 'demo', // Web Development
-                'category' => 'sub4', // Financial Services
+                'description' => 'Real-time R&D analytics and reporting',
+                'client' => 'company_3', // Macht Group - Oscorp
+                'assignee' => 'demo',
+                'category' => 'sub3',
             ],
             [
-                'name' => 'Content Management System',
+                'name' => 'Enterprise CMS',
                 'status' => ProjectStatus::COMPLETED,
-                'description' => 'Custom CMS for blog and article management',
-                'client' => 'company_3', // Digital Marketing Pro
-                'assignee' => 'demo', // Web Development
-                'category' => 'sub7', // Content Creation
-            ],
-            [
-                'name' => 'Mobile Game Development',
-                'status' => ProjectStatus::PLANNING,
-                'description' => 'Casual mobile game with social features',
-                'client' => 'company_4', // Mobile Innovations Inc
-                'assignee' => 'developer', // Mobile Development
-                'category' => 'sub2', // Mobile Development
-            ],
-            [
-                'name' => 'ERP System Integration',
-                'status' => ProjectStatus::IN_PROGRESS,
-                'description' => 'Integration of existing systems with new ERP solution',
-                'client' => 'company_0', // Acme Corporation
-                'assignee' => 'admin', // Business Services
-                'category' => 'sub3', // Software Solutions
+                'description' => 'Enterprise-grade content management solution',
+                'client' => 'company_4', // Macht Group - Weyland-Yutani
+                'assignee' => 'demo',
+                'category' => 'sub7',
             ],
         ];
 

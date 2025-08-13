@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
-use App\Entity\SystemEntity;
+use App\Entity\DomainEntityPermission;
 use App\Entity\User;
 use App\Service\DuplicateService;
 use App\Service\PermissionService;
@@ -61,7 +61,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
             'User' => 'Users',
             'Company' => 'Companies',
             'Category' => 'Categories',
-            'SystemEntity' => 'SystemEntities',
+            'DomainEntityPermission' => 'DomainEntityPermissions',
             'CompanyGroup' => 'CompanyGroups',
             'Project' => 'Projects',
         ];
@@ -75,7 +75,7 @@ abstract class AbstractCrudController extends EasyAdminAbstractCrudController
     /**
      * Get the system entity for permission checking.
      */
-    protected function getSystemEntity(): SystemEntity
+    protected function getSystemEntity(): DomainEntityPermission
     {
         return $this->permissionService->getSystemEntityByCode($this->getSystemEntityCode());
     }

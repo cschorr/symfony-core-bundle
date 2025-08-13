@@ -66,8 +66,9 @@ security:
 
     #custom
     role_hierarchy:
-        ROLE_ADMIN:       ROLE_USER
+        ROLE_ADMIN:       [ROLE_USER, ROLE_MODERATOR]
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_MANAGER:     [ROLE_TEAMLEAD, ROLE_FINANCE, ROLE_QUALITY, ROLE_PROJECT_MANAGEMENT]
 
 when@test:
     security:

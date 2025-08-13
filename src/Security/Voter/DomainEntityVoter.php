@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace App\Security\Voter;
 
-use App\Entity\SystemEntity;
+use App\Entity\DomainEntityPermission;
 use App\Entity\User;
-use App\Enum\SystemEntityPermission;
-use App\Repository\SystemEntityRepository;
-use App\Repository\UserGroupSystemEntityPermissionRepository;
+use App\Enum\Permission;
+use App\Repository\DomainEntityRepository;
+use App\Repository\UserGroupDomainEntityPermissionRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class SystemEntityVoter extends Voter
+class DomainEntityVoter extends Voter
 {
     public function __construct(
-        private readonly UserGroupSystemEntityPermissionRepository $permissionRepository,
-        private readonly SystemEntityRepository $systemEntityRepository,
+        private readonly UserGroupDomainEntityPermissionRepository $permissionRepository,
+        private readonly DomainEntityRepository $domainEntityRepository,
         private readonly LoggerInterface $logger,
     ) {
     }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        // Support both SystemEntity entities and system entity codes/names (strings)
-        $validAttributes = array_map(fn (SystemEntityPermission $case) => $case->value, SystemEntityPermission::cases());
+        // Support both DomainEntityPermission entities and system entity codes/names (strings)
+        $validAttributes = array_map(fn (Permission $case) => $case->value, Permission::cases());
 
         return in_array($attribute, $validAttributes, true)
-            && ($subject instanceof SystemEntity || is_string($subject));
+            && ($subject instanceof DomainEntityPermission || is_string($subject));
     }
 
     protected function voteOnAttribute(
@@ -55,59 +55,59 @@ class SystemEntityVoter extends Voter
         // Get the system entity
         $systemEntity = $subject;
         if (is_string($subject)) {
-            // Try to resolve string to SystemEntity entity
+            // Try to resolve string to DomainEntityPermission entity
             $systemEntity = $this->resolveSystemEntityFromString($subject);
             if (null === $systemEntity) {
                 // Debug: Log when resolution fails
-                $this->logger->debug(sprintf("SystemEntityVoter: Could not resolve '%s' to SystemEntity", $subject));
+                $this->logger->debug(sprintf("SystemEntityVoter: Could not resolve '%s' to DomainEntityPermission", $subject));
 
                 return false;
             }
 
             // Debug: Log successful resolution
-            $this->logger->debug(sprintf("SystemEntityVoter: Resolved '%s' to SystemEntity ID: %s", $subject, $systemEntity->getId()));
+            $this->logger->debug(sprintf("SystemEntityVoter: Resolved '%s' to DomainEntityPermission ID: %s", $subject, $systemEntity->getId()));
         }
 
-        if (!$systemEntity instanceof SystemEntity) {
+        if (!$systemEntity instanceof DomainEntityPermission) {
             return false;
         }
 
         // Check specific permission
         // Convert string to enum for type safety
-        $permission = SystemEntityPermission::tryFrom($attribute);
+        $permission = Permission::tryFrom($attribute);
         if (!$permission) {
             return false;
         }
 
         // Check specific permission using match expression
         return match ($permission) {
-            SystemEntityPermission::READ => $this->canRead($systemEntity, $user),
-            SystemEntityPermission::WRITE,
-            SystemEntityPermission::EDIT,
-            SystemEntityPermission::DELETE => $this->canWrite($systemEntity, $user),
+            Permission::READ => $this->canRead($systemEntity, $user),
+            Permission::WRITE,
+            Permission::EDIT,
+            Permission::DELETE => $this->canWrite($systemEntity, $user),
         };
     }
 
-    private function canRead(SystemEntity $systemEntity, User $user): bool
+    private function canRead(DomainEntityPermission $systemEntity, User $user): bool
     {
         return $this->permissionRepository->userHasReadAccess($user, $systemEntity);
     }
 
-    private function canWrite(SystemEntity $systemEntity, User $user): bool
+    private function canWrite(DomainEntityPermission $systemEntity, User $user): bool
     {
         return $this->permissionRepository->userHasWriteAccess($user, $systemEntity);
     }
 
     /**
-     * Try to resolve a string (system entity code or name) to a SystemEntity entity.
+     * Try to resolve a string (system entity code or name) to a DomainEntityPermission entity.
      */
-    private function resolveSystemEntityFromString(string $subject): ?SystemEntity
+    private function resolveSystemEntityFromString(string $subject): ?DomainEntityPermission
     {
         // Try to find by code first, then by name
-        $systemEntity = $this->systemEntityRepository->findOneBy(['code' => $subject]);
+        $systemEntity = $this->domainEntityRepository->findOneBy(['code' => $subject]);
 
         if (null === $systemEntity) {
-            return $this->systemEntityRepository->findOneBy(['name' => $subject]);
+            return $this->domainEntityRepository->findOneBy(['name' => $subject]);
         }
 
         return $systemEntity;
