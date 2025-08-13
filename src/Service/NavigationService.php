@@ -7,26 +7,26 @@ namespace App\Service;
 use App\Entity\Company;
 use App\Entity\CompanyGroup;
 use App\Entity\Project;
-use App\Entity\SystemEntity;
+use App\Entity\DomainEntityPermission;
 use App\Entity\User;
 use App\Entity\Contact;
 use App\Entity\Category;
 use App\Entity\UserGroup;
-use App\Repository\SystemEntityRepository;
+use App\Repository\DomainEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class NavigationService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly SystemEntityRepository $systemEntityRepository,
+        private readonly DomainEntityRepository $systemEntityRepository,
     ) {
     }
 
     /**
      * Get all active system entities that the user can access (has read or write permissions).
      *
-     * @return SystemEntity[]
+     * @return DomainEntityPermission[]
      */
     public function getAccessibleSystemEntitiesForUser(User $user): array
     {
@@ -50,7 +50,7 @@ class NavigationService
     /**
      * Get all active system entities (admin view).
      *
-     * @return SystemEntity[]
+     * @return DomainEntityPermission[]
      */
     public function getAllActiveSystemEntities(): array
     {
@@ -68,7 +68,7 @@ class NavigationService
     /**
      * Get system entity by code for icon display.
      */
-    public function getSystemEntityIcon(SystemEntity $systemEntity): string
+    public function getSystemEntityIcon(DomainEntityPermission $systemEntity): string
     {
         return $systemEntity->getIcon() ?? 'fas fa-circle';
     }
@@ -80,7 +80,7 @@ class NavigationService
     {
         // Predefined mapping of system entity codes to their corresponding entity classes
         $classMapping = [
-            'SystemEntity' => SystemEntity::class,
+            'DomainEntityPermission' => DomainEntityPermission::class,
             'User' => User::class,
             'UserGroup' => UserGroup::class,
             'Company' => Company::class,

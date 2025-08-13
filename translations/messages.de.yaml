@@ -14,9 +14,9 @@ Logout: "Abmelden"
 "supported by": "unterstützt von"
 "Placeholder image": "Platzhalter-Bild"
 
-# SystemEntity/Entity Names (direct translation approach)
-# These keys match the "code" and "name" fields in the SystemEntity entity
-# - Singular forms (code field): User, Company, SystemEntity, CompanyGroup, Project
+# DomainEntityPermission/Entity Names (direct translation approach)
+# These keys match the "code" and "name" fields in the DomainEntityPermission entity
+# - Singular forms (code field): User, Company, DomainEntityPermission, CompanyGroup, Project
 # - Plural forms (name field): Users, Companies, System Entities, CompanyGroups, Projects
 # Navigation uses the plural forms automatically via $systemEntity->getName()
 Category: "Kategorie"
@@ -62,14 +62,14 @@ Show: "Anzeigen"
 "Edit %s": "%s bearbeiten"
 "Create %s": "%s erstellen"
 
-# SystemEntity Management
+# DomainEntityPermission Management
 "Create System Entity": "System-Entität erstellen"
 "System Entity Information": "System-Entitäts-Informationen"
 "Basic information about the system entity": "Grundinformationen über die System-Entität"
 "Manage system entities and their permissions.": "System-Entitäten und deren Berechtigungen verwalten."
 "Display name for the system entity": "Anzeigename für die System-Entität"
-"Unique code that matches the entity name (e.g., User, Company, SystemEntity)": "Eindeutiger Code, der dem Entitätsnamen entspricht (z.B. User, Company, SystemEntity)"
-"e.g., User, Company, SystemEntity": "z.B. User, Company, SystemEntity"
+"Unique code that matches the entity name (e.g., User, Company, SystemEntity)": "Eindeutiger Code, der dem Entitätsnamen entspricht (z.B. User, Company, DomainEntityPermission)"
+"e.g., User, Company, SystemEntity": "z.B. User, Company, DomainEntityPermission"
 "Optional description of what this system entity manages": "Optionale Beschreibung dessen, was diese System-Entität verwaltet"
 
 # Permissions
@@ -88,8 +88,8 @@ Show: "Anzeigen"
 "Unknown SystemEntity": "Unbekannte System-Entität"
 Read: "Lesen"
 Write: "Schreiben"
-"Access denied. You need read permission for the %systemEntity% system entity.": "Zugriff verweigert. Sie benötigen Leseberechtigung für die %systemEntity%-System-Entität."
-"Access denied. You need write permission for the %systemEntity% system entity.": "Zugriff verweigert. Sie benötigen Schreibberechtigung für die %systemEntity%-System-Entität."
+"Access denied. You need read permission for the %systemEntity% system entity.": "Zugriff verweigert. Sie benötigen Leseberechtigung für die %domainEntityPermission%-System-Entität."
+"Access denied. You need write permission for the %systemEntity% system entity.": "Zugriff verweigert. Sie benötigen Schreibberechtigung für die %domainEntityPermission%-System-Entität."
 
 # User Management
 "User Information": "Benutzerinformationen"

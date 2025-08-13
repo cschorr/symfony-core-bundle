@@ -14,9 +14,9 @@ Logout: "Logout"
 "supported by": "supported by"
 "Placeholder image": "Placeholder image"
 
-# SystemEntity/Entity Names (direct translation approach)
-# These keys match the "code" and "name" fields in the SystemEntity entity
-# - Singular forms (code field): User, Company, SystemEntity, CompanyGroup, Project
+# DomainEntityPermission/Entity Names (direct translation approach)
+# These keys match the "code" and "name" fields in the DomainEntityPermission entity
+# - Singular forms (code field): User, Company, DomainEntityPermission, CompanyGroup, Project
 # - Plural forms (name field): Users, Companies, System Entities, CompanyGroups, Projects
 # Navigation uses the plural forms automatically via $systemEntity->getName()
 User: "User"
@@ -59,14 +59,14 @@ Show: "Show"
 "Edit %s": "Edit %s"
 "Create %s": "Create %s"
 
-# SystemEntity Management
+# DomainEntityPermission Management
 "Create System Entity": "Create System Entity"
 "System Entity Information": "System Entity Information"
 "Basic information about the system entity": "Basic information about the system entity"
 "Manage system entities and their permissions.": "Manage system entities and their permissions."
 "Display name for the system entity": "Display name for the system entity"
-"Unique code that matches the entity name (e.g., User, Company, SystemEntity)": "Unique code that matches the entity name (e.g., User, Company, SystemEntity)"
-"e.g., User, Company, SystemEntity": "e.g., User, Company, SystemEntity"
+"Unique code that matches the entity name (e.g., User, Company, SystemEntity)": "Unique code that matches the entity name (e.g., User, Company, DomainEntityPermission)"
+"e.g., User, Company, SystemEntity": "e.g., User, Company, DomainEntityPermission"
 "Optional description of what this system entity manages": "Optional description of what this system entity manages"
 
 # Permissions
@@ -74,7 +74,7 @@ Show: "Show"
 "Manage user permissions for this system entity": "Manage user permissions for this system entity"
 "Can Read": "Can Read"
 "Can Write": "Can Write"
-"SystemEntity Permissions": "SystemEntity Permissions"
+"SystemEntity Permissions": "DomainEntityPermission Permissions"
 "System Permissions": "System Permissions"
 "Count of system entity permissions for this user": "Count of system entity permissions for this user"
 "No permissions": "No permissions"
@@ -82,11 +82,11 @@ Show: "Show"
 "%d permission(s) assigned": "%d permission(s) assigned"
 "Permission Details": "Permission Details"
 "Unknown User": "Unknown User"
-"Unknown SystemEntity": "Unknown SystemEntity"
+"Unknown SystemEntity": "Unknown DomainEntityPermission"
 Read: "Read"
 Write: "Write"
-"Access denied. You need read permission for the %systemEntity% system entity.": "Access denied. You need read permission for the %systemEntity% system entity."
-"Access denied. You need write permission for the %systemEntity% system entity.": "Access denied. You need write permission for the %systemEntity% system entity."
+"Access denied. You need read permission for the %systemEntity% system entity.": "Access denied. You need read permission for the %domainEntityPermission% system entity."
+"Access denied. You need write permission for the %systemEntity% system entity.": "Access denied. You need write permission for the %domainEntityPermission% system entity."
 
 # User Management
 "User Information": "User Information"

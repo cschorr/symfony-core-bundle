@@ -29,9 +29,9 @@ class DebugUuidCommand
 
         $io->title('UUID and Doctrine QueryBuilder Debug');
 
-        // Get the demo user and a SystemEntity
+        // Get the demo user and a DomainEntityPermission
         $userRepo = $this->entityManager->getRepository(User::class);
-        $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\SystemEntity::class);
+        $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\DomainEntityPermission::class);
         $permissionRepo = $this->entityManager->getRepository(\App\Entity\UserSystemEntityPermission::class);
 
         $demoUser = $userRepo->findOneBy(['email' => 'demo@example.com']);
@@ -57,7 +57,7 @@ class DebugUuidCommand
         $qb = $permissionRepo->createQueryBuilder('usep')
             ->select('COUNT(usep.id)')
             ->andWhere('usep.user = :user')
-            ->andWhere('usep.systemEntity = :systemEntity')
+            ->andWhere('usep.domainEntityPermission = :systemEntity')
             ->setParameter('user', $demoUser)
             ->setParameter('systemEntity', $companyEntity);
 
@@ -68,7 +68,7 @@ class DebugUuidCommand
         $qb2 = $permissionRepo->createQueryBuilder('usep')
             ->select('COUNT(usep.id)')
             ->andWhere('usep.user = :userId')
-            ->andWhere('usep.systemEntity = :systemEntityId')
+            ->andWhere('usep.domainEntityPermission = :systemEntityId')
             ->setParameter('userId', $demoUser->getId(), 'uuid')
             ->setParameter('systemEntityId', $companyEntity->getId(), 'uuid');
 
@@ -83,13 +83,13 @@ class DebugUuidCommand
         // Test 5: Check entity state
         $io->writeln("\n5. Entity state check:");
         $io->writeln('User is managed: ' . ($this->entityManager->contains($demoUser) ? 'YES' : 'NO'));
-        $io->writeln('SystemEntity is managed: ' . ($this->entityManager->contains($companyEntity) ? 'YES' : 'NO'));
+        $io->writeln('DomainEntityPermission is managed: ' . ($this->entityManager->contains($companyEntity) ? 'YES' : 'NO'));
 
         // Test 6: Try with explicit binary parameter binding
         $qb3 = $permissionRepo->createQueryBuilder('usep')
             ->select('COUNT(usep.id)')
             ->andWhere("usep.user = UNHEX(REPLACE(:userId, '-', ''))")
-            ->andWhere("usep.systemEntity = UNHEX(REPLACE(:systemEntityId, '-', ''))")
+            ->andWhere("usep.domainEntityPermission = UNHEX(REPLACE(:systemEntityId, '-', ''))")
             ->setParameter('userId', $demoUser->getId()->__toString())
             ->setParameter('systemEntityId', $companyEntity->getId()->__toString());
 
@@ -104,7 +104,7 @@ class DebugUuidCommand
         $io->writeln("\n7. Parameter binding debug:");
         $io->writeln('User ID as string: ' . $demoUser->getId()->__toString());
         $io->writeln('User ID __toString(): ' . $demoUser->getId());
-        $io->writeln('SystemEntity ID as string: ' . $companyEntity->getId()->__toString());
+        $io->writeln('DomainEntityPermission ID as string: ' . $companyEntity->getId()->__toString());
 
         // Test 8: Test our repository methods that use the clean UUID solution
         $io->writeln("\n8. Testing our fixed repository methods:");
@@ -116,13 +116,13 @@ class DebugUuidCommand
         $io->writeln('UserSystemEntityPermissionRepository READ permissions: ' . count($readPermissions));
         $io->writeln('UserSystemEntityPermissionRepository WRITE permissions: ' . count($writePermissions));
 
-        // Test SystemEntityRepository
-        $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\SystemEntity::class);
+        // Test DomainEntityRepository
+        $systemEntityRepo = $this->entityManager->getRepository(\App\Entity\DomainEntityPermission::class);
         $readableEntities = $systemEntityRepo->findReadableByUser($demoUser);
-        $io->writeln('SystemEntityRepository->findReadableByUser: Found ' . count($readableEntities) . ' entities');
+        $io->writeln('DomainEntityRepository->findReadableByUser: Found ' . count($readableEntities) . ' entities');
 
         $writableEntities = $systemEntityRepo->findWritableByUser($demoUser);
-        $io->writeln('SystemEntityRepository->findWritableByUser: Found ' . count($writableEntities) . ' entities');
+        $io->writeln('DomainEntityRepository->findWritableByUser: Found ' . count($writableEntities) . ' entities');
 
         return Command::SUCCESS;
     }

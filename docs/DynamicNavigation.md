@@ -51,7 +51,7 @@ $isAdmin = $navigationService->isUserAdmin($user);
 4. **Create systemEntity record** in the database:
 ```php
 $systemEntity = new SystemEntity();
-$systemEntity->setName('Your SystemEntity Name');
+$systemEntity->setName('Your DomainEntityPermission Name');
 $systemEntity->setCode('YourSystemEntity'); // Must match entity mapping key
 $systemEntity->setText('Description of your systemEntity');
 $systemEntity->setActive(true);
