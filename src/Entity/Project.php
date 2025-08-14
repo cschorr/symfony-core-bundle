@@ -20,8 +20,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['project:read']],
-    denormalizationContext: ['groups' => ['project:write']],
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
     paginationEnabled: true,
@@ -41,7 +39,6 @@ class Project extends AbstractEntity
     use SetStartEndTrait;
 
     #[ORM\Column(type: Types::STRING, length: 32, nullable: false, enumType: ProjectStatus::class)]
-    #[Groups(['project:read', 'project:write'])]
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
@@ -62,19 +59,15 @@ class Project extends AbstractEntity
     }
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
-    #[Groups(['project:read', 'project:write'])]
     private ?User $assignee = null;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
-    #[Groups(['project:read', 'project:write'])]
     private ?Company $client = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['project:read', 'project:write'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne]
-    #[Groups(['project:read', 'project:write'])]
     private ?Category $category = null;
 
     /**
