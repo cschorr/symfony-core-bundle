@@ -42,10 +42,10 @@ class AppFixtures extends Fixture
         $this->createDomainEntityFixtures($manager);
         $this->createCategoryFixtures($manager);
         $this->createUserGroupFixtures($manager);
+        $this->createCompanyGroupFixtures($manager); // Create groups before companies
+        $this->createCompanyFixtures($manager); // Create companies before users for proper assignment
         $this->createUserFixtures($manager);
         $this->createPermissionFixtures($manager);
-        $this->createCompanyGroupFixtures($manager); // NEW: groups before companies
-        $this->createCompanyFixtures($manager);
         $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
     }
@@ -262,60 +262,113 @@ class AppFixtures extends Fixture
                 'notes' => 'Administrator user with full access',
                 'category' => 'main2',
                 'nameLast' => 'Admin',
-                'nameFirst' => 'User',
+                'nameFirst' => 'System',
                 'userGroups' => ['Admin'],
+                'company' => null, // Admin not assigned to specific company
             ],
             'editor' => [
                 'email' => 'editor@example.com',
                 'active' => true,
-                'notes' => 'Demo user with limited access',
+                'notes' => 'Web developer working on e-commerce projects',
                 'category' => 'sub1',
-                'nameLast' => 'Demo',
-                'nameFirst' => 'User',
+                'nameLast' => 'Wilson',
+                'nameFirst' => 'Sarah',
                 'userGroups' => ['Editor'],
+                'company' => 'company_0', // Cyberdyne Systems
             ],
             'teamlead' => [
                 'email' => 'teamlead@example.com',
                 'active' => true,
                 'notes' => 'Senior developer specializing in mobile apps',
                 'category' => 'sub2',
-                'nameLast' => 'Developer',
-                'nameFirst' => 'User',
+                'nameLast' => 'Johnson',
+                'nameFirst' => 'Michael',
                 'userGroups' => ['Teamlead'],
                 'roles' => ['ROLE_QUALITY'],
+                'company' => 'company_1', // Stark Industries
             ],
             'manager' => [
                 'email' => 'marketing@example.com',
                 'active' => true,
                 'notes' => 'Marketing specialist for digital campaigns',
                 'category' => 'sub6',
-                'nameLast' => 'Marketing',
-                'nameFirst' => 'User',
+                'nameLast' => 'Davis',
+                'nameFirst' => 'Emma',
                 'userGroups' => ['Manager'],
+                'company' => 'company_5', // Umbrella Corporation
             ],
             'external' => [
                 'email' => 'external@example.com',
                 'active' => true,
                 'notes' => 'Business consultant for process optimization',
                 'category' => 'main4',
-                'nameLast' => 'Consultant',
-                'nameFirst' => 'User',
+                'nameLast' => 'Thompson',
+                'nameFirst' => 'Robert',
                 'userGroups' => ['External Users'],
+                'company' => 'company_2', // Wayne Enterprises
             ],
             'demo' => [
                 'email' => 'demo@example.com',
                 'active' => true,
-                'notes' => 'Demo user with limited access',
+                'notes' => 'Full-stack developer with React and PHP expertise',
                 'category' => 'sub1',
-                'nameLast' => 'Demo',
-                'nameFirst' => 'User',
+                'nameLast' => 'Anderson',
+                'nameFirst' => 'Alex',
                 'userGroups' => ['Editor'],
+                'company' => 'company_3', // Oscorp
+            ],
+            // Additional employees for the expanded companies
+            'dev1' => [
+                'email' => 'dev1@example.com',
+                'active' => true,
+                'notes' => 'Frontend specialist focusing on React and Vue.js',
+                'category' => 'sub1',
+                'nameLast' => 'Brown',
+                'nameFirst' => 'Jessica',
+                'userGroups' => ['Editor'],
+                'company' => 'company_7', // Parker Industries
+            ],
+            'dev2' => [
+                'email' => 'dev2@example.com',
+                'active' => true,
+                'notes' => 'Mobile app developer with iOS and Android experience',
+                'category' => 'sub2',
+                'nameLast' => 'Garcia',
+                'nameFirst' => 'Carlos',
+                'userGroups' => ['Teamlead'],
+                'company' => 'company_8', // Pym Technologies
+            ],
+            'consultant1' => [
+                'email' => 'consultant1@example.com',
+                'active' => true,
+                'notes' => 'Business process optimization specialist',
+                'category' => 'main4',
+                'nameLast' => 'Miller',
+                'nameFirst' => 'Amanda',
+                'userGroups' => ['Manager'],
+                'company' => 'company_10', // Queen Industries
+            ],
+            'marketing1' => [
+                'email' => 'marketing1@example.com',
+                'active' => true,
+                'notes' => 'Digital marketing strategist and content creator',
+                'category' => 'sub6',
+                'nameLast' => 'Williams',
+                'nameFirst' => 'David',
+                'userGroups' => ['Manager'],
+                'company' => 'company_15', // Tricell Pharmaceuticals
             ],
         ];
 
         foreach ($usersData as $key => $userData) {
             $category = $this->categories[$userData['category']] ?? null;
             $userGroups = $this->userGroupRepository->findBy(['name' => $userData['userGroups']]);
+            $company = null;
+
+            // Get company if specified
+            if (isset($userData['company']) && $userData['company'] !== null) {
+                $company = $this->companies[$userData['company']] ?? null;
+            }
 
             if (!$category) {
                 throw new \Exception(
@@ -338,6 +391,11 @@ class AppFixtures extends Fixture
                 ->setCategory($category)
                 ->setRoles($userData['roles'] ?? [])
             ;
+
+            if ($company) {
+                $user->setCompany($company);
+            }
+
             foreach ($userGroups as $userGroup) {
                 $user->addUserGroup($userGroup);
             }
@@ -446,7 +504,7 @@ class AppFixtures extends Fixture
 
     private function createCompanyFixtures(ObjectManager $manager): void
     {
-        // Companies themed from comics/movies, renamed to start with "Macht Group - ..."
+        // Companies themed from comics/movies and additional diverse demo companies
         $companiesData = [
             [
                 'display' => 'Cyberdyne Systems',
@@ -520,6 +578,167 @@ class AppFixtures extends Fixture
                 'zipCode' => '10117',
                 'group' => 'umbrella',
             ],
+            // Additional Skynet Group companies
+            [
+                'display' => 'GeneDyne Technologies',
+                'email' => 'info@genedyne.example',
+                'country' => 'CA',
+                'category' => 'sub3', // Software Solutions
+                'phone' => '+1 416 555 0200',
+                'url' => 'https://genedyne.example',
+                'street' => '2500 Tech Valley Dr',
+                'city' => 'Toronto',
+                'zipCode' => 'M5V 3A8',
+                'group' => 'skynet',
+            ],
+            [
+                'display' => 'NeuralLink Systems',
+                'email' => 'contact@neurallink.example',
+                'country' => 'JP',
+                'category' => 'main1', // Technology
+                'phone' => '+81 3 5555 0300',
+                'url' => 'https://neurallink.example',
+                'street' => '1-1-1 Shibuya',
+                'city' => 'Tokyo',
+                'zipCode' => '150-0002',
+                'group' => 'skynet',
+            ],
+            // Additional Marvel Group companies
+            [
+                'display' => 'Parker Industries',
+                'email' => 'hello@parker.example',
+                'country' => 'US',
+                'category' => 'sub2', // Mobile Development
+                'phone' => '+1 555 0400',
+                'url' => 'https://parker.example',
+                'street' => '20 Ingram Street',
+                'city' => 'New York',
+                'zipCode' => '10038',
+                'group' => 'marvel',
+            ],
+            [
+                'display' => 'Pym Technologies',
+                'email' => 'info@pym.example',
+                'country' => 'US',
+                'category' => 'sub3', // Software Solutions
+                'phone' => '+1 415 555 0500',
+                'url' => 'https://pym.example',
+                'street' => '1955 Quantum Ave',
+                'city' => 'San Francisco',
+                'zipCode' => '94102',
+                'group' => 'marvel',
+            ],
+            [
+                'display' => 'Rand Corporation',
+                'email' => 'contact@rand.example',
+                'country' => 'US',
+                'category' => 'main2', // Business Services
+                'phone' => '+1 555 0600',
+                'url' => 'https://rand.example',
+                'street' => '200 Iron Fist Plaza',
+                'city' => 'New York',
+                'zipCode' => '10013',
+                'group' => 'marvel',
+            ],
+            // Additional DC Group companies
+            [
+                'display' => 'Queen Industries',
+                'email' => 'admin@queen.example',
+                'country' => 'US',
+                'category' => 'sub4', // Financial Services
+                'phone' => '+1 206 555 0700',
+                'url' => 'https://queen.example',
+                'street' => '1701 Green Arrow Way',
+                'city' => 'Star City',
+                'zipCode' => '98101',
+                'group' => 'dc',
+            ],
+            [
+                'display' => 'LexCorp',
+                'email' => 'info@lexcorp.example',
+                'country' => 'US',
+                'category' => 'main4', // Consulting
+                'phone' => '+1 555 0800',
+                'url' => 'https://lexcorp.example',
+                'street' => '1000 LexCorp Plaza',
+                'city' => 'Metropolis',
+                'zipCode' => '10001',
+                'group' => 'dc',
+            ],
+            [
+                'display' => 'Kord Industries',
+                'email' => 'hello@kord.example',
+                'country' => 'US',
+                'category' => 'sub1', // Web Development
+                'phone' => '+1 773 555 0900',
+                'url' => 'https://kord.example',
+                'street' => '42 Beetle Drive',
+                'city' => 'Chicago',
+                'zipCode' => '60601',
+                'group' => 'dc',
+            ],
+            // Additional Weyland Group companies
+            [
+                'display' => 'Tyrell Corporation',
+                'email' => 'corp@tyrell.example',
+                'country' => 'US',
+                'category' => 'main1', // Technology
+                'phone' => '+1 213 555 1000',
+                'url' => 'https://tyrell.example',
+                'street' => '2019 Replicant Blvd',
+                'city' => 'Los Angeles',
+                'zipCode' => '90028',
+                'group' => 'weyland',
+            ],
+            [
+                'display' => 'Seegson Corporation',
+                'email' => 'contact@seegson.example',
+                'country' => 'FR',
+                'category' => 'sub5', // Legal Services
+                'phone' => '+33 1 55 55 1100',
+                'url' => 'https://seegson.example',
+                'street' => '77 Rue de la Paix',
+                'city' => 'Paris',
+                'zipCode' => '75001',
+                'group' => 'weyland',
+            ],
+            // Additional Umbrella Group companies
+            [
+                'display' => 'Tricell Pharmaceuticals',
+                'email' => 'info@tricell.example',
+                'country' => 'ZA',
+                'category' => 'sub6', // Digital Marketing
+                'phone' => '+27 11 555 1200',
+                'url' => 'https://tricell.example',
+                'street' => '15 Kijuju Business Park',
+                'city' => 'Johannesburg',
+                'zipCode' => '2000',
+                'group' => 'umbrella',
+            ],
+            [
+                'display' => 'TerraSave International',
+                'email' => 'hello@terrasave.example',
+                'country' => 'AU',
+                'category' => 'sub7', // Content Creation
+                'phone' => '+61 2 5555 1300',
+                'url' => 'https://terrasave.example',
+                'street' => '88 Resident Way',
+                'city' => 'Sydney',
+                'zipCode' => '2000',
+                'group' => 'umbrella',
+            ],
+            [
+                'display' => 'Blue Umbrella Ltd',
+                'email' => 'contact@blueumbrella.example',
+                'country' => 'GB',
+                'category' => 'main3', // Marketing & Sales
+                'phone' => '+44 20 7555 1400',
+                'url' => 'https://blueumbrella.example',
+                'street' => '10 Downing Street',
+                'city' => 'London',
+                'zipCode' => 'SW1A 2AA',
+                'group' => 'umbrella',
+            ],
         ];
 
         foreach ($companiesData as $index => $data) {
@@ -581,53 +800,306 @@ class AppFixtures extends Fixture
     private function createProjectFixtures(ObjectManager $manager): void
     {
         $projectsData = [
+            // Cyberdyne Systems - Multiple projects (company_0)
             [
                 'name' => 'E-Commerce Platform',
                 'status' => ProjectStatus::IN_PROGRESS,
                 'description' => 'Modern e-commerce platform with advanced features',
-                'client' => 'company_0', // Macht Group - Cyberdyne Systems
-                'assignee' => 'demo',
+                'client' => 'company_0',
+                'assignee' => 'editor', // Sarah Wilson (employee of Cyberdyne)
                 'category' => 'sub1',
             ],
+            [
+                'name' => 'AI Security System',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Advanced AI-powered security and surveillance system',
+                'client' => 'company_0',
+                'assignee' => 'editor',
+                'category' => 'main1',
+            ],
+            [
+                'name' => 'Automated Defense Network',
+                'status' => ProjectStatus::COMPLETED,
+                'description' => 'Fully automated defense and monitoring network',
+                'client' => 'company_0',
+                'assignee' => 'admin',
+                'category' => 'sub3',
+            ],
+
+            // Stark Industries - Multiple projects (company_1)
             [
                 'name' => 'Mobile Banking App',
                 'status' => ProjectStatus::PLANNING,
                 'description' => 'Secure mobile banking application with biometric authentication',
-                'client' => 'company_1', // Macht Group - Stark Industries
-                'assignee' => 'teamlead',
+                'client' => 'company_1',
+                'assignee' => 'teamlead', // Michael Johnson (employee of Stark)
                 'category' => 'sub2',
             ],
             [
-                'name' => 'Digital Marketing Campaign',
+                'name' => 'Arc Reactor Monitoring',
                 'status' => ProjectStatus::IN_PROGRESS,
-                'description' => 'Comprehensive digital marketing strategy implementation',
-                'client' => 'company_5', // Macht Group - Umbrella Corporation
-                'assignee' => 'manager',
-                'category' => 'sub6',
+                'description' => 'Real-time monitoring system for arc reactor technology',
+                'client' => 'company_1',
+                'assignee' => 'teamlead',
+                'category' => 'sub3',
             ],
+
+            // Wayne Enterprises - Multiple projects (company_2)
             [
                 'name' => 'Business Process Optimization',
                 'status' => ProjectStatus::ON_HOLD,
                 'description' => 'Analysis and optimization of business workflows',
-                'client' => 'company_2', // Macht Group - Wayne Enterprises
-                'assignee' => 'external',
+                'client' => 'company_2',
+                'assignee' => 'external', // Robert Thompson (employee of Wayne)
                 'category' => 'main4',
             ],
+            [
+                'name' => 'Corporate Security Upgrade',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Enterprise-wide security system upgrade',
+                'client' => 'company_2',
+                'assignee' => 'external',
+                'category' => 'main2',
+            ],
+            [
+                'name' => 'Financial Portfolio Management',
+                'status' => ProjectStatus::COMPLETED,
+                'description' => 'Advanced portfolio management and analysis system',
+                'client' => 'company_2',
+                'assignee' => 'consultant1',
+                'category' => 'sub4',
+            ],
+
+            // Oscorp - Multiple projects (company_3)
             [
                 'name' => 'R&D Dashboard',
                 'status' => ProjectStatus::IN_PROGRESS,
                 'description' => 'Real-time R&D analytics and reporting',
-                'client' => 'company_3', // Macht Group - Oscorp
-                'assignee' => 'demo',
+                'client' => 'company_3',
+                'assignee' => 'demo', // Alex Anderson (employee of Oscorp)
                 'category' => 'sub3',
             ],
+            [
+                'name' => 'Scientific Data Analysis',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Advanced data analysis platform for scientific research',
+                'client' => 'company_3',
+                'assignee' => 'demo',
+                'category' => 'main1',
+            ],
+
+            // Weyland-Yutani (company_4)
             [
                 'name' => 'Enterprise CMS',
                 'status' => ProjectStatus::COMPLETED,
                 'description' => 'Enterprise-grade content management solution',
-                'client' => 'company_4', // Macht Group - Weyland-Yutani
-                'assignee' => 'demo',
+                'client' => 'company_4',
+                'assignee' => 'admin',
                 'category' => 'sub7',
+            ],
+
+            // Umbrella Corporation - Multiple projects (company_5)
+            [
+                'name' => 'Digital Marketing Campaign',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Comprehensive digital marketing strategy implementation',
+                'client' => 'company_5',
+                'assignee' => 'manager', // Emma Davis (employee of Umbrella)
+                'category' => 'sub6',
+            ],
+            [
+                'name' => 'Pharmaceutical Research Portal',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Web portal for pharmaceutical research and development',
+                'client' => 'company_5',
+                'assignee' => 'manager',
+                'category' => 'sub1',
+            ],
+            [
+                'name' => 'Global Distribution Network',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Worldwide distribution and logistics management system',
+                'client' => 'company_5',
+                'assignee' => 'marketing1',
+                'category' => 'main3',
+            ],
+
+            // GeneDyne Technologies (company_6)
+            [
+                'name' => 'Neural Interface Development',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Advanced AI-driven neural interface system',
+                'client' => 'company_6',
+                'assignee' => 'teamlead',
+                'category' => 'main1',
+            ],
+
+            // NeuralLink Systems (company_7)
+            [
+                'name' => 'Quantum Computing Research',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Research and development of quantum computing solutions',
+                'client' => 'company_7',
+                'assignee' => 'admin',
+                'category' => 'sub3',
+            ],
+
+            // Parker Industries - Multiple projects (company_8)
+            [
+                'name' => 'Mobile Commerce App',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Cross-platform mobile commerce application',
+                'client' => 'company_8',
+                'assignee' => 'dev1', // Jessica Brown (employee of Parker)
+                'category' => 'sub2',
+            ],
+            [
+                'name' => 'Web Crawler Technology',
+                'status' => ProjectStatus::COMPLETED,
+                'description' => 'Advanced web crawling and indexing system',
+                'client' => 'company_8',
+                'assignee' => 'dev1',
+                'category' => 'sub1',
+            ],
+
+            // Pym Technologies - Multiple projects (company_9)
+            [
+                'name' => 'Microservices Architecture',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Migration to microservices architecture',
+                'client' => 'company_9',
+                'assignee' => 'dev2', // Carlos Garcia (employee of Pym)
+                'category' => 'sub3',
+            ],
+            [
+                'name' => 'Quantum Realm Analytics',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Quantum-level data analysis and processing system',
+                'client' => 'company_9',
+                'assignee' => 'dev2',
+                'category' => 'main1',
+            ],
+
+            // Rand Corporation (company_10)
+            [
+                'name' => 'Iron Fist Training Platform',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Digital training and certification platform',
+                'client' => 'company_10',
+                'assignee' => 'admin',
+                'category' => 'sub1',
+            ],
+
+            // Queen Industries - Multiple projects (company_11)
+            [
+                'name' => 'Financial Analytics Platform',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Real-time financial data analytics and reporting platform',
+                'client' => 'company_11',
+                'assignee' => 'consultant1', // Amanda Miller (employee of Queen)
+                'category' => 'sub4',
+            ],
+            [
+                'name' => 'Green Arrow Logistics',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Sustainable logistics and supply chain management system',
+                'client' => 'company_11',
+                'assignee' => 'consultant1',
+                'category' => 'main2',
+            ],
+
+            // LexCorp - Multiple projects (company_12)
+            [
+                'name' => 'Legal Document Management',
+                'status' => ProjectStatus::COMPLETED,
+                'description' => 'Automated legal document processing and management system',
+                'client' => 'company_12',
+                'assignee' => 'external',
+                'category' => 'sub5',
+            ],
+            [
+                'name' => 'Corporate Intelligence System',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Advanced business intelligence and analytics platform',
+                'client' => 'company_12',
+                'assignee' => 'admin',
+                'category' => 'main4',
+            ],
+
+            // Kord Industries (company_13)
+            [
+                'name' => 'Web Portal Redesign',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Complete redesign of corporate web portal with modern UI/UX',
+                'client' => 'company_13',
+                'assignee' => 'editor',
+                'category' => 'sub1',
+            ],
+
+            // Tyrell Corporation (company_14)
+            [
+                'name' => 'Replicant Database System',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Advanced database system for synthetic biology research',
+                'client' => 'company_14',
+                'assignee' => 'teamlead',
+                'category' => 'sub3',
+            ],
+
+            // Seegson Corporation (company_15)
+            [
+                'name' => 'Legal Compliance Platform',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Multi-jurisdictional legal compliance management system',
+                'client' => 'company_15',
+                'assignee' => 'external',
+                'category' => 'sub5',
+            ],
+
+            // Tricell Pharmaceuticals - Multiple projects (company_16)
+            [
+                'name' => 'Pharmaceutical CRM',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Customer relationship management system for pharmaceutical industry',
+                'client' => 'company_16',
+                'assignee' => 'marketing1', // David Williams (employee of Tricell)
+                'category' => 'sub6',
+            ],
+            [
+                'name' => 'Clinical Trial Management',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'Comprehensive clinical trial tracking and management system',
+                'client' => 'company_16',
+                'assignee' => 'marketing1',
+                'category' => 'main2',
+            ],
+
+            // TerraSave International (company_17)
+            [
+                'name' => 'AI Content Generation',
+                'status' => ProjectStatus::PLANNING,
+                'description' => 'AI-powered content creation and management system',
+                'client' => 'company_17',
+                'assignee' => 'admin',
+                'category' => 'sub7',
+            ],
+
+            // Blue Umbrella Ltd - Multiple projects (company_18)
+            [
+                'name' => 'Global Marketing Automation',
+                'status' => ProjectStatus::IN_PROGRESS,
+                'description' => 'Multi-channel marketing automation platform',
+                'client' => 'company_18',
+                'assignee' => 'manager',
+                'category' => 'main3',
+            ],
+            [
+                'name' => 'Brand Management System',
+                'status' => ProjectStatus::COMPLETED,
+                'description' => 'Comprehensive brand management and tracking platform',
+                'client' => 'company_18',
+                'assignee' => 'marketing1',
+                'category' => 'sub6',
             ],
         ];
 
