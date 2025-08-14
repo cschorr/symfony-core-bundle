@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\Campaign;
 use App\Entity\Category;
 use App\Entity\Company;
 use App\Entity\CompanyGroup;
@@ -29,6 +30,8 @@ class AppFixtures extends Fixture
     private array $companies = [];
     private array $contacts = [];
     private array $companyGroups = [];
+    private array $campaigns = [];
+    private array $projects = [];
 
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
@@ -48,6 +51,7 @@ class AppFixtures extends Fixture
         $this->createPermissionFixtures($manager);
         $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
+        $this->createCampaignFixtures($manager); // Create campaigns after projects
     }
 
     private function createDomainEntityFixtures(ObjectManager $manager): void
@@ -1103,7 +1107,7 @@ class AppFixtures extends Fixture
             ],
         ];
 
-        foreach ($projectsData as $projectData) {
+        foreach ($projectsData as $index => $projectData) {
             $client = $this->companies[$projectData['client']] ?? null;
             $assignee = $this->users[$projectData['assignee']] ?? null;
             $category = $this->categories[$projectData['category']] ?? null;
@@ -1117,6 +1121,78 @@ class AppFixtures extends Fixture
                 ->setCategory($category);
 
             $manager->persist($project);
+            $this->projects["project_{$index}"] = $project;
+        }
+
+        $manager->flush();
+    }
+
+    private function createCampaignFixtures(ObjectManager $manager): void
+    {
+        $campaignsData = [
+            [
+                'name' => 'Digital Transformation 2025',
+                'description' => 'Comprehensive digital transformation initiative focusing on modernizing legacy systems and implementing cutting-edge technologies across multiple client organizations.',
+                'category' => 'main1', // Technology
+                'manager' => 'admin',
+                'projects' => [
+                    'project_0', // E-Commerce Platform
+                    'project_1', // AI Security System
+                    'project_4', // Mobile Banking App
+                    'project_7', // Scientific Data Analysis
+                    'project_15', // Quantum Computing Research
+                    'project_18', // Quantum Realm Analytics
+                ],
+            ],
+            [
+                'name' => 'Global Marketing Excellence',
+                'description' => 'Multi-company marketing campaign focusing on brand management, digital marketing automation, and content creation strategies for international markets.',
+                'category' => 'main3', // Marketing & Sales
+                'manager' => 'manager', // Emma Davis
+                'projects' => [
+                    'project_11', // Digital Marketing Campaign
+                    'project_13', // Global Distribution Network
+                    'project_28', // Global Marketing Automation
+                    'project_29', // Brand Management System
+                    'project_25', // Pharmaceutical CRM
+                ],
+            ],
+            [
+                'name' => 'Enterprise Security & Compliance',
+                'description' => 'Strategic initiative to enhance security infrastructure and ensure regulatory compliance across all client operations, including legal document management and corporate intelligence systems.',
+                'category' => 'main2', // Business Services
+                'manager' => 'external', // Robert Thompson
+                'projects' => [
+                    'project_2', // Automated Defense Network
+                    'project_6', // Corporate Security Upgrade
+                    'project_22', // Legal Document Management
+                    'project_23', // Corporate Intelligence System
+                    'project_26', // Legal Compliance Platform
+                    'project_5', // Business Process Optimization
+                ],
+            ],
+        ];
+
+        foreach ($campaignsData as $index => $campaignData) {
+            $category = $this->categories[$campaignData['category']] ?? null;
+            $manager_user = $this->users[$campaignData['manager']] ?? null;
+
+            $campaign = (new Campaign())
+                ->setName($campaignData['name'])
+                ->setDescription($campaignData['description'])
+                ->setCategory($category)
+            ;
+            
+            // Assign projects to campaign
+            foreach ($campaignData['projects'] as $projectKey) {
+                $project = $this->projects[$projectKey] ?? null;
+                if ($project) {
+                    $campaign->addProject($project);
+                }
+            }
+
+            $manager->persist($campaign);
+            $this->campaigns["campaign_{$index}"] = $campaign;
         }
 
         $manager->flush();

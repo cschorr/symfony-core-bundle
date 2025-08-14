@@ -70,10 +70,17 @@ class Category extends AbstractEntity
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $icon = null;
 
+    /**
+     * @var Collection<int, Campaign>
+     */
+    #[ORM\OneToMany(targetEntity: Campaign::class, mappedBy: 'category')]
+    private Collection $campaigns;
+
     public function __construct()
     {
         parent::__construct();
         $this->children = new ArrayCollection();
+        $this->campaigns = new ArrayCollection();
     }
 
     public function getRoot(): ?self
@@ -121,6 +128,36 @@ class Category extends AbstractEntity
     public function setIcon(?string $icon): static
     {
         $this->icon = $icon;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Campaign>
+     */
+    public function getCampaigns(): Collection
+    {
+        return $this->campaigns;
+    }
+
+    public function addCampaign(Campaign $campaign): static
+    {
+        if (!$this->campaigns->contains($campaign)) {
+            $this->campaigns->add($campaign);
+            $campaign->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCampaign(Campaign $campaign): static
+    {
+        if ($this->campaigns->removeElement($campaign)) {
+            // set the owning side to null (unless already changed)
+            if ($campaign->getCategory() === $this) {
+                $campaign->setCategory(null);
+            }
+        }
 
         return $this;
     }
