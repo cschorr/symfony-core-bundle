@@ -76,6 +76,9 @@ class Project extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'project')]
     private Collection $notifications;
 
+    #[ORM\ManyToOne(inversedBy: 'projects')]
+    private ?Campaign $campaign = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -188,6 +191,18 @@ class Project extends AbstractEntity
                 $notification->setProject(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCampaign(): ?Campaign
+    {
+        return $this->campaign;
+    }
+
+    public function setCampaign(?Campaign $campaign): static
+    {
+        $this->campaign = $campaign;
 
         return $this;
     }
