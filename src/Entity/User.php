@@ -72,11 +72,18 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $roles = null;
 
+    /**
+     * @var Collection<int, AuditLogs>
+     */
+    #[ORM\OneToMany(targetEntity: AuditLogs::class, mappedBy: 'author')]
+    private Collection $auditLogs;
+
     public function __construct()
     {
         parent::__construct();
         $this->projects = new ArrayCollection();
         $this->userGroups = new ArrayCollection();
+        $this->auditLogs = new ArrayCollection();
     }
 
     #[\Override]
@@ -303,6 +310,36 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setPasswordResetTokenExpiresAt(?\DateTimeImmutable $passwordResetTokenExpiresAt): static
     {
         $this->passwordResetTokenExpiresAt = $passwordResetTokenExpiresAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AuditLogs>
+     */
+    public function getAuditLogs(): Collection
+    {
+        return $this->auditLogs;
+    }
+
+    public function addAuditLog(AuditLogs $auditLog): static
+    {
+        if (!$this->auditLogs->contains($auditLog)) {
+            $this->auditLogs->add($auditLog);
+            $auditLog->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuditLog(AuditLogs $auditLog): static
+    {
+        if ($this->auditLogs->removeElement($auditLog)) {
+            // set the owning side to null (unless already changed)
+            if ($auditLog->getAuthor() === $this) {
+                $auditLog->setAuthor(null);
+            }
+        }
 
         return $this;
     }
