@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Traits\Single\StringNameTrait;
 use App\Enum\UserRole;
 use App\Repository\UserGroupRepository;
@@ -16,7 +21,15 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserGroupRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(uriTemplate: '/user-groups/{id}'),
+        new GetCollection(uriTemplate: '/user-groups'),
+        new Post(uriTemplate: '/user-groups'),
+        new Put(uriTemplate: '/user-groups/{id}'),
+        new Delete(uriTemplate: '/user-groups/{id}'),
+    ]
+)]
 class UserGroup extends AbstractEntity
 {
     use StringNameTrait;
