@@ -1,0 +1,22 @@
+import:
+  - recipe/symfony.php
+
+config:
+  repository: 'git@github.com:cschorr/symfony-core-kickstarter.git'
+  keep_releases: 3
+
+  shared_dirs:
+      - 'config/jwt'
+
+hosts:
+  dev:
+    remote_user: cschorr
+    hostname: 157.90.166.119
+    deploy_path: '/var/www/globe'
+
+tasks:
+  build:
+    - run: uptime
+
+after:
+  deploy:failed: deploy:unlock
