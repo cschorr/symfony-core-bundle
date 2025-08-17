@@ -16,6 +16,7 @@
         "deployer/deployer": "^7.5",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.15",
+        "doctrine/doctrine-fixtures-bundle": "^4.1",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.5",
         "easycorp/easyadmin-bundle": "^4.24",
@@ -112,7 +113,6 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^4.1",
         "friendsofphp/php-cs-fixer": "^3.84",
         "phpstan/phpstan": "*",
         "phpunit/phpunit": "^12.2",
