@@ -27,7 +27,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Put(uriTemplate: '/company-groups/{id}'),
         new Delete(uriTemplate: '/company-groups/{id}'),
     ],
-    normalizationContext: ['groups' => ['companyGroup:read']]
 )]
 class CompanyGroup extends AbstractEntity
 {
@@ -49,7 +48,6 @@ class CompanyGroup extends AbstractEntity
     /**
      * @return Collection<int, Company>
      */
-    #[Groups(['companyGroup:read'])]
     public function getCompanies(): Collection
     {
         return $this->companies;
