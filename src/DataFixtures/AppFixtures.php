@@ -1182,7 +1182,7 @@ class AppFixtures extends Fixture
                 ->setDescription($campaignData['description'])
                 ->setCategory($category)
             ;
-            
+
             // Assign projects to campaign
             foreach ($campaignData['projects'] as $projectKey) {
                 $project = $this->projects[$projectKey] ?? null;
