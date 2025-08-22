@@ -79,6 +79,9 @@ class Project extends AbstractEntity
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?Campaign $campaign = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $dueDate = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -203,6 +206,18 @@ class Project extends AbstractEntity
     public function setCampaign(?Campaign $campaign): static
     {
         $this->campaign = $campaign;
+
+        return $this;
+    }
+
+    public function getDueDate(): ?\DateTimeImmutable
+    {
+        return $this->dueDate;
+    }
+
+    public function setDueDate(?\DateTimeImmutable $dueDate): static
+    {
+        $this->dueDate = $dueDate;
 
         return $this;
     }
