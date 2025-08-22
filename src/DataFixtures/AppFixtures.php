@@ -812,6 +812,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_0',
                 'assignee' => 'editor', // Sarah Wilson (employee of Cyberdyne)
                 'category' => 'sub1',
+                'dueDate' => new \DateTimeImmutable('Monday this week 9:00'),
             ],
             [
                 'name' => 'AI Security System',
@@ -820,6 +821,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_0',
                 'assignee' => 'editor',
                 'category' => 'main1',
+                'dueDate' => new \DateTimeImmutable('Monday this week 14:30'),
             ],
             [
                 'name' => 'Automated Defense Network',
@@ -828,6 +830,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_0',
                 'assignee' => 'admin',
                 'category' => 'sub3',
+                'dueDate' => new \DateTimeImmutable('Tuesday this week 10:15'),
             ],
 
             // Stark Industries - Multiple projects (company_1)
@@ -838,6 +841,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_1',
                 'assignee' => 'teamlead', // Michael Johnson (employee of Stark)
                 'category' => 'sub2',
+                'dueDate' => new \DateTimeImmutable('Tuesday this week 16:00'),
             ],
             [
                 'name' => 'Arc Reactor Monitoring',
@@ -846,6 +850,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_1',
                 'assignee' => 'teamlead',
                 'category' => 'sub3',
+                'dueDate' => new \DateTimeImmutable('Wednesday this week 11:45'),
             ],
 
             // Wayne Enterprises - Multiple projects (company_2)
@@ -856,6 +861,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_2',
                 'assignee' => 'external', // Robert Thompson (employee of Wayne)
                 'category' => 'main4',
+                'dueDate' => new \DateTimeImmutable('Wednesday this week 15:20'),
             ],
             [
                 'name' => 'Corporate Security Upgrade',
@@ -864,6 +870,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_2',
                 'assignee' => 'external',
                 'category' => 'main2',
+                'dueDate' => new \DateTimeImmutable('Thursday this week 9:30'),
             ],
             [
                 'name' => 'Financial Portfolio Management',
@@ -872,6 +879,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_2',
                 'assignee' => 'consultant1',
                 'category' => 'sub4',
+                'dueDate' => new \DateTimeImmutable('Thursday this week 13:10'),
             ],
 
             // Oscorp - Multiple projects (company_3)
@@ -882,6 +890,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_3',
                 'assignee' => 'demo', // Alex Anderson (employee of Oscorp)
                 'category' => 'sub3',
+                'dueDate' => new \DateTimeImmutable('Thursday this week 16:45'),
             ],
             [
                 'name' => 'Scientific Data Analysis',
@@ -890,6 +899,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_3',
                 'assignee' => 'demo',
                 'category' => 'main1',
+                'dueDate' => new \DateTimeImmutable('Friday this week 10:00'),
             ],
 
             // Weyland-Yutani (company_4)
@@ -900,6 +910,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_4',
                 'assignee' => 'admin',
                 'category' => 'sub7',
+                'dueDate' => new \DateTimeImmutable('Friday this week 14:15'),
             ],
 
             // Umbrella Corporation - Multiple projects (company_5)
@@ -910,6 +921,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_5',
                 'assignee' => 'manager', // Emma Davis (employee of Umbrella)
                 'category' => 'sub6',
+                'dueDate' => new \DateTimeImmutable('Friday this week 17:00'),
             ],
             [
                 'name' => 'Pharmaceutical Research Portal',
@@ -918,6 +930,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_5',
                 'assignee' => 'manager',
                 'category' => 'sub1',
+                'dueDate' => new \DateTimeImmutable('Monday next week 9:15'),
             ],
             [
                 'name' => 'Global Distribution Network',
@@ -926,6 +939,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_5',
                 'assignee' => 'marketing1',
                 'category' => 'main3',
+                'dueDate' => new \DateTimeImmutable('Monday next week 12:30'),
             ],
 
             // GeneDyne Technologies (company_6)
@@ -936,6 +950,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_6',
                 'assignee' => 'teamlead',
                 'category' => 'main1',
+                'dueDate' => new \DateTimeImmutable('Monday next week 15:45'),
             ],
 
             // NeuralLink Systems (company_7)
@@ -946,6 +961,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_7',
                 'assignee' => 'admin',
                 'category' => 'sub3',
+                'dueDate' => new \DateTimeImmutable('Tuesday next week 10:20'),
             ],
 
             // Parker Industries - Multiple projects (company_8)
@@ -956,6 +972,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_8',
                 'assignee' => 'dev1', // Jessica Brown (employee of Parker)
                 'category' => 'sub2',
+                'dueDate' => new \DateTimeImmutable('Tuesday next week 13:50'),
             ],
             [
                 'name' => 'Web Crawler Technology',
@@ -964,6 +981,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_8',
                 'assignee' => 'dev1',
                 'category' => 'sub1',
+                'dueDate' => new \DateTimeImmutable('Tuesday next week 16:25'),
             ],
 
             // Pym Technologies - Multiple projects (company_9)
@@ -974,6 +992,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_9',
                 'assignee' => 'dev2', // Carlos Garcia (employee of Pym)
                 'category' => 'sub3',
+                'dueDate' => new \DateTimeImmutable('Wednesday next week 9:40'),
             ],
             [
                 'name' => 'Quantum Realm Analytics',
@@ -982,6 +1001,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_9',
                 'assignee' => 'dev2',
                 'category' => 'main1',
+                'dueDate' => new \DateTimeImmutable('Wednesday next week 11:55'),
             ],
 
             // Rand Corporation (company_10)
@@ -992,6 +1012,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_10',
                 'assignee' => 'admin',
                 'category' => 'sub1',
+                'dueDate' => new \DateTimeImmutable('Wednesday next week 14:10'),
             ],
 
             // Queen Industries - Multiple projects (company_11)
@@ -1002,6 +1023,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_11',
                 'assignee' => 'consultant1', // Amanda Miller (employee of Queen)
                 'category' => 'sub4',
+                'dueDate' => new \DateTimeImmutable('Wednesday next week 16:35'),
             ],
             [
                 'name' => 'Green Arrow Logistics',
@@ -1010,6 +1032,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_11',
                 'assignee' => 'consultant1',
                 'category' => 'main2',
+                'dueDate' => new \DateTimeImmutable('Thursday next week 9:25'),
             ],
 
             // LexCorp - Multiple projects (company_12)
@@ -1020,6 +1043,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_12',
                 'assignee' => 'external',
                 'category' => 'sub5',
+                'dueDate' => new \DateTimeImmutable('Thursday next week 12:15'),
             ],
             [
                 'name' => 'Corporate Intelligence System',
@@ -1028,6 +1052,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_12',
                 'assignee' => 'admin',
                 'category' => 'main4',
+                'dueDate' => new \DateTimeImmutable('Thursday next week 15:00'),
             ],
 
             // Kord Industries (company_13)
@@ -1038,6 +1063,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_13',
                 'assignee' => 'editor',
                 'category' => 'sub1',
+                'dueDate' => new \DateTimeImmutable('Thursday next week 17:00'),
             ],
 
             // Tyrell Corporation (company_14)
@@ -1048,6 +1074,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_14',
                 'assignee' => 'teamlead',
                 'category' => 'sub3',
+                'dueDate' => new \DateTimeImmutable('Friday next week 10:30'),
             ],
 
             // Seegson Corporation (company_15)
@@ -1058,6 +1085,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_15',
                 'assignee' => 'external',
                 'category' => 'sub5',
+                'dueDate' => new \DateTimeImmutable('Friday next week 13:20'),
             ],
 
             // Tricell Pharmaceuticals - Multiple projects (company_16)
@@ -1068,6 +1096,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_16',
                 'assignee' => 'marketing1', // David Williams (employee of Tricell)
                 'category' => 'sub6',
+                'dueDate' => new \DateTimeImmutable('Friday next week 15:40'),
             ],
             [
                 'name' => 'Clinical Trial Management',
@@ -1076,6 +1105,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_16',
                 'assignee' => 'marketing1',
                 'category' => 'main2',
+                'dueDate' => new \DateTimeImmutable('Monday this week 11:00'),
             ],
 
             // TerraSave International (company_17)
@@ -1086,6 +1116,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_17',
                 'assignee' => 'admin',
                 'category' => 'sub7',
+                'dueDate' => new \DateTimeImmutable('Tuesday this week 12:45'),
             ],
 
             // Blue Umbrella Ltd - Multiple projects (company_18)
@@ -1096,6 +1127,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_18',
                 'assignee' => 'manager',
                 'category' => 'main3',
+                'dueDate' => new \DateTimeImmutable('Wednesday this week 10:30'),
             ],
             [
                 'name' => 'Brand Management System',
@@ -1104,6 +1136,7 @@ class AppFixtures extends Fixture
                 'client' => 'company_18',
                 'assignee' => 'marketing1',
                 'category' => 'sub6',
+                'dueDate' => new \DateTimeImmutable('Friday this week 11:30'),
             ],
         ];
 
@@ -1118,7 +1151,8 @@ class AppFixtures extends Fixture
                 ->setDescription($projectData['description'])
                 ->setClient($client)
                 ->setAssignee($assignee)
-                ->setCategory($category);
+                ->setCategory($category)
+                ->setDueDate($projectData['dueDate'] ?? null);
 
             $manager->persist($project);
             $this->projects["project_{$index}"] = $project;
