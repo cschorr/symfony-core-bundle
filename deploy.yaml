@@ -9,7 +9,7 @@ config:
       - 'config/jwt'
 
 hosts:
-  dev:
+  stage:
     remote_user: cschorr
     hostname: 157.90.166.119
     deploy_path: '/var/www/globe'
