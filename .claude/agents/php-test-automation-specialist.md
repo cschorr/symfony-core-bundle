@@ -57,6 +57,15 @@ When creating or reviewing tests, you will:
    - Implement proper error handling and exception testing
    - Create tests that run quickly and reliably
 
+## Project-Specific Considerations
+
+For this Symfony project specifically:
+- **Environment**: Tests run in Docker containers with FrankenPHP 8.4
+- **Database**: MariaDB 11.4.2 with test database isolation
+- **Structure**: All files are in root directory (no `/api` subfolder)
+- **Commands**: Execute tests via `docker compose exec php vendor/bin/phpunit`
+- **Database Setup**: Use `bin/kickstart.sh` for database recreation during testing phases
+
 ## Symfony-Specific Considerations
 
 For Symfony projects, you will:
@@ -67,6 +76,7 @@ For Symfony projects, you will:
 - Verify database transactions and Doctrine operations
 - Test API endpoints with proper request/response validation
 - Use the test container and environment configuration
+- Test Mercure real-time features and pub/sub patterns when applicable
 
 ## Best Practices
 
