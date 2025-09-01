@@ -1,0 +1,38 @@
+{
+  "commit": {
+    "template": "{message}",
+    "includeClaudeAttribution": false,
+    "includeCoAuthor": false,
+    "conventionalCommits": true,
+    "maxMessageLength": 72
+  },
+  "git": {
+    "autoCommit": false,
+    "customCommitFooter": "",
+    "defaultBranch": "main"
+  },
+  "project": {
+    "name": "symfony-core-kickstarter",
+    "description": "Symfony API Platform project with FrankenPHP and MariaDB",
+    "language": "php",
+    "framework": "symfony",
+    "testRunner": "phpunit",
+    "linter": "phpstan",
+    "formatter": "php-cs-fixer"
+  },
+  "workflow": {
+    "enableTodos": true,
+    "verboseOutput": false
+  },
+  "security": {
+    "scanForSecrets": true,
+    "preventSecretCommits": true,
+    "allowedDomains": ["github.com", "api-platform.com", "symfony.com", "packagist.org"],
+    "blockedPatterns": ["password", "secret", "token", "api_key", "private_key", "jwt_secret"]
+  },
+  "tools": {
+    "enableWebSearch": true,
+    "enableWebFetch": true,
+    "defaultTimeout": 30000
+  }
+}
