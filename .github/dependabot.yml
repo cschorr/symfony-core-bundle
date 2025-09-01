@@ -7,7 +7,7 @@ updates:
     schedule:
       interval: monthly
   - package-ecosystem: composer
-    directory: /api
+    directory: /
     schedule:
       interval: daily
     labels:
