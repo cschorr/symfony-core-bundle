@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ApiResource(
     mercure: true,
-    normalizationContext: ['groups' => ['project:read']],
-    denormalizationContext: ['groups' => ['project:write']],
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
     paginationEnabled: true,

@@ -122,6 +122,7 @@
         }
     },
     "require-dev": {
+        "api-platform/schema-generator": "^5.0",
         "friendsofphp/php-cs-fixer": "^3.84",
         "phpstan/phpstan": "*",
         "phpunit/phpunit": "^12.2",
@@ -132,8 +133,7 @@
         "symfony/debug-bundle": "7.3.*",
         "symfony/maker-bundle": "^1.0",
         "symfony/stopwatch": "7.3.*",
-        "symfony/web-profiler-bundle": "7.3.*",
-        "api-platform/schema-generator": "^5.0",
-        "symfony/var-dumper": "7.2.*"
+        "symfony/var-dumper": "7.2.*",
+        "symfony/web-profiler-bundle": "7.3.*"
     }
 }
