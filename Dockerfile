@@ -21,6 +21,7 @@ WORKDIR /app
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install --no-install-recommends -y \
 	acl \
+	curl \
 	file \
 	gettext \
 	git \
@@ -53,7 +54,7 @@ COPY --link frankenphp/Caddyfile /etc/frankenphp/Caddyfile
 
 ENTRYPOINT ["docker-entrypoint"]
 
-HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
+HEALTHCHECK --start-period=120s --interval=10s --timeout=5s --retries=3 CMD curl -f http://localhost:2019/metrics || exit 1
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile" ]
 
 # Dev FrankenPHP image
