@@ -1,0 +1,37 @@
+framework:
+    workflows:
+        project_status:
+            type: 'state_machine'
+            audit_trail:
+                enabled: true
+            marking_store:
+                type: 'method'
+                property: 'status'
+            supports:
+                - App\Entity\Project
+            initial_marking: draft
+            places:
+                - draft
+                - in_progress
+                - review
+                - completed
+                - cancelled
+            transitions:
+                start:
+                    from: draft
+                    to: in_progress
+                submit_for_review:
+                    from: in_progress
+                    to: review
+                approve:
+                    from: review
+                    to: completed
+                reject:
+                    from: review
+                    to: in_progress
+                cancel:
+                    from: [draft, in_progress, review]
+                    to: cancelled
+                reopen:
+                    from: [completed, cancelled]
+                    to: draft
