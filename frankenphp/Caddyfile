@@ -1,5 +1,6 @@
 {
 	skip_install_trust
+	admin :2019
 
 	{$CADDY_GLOBAL_OPTIONS}
 
