@@ -4,17 +4,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Environment & Commands
 
+### Project Structure
+- **Standard Symfony structure**: All API Platform files are in the root directory (no `/api` subfolder)
+- **Database**: MariaDB 11.4.2 (switched from PostgreSQL)
+- **Web Server**: FrankenPHP 8.4 (upgraded from PHP-FPM 8.3)
+- **Docker**: Development environment using Docker Compose with FrankenPHP
+
 ### Database Management
 - **Always use `bin/kickstart.sh`** to rebuild the database during the current project phase
 - Do **NOT** run migrations manually - use the kickstart script which recreates the database
-- The project uses DDEV for development environment
+- Database runs on port 3306 (MariaDB) instead of 5432 (PostgreSQL)
+- Connection: `mysql://app:!ChangeMe!@database:3306/app`
+
+### Docker Commands
+- **Start services**: `docker compose up -d`
+- **Build/rebuild**: `docker compose build --no-cache`
+- **Restart services**: `docker compose restart`
+- **Execute PHP commands**: `docker compose exec php [command]`
+- **Database access**: `docker compose exec database mariadb -u app -p!ChangeMe! app`
 
 ### Code Quality & Testing
-- **PHPStan**: `vendor/bin/phpstan analyse` (level 8, configured in `phpstan.dist.neon`)
-- **PHP CS Fixer**: `vendor/bin/php-cs-fixer fix` (PSR-12 standards)
-- **PHP_CodeSniffer**: `vendor/bin/phpcs` (PSR-12 standards)
-- **PHPUnit**: `vendor/bin/phpunit` (tests in `/tests` directory)
-- **Rector**: `vendor/bin/rector process` (configured in `rector.php`)
+- **PHPStan**: `docker compose exec php vendor/bin/phpstan analyse` (level 8, configured in `phpstan.dist.neon`)
+- **PHP CS Fixer**: `docker compose exec php vendor/bin/php-cs-fixer fix` (PSR-12 standards)
+- **PHP_CodeSniffer**: `docker compose exec php vendor/bin/phpcs` (PSR-12 standards)
+- **PHPUnit**: `docker compose exec php vendor/bin/phpunit` (tests in `/tests` directory)
+- **Rector**: `docker compose exec php vendor/bin/rector process` (configured in `rector.php`)
 
 ### API Documentation
 - **OpenAPI/Swagger**: `bin/console api:openapi:export` - Generates dynamic REST API documentation
@@ -53,10 +67,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Translation support**: All UI elements are translatable
 
 ### API Platform Integration
+- **FrankenPHP**: Modern PHP application server with built-in HTTP/2, HTTP/3, and Mercure support
+- **Mercure Hub**: Real-time features with Server-Sent Events built into FrankenPHP
 - GraphQL and REST API endpoints auto-generated from entities
 - Custom processors for write operations (`CommentWriteProcessor`, `VoteDeleteProcessor`)
 - JWT authentication with refresh tokens
 - CORS configuration for API access
+- **Caddy**: Automatic HTTPS with self-signed certificates for development
 
 ### Key Services
 - **PermissionService**: Manages domain entity permissions

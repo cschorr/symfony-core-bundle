@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ApiResource(
+    mercure: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
     paginationEnabled: true,
