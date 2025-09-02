@@ -16,6 +16,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **PHPUnit**: `vendor/bin/phpunit` (tests in `/tests` directory)
 - **Rector**: `vendor/bin/rector process` (configured in `rector.php`)
 
+### API Documentation
+- **OpenAPI/Swagger**: `bin/console api:openapi:export` - Generates dynamic REST API documentation
+  - Outputs OpenAPI 3.0 specification in JSON format
+  - Includes all API Platform resources, operations, and schemas
+  - Can be saved to file: `bin/console api:openapi:export > openapi.json`
+  - View in browser: `bin/console api:openapi:export --yaml` for YAML format
+
+- **GraphQL Schema**: `bin/console app:graphql:export` - Generates dynamic GraphQL schema documentation
+  - Outputs complete GraphQL schema definition language (SDL)
+  - Includes all types, queries, mutations, and subscriptions
+  - Can be saved to file: `bin/console app:graphql:export > schema.graphql`
+  - Auto-generated from API Platform resources and configurations
+
 ### Asset Management
 - Uses **Symfony Asset Mapper** (not Webpack Encore)
 - No need to run `asset-map:compile` in dev environment
