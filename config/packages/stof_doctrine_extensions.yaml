@@ -5,6 +5,7 @@ stof_doctrine_extensions:
     orm:
         default:
             tree: true
-            timestampable: false
-            blameable: false
+            timestampable: true
+            blameable: true
             sluggable: false
+            softdeleteable: true

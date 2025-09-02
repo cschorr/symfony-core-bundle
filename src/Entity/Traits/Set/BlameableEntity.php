@@ -28,11 +28,6 @@ trait BlameableEntity
     #[Gedmo\Blameable(on: 'update')]
     private ?User $updatedBy = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'deleted_by', referencedColumnName: 'id')]
-    #[Gedmo\Blameable(on: 'delete')]
-    private ?User $deletedBy = null;
-
     public function getCreatedBy()
     {
         return $this->createdBy;
@@ -53,18 +48,6 @@ trait BlameableEntity
     public function setUpdatedBy(User $updatedBy): static
     {
         $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getDeletedBy()
-    {
-        return $this->deletedBy;
-    }
-
-    public function setDeletedBy(User $deletedBy): static
-    {
-        $this->deletedBy = $deletedBy;
 
         return $this;
     }
