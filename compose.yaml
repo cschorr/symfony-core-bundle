@@ -1,5 +1,6 @@
 services:
   php:
+    container_name: globe-backend-php
     image: ${IMAGES_PREFIX:-}app-php
     depends_on:
       - database
@@ -33,6 +34,7 @@ services:
 
 ###> doctrine/doctrine-bundle ###
   database:
+    container_name: globe-backend-database
     image: mariadb:${MYSQL_VERSION:-11.4.2}
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE:-app}
