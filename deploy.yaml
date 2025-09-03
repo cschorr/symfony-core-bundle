@@ -62,11 +62,11 @@ tasks:
   
   # Start Docker containers with environment variables from .env.local
   deploy:docker:up:
-    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} -p {{docker_compose_project}} --env-file .env.local up -d'
+    - run: 'cd {{release_path}} && HTTP_PORT={{HTTP_PORT}} HTTPS_PORT={{HTTPS_PORT}} DB_PORT={{DB_PORT}} APP_ENV={{APP_ENV}} docker compose -f {{docker_compose_file}} -p {{docker_compose_project}} --env-file .env.local up -d'
   
   # Wait for containers to be ready
   deploy:docker:wait:
-    - run: 'sleep 5'
+    - run: 'sleep 10'
     - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php php -v'
   
   # Install vendors using Docker (after shared files are available)
