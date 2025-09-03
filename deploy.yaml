@@ -38,8 +38,6 @@ hosts:
     deploy_path: '/var/www/globe'
     branch: 'main'
     
-    # Stage-specific overrides
-    docker_compose_file: 'compose.yaml -f compose.stage.yaml'
     app_env: 'stage'
     http_port: '8080'
     https_port: '444'
@@ -47,9 +45,6 @@ hosts:
 tasks:
   deploy:env:setup:
     - run: 'if [ ! -f {{deploy_path}}/shared/.env.local ]; then echo "ERROR: {{deploy_path}}/shared/.env.local not found. Please create it with production secrets."; exit 1; fi'
-  
-  deploy:prepare:stage:
-    - run: 'cd {{release_path}} && [ ! -f compose.stage.yaml ] && [ -f compose.stage.yaml.dist ] && cp compose.stage.yaml.dist compose.stage.yaml || true'
   
   deploy:docker:build:
     - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} build --no-cache'
@@ -81,7 +76,6 @@ tasks:
 before:
   deploy:symlink:
     - deploy:env:setup
-    - deploy:prepare:stage
     - deploy:docker:down
 
 after:
