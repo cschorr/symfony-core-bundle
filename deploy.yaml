@@ -92,7 +92,6 @@ tasks:
 before:
   # Before updating code, check shared files exist
   deploy:update_code:
-    - deploy:check:shared
     - deploy:shared:dirs
   
   # Before switching symlink, stop old containers
