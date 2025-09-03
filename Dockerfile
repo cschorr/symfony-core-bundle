@@ -79,7 +79,15 @@ CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod
 
-ENV APP_ENV=prod
+ARG HTTP_PORT=80
+ARG HTTPS_PORT=443
+ARG DB_PORT=3306
+ARG APP_ENV=prod
+
+ENV APP_ENV=${APP_ENV}
+ENV HTTP_PORT=${HTTP_PORT}
+ENV HTTPS_PORT=${HTTPS_PORT}
+ENV DB_PORT=${DB_PORT}
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 

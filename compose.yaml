@@ -2,6 +2,14 @@ services:
   php:
     container_name: globe-backend-php
     image: ${IMAGES_PREFIX:-}app-php
+    build:
+      context: .
+      target: frankenphp_prod
+      args:
+        HTTP_PORT: ${HTTP_PORT:-80}
+        HTTPS_PORT: ${HTTPS_PORT:-443}
+        DB_PORT: ${DB_PORT:-3306}
+        APP_ENV: ${APP_ENV:-prod}
     depends_on:
       - database
     restart: unless-stopped
@@ -15,19 +23,17 @@ services:
       MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
       MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}/.well-known/mercure}
       MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      HTTP_PORT: ${HTTP_PORT:-80}
-      HTTPS_PORT: ${HTTPS_PORT:-443}
     volumes:
       - caddy_data:/data
       - caddy_config:/config
     ports:
       # HTTP
       - target: 80
-        published: ${HTTP_PORT}
+        published: ${HTTP_PORT:-80}
         protocol: tcp
       # HTTPS
       - target: 443
-        published: ${HTTPS_PORT}
+        published: ${HTTPS_PORT:-443}
         protocol: tcp
       # HTTP/3
       - target: 443
