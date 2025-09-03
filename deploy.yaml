@@ -38,6 +38,11 @@ hosts:
     deploy_path: '/var/www/globe'
     branch: 'main'
 
+    APP_ENV: 'stage'
+    HTTP_PORT: '8080'
+    HTTPS_PORT: '444'
+    DB_PORT: '3307'
+
 tasks:
   deploy:env:setup:
     - run: 'if [ ! -f {{deploy_path}}/shared/.env.local ]; then echo "ERROR: {{deploy_path}}/shared/.env.local not found. Please create it with production secrets."; exit 1; fi'
@@ -49,7 +54,7 @@ tasks:
   
   # Build Docker image
   deploy:docker:build:
-    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} build --no-cache'
+    - run: 'cd {{release_path}} && HTTP_PORT={{HTTP_PORT}} HTTPS_PORT={{HTTPS_PORT}} DB_PORT={{DB_PORT}} APP_ENV={{APP_ENV}} docker compose -f {{docker_compose_file}} build --no-cache'
   
   # Stop previous Docker containers
   deploy:docker:down:
