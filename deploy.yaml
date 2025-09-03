@@ -2,21 +2,100 @@ import:
   - recipe/symfony.php
 
 config:
+  application: 'globe-backend'
   repository: 'git@github.com:cschorr/symfony-core-kickstarter.git'
+  git_tty: false
   keep_releases: 3
-
+  
+  # Docker configuration
+  docker_compose_file: 'compose.yaml -f compose.prod.yaml'
+  docker_compose_project: 'globe-backend'
+  
+  # Symfony configuration
+  bin/console: '{{bin/php}} bin/console'
+  console_options: '--no-interaction'
+  
+  # Shared files and directories
+  shared_files:
+    - '.env.local'
+    - 'config/jwt/private.pem'
+    - 'config/jwt/public.pem'
+  
   shared_dirs:
-      - 'config/jwt'
+    - 'var/log'
+    - 'var/sessions'
+    - 'public/uploads'
+  
+  # Writeable directories
+  writable_dirs:
+    - 'var'
+    - 'public/uploads'
 
 hosts:
   stage:
-    remote_user: cschorr
-    hostname: 157.90.166.119
+    hostname: '157.90.166.119'
+    remote_user: 'cschorr'
     deploy_path: '/var/www/globe'
+    branch: 'main'
+    
+    # Stage-specific overrides
+    docker_compose_file: 'compose.yaml -f compose.stage.yaml'
+    app_env: 'stage'
+    http_port: '8080'
+    https_port: '444'
 
 tasks:
-  build:
-    - run: uptime
+  deploy:env:setup:
+    - run: 'if [ ! -f {{deploy_path}}/shared/.env.local ]; then echo "ERROR: {{deploy_path}}/shared/.env.local not found. Please create it with production secrets."; exit 1; fi'
+  
+  deploy:prepare:stage:
+    - run: 'cd {{release_path}} && [ ! -f compose.stage.yaml ] && [ -f compose.stage.yaml.dist ] && cp compose.stage.yaml.dist compose.stage.yaml || true'
+  
+  deploy:docker:build:
+    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} build --no-cache'
+  
+  deploy:docker:down:
+    - run: 'cd {{previous_release}} && docker compose -p {{docker_compose_project}} down || true'
+  
+  deploy:docker:up:
+    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} -p {{docker_compose_project}} up -d'
+  
+  deploy:database:kickstart:
+    - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php bin/kickstart.sh'
+  
+  deploy:database:migrate:
+    - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php {{bin/console}} doctrine:migrations:migrate {{console_options}}'
+  
+  deploy:cache:clear:
+    - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php {{bin/console}} cache:clear {{console_options}}'
+  
+  deploy:cache:warmup:
+    - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php {{bin/console}} cache:warmup {{console_options}}'
+  
+  deploy:health:check:
+    - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} ps'
+  
+  deploy:vendors:
+    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} run --rm php composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader'
+
+before:
+  deploy:symlink:
+    - deploy:env:setup
+    - deploy:prepare:stage
+    - deploy:docker:down
 
 after:
-  deploy:failed: deploy:unlock
+  deploy:update_code:
+    - deploy:docker:build
+  
+  deploy:symlink:
+    - deploy:docker:up
+    - deploy:cache:clear
+    - deploy:cache:warmup
+    - deploy:database:kickstart  # For staging
+    # - deploy:database:migrate  # For production (uncomment and comment kickstart)
+    - deploy:health:check
+  
+  deploy:failed:
+    - deploy:unlock
+    - deploy:docker:down
