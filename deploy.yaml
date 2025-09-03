@@ -8,7 +8,7 @@ config:
   keep_releases: 3
   
   # Docker configuration
-  docker_compose_file: 'compose.yaml -f compose.prod.yaml'
+  docker_compose_file: 'compose.yaml'
   docker_compose_project: 'globe-backend'
   
   # Symfony configuration
@@ -37,65 +37,88 @@ hosts:
     remote_user: 'cschorr'
     deploy_path: '/var/www/globe'
     branch: 'main'
-    
-    # Stage-specific overrides
-    docker_compose_file: 'compose.yaml -f compose.stage.yaml'
-    app_env: 'stage'
-    http_port: '8080'
-    https_port: '444'
 
 tasks:
   deploy:env:setup:
     - run: 'if [ ! -f {{deploy_path}}/shared/.env.local ]; then echo "ERROR: {{deploy_path}}/shared/.env.local not found. Please create it with production secrets."; exit 1; fi'
+    - run: 'if [ ! -f {{deploy_path}}/shared/config/jwt/private.pem ]; then echo "WARNING: JWT keys not found. Generate them with: php bin/console lexik:jwt:generate-keypair"; fi'
   
-  deploy:prepare:stage:
-    - run: 'cd {{release_path}} && [ ! -f compose.stage.yaml ] && [ -f compose.stage.yaml.dist ] && cp compose.stage.yaml.dist compose.stage.yaml || true'
+  # Create necessary shared directories
+  deploy:shared:dirs:
+    - run: 'mkdir -p {{deploy_path}}/shared/config/jwt {{deploy_path}}/shared/var/log {{deploy_path}}/shared/var/sessions {{deploy_path}}/shared/public/uploads'
   
+  # Build Docker image
   deploy:docker:build:
     - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} build --no-cache'
   
+  # Stop previous Docker containers
   deploy:docker:down:
-    - run: 'cd {{previous_release}} && docker compose -p {{docker_compose_project}} down || true'
+    - run: 'if [ -L {{deploy_path}}/current ]; then cd {{deploy_path}}/current && docker compose -p {{docker_compose_project}} down || true; fi'
   
+  # Start Docker containers with environment variables from .env.local
   deploy:docker:up:
-    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} -p {{docker_compose_project}} up -d'
+    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} -p {{docker_compose_project}} --env-file .env.local up -d'
   
-  deploy:database:kickstart:
-    - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php bin/kickstart.sh'
+  # Wait for containers to be ready
+  deploy:docker:wait:
+    - run: 'sleep 5'
+    - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php php -v'
   
+  # Install vendors using Docker (after shared files are available)
+  deploy:vendors:
+    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} --env-file .env.local run --rm -T php composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader'
+  
+  # Database migration
   deploy:database:migrate:
     - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php {{bin/console}} doctrine:migrations:migrate {{console_options}}'
   
+  # Cache tasks
   deploy:cache:clear:
     - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php {{bin/console}} cache:clear {{console_options}}'
   
   deploy:cache:warmup:
     - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php {{bin/console}} cache:warmup {{console_options}}'
   
+  # Health check
   deploy:health:check:
     - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} ps'
+    - run: 'cd {{release_path}} && docker compose -p {{docker_compose_project}} exec -T php php bin/console about'
   
-  deploy:vendors:
-    - run: 'cd {{release_path}} && docker compose -f {{docker_compose_file}} run --rm php composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader'
+  # Make bin files executable
+  deploy:fix:permissions:
+    - run: 'chmod +x {{release_path}}/bin/*'
 
+# Hooks - Order is important!
 before:
+  # Before updating code, check shared files exist
+  deploy:update_code:
+    - deploy:check:shared
+    - deploy:shared:dirs
+  
+  # Before switching symlink, stop old containers
   deploy:symlink:
-    - deploy:env:setup
-    - deploy:prepare:stage
     - deploy:docker:down
 
 after:
+  # After code is updated but before shared files are linked
   deploy:update_code:
+    - deploy:fix:permissions
     - deploy:docker:build
   
+  # After shared files are linked (critical for .env.local and JWT keys)
+  deploy:shared:
+    - deploy:vendors
+  
+  # After symlink is switched to new release
   deploy:symlink:
     - deploy:docker:up
+    - deploy:docker:wait
     - deploy:cache:clear
     - deploy:cache:warmup
-    - deploy:database:kickstart  # For staging
-    # - deploy:database:migrate  # For production (uncomment and comment kickstart)
+    - deploy:database:migrate
     - deploy:health:check
   
+  # On deployment failure
   deploy:failed:
     - deploy:unlock
     - deploy:docker:down
