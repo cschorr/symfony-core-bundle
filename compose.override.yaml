@@ -26,9 +26,6 @@ services:
   database:
     ports:
       - target: 3306
-        published: 3306
+        published: ${DB_PORT:-3307}
         protocol: tcp
 ###< doctrine/doctrine-bundle ###
-
-###> symfony/mercure-bundle ###
-###< symfony/mercure-bundle ###

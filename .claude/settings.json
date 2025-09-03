@@ -26,9 +26,7 @@
   },
   "security": {
     "scanForSecrets": true,
-    "preventSecretCommits": true,
-    "allowedDomains": ["github.com", "api-platform.com", "symfony.com", "packagist.org"],
-    "blockedPatterns": ["password", "secret", "token", "api_key", "private_key", "jwt_secret"]
+    "preventSecretCommits": true
   },
   "tools": {
     "enableWebSearch": true,
