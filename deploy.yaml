@@ -39,8 +39,7 @@ hosts:
     branch: 'main'
 
 tasks:
-  # Check that required shared files exist before deployment
-  deploy:check:shared:
+  deploy:env:setup:
     - run: 'if [ ! -f {{deploy_path}}/shared/.env.local ]; then echo "ERROR: {{deploy_path}}/shared/.env.local not found. Please create it with production secrets."; exit 1; fi'
     - run: 'if [ ! -f {{deploy_path}}/shared/config/jwt/private.pem ]; then echo "WARNING: JWT keys not found. Generate them with: php bin/console lexik:jwt:generate-keypair"; fi'
   
