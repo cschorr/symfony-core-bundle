@@ -26,6 +26,14 @@ trait SetNamePersonTrait
         return $this->nameFirst . ' ' . $this->nameLast;
     }
 
+    public function getName(): ?string
+    {
+        if ($this->academicTitle) {
+            return $this->academicTitle . ' ' . $this->nameFirst . ' ' . $this->nameLast;
+        }
+        return $this->nameFirst . ' ' . $this->nameLast;
+    }
+
     public function getFormalFullName(): ?string
     {
         if ($this->academicTitle) {

@@ -34,9 +34,24 @@ class Contact extends AbstractEntity
     use SetCommunicationTrait;
     use SetAddressTrait;
 
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    private ?Company $company = null;
+
     #[\Override]
     public function __toString(): string
     {
         return $this->getFullName() ?? 'Unnamed Contact';
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }
