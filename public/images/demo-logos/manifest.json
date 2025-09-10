@@ -1,0 +1,194 @@
+[
+  {
+    "brand": "Aurora",
+    "files": {
+      "square": "aurora-square.svg",
+      "wide": "aurora-wide.svg"
+    },
+    "palette": {
+      "bg": "#0f172a",
+      "primary": "#38bdf8",
+      "accent": "#34d399"
+    }
+  },
+  {
+    "brand": "Bitwave",
+    "files": {
+      "square": "bitwave-square.svg",
+      "wide": "bitwave-wide.svg"
+    },
+    "palette": {
+      "bg": "#111827",
+      "primary": "#f43f5e",
+      "accent": "#f59e0b"
+    }
+  },
+  {
+    "brand": "Nimbus",
+    "files": {
+      "square": "nimbus-square.svg",
+      "wide": "nimbus-wide.svg"
+    },
+    "palette": {
+      "bg": "#0b1220",
+      "primary": "#a78bfa",
+      "accent": "#22d3ee"
+    }
+  },
+  {
+    "brand": "Forge",
+    "files": {
+      "square": "forge-square.svg",
+      "wide": "forge-wide.svg"
+    },
+    "palette": {
+      "bg": "#0c1326",
+      "primary": "#f97316",
+      "accent": "#84cc16"
+    }
+  },
+  {
+    "brand": "Quantum",
+    "files": {
+      "square": "quantum-square.svg",
+      "wide": "quantum-wide.svg"
+    },
+    "palette": {
+      "bg": "#09090b",
+      "primary": "#e879f9",
+      "accent": "#60a5fa"
+    }
+  },
+  {
+    "brand": "Lumen",
+    "files": {
+      "square": "lumen-square.svg",
+      "wide": "lumen-wide.svg"
+    },
+    "palette": {
+      "bg": "#0a0a0a",
+      "primary": "#10b981",
+      "accent": "#f472b6"
+    }
+  },
+  {
+    "brand": "Atlas",
+    "files": {
+      "square": "atlas-square.svg",
+      "wide": "atlas-wide.svg"
+    },
+    "palette": {
+      "bg": "#111827",
+      "primary": "#22c55e",
+      "accent": "#06b6d4"
+    }
+  },
+  {
+    "brand": "Echo",
+    "files": {
+      "square": "echo-square.svg",
+      "wide": "echo-wide.svg"
+    },
+    "palette": {
+      "bg": "#0f172a",
+      "primary": "#fbbf24",
+      "accent": "#6366f1"
+    }
+  },
+  {
+    "brand": "Harbor",
+    "files": {
+      "square": "harbor-square.svg",
+      "wide": "harbor-wide.svg"
+    },
+    "palette": {
+      "bg": "#0f172a",
+      "primary": "#38bdf8",
+      "accent": "#34d399"
+    }
+  },
+  {
+    "brand": "Pulse",
+    "files": {
+      "square": "pulse-square.svg",
+      "wide": "pulse-wide.svg"
+    },
+    "palette": {
+      "bg": "#111827",
+      "primary": "#f43f5e",
+      "accent": "#f59e0b"
+    }
+  },
+  {
+    "brand": "Vertex",
+    "files": {
+      "square": "vertex-square.svg",
+      "wide": "vertex-wide.svg"
+    },
+    "palette": {
+      "bg": "#0b1220",
+      "primary": "#a78bfa",
+      "accent": "#22d3ee"
+    }
+  },
+  {
+    "brand": "Orbit",
+    "files": {
+      "square": "orbit-square.svg",
+      "wide": "orbit-wide.svg"
+    },
+    "palette": {
+      "bg": "#0c1326",
+      "primary": "#f97316",
+      "accent": "#84cc16"
+    }
+  },
+  {
+    "brand": "Drift",
+    "files": {
+      "square": "drift-square.svg",
+      "wide": "drift-wide.svg"
+    },
+    "palette": {
+      "bg": "#09090b",
+      "primary": "#e879f9",
+      "accent": "#60a5fa"
+    }
+  },
+  {
+    "brand": "Flux",
+    "files": {
+      "square": "flux-square.svg",
+      "wide": "flux-wide.svg"
+    },
+    "palette": {
+      "bg": "#0a0a0a",
+      "primary": "#10b981",
+      "accent": "#f472b6"
+    }
+  },
+  {
+    "brand": "Nova",
+    "files": {
+      "square": "nova-square.svg",
+      "wide": "nova-wide.svg"
+    },
+    "palette": {
+      "bg": "#111827",
+      "primary": "#22c55e",
+      "accent": "#06b6d4"
+    }
+  },
+  {
+    "brand": "Zephyr",
+    "files": {
+      "square": "zephyr-square.svg",
+      "wide": "zephyr-wide.svg"
+    },
+    "palette": {
+      "bg": "#0f172a",
+      "primary": "#fbbf24",
+      "accent": "#6366f1"
+    }
+  }
+]

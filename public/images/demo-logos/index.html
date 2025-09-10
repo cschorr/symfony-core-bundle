@@ -1,0 +1,422 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Demo Logos Preview</title>
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1"
+    />
+    <style>
+      :root {
+        --bg: #0b0f19;
+        --fg: #e5e7eb;
+        --muted: #9ca3af;
+        --card: #111827;
+        --border: #1f2937;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 2rem;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          16px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Ubuntu,
+          Cantarell,
+          Noto Sans,
+          Helvetica,
+          Arial,
+          'Apple Color Emoji',
+          'Segoe UI Emoji';
+      }
+      h1 {
+        margin: 0 0 1rem;
+        font-size: 2rem;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      }
+      .thumb {
+        background: #0a0f1a;
+        border-radius: 12px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 220px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .thumb.wide {
+        height: 160px;
+        margin-top: 0.5rem;
+      }
+      .thumb img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+      .meta {
+        margin-top: 0.75rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      code {
+        background: #0b1220;
+        padding: 0.15rem 0.35rem;
+        border-radius: 6px;
+      }
+      footer {
+        margin-top: 2rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Demo Logos (SVG) — 16 brands · square + wide</h1>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./aurora-square.svg"
+            alt="Aurora square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./aurora-wide.svg"
+            alt="Aurora wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Aurora</strong><br />
+          <code>aurora-square.svg</code><br />
+          <code>aurora-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./bitwave-square.svg"
+            alt="Bitwave square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./bitwave-wide.svg"
+            alt="Bitwave wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Bitwave</strong><br />
+          <code>bitwave-square.svg</code><br />
+          <code>bitwave-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./nimbus-square.svg"
+            alt="Nimbus square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./nimbus-wide.svg"
+            alt="Nimbus wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Nimbus</strong><br />
+          <code>nimbus-square.svg</code><br />
+          <code>nimbus-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./forge-square.svg"
+            alt="Forge square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./forge-wide.svg"
+            alt="Forge wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Forge</strong><br />
+          <code>forge-square.svg</code><br />
+          <code>forge-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./quantum-square.svg"
+            alt="Quantum square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./quantum-wide.svg"
+            alt="Quantum wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Quantum</strong><br />
+          <code>quantum-square.svg</code><br />
+          <code>quantum-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./lumen-square.svg"
+            alt="Lumen square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./lumen-wide.svg"
+            alt="Lumen wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Lumen</strong><br />
+          <code>lumen-square.svg</code><br />
+          <code>lumen-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./atlas-square.svg"
+            alt="Atlas square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./atlas-wide.svg"
+            alt="Atlas wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Atlas</strong><br />
+          <code>atlas-square.svg</code><br />
+          <code>atlas-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./echo-square.svg"
+            alt="Echo square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./echo-wide.svg"
+            alt="Echo wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Echo</strong><br />
+          <code>echo-square.svg</code><br />
+          <code>echo-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./harbor-square.svg"
+            alt="Harbor square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./harbor-wide.svg"
+            alt="Harbor wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Harbor</strong><br />
+          <code>harbor-square.svg</code><br />
+          <code>harbor-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./pulse-square.svg"
+            alt="Pulse square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./pulse-wide.svg"
+            alt="Pulse wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Pulse</strong><br />
+          <code>pulse-square.svg</code><br />
+          <code>pulse-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./vertex-square.svg"
+            alt="Vertex square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./vertex-wide.svg"
+            alt="Vertex wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Vertex</strong><br />
+          <code>vertex-square.svg</code><br />
+          <code>vertex-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./orbit-square.svg"
+            alt="Orbit square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./orbit-wide.svg"
+            alt="Orbit wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Orbit</strong><br />
+          <code>orbit-square.svg</code><br />
+          <code>orbit-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./drift-square.svg"
+            alt="Drift square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./drift-wide.svg"
+            alt="Drift wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Drift</strong><br />
+          <code>drift-square.svg</code><br />
+          <code>drift-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./flux-square.svg"
+            alt="Flux square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./flux-wide.svg"
+            alt="Flux wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Flux</strong><br />
+          <code>flux-square.svg</code><br />
+          <code>flux-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./nova-square.svg"
+            alt="Nova square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./nova-wide.svg"
+            alt="Nova wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Nova</strong><br />
+          <code>nova-square.svg</code><br />
+          <code>nova-wide.svg</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="thumb">
+          <img
+            src="./zephyr-square.svg"
+            alt="Zephyr square logo"
+          />
+        </div>
+        <div class="thumb wide">
+          <img
+            src="./zephyr-wide.svg"
+            alt="Zephyr wide logo"
+          />
+        </div>
+        <div class="meta">
+          <strong>Zephyr</strong><br />
+          <code>zephyr-square.svg</code><br />
+          <code>zephyr-wide.svg</code>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <p>
+        All assets are original, royalty-free demo graphics generated for your project. Colors are
+        WCAG-friendly on dark backgrounds.
+      </p>
+    </footer>
+  </body>
+</html>

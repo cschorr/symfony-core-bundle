@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img"><rect width="512" height="512" fill="#111827"/>
+<title>Atlas — Demo Logo (square)</title>
+<rect x="76.8" y="76.8" width="358.4" height="358.4" rx="61.44" ry="61.44" fill="#22c55e" fill-opacity="0.95"/>
+<path d="M 256.0 122.88 A 133.12 133.12 0 1 1 255.99 122.88 M 256.0 194.56 A 61.44 61.44 0 1 0 255.99 194.56 Z" fill="#06b6d4" fill-rule="evenodd"/>
+<polygon points="335.81290121277385,209.92000000000002 335.81290121277385,302.08 256.0,348.15999999999997 176.18709878722615,302.08 176.18709878722612,209.92000000000002 255.99999999999991,163.84" fill="#111827" fill-opacity="0.9"/>
+</svg>

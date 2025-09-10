@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="256" viewBox="0 0 512 256" role="img"><rect width="512" height="256" fill="#0b1220"/>
+<title>Nimbus — Demo Logo (wide)</title>
+<rect x="20.48" y="20.48" width="215.04" height="215.04" rx="38.7072" ry="38.7072" fill="#a78bfa" fill-opacity="0.95"/>
+<circle cx="128.0" cy="128.0" r="60.211200000000005" fill="#22d3ee" fill-opacity="0.95"/>
+<polygon points="128.0,52.736000000000004 145.20319999999998,98.20318354723109 193.18053599043196,90.368 162.4064,128.0 193.180535990432,165.63199999999998 145.2032,157.7968164527689 128.0,203.264 110.7968,157.7968164527689 62.81946400956802,165.63200000000003 93.59360000000001,128.0 62.81946400956798,90.36800000000005 110.79679999999999,98.2031835472311" fill="#0b1220" fill-opacity="0.85"/>
+<path d="M 230.4 0 L 512 0 L 512 256 L 230.4 256 Q 296.96 133.12 230.4 0 Z" fill="#22d3ee" fill-opacity="0.9"/>
+<circle cx="268" cy="51" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="268" cy="102" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="268" cy="153" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="303" cy="51" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="303" cy="102" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="303" cy="153" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="338" cy="51" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="338" cy="102" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="338" cy="153" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="373" cy="51" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="373" cy="102" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="373" cy="153" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="408" cy="51" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="408" cy="102" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="408" cy="153" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="443" cy="51" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="443" cy="102" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="443" cy="153" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="478" cy="51" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="478" cy="102" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+<circle cx="478" cy="153" r="3.072" fill="#a78bfa" fill-opacity="0.6"/>
+</svg>
