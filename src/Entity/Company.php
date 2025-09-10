@@ -67,6 +67,9 @@ class Company extends AbstractEntity
     #[ORM\ManyToOne(targetEntity: Category::class)]
     private ?Category $category = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $imagePath = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -160,6 +163,22 @@ class Company extends AbstractEntity
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getImagePath(): ?string
+    {
+        if ($this->imagePath === null) {
+            return null;
+        }
+        
+        return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($this->imagePath, '/');
+    }
+
+    public function setImagePath(?string $imagePath): static
+    {
+        $this->imagePath = $imagePath;
 
         return $this;
     }
