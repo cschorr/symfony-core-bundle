@@ -804,6 +804,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2001',
                 'company' => 'company_0',
                 'academicTitle' => null,
+                'position' => 'Chief Technology Officer',
+                'department' => 'Technology',
             ],
             [
                 'firstName' => 'Jane',
@@ -813,6 +815,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2002',
                 'company' => 'company_1',
                 'academicTitle' => 'Ms.',
+                'position' => 'Senior Software Engineer',
+                'department' => 'Engineering',
             ],
             [
                 'firstName' => 'Alice',
@@ -822,6 +826,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2003',
                 'company' => 'company_2',
                 'academicTitle' => 'Dr.',
+                'position' => 'Director of Research',
+                'department' => 'Research & Development',
             ],
             // 50 additional contacts
             [
@@ -832,6 +838,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2004',
                 'company' => 'company_0',
                 'academicTitle' => null,
+                'position' => 'Systems Architect',
+                'department' => 'Engineering',
             ],
             [
                 'firstName' => 'Sarah',
@@ -841,6 +849,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2005',
                 'company' => 'company_1',
                 'academicTitle' => 'Dr.',
+                'position' => 'VP of Innovation',
+                'department' => 'Research & Development',
             ],
             [
                 'firstName' => 'Robert',
@@ -850,6 +860,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2006',
                 'company' => 'company_2',
                 'academicTitle' => 'Prof.',
+                'position' => 'Chief Financial Officer',
+                'department' => 'Finance',
             ],
             [
                 'firstName' => 'Emma',
@@ -859,6 +871,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2007',
                 'company' => 'company_3',
                 'academicTitle' => null,
+                'position' => 'Product Manager',
+                'department' => 'Product Management',
             ],
             [
                 'firstName' => 'David',
@@ -868,6 +882,8 @@ class AppFixtures extends Fixture
                 'cell' => '+44 7700 900001',
                 'company' => 'company_4',
                 'academicTitle' => 'Mr.',
+                'position' => 'Sales Director',
+                'department' => 'Sales',
             ],
             [
                 'firstName' => 'Jessica',
@@ -877,6 +893,8 @@ class AppFixtures extends Fixture
                 'cell' => '+49 170 123456',
                 'company' => 'company_5',
                 'academicTitle' => 'Dr.',
+                'position' => 'Head of Marketing',
+                'department' => 'Marketing',
             ],
             [
                 'firstName' => 'Christopher',
@@ -886,6 +904,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 416 555 0301',
                 'company' => 'company_6',
                 'academicTitle' => null,
+                'position' => 'DevOps Engineer',
+                'department' => 'IT Operations',
             ],
             [
                 'firstName' => 'Amanda',
@@ -895,6 +915,8 @@ class AppFixtures extends Fixture
                 'cell' => '+81 90 1234 5678',
                 'company' => 'company_7',
                 'academicTitle' => 'Ms.',
+                'position' => 'UX Designer',
+                'department' => 'Design',
             ],
             [
                 'firstName' => 'Daniel',
@@ -904,6 +926,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 0501',
                 'company' => 'company_8',
                 'academicTitle' => null,
+                'position' => 'Quality Assurance Lead',
+                'department' => 'Quality Assurance',
             ],
             [
                 'firstName' => 'Lisa',
@@ -913,6 +937,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 415 555 0601',
                 'company' => 'company_9',
                 'academicTitle' => 'Dr.',
+                'position' => 'Data Scientist',
+                'department' => 'Analytics',
             ],
             [
                 'firstName' => 'Matthew',
@@ -922,6 +948,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 0701',
                 'company' => 'company_10',
                 'academicTitle' => null,
+                'position' => 'Business Analyst',
+                'department' => 'Business Development',
             ],
             [
                 'firstName' => 'Ashley',
@@ -931,6 +959,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 206 555 0801',
                 'company' => 'company_11',
                 'academicTitle' => 'Ms.',
+                'position' => 'HR Manager',
+                'department' => 'Human Resources',
             ],
             [
                 'firstName' => 'James',
@@ -940,6 +970,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 0901',
                 'company' => 'company_12',
                 'academicTitle' => 'Prof.',
+                'position' => 'Legal Counsel',
+                'department' => 'Legal',
             ],
             [
                 'firstName' => 'Michelle',
@@ -949,6 +981,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 773 555 1001',
                 'company' => 'company_13',
                 'academicTitle' => null,
+                'position' => 'Project Manager',
+                'department' => 'Project Management',
             ],
             [
                 'firstName' => 'Ryan',
@@ -958,6 +992,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 213 555 1101',
                 'company' => 'company_14',
                 'academicTitle' => 'Dr.',
+                'position' => 'Research Scientist',
+                'department' => 'Research & Development',
             ],
             [
                 'firstName' => 'Stephanie',
@@ -967,6 +1003,8 @@ class AppFixtures extends Fixture
                 'cell' => '+33 6 12 34 56 78',
                 'company' => 'company_15',
                 'academicTitle' => 'Ms.',
+                'position' => 'Compliance Officer',
+                'department' => 'Compliance',
             ],
             [
                 'firstName' => 'Kevin',
@@ -976,6 +1014,8 @@ class AppFixtures extends Fixture
                 'cell' => '+27 82 123 4567',
                 'company' => 'company_16',
                 'academicTitle' => null,
+                'position' => 'Account Manager',
+                'department' => 'Sales',
             ],
             [
                 'firstName' => 'Nicole',
@@ -985,6 +1025,8 @@ class AppFixtures extends Fixture
                 'cell' => '+61 4 1234 5678',
                 'company' => 'company_17',
                 'academicTitle' => 'Dr.',
+                'position' => 'Content Strategist',
+                'department' => 'Marketing',
             ],
             [
                 'firstName' => 'Brandon',
@@ -994,6 +1036,8 @@ class AppFixtures extends Fixture
                 'cell' => '+44 7700 900002',
                 'company' => 'company_18',
                 'academicTitle' => null,
+                'position' => 'Creative Director',
+                'department' => 'Creative',
             ],
             // Additional contacts for larger companies
             [
@@ -1326,6 +1370,14 @@ class AppFixtures extends Fixture
 
             if (!empty($contactData['academicTitle'])) {
                 $contact->setAcademicTitle($contactData['academicTitle']);
+            }
+
+            if (!empty($contactData['position'])) {
+                $contact->setPosition($contactData['position']);
+            }
+
+            if (!empty($contactData['department'])) {
+                $contact->setDepartment($contactData['department']);
             }
 
             $manager->persist($contact);
