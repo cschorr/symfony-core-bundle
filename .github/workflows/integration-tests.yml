@@ -47,7 +47,9 @@ jobs:
         run: curl -v --fail-with-body http://localhost
       -
         name: Check API reachability
-        run: curl -vk --fail-with-body https://localhost
+        run: |
+          echo "Testing API Platform Swagger UI endpoint..."
+          curl -sk --fail-with-body -H "Accept: text/html" https://localhost/api | grep -q "API Platform" && echo "✅ API Platform documentation accessible"
       -
         name: Check Mercure reachability
         run: curl -vkI --fail-with-body https://localhost/.well-known/mercure?topic=test
