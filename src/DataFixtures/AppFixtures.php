@@ -22,15 +22,24 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    private const DEFAULT_PASSWORD = 'pass_1234';
+    private const string DEFAULT_PASSWORD = 'pass_1234';
+
     private array $users = [];
+
     private array $userGroups = [];
+
     private array $domainEntityPermission = [];
+
     private array $categories = [];
+
     private array $companies = [];
+
     private array $contacts = [];
+
     private array $companyGroups = [];
+
     private array $campaigns = [];
+
     private array $projects = [];
 
     public function __construct(
@@ -465,7 +474,7 @@ class AppFixtures extends Fixture
             $existingPermission = $manager->getRepository(UserGroupDomainEntityPermission::class)
                 ->findOneBy(['userGroup' => $userGroup, 'domainEntityPermission' => $domainEntityPermission]);
 
-            if (!$existingPermission) {
+            if ($existingPermission === null) {
                 $permission = (new UserGroupDomainEntityPermission())
                     ->setUserGroup($userGroup)
                     ->setDomainEntityPermission($domainEntityPermission)
@@ -779,7 +788,7 @@ class AppFixtures extends Fixture
                 ->setImagePath($randomLogo);
 
             $manager->persist($company);
-            $this->companies["company_{$index}"] = $company;
+            $this->companies['company_' . $index] = $company;
         }
 
         $manager->flush();
@@ -1361,20 +1370,20 @@ class AppFixtures extends Fixture
                 ->setCell($contactData['cell'])
                 ->setCompany($company);
 
-            if (!empty($contactData['academicTitle'])) {
+            if (isset($contactData['academicTitle']) && ($contactData['academicTitle'] !== '' && $contactData['academicTitle'] !== '0')) {
                 $contact->setAcademicTitle($contactData['academicTitle']);
             }
 
-            if (!empty($contactData['position'])) {
+            if (isset($contactData['position']) && ($contactData['position'] !== '' && $contactData['position'] !== '0')) {
                 $contact->setPosition($contactData['position']);
             }
 
-            if (!empty($contactData['department'])) {
+            if (isset($contactData['department']) && ($contactData['department'] !== '' && $contactData['department'] !== '0')) {
                 $contact->setDepartment($contactData['department']);
             }
 
             $manager->persist($contact);
-            $this->contacts["contact_{$index}"] = $contact;
+            $this->contacts['contact_' . $index] = $contact;
         }
 
         $manager->flush();
@@ -1734,7 +1743,7 @@ class AppFixtures extends Fixture
                 ->setDueDate($projectData['dueDate'] ?? null);
 
             $manager->persist($project);
-            $this->projects["project_{$index}"] = $project;
+            $this->projects['project_' . $index] = $project;
         }
 
         $manager->flush();
@@ -1805,7 +1814,7 @@ class AppFixtures extends Fixture
             }
 
             $manager->persist($campaign);
-            $this->campaigns["campaign_{$index}"] = $campaign;
+            $this->campaigns['campaign_' . $index] = $campaign;
         }
 
         $manager->flush();

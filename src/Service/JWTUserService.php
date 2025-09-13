@@ -11,8 +11,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class JWTUserService
 {
     public function __construct(
-        private JWTTokenManagerInterface $jwtManager,
-        private UserRepository $userRepository,
+        private readonly JWTTokenManagerInterface $jwtManager,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -29,7 +29,7 @@ class JWTUserService
             return $this->userRepository->findOneBy(['email' => $username]);
 
             // return $this->userProvider->loadUserByIdentifier($username);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }

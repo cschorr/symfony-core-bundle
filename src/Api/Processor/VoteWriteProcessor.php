@@ -18,16 +18,18 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 /**
  * @implements ProcessorInterface<Vote, Vote>
  */
-final class VoteWriteProcessor implements ProcessorInterface
+final readonly class VoteWriteProcessor implements ProcessorInterface
 {
     /**
      * @param ProcessorInterface<Vote, Vote> $persistProcessor
      */
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
+        
         private ProcessorInterface $persistProcessor,
         private Security $security,
         #[Autowire(service: 'limiter.votes_per_10m')]
+        
         private RateLimiterFactory $votesLimiter,
         private VoteRepository $votes,
     ) {

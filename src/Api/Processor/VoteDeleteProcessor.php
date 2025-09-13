@@ -12,13 +12,14 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * @implements ProcessorInterface<Vote, null>
  */
-final class VoteDeleteProcessor implements ProcessorInterface
+final readonly class VoteDeleteProcessor implements ProcessorInterface
 {
     /**
      * @param ProcessorInterface<Vote, null> $removeProcessor
      */
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')]
+        
         private ProcessorInterface $removeProcessor,
     ) {
     }

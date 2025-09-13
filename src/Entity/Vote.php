@@ -54,7 +54,7 @@ class Vote
     #[Groups(['vote:read'])]
     private ?User $voter = null;
 
-    #[ORM\Column(type: 'smallint')]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::SMALLINT)]
     #[Assert\Choice(choices: [-1, 1])]
     #[Groups(['vote:read', 'vote:write'])]
     private int $value = 1;

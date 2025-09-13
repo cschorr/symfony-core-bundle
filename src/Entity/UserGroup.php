@@ -39,7 +39,7 @@ class UserGroup extends AbstractEntity
      *
      * @var list<string>|null
      */
-    #[ORM\Column(type: 'json', nullable: true)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::JSON, nullable: true)]
     #[Assert\Choice(callback: [UserRole::class, 'values'], multiple: true)]
     #[Assert\Unique]
     private ?array $roles = null;
