@@ -1,49 +1,18 @@
 # English translations for the application
 
-# Authentication/Login
-Login: "Login"
-"Please sign in": "Please sign in"
-Email: "Email"
-Password: "Password"
-"Sign in": "Sign in"
-"You are logged in as": "You are logged in as"
-Logout: "Logout"
-"Demo Credentials": "Demo Credentials"
-"Admin User": "Admin User"
-"Regular User": "Regular User"
-"supported by": "supported by"
-"Placeholder image": "Placeholder image"
-
-# DomainEntityPermission/Entity Names (direct translation approach)
-# These keys match the "code" and "name" fields in the DomainEntityPermission entity
-# - Singular forms (code field): User, Company, DomainEntityPermission, CompanyGroup, Project
-# - Plural forms (name field): Users, Companies, System Entities, CompanyGroups, Projects
-# Navigation uses the plural forms automatically via $systemEntity->getName()
+# Entity Names
 User: "User"
 Users: "Users"
 Company: "Company"
 Companies: "Companies"
-SystemEntity: "System Entity"
-"System Entities": "System Entities"
-"Configure and manage system entities": "Configure and manage system entities"
-"View System Entities": "View System Entities"
-CompanyGroup: "Company Group"
-CompanyGroups: "Company Groups"
 Project: "Project"
 Projects: "Projects"
+CompanyGroup: "Company Group"
+CompanyGroups: "Company Groups"
+Contact: "Contact"
+Contacts: "Contacts"
 
 # General UI
-Dashboard: "Dashboard"
-"Theme Settings": "Theme Settings"
-"Background Tone": "Background Tone"
-"Status": "Status"
-"Default Theme Active": "Default Theme Active"
-Default: "Default"
-Blue: "Blue"
-Green: "Green"
-Purple: "Purple"
-Orange: "Orange"
-Ocean: "Ocean"
 Description: "Description"
 "Country Code": "Country Code"
 Website: "Website"
@@ -53,118 +22,50 @@ Inactive: "Inactive"
 Create: "Create"
 Edit: "Edit"
 Delete: "Delete"
-Duplicate: "Duplicate"
 Show: "Show"
 "View %s": "View %s"
 "Edit %s": "Edit %s"
 "Create %s": "Create %s"
 
-# DomainEntityPermission Management
-"Create System Entity": "Create System Entity"
-"System Entity Information": "System Entity Information"
-"Basic information about the system entity": "Basic information about the system entity"
-"Manage system entities and their permissions.": "Manage system entities and their permissions."
-"Display name for the system entity": "Display name for the system entity"
-"Unique code that matches the entity name (e.g., User, Company, SystemEntity)": "Unique code that matches the entity name (e.g., User, Company, DomainEntityPermission)"
-"e.g., User, Company, SystemEntity": "e.g., User, Company, DomainEntityPermission"
-"Optional description of what this system entity manages": "Optional description of what this system entity manages"
-
 # Permissions
-"User Permissions": "User Permissions"
-"Manage user permissions for this system entity": "Manage user permissions for this system entity"
 "Can Read": "Can Read"
 "Can Write": "Can Write"
-"SystemEntity Permissions": "DomainEntityPermission Permissions"
-"System Permissions": "System Permissions"
-"Count of system entity permissions for this user": "Count of system entity permissions for this user"
-"No permissions": "No permissions"
-"No permissions assigned": "No permissions assigned"
-"%d permission(s) assigned": "%d permission(s) assigned"
-"Permission Details": "Permission Details"
-"Unknown User": "Unknown User"
-"Unknown SystemEntity": "Unknown DomainEntityPermission"
 Read: "Read"
 Write: "Write"
-"Access denied. You need read permission for the %systemEntity% system entity.": "Access denied. You need read permission for the %domainEntityPermission% system entity."
-"Access denied. You need write permission for the %systemEntity% system entity.": "Access denied. You need write permission for the %domainEntityPermission% system entity."
 
 # User Management
 "User Information": "User Information"
 "Basic information about the user": "Basic information about the user"
 Roles: "Roles"
-Admin: "Admin"
-Management: "Management"
 
 # Project Management
-"Manage projects, assignments, and timelines.": "Manage projects, assignments, and timelines."
 "Project Name": "Project Name"
-"The name of the project": "The name of the project"
-"Detailed description of the project": "Detailed description of the project"
-"Current status of the project": "Current status of the project"
 Assignee: "Assignee"
-"User responsible for this project": "User responsible for this project"
-"Not assigned": "Not assigned"
 Client: "Client"
-"Company or client for this project": "Company or client for this project"
-"No client assigned": "No client assigned"
 "Start Date": "Start Date"
-"Project start date": "Project start date"
 "End Date": "End Date"
-"Project end date": "Project end date"
 "Planning": "Planning"
 "In Progress": "In Progress"
 "On Hold": "On Hold"
 "Completed": "Completed"
 "Cancelled": "Cancelled"
-"Unknown": "Unknown"
-
-# Company Group Management
-"Company Group Name": "Company Group Name"
 
 # Company Management
-"Name Extension": "Name Extension"
 "Company Group": "Company Group"
-"Communication": "Communication"
 "Email Address": "Email Address"
 "Phone Number": "Phone Number"
-"Mobile/Cell Phone": "Mobile/Cell Phone"
-"Address Information": "Address Information"
 "Street Address": "Street Address"
 "ZIP/Postal Code": "ZIP/Postal Code"
 "City": "City"
 "Country": "Country"
-"Mitarbeiter": "Employees"
 
-# Form Actions
-"Erstellen und weiteres Element hinzufügen": "Create and add another item"
-"Erstellen": "Create"
+# Contact Management
+"First Name": "First Name"
+"Last Name": "Last Name"
+Position: "Position"
+Department: "Department"
 
 # Field Labels
 "Name": "Name"
 Street: "Street"
-Icon: "Icon"
 Code: "Code"
-
-# Duplication
-"Duplicate this record": "Duplicate this record"
-"Entity duplicated successfully": "Entity duplicated successfully"
-"Error duplicating entity: ": "Error duplicating entity: "
-"Form pre-filled with duplicated values. Click \"Save\" to create the new record.": "Form pre-filled with duplicated values. Click \"Save\" to create the new record."
-Copy: "Copy"
-
-# Pluralization
-"{1} 1 permission assigned|]1,Inf[ %count% permissions assigned": "{1} 1 permission assigned|]1,Inf[ %count% permissions assigned"
-
-# Additional missing translations
-Temporary: "Temporary"
-"Welcome to your Dashboard": "Welcome to your Dashboard"
-"This is your customized EasyAdmin dashboard with a beautiful background image and color tone.": "This is your customized EasyAdmin dashboard with a beautiful background image and color tone."
-"Manage system users and their permissions": "Manage system users and their permissions"
-"View Users": "View Users"
-"View SystemEntities": "View System Entities"
-"FontAwesome icon class (e.g., fas fa-users, fas fa-building)": "FontAwesome icon class (e.g., fas fa-users, fas fa-building)"
-"e.g., fas fa-users, fas fa-building": "e.g., fas fa-users, fas fa-building"
-"Error duplicating entity:": "Error duplicating entity:"
-"Cannot delete record. It has related records that prevent deletion.": "Cannot delete record. It has related records that prevent deletion."
-"Cannot delete record. It has related records that prevent deletion. Please remove all related records first.": "Cannot delete record. It has related records that prevent deletion. Please remove all related records first."
-"Keine Zuordnung": "❌ No Assignment"

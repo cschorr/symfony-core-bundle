@@ -1,6 +1,7 @@
+- we are using Docker Compose in dev environment  
 - always use "bin/kickstart.sh" to rebuild the database during the current project phase
-- we are using asset mapper
+- we are using Symfony Asset Mapper (not Webpack Encore)
 - since we code in dev environment there is no need to run the asset-map:compile command
-- we are using easyadmin version 4
-- please interact with the easyadmin code base and watch easyadmins own state management
+- this is an API-first application using API Platform without admin interface
+- please interact with API Platform resources, GraphQL/REST endpoints, and JWT authentication
 - dont run any migrations in current dev phase, since we are re-creating the database each time
