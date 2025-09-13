@@ -10,6 +10,9 @@ use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
+/**
+ * @implements ProviderInterface<User>
+ */
 class UserCurrentProvider implements ProviderInterface
 {
     public function __construct(

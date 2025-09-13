@@ -109,9 +109,8 @@ class UserGroup extends AbstractEntity
     {
         $stored = $this->roles ?? [];
 
-        return array_values(
-            array_map(static fn (string $r) => UserRole::from($r), $stored)
-        );
+        // No need for array_values since $stored is already a list
+        return array_map(static fn (string $r) => UserRole::from($r), $stored);
     }
 
     /**
@@ -168,6 +167,36 @@ class UserGroup extends AbstractEntity
     {
         if ($this->users->removeElement($user)) {
             $user->removeUserGroup($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserGroupDomainEntityPermission>
+     */
+    public function getUserGroupDomainEntityPermissions(): Collection
+    {
+        return $this->userGroupDomainEntityPermissions;
+    }
+
+    public function addUserGroupDomainEntityPermission(UserGroupDomainEntityPermission $permission): static
+    {
+        if (!$this->userGroupDomainEntityPermissions->contains($permission)) {
+            $this->userGroupDomainEntityPermissions->add($permission);
+            $permission->setUserGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserGroupDomainEntityPermission(UserGroupDomainEntityPermission $permission): static
+    {
+        if ($this->userGroupDomainEntityPermissions->removeElement($permission)) {
+            // set the owning side to null (unless already changed)
+            if ($permission->getUserGroup() === $this) {
+                $permission->setUserGroup(null);
+            }
         }
 
         return $this;

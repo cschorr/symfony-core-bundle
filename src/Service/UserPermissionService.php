@@ -21,10 +21,13 @@ class UserPermissionService
     public function userHasReadAccess(User $user, DomainEntityPermission $systemEntity): bool
     {
         foreach ($user->getUserGroups() as $userGroup) {
-            $permission[] = $this->userGroupSystemEntityPermissionRepository->findByUserGroupAndSystemEntity($userGroup, $systemEntity);
+            $permission = $this->userGroupSystemEntityPermissionRepository->findByUserGroupAndSystemEntity($userGroup, $systemEntity);
+            if ($permission !== null && $permission->canRead()) {
+                return true;
+            }
         }
 
-        return $permission && $permission->canRead();
+        return false;
     }
 
     /**
@@ -32,8 +35,13 @@ class UserPermissionService
      */
     public function userHasWriteAccess(User $user, DomainEntityPermission $systemEntity): bool
     {
-        $permission = $this->userGroupSystemEntityPermissionRepository->findByUserGroupAndSystemEntity($user, $systemEntity);
+        foreach ($user->getUserGroups() as $userGroup) {
+            $permission = $this->userGroupSystemEntityPermissionRepository->findByUserGroupAndSystemEntity($userGroup, $systemEntity);
+            if ($permission !== null && $permission->canWrite()) {
+                return true;
+            }
+        }
 
-        return $permission && $permission->canWrite();
+        return false;
     }
 }

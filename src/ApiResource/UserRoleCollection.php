@@ -21,13 +21,20 @@ use App\State\UserRoleProvider;
 )]
 class UserRoleCollection
 {
+    public readonly int $total;
+
+    /**
+     * @param array<int, array{name: string, value: string}> $roles
+     */
     public function __construct(
         public readonly array $roles = [],
-        public readonly int $total = 0,
     ) {
         $this->total = count($this->roles);
     }
 
+    /**
+     * @return array<int, array{name: string, value: string}>
+     */
     public function getRoles(): array
     {
         return $this->roles;
