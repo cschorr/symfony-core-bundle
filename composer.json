@@ -109,6 +109,46 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "cs-check": [
+            "php-cs-fixer fix --dry-run --diff --verbose"
+        ],
+        "cs-fix": [
+            "php-cs-fixer fix"
+        ],
+        "phpstan": [
+            "phpstan analyse"
+        ],
+        "phpcs": [
+            "phpcs"
+        ],
+        "rector-check": [
+            "rector process --dry-run"
+        ],
+        "rector-fix": [
+            "rector process"
+        ],
+        "security-audit": [
+            "composer audit"
+        ],
+        "composer-validate": [
+            "composer validate --strict"
+        ],
+        "test": [
+            "phpunit"
+        ],
+        "check-all": [
+            "@composer-validate",
+            "@security-audit",
+            "@cs-check",
+            "@phpstan",
+            "@phpcs",
+            "@rector-check",
+            "@test"
+        ],
+        "fix-all": [
+            "@cs-fix",
+            "@rector-fix"
         ]
     },
     "conflict": {
