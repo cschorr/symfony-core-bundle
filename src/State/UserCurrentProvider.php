@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 class UserCurrentProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly Security $security
+        private readonly Security $security,
     ) {
     }
 

@@ -91,11 +91,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **HTTPS certificate warnings**: Normal for development - FrankenPHP uses self-signed certificates
 
 ### Code Quality & Testing
+#### Direct Tool Usage
 - **PHPStan**: `docker compose exec php vendor/bin/phpstan analyse` (level 8, configured in `phpstan.dist.neon`)
 - **PHP CS Fixer**: `docker compose exec php vendor/bin/php-cs-fixer fix` (PSR-12 standards)
 - **PHP_CodeSniffer**: `docker compose exec php vendor/bin/phpcs` (PSR-12 standards)
 - **PHPUnit**: `docker compose exec php vendor/bin/phpunit` (tests in `/tests` directory)
 - **Rector**: `docker compose exec php vendor/bin/rector process` (configured in `rector.php`)
+
+#### Composer Scripts (Recommended)
+- **Code Style**: `docker compose exec php composer cs-check` / `composer cs-fix`
+- **Static Analysis**: `docker compose exec php composer phpstan`
+- **Code Standards**: `docker compose exec php composer phpcs`
+- **Code Modernization**: `docker compose exec php composer rector-check` / `composer rector-fix`
+- **Security**: `docker compose exec php composer security-audit`
+- **All Checks**: `docker compose exec php composer check-all`
+- **Auto-Fix All**: `docker compose exec php composer fix-all`
 
 ### API Documentation
 - **OpenAPI/Swagger**: `bin/console api:openapi:export` - Generates dynamic REST API documentation

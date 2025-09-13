@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\Category;
 use App\Entity\Company;
 use App\Entity\CompanyGroup;
-use App\Entity\Project;
-use App\Entity\DomainEntityPermission;
-use App\Entity\User;
 use App\Entity\Contact;
-use App\Entity\Category;
+use App\Entity\DomainEntityPermission;
+use App\Entity\Project;
+use App\Entity\User;
 use App\Entity\UserGroup;
 use App\Repository\DomainEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;

@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             provider: UserCurrentProvider::class,
             normalizationContext: ['groups' => ['user:read']],
             security: 'is_granted("ROLE_USER")'
-        )
+        ),
     ]
 )]
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
@@ -150,7 +150,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     public function setRolesFromEnums(array $roles): static
     {
-        $this->roles = array_values(array_unique(array_map(static fn(UserRole $r) => $r->value, $roles)));
+        $this->roles = array_values(array_unique(array_map(static fn (UserRole $r) => $r->value, $roles)));
 
         return $this;
     }
@@ -163,8 +163,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function getRoleEnums(): array
     {
         $stored = $this->roles ?? [];
+
         return array_values(
-            array_map(static fn(string $r) => UserRole::from($r), $stored)
+            array_map(static fn (string $r) => UserRole::from($r), $stored)
         );
     }
 
@@ -175,13 +176,14 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     public function setRoles(?array $roles): static
     {
-        if ($roles === null) {
+        if (null === $roles) {
             $this->roles = null;
+
             return $this;
         }
 
         $this->roles = array_values(array_unique(array_map(
-            static fn(string|UserRole $r) => $r instanceof UserRole ? $r->value : (string) $r,
+            static fn (string|UserRole $r) => $r instanceof UserRole ? $r->value : (string) $r,
             $roles
         )));
 

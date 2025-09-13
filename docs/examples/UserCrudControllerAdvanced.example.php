@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\User;
@@ -8,12 +10,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 /**
  * Advanced example showing multiple approaches for field configuration
- * using the enhanced EasyAdminFieldService
+ * using the enhanced EasyAdminFieldService.
  */
 class UserCrudControllerAdvanced extends AbstractCrudController
 {
     public function __construct(
-        private EasyAdminFieldService $fieldService
+        private EasyAdminFieldService $fieldService,
     ) {
     }
 
@@ -63,7 +65,7 @@ class UserCrudControllerAdvanced extends AbstractCrudController
 
         // APPROACH 4: Complex builder configurations
         $fields[] = $this->fieldService->createPanelConfig('company_panel', 'Company Information', ['detail', 'form'], 'fas fa-building');
-        
+
         $fields[] = $this->fieldService->field('company')
             ->association(\App\Entity\Company::class, 'name')
             ->label('Company')
@@ -71,7 +73,7 @@ class UserCrudControllerAdvanced extends AbstractCrudController
 
         // APPROACH 5: Advanced configurations
         $fields[] = $this->fieldService->createPanelConfig('account_panel', 'Account Settings', ['detail', 'form'], 'fas fa-cog');
-        
+
         $fields[] = $this->fieldService->field('isActive')
             ->type('boolean')
             ->label('Active Account')
@@ -81,7 +83,7 @@ class UserCrudControllerAdvanced extends AbstractCrudController
         $fields[] = $this->fieldService->field('roles')
             ->choices([
                 'Administrator' => 'ROLE_ADMIN',
-                'Manager' => 'ROLE_MANAGER', 
+                'Manager' => 'ROLE_MANAGER',
                 'User' => 'ROLE_USER',
             ])
             ->multiple()
@@ -104,26 +106,26 @@ class UserCrudControllerAdvanced extends AbstractCrudController
 
 // COMPARISON: Before vs After
 
-/**
+/*
  * OLD APPROACH (verbose and repetitive):
- * 
+ *
  * $this->fieldService->createFieldConfig('email', 'email', ['index', 'detail', 'form'], 'Email Address', [
  *     'required' => true,
  *     'indexLabel' => 'Email',
  *     'columns' => 12,
  * ])
- * 
+ *
  * NEW APPROACHES:
- * 
+ *
  * // Builder pattern (readable and flexible):
  * $this->fieldService->field('email')
  *     ->required()
  *     ->indexLabel('Email')
  *     ->build()
- * 
+ *
  * // Field groups (fastest for common patterns):
  * $this->fieldService->createCommunicationFieldGroup()
- * 
+ *
  * // Auto-detection (minimal configuration):
  * $this->fieldService->createFields(['email'])
  */

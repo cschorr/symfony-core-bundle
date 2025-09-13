@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 // src/OpenApi/RoleEnumDecorator.php
+
 namespace App\OpenApi;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;

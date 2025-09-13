@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Api;
 
 use App\Service\JWTUserService;
@@ -17,7 +19,7 @@ class UserInfoController extends AbstractController
     #[Route('/userinfo', name: 'userinfo', methods: ['POST'])]
     public function userInfoFromToken(
         Request $request,
-        JWTUserService $jwtUserService
+        JWTUserService $jwtUserService,
     ): JsonResponse {
         // Extract token from Authorization header
         $authHeader = $request->headers->get('Authorization');

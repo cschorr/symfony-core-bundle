@@ -14,7 +14,7 @@ class UserRoleProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $roles = [];
-        
+
         foreach (UserRole::cases() as $role) {
             $roles[] = [
                 'name' => $role->name,
