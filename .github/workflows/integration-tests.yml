@@ -55,7 +55,11 @@ jobs:
         run: curl -vkI --fail-with-body https://localhost/.well-known/mercure?topic=test
       -
         name: Create test database
-        run: docker compose exec -T php bin/console -e test doctrine:database:create
+        run: |
+          echo "Creating test database with root privileges..."
+          docker compose exec -T database mariadb -u root -p!ChangeMe! -e "CREATE DATABASE IF NOT EXISTS app_test;"
+          docker compose exec -T database mariadb -u root -p!ChangeMe! -e "GRANT ALL PRIVILEGES ON app_test.* TO 'app'@'%';"
+          docker compose exec -T database mariadb -u root -p!ChangeMe! -e "FLUSH PRIVILEGES;"
       -
         name: Run migrations
         run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
