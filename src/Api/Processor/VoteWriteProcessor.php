@@ -6,6 +6,7 @@ namespace App\Api\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Entity\User;
 use App\Entity\Vote;
 use App\Repository\VoteRepository;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -14,8 +15,14 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 
+/**
+ * @implements ProcessorInterface<Vote, Vote>
+ */
 final class VoteWriteProcessor implements ProcessorInterface
 {
+    /**
+     * @param ProcessorInterface<Vote, Vote> $persistProcessor
+     */
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
@@ -30,10 +37,14 @@ final class VoteWriteProcessor implements ProcessorInterface
     {
         if ($data instanceof Vote) {
             $user = $this->security->getUser();
+            if (!$user instanceof User) {
+                throw new \LogicException('User must be authenticated to vote');
+            }
 
             $limit = $this->votesLimiter->create($user->getUserIdentifier())->consume(1);
             if (!$limit->isAccepted()) {
-                $retry = $limit->getRetryAfter()?->getTimestamp();
+                $retryAfter = $limit->getRetryAfter();
+                $retry = $retryAfter !== null ? $retryAfter->getTimestamp() : null;
                 throw new TooManyRequestsHttpException($retry ? max(1, $retry - time()) : null, 'Vote rate limit exceeded');
             }
 
@@ -43,9 +54,9 @@ final class VoteWriteProcessor implements ProcessorInterface
                 throw new BadRequestHttpException('value must be -1 or 1');
             }
 
-            // „POST wenn schon vorhanden“ → als Update behandeln
+            // „POST wenn schon vorhanden" → als Update behandeln
             $existing = $this->votes->findOneBy(['comment' => $data->getComment(), 'voter' => $user]);
-            if ($existing && $existing !== $data) {
+            if ($existing instanceof Vote && $existing !== $data) {
                 $existing->setValue($data->getValue());
 
                 return $this->persistProcessor->process($existing, $operation, $uriVariables, $context);

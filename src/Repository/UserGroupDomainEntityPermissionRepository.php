@@ -142,11 +142,11 @@ class UserGroupDomainEntityPermissionRepository extends ServiceEntityRepository
      */
     public function grantPermissions(UserGroup $userGroup, DomainEntityPermission $systemEntity, bool $canRead = false, bool $canWrite = false): UserGroupDomainEntityPermission
     {
-        $permission = $this->findByUserGroupAndSystemEntity($user, $systemEntity);
+        $permission = $this->findByUserGroupAndSystemEntity($userGroup, $systemEntity);
 
         if (null === $permission) {
             $permission = new UserGroupDomainEntityPermission();
-            $permission->setUserGroup($user);
+            $permission->setUserGroup($userGroup);
             $permission->setDomainEntityPermission($systemEntity);
             $this->getEntityManager()->persist($permission);
         }

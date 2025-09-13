@@ -9,6 +9,9 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\UserRoleCollection;
 use App\Enum\UserRole;
 
+/**
+ * @implements ProviderInterface<UserRoleCollection>
+ */
 class UserRoleProvider implements ProviderInterface
 {
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null

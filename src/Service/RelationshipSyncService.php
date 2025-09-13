@@ -80,6 +80,9 @@ class RelationshipSyncService
         }
     }
 
+    /**
+     * @param Collection<int, object> $currentCollection
+     */
     private function removePreviousReferences(object $owningEntity, string $owningEntityClass, Collection $currentCollection, string $inverseProperty): void
     {
         // Get entity class from collection to find previous items
@@ -91,6 +94,7 @@ class RelationshipSyncService
         $itemClass = $firstItem::class;
 
         // Find all items that were previously assigned to this entity
+        /** @var class-string $itemClass */
         $repository = $this->entityManager->getRepository($itemClass);
         $previousItems = $repository->findBy([$inverseProperty => $owningEntity]);
 
