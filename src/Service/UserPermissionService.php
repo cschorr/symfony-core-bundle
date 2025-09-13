@@ -22,7 +22,7 @@ class UserPermissionService
     {
         foreach ($user->getUserGroups() as $userGroup) {
             $permission = $this->userGroupSystemEntityPermissionRepository->findByUserGroupAndSystemEntity($userGroup, $systemEntity);
-            if ($permission !== null && $permission->canRead()) {
+            if (null !== $permission && $permission->canRead()) {
                 return true;
             }
         }
@@ -37,7 +37,7 @@ class UserPermissionService
     {
         foreach ($user->getUserGroups() as $userGroup) {
             $permission = $this->userGroupSystemEntityPermissionRepository->findByUserGroupAndSystemEntity($userGroup, $systemEntity);
-            if ($permission !== null && $permission->canWrite()) {
+            if (null !== $permission && $permission->canWrite()) {
                 return true;
             }
         }
