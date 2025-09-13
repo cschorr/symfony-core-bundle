@@ -57,12 +57,12 @@ class Comment
     #[Groups(['comment:read', 'comment:write'])]
     private ?self $parent = null;
 
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::TEXT)]
     #[Assert\NotBlank]
     #[Groups(['comment:read', 'comment:write'])]
     private string $content = '';
 
-    #[ORM\Column(type: 'datetime_immutable', name: 'created_at')]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE, name: 'created_at')]
     #[Groups(['comment:read'])]
     private \DateTimeImmutable $createdAt;
 
@@ -72,15 +72,15 @@ class Comment
     private ?User $author = null;
 
     // Counter Caches (werden von Listener aktualisiert)
-    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER, options: ['default' => 0])]
     #[Groups(['comment:read'])]
     private int $upCount = 0;
 
-    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER, options: ['default' => 0])]
     #[Groups(['comment:read'])]
     private int $downCount = 0;
 
-    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER, options: ['default' => 0])]
     #[Groups(['comment:read'])]
     private int $score = 0;
 

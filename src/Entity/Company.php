@@ -67,7 +67,7 @@ class Company extends AbstractEntity
     #[ORM\ManyToOne(targetEntity: Category::class)]
     private ?Category $category = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     private ?string $imagePath = null;
 
     public function __construct()

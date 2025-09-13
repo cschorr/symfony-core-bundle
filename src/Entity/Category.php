@@ -98,6 +98,9 @@ class Category extends AbstractEntity
         return $this->parent;
     }
 
+    /**
+     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Category>
+     */
     public function getChildren(): Collection
     {
         return $this->children;

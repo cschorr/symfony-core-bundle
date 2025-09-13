@@ -8,7 +8,7 @@ use App\Entity\Comment;
 use App\Entity\Vote;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class CommentScoreUpdater
+final readonly class CommentScoreUpdater
 {
     public function __construct(private EntityManagerInterface $em)
     {

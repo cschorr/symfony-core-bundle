@@ -84,7 +84,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private ?\DateTimeImmutable $passwordResetTokenExpiresAt = null;
 
     // Stored as list of strings in DB; use helper methods to work with UserRole enums.
-    #[ORM\Column(type: 'json', nullable: true)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::JSON, nullable: true)]
     #[Groups(['user:read'])]
     private ?array $roles = null;
 

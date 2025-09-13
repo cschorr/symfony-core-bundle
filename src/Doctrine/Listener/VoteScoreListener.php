@@ -13,7 +13,7 @@ use Doctrine\Persistence\Event\LifecycleEventArgs;
 #[AsEntityListener(event: Events::postPersist, entity: Vote::class)]
 #[AsEntityListener(event: Events::postUpdate, entity: Vote::class)]
 #[AsEntityListener(event: Events::postRemove, entity: Vote::class)]
-final class VoteScoreListener
+final readonly class VoteScoreListener
 {
     public function __construct(private CommentScoreUpdater $updater)
     {
