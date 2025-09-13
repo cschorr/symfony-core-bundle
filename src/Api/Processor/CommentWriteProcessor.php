@@ -37,11 +37,11 @@ final class CommentWriteProcessor implements ProcessorInterface
             if (!$user instanceof User) {
                 throw new \LogicException('User must be authenticated to create a comment');
             }
-            
+
             $limit = $this->commentsLimiter->create($user->getUserIdentifier())->consume(1);
             if (!$limit->isAccepted()) {
                 $retryAfter = $limit->getRetryAfter();
-                $retry = $retryAfter !== null ? $retryAfter->getTimestamp() : null;
+                $retry = null !== $retryAfter ? $retryAfter->getTimestamp() : null;
                 throw new TooManyRequestsHttpException($retry ? max(1, $retry - time()) : null, 'Comment rate limit exceeded');
             }
 

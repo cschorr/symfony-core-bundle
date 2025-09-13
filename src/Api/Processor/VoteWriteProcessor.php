@@ -44,7 +44,7 @@ final class VoteWriteProcessor implements ProcessorInterface
             $limit = $this->votesLimiter->create($user->getUserIdentifier())->consume(1);
             if (!$limit->isAccepted()) {
                 $retryAfter = $limit->getRetryAfter();
-                $retry = $retryAfter !== null ? $retryAfter->getTimestamp() : null;
+                $retry = null !== $retryAfter ? $retryAfter->getTimestamp() : null;
                 throw new TooManyRequestsHttpException($retry ? max(1, $retry - time()) : null, 'Vote rate limit exceeded');
             }
 

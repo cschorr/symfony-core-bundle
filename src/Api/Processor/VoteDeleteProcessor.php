@@ -26,7 +26,7 @@ final class VoteDeleteProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         $this->removeProcessor->process($data, $operation, $uriVariables, $context);
-        
+
         return null;
     }
 }
