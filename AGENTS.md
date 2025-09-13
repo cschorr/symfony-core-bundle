@@ -1,4 +1,3 @@
-- we are using "ddev" in dev environment
 - always use "bin/kickstart.sh" to rebuild the database during the current project phase
 - we are using asset mapper
 - since we code in dev environment there is no need to run the asset-map:compile command

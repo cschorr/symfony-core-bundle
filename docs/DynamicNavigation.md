@@ -93,7 +93,7 @@ $systemEntity->setActive(true);
 
 Run tests to verify functionality:
 ```bash
-ddev exec ./bin/phpunit tests/Service/NavigationServiceTest.php
+docker compose exec php ./bin/phpunit tests/Service/NavigationServiceTest.php
 ```
 
 ## Migration from Static Navigation
