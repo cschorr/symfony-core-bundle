@@ -11,6 +11,9 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'api_')]
 class UserInfoController extends AbstractController
 {
+    /**
+     * @deprecated Use GET /users/me endpoint instead. This endpoint will be removed in a future version.
+     */
     #[Route('/userinfo', name: 'userinfo', methods: ['POST'])]
     public function userInfoFromToken(
         Request $request,

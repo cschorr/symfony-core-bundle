@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use App\Entity\Traits\Set\SetCommunicationTrait;
 use App\Entity\Traits\Set\SetNamePersonTrait;
 use App\Enum\UserRole;
 use App\Repository\UserRepository;
+use App\State\UserCurrentProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,6 +24,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     shortName: 'User',
     description: 'Represents a user in the system, with roles and permissions.',
+    operations: [
+        new Get(
+            uriTemplate: '/users/me',
+            read: false,
+            provider: UserCurrentProvider::class,
+            normalizationContext: ['groups' => ['user:read']],
+            security: 'is_granted("ROLE_USER")'
+        )
+    ]
 )]
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -48,18 +59,22 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
+    #[Groups(['user:read'])]
     private ?Category $category = null;
 
     /**
      * @var Collection<int, UserGroup>
      */
     #[ORM\ManyToMany(targetEntity: UserGroup::class, inversedBy: 'users')]
+    #[Groups(['user:read'])]
     private Collection $userGroups;
 
     #[ORM\Column(nullable: false, options: ['default' => false])]
+    #[Groups(['user:read'])]
     private ?bool $locked = false;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['user:read'])]
     private ?\DateTimeImmutable $lastLogin = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -70,6 +85,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     // Stored as list of strings in DB; use helper methods to work with UserRole enums.
     #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['user:read'])]
     private ?array $roles = null;
 
     /**
@@ -342,5 +358,42 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         }
 
         return $this;
+    }
+
+    // API Platform serialization methods
+    #[Groups(['user:read'])]
+    public function getIdString(): ?string
+    {
+        return $this->getId()?->toString();
+    }
+
+    #[Groups(['user:read'])]
+    public function getIsActive(): bool
+    {
+        return $this->isActive();
+    }
+
+    #[Groups(['user:read'])]
+    public function getIsLocked(): bool
+    {
+        return $this->isLocked();
+    }
+
+    #[Groups(['user:read'])]
+    public function getFirstName(): ?string
+    {
+        return $this->getNameFirst();
+    }
+
+    #[Groups(['user:read'])]
+    public function getLastName(): ?string
+    {
+        return $this->getNameLast();
+    }
+
+    #[Groups(['user:read'])]
+    public function getUsername(): string
+    {
+        return $this->getUserIdentifier();
     }
 }
