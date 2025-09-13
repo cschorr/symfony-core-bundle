@@ -27,10 +27,6 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    # Command services that need explicit configuration
-    App\Command\MigrateEasyAdminFieldsCommand:
-        arguments:
-            $projectDir: '%kernel.project_dir%'
 
     App\OpenApi\RoleEnumDecorator:
         decorates: 'api_platform.openapi.factory'
