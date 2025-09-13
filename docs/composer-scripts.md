@@ -33,7 +33,7 @@ docker compose exec php composer rector-fix
 
 ### Security & Validation
 ```bash
-# Check for security vulnerabilities
+# Check for security vulnerabilities (ignores abandoned packages)
 docker compose exec php composer security-audit
 
 # Validate composer.json structure
@@ -83,3 +83,14 @@ If any script returns a non-zero exit code, it indicates issues were found:
 - **Tests**: Test failures occurred
 
 Run individual scripts to get detailed information about specific issues.
+
+## 📦 Package Notes
+
+### Abandoned Packages
+The `security-audit` script uses `--abandoned=ignore` to focus only on security vulnerabilities and ignore abandoned package warnings. Currently, there's one abandoned package:
+
+- `behat/transliterator` - Required by `gedmo/doctrine-extensions` (StofDoctrineExtensionsBundle)
+- No replacement suggested by maintainers
+- Not a security risk, just unmaintained
+
+This configuration ensures CI/CD pipelines don't fail on abandoned packages that have no security implications.

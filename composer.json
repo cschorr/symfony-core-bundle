@@ -129,7 +129,7 @@
             "rector process"
         ],
         "security-audit": [
-            "composer audit"
+            "composer audit --abandoned=ignore"
         ],
         "composer-validate": [
             "composer validate --strict"
