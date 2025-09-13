@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Api\Processor;
 
 use ApiPlatform\Metadata\Operation;
@@ -10,7 +12,7 @@ final class VoteDeleteProcessor implements ProcessorInterface
 {
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')]
-        private ProcessorInterface $removeProcessor
+        private ProcessorInterface $removeProcessor,
     ) {
     }
 

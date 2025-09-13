@@ -6,10 +6,10 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
-use App\Entity\Traits\Set\SetNamePersonTrait;
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Set\SetAddressTrait;
 use App\Entity\Traits\Set\SetCommunicationTrait;
-use ApiPlatform\Metadata\ApiResource;
+use App\Entity\Traits\Set\SetNamePersonTrait;
 use App\Repository\ContactRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

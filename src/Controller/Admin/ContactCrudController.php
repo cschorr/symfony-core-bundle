@@ -144,7 +144,7 @@ class ContactCrudController extends AbstractCrudController
                 ->build(),
 
             // Additional fields for index view
-            #$this->fieldService->createFieldConfig('companyGroup', 'association', ['index'], 'Company Group'),
+            // $this->fieldService->createFieldConfig('companyGroup', 'association', ['index'], 'Company Group'),
 
             // Contact information for index view
             $this->fieldService->createFieldConfig('url', 'url', ['index'], 'Website'),

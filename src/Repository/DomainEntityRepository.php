@@ -39,7 +39,9 @@ class DomainEntityRepository extends ServiceEntityRepository
 
     /**
      * Find all active system entities that a user group has any permission for.
+     *
      * @param array<UserGroup> $userGroups
+     *
      * @return DomainEntityPermission[]
      */
     public function findActiveSystemEntitiesForUser($userGroups): array
@@ -48,7 +50,7 @@ class DomainEntityRepository extends ServiceEntityRepository
             return [];
         }
 
-        $userGroupIds = array_map(fn($group) => $group->getId(), $userGroups);
+        $userGroupIds = array_map(fn ($group) => $group->getId(), $userGroups);
 
         return $this->createQueryBuilder('se')
             ->distinct()

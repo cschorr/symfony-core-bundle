@@ -169,10 +169,10 @@ class Company extends AbstractEntity
 
     public function getImagePath(): ?string
     {
-        if ($this->imagePath === null) {
+        if (null === $this->imagePath) {
             return null;
         }
-        
+
         return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($this->imagePath, '/');
     }
 

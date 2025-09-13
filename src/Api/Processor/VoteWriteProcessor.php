@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Api\Processor;
 
 use ApiPlatform\Metadata\Operation;
@@ -20,7 +22,7 @@ final class VoteWriteProcessor implements ProcessorInterface
         private Security $security,
         #[Autowire(service: 'limiter.votes_per_10m')]
         private RateLimiterFactory $votesLimiter,
-        private VoteRepository $votes
+        private VoteRepository $votes,
     ) {
     }
 
@@ -45,6 +47,7 @@ final class VoteWriteProcessor implements ProcessorInterface
             $existing = $this->votes->findOneBy(['comment' => $data->getComment(), 'voter' => $user]);
             if ($existing && $existing !== $data) {
                 $existing->setValue($data->getValue());
+
                 return $this->persistProcessor->process($existing, $operation, $uriVariables, $context);
             }
         }

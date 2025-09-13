@@ -7,7 +7,6 @@ namespace App\Entity\Traits\Set;
 use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
  * Trait for blamable objects.

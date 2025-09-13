@@ -21,7 +21,7 @@ final class DashboardCustomController extends AbstractController
         // only select projects where i am assigned
         $user = $this->getUser();
 
-        if ($user === null) {
+        if (null === $user) {
             return $this->redirectToRoute('admin');
         }
 

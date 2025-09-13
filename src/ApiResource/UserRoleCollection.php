@@ -23,7 +23,7 @@ class UserRoleCollection
 {
     public function __construct(
         public readonly array $roles = [],
-        public readonly int $total = 0
+        public readonly int $total = 0,
     ) {
         $this->total = count($this->roles);
     }

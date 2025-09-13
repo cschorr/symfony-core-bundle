@@ -9,8 +9,8 @@ use App\Entity\Category;
 use App\Entity\Company;
 use App\Entity\CompanyGroup;
 use App\Entity\Contact;
-use App\Entity\Project;
 use App\Entity\DomainEntityPermission;
+use App\Entity\Project;
 use App\Entity\User;
 use App\Entity\UserGroup;
 use App\Entity\UserGroupDomainEntityPermission;
@@ -370,19 +370,12 @@ class AppFixtures extends Fixture
             $company = null;
 
             // Get company if specified
-            if (isset($userData['company']) && $userData['company'] !== null) {
+            if (isset($userData['company']) && null !== $userData['company']) {
                 $company = $this->companies[$userData['company']] ?? null;
             }
 
             if (!$category) {
-                throw new \Exception(
-                    sprintf(
-                        'Category "%s" not found for user "%s". Available categories: %s',
-                        $userData['category'],
-                        $key,
-                        implode(', ', array_keys($this->categories))
-                    )
-                );
+                throw new \Exception(sprintf('Category "%s" not found for user "%s". Available categories: %s', $userData['category'], $key, implode(', ', array_keys($this->categories))));
             }
 
             $user = new User();
@@ -768,7 +761,7 @@ class AppFixtures extends Fixture
         foreach ($companiesData as $index => $data) {
             $category = $this->categories[$data['category']] ?? null;
             $group = $this->companyGroups[$data['group']] ?? null;
-            
+
             // Randomly assign a demo logo
             $randomLogo = $demoLogos[array_rand($demoLogos)];
 

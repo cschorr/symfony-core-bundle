@@ -16,7 +16,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ApiResource(
@@ -43,7 +42,7 @@ class Project extends AbstractEntity
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'enum' => ['planning', 'in_progress', 'on_hold', 'completed', 'cancelled']
+            'enum' => ['planning', 'in_progress', 'on_hold', 'completed', 'cancelled'],
         ]
     )]
     private ProjectStatus $status = ProjectStatus::PLANNING;
@@ -56,6 +55,7 @@ class Project extends AbstractEntity
     public function setStatus(ProjectStatus $status): static
     {
         $this->status = $status;
+
         return $this;
     }
 

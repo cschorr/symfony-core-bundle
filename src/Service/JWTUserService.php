@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Repository\UserRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class JWTUserService
 {
     public function __construct(
         private JWTTokenManagerInterface $jwtManager,
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
     ) {
     }
 
@@ -24,9 +25,10 @@ class JWTUserService
             if (!$username) {
                 return null;
             }
+
             return $this->userRepository->findOneBy(['email' => $username]);
 
-            #return $this->userProvider->loadUserByIdentifier($username);
+            // return $this->userProvider->loadUserByIdentifier($username);
         } catch (\Exception $e) {
             return null;
         }

@@ -13,7 +13,7 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 final class LoginTimestampEventListener
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
