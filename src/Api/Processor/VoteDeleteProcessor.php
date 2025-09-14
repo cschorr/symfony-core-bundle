@@ -19,7 +19,6 @@ final readonly class VoteDeleteProcessor implements ProcessorInterface
      */
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')]
-        
         private ProcessorInterface $removeProcessor,
     ) {
     }

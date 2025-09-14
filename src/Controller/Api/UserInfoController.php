@@ -23,20 +23,20 @@ class UserInfoController extends AbstractController
         // Extract token from Authorization header
         $authHeader = $request->headers->get('Authorization');
 
-        if ($authHeader === null || $authHeader === '' || $authHeader === '0' || !str_starts_with($authHeader, 'Bearer ')) {
+        if (null === $authHeader || '' === $authHeader || '0' === $authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return $this->json(['error' => 'Authorization header with Bearer token required'], 400);
         }
 
         // Remove "Bearer " prefix to get the actual token
         $token = substr($authHeader, 7);
 
-        if ($token === '' || $token === '0') {
+        if ('' === $token || '0' === $token) {
             return $this->json(['error' => 'Token required'], 400);
         }
 
         $user = $jwtUserService->getUserFromToken($token);
 
-        if ($user === null) {
+        if (null === $user) {
             return $this->json(['error' => 'Invalid token'], 401);
         }
 

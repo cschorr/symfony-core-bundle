@@ -23,11 +23,9 @@ final readonly class CommentWriteProcessor implements ProcessorInterface
      */
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
-        
         private ProcessorInterface $persistProcessor,
         private Security $security,
         #[Autowire(service: 'limiter.comments_per_10m')]
-        
         private RateLimiterFactory $commentsLimiter,
     ) {
     }
