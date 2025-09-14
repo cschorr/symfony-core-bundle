@@ -16,7 +16,6 @@ use App\Repository\UserGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -53,7 +52,6 @@ class UserGroup extends AbstractEntity
      */
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'userGroups')]
     private Collection $users;
-
 
     public function __construct()
     {
@@ -164,5 +162,4 @@ class UserGroup extends AbstractEntity
 
         return $this;
     }
-
 }
