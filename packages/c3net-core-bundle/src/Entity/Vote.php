@@ -1,0 +1,97 @@
+<?php
+
+declare(strict_types=1);
+
+namespace C3net\CoreBundle\Entity;
+
+use ApiPlatform\Metadata as API;
+use C3net\CoreBundle\Api\Processor\VoteDeleteProcessor;
+use C3net\CoreBundle\Api\Processor\VoteWriteProcessor;
+use C3net\CoreBundle\Entity\Traits\Set\BlameableEntity;
+use C3net\CoreBundle\Entity\Traits\Single\BoolActiveTrait;
+use C3net\CoreBundle\Entity\Traits\Single\UuidTrait;
+use C3net\CoreBundle\Repository\VoteRepository;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ORM\Entity(repositoryClass: VoteRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_comment_voter', columns: ['comment_id', 'voter_id'])]
+#[API\ApiResource(
+    mercure: true,
+    normalizationContext: ['groups' => ['vote:read']],
+    denormalizationContext: ['groups' => ['vote:write']],
+    operations: [
+        new API\Post(
+            security: "is_granted('ROLE_USER')",
+            processor: VoteWriteProcessor::class
+        ),
+        new API\Patch(
+            security: 'object.getVoter() == user',
+            processor: VoteWriteProcessor::class
+        ),
+        new API\Delete(
+            security: "object.getVoter() == user or is_granted('ROLE_MODERATOR')",
+            processor: VoteDeleteProcessor::class
+        ),
+        new API\Get(security: "is_granted('ROLE_MODERATOR')"),
+        new API\GetCollection(security: "is_granted('ROLE_MODERATOR')"),
+    ]
+)]
+class Vote
+{
+    use UuidTrait;
+    use BlameableEntity;
+    use BoolActiveTrait;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['vote:read', 'vote:write'])]
+    private ?Comment $comment = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['vote:read'])]
+    private ?User $voter = null;
+
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::SMALLINT)]
+    #[Assert\Choice(choices: [-1, 1])]
+    #[Groups(['vote:read', 'vote:write'])]
+    private int $value = 1;
+
+    public function getComment(): ?Comment
+    {
+        return $this->comment;
+    }
+
+    public function setComment(Comment $c): self
+    {
+        $this->comment = $c;
+
+        return $this;
+    }
+
+    public function getVoter(): ?User
+    {
+        return $this->voter;
+    }
+
+    public function setVoter(User $u): self
+    {
+        $this->voter = $u;
+
+        return $this;
+    }
+
+    public function getValue(): int
+    {
+        return $this->value;
+    }
+
+    public function setValue(int $v): self
+    {
+        $this->value = $v;
+
+        return $this;
+    }
+}

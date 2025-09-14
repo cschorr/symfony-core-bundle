@@ -1,0 +1,77 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # Auto-register all services in the bundle
+    C3net\CoreBundle\:
+        resource: '../src/'
+        exclude:
+            - '../src/Entity/'
+            - '../src/Enum/'
+            - '../src/DataFixtures/'
+            - '../src/Repository/'
+
+    # Controllers
+    C3net\CoreBundle\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+    # API Platform State Providers/Processors
+    C3net\CoreBundle\State\:
+        resource: '../src/State/'
+
+    # Event Listeners
+    C3net\CoreBundle\EventListener\:
+        resource: '../src/EventListener/'
+
+    # Repositories (exclude from auto-registration, handled by Doctrine)
+    # C3net\CoreBundle\Repository\:
+    #     resource: '../src/Repository/'
+    #     tags: ['doctrine.repository_service']
+
+    # Services
+    C3net\CoreBundle\Service\:
+        resource: '../src/Service/'
+
+    # Data Fixtures
+    C3net\CoreBundle\DataFixtures\:
+        resource: '../src/DataFixtures/'
+        tags: ['doctrine.fixture.orm']
+
+    # Doctrine Listeners
+    C3net\CoreBundle\Doctrine\Listener\:
+        resource: '../src/Doctrine/Listener/'
+
+    # API Processors
+    C3net\CoreBundle\Api\Processor\:
+        resource: '../src/Api/Processor/'
+
+    # Domain Services
+    C3net\CoreBundle\Domain\:
+        resource: '../src/Domain/'
+
+    # Form Types
+    C3net\CoreBundle\Form\Type\:
+        resource: '../src/Form/Type/'
+
+    # OpenApi Configuration
+    C3net\CoreBundle\OpenApi\:
+        resource: '../src/OpenApi/'
+
+    # Specific repository services that are needed by other services
+    C3net\CoreBundle\Repository\VoteRepository:
+        factory: ['@doctrine.orm.entity_manager', 'getRepository']
+        arguments:
+            - 'C3net\CoreBundle\Entity\Vote'
+
+    C3net\CoreBundle\Repository\UserRepository:
+        factory: ['@doctrine.orm.entity_manager', 'getRepository']
+        arguments:
+            - 'C3net\CoreBundle\Entity\User'
+
+    C3net\CoreBundle\Repository\UserGroupRepository:
+        factory: ['@doctrine.orm.entity_manager', 'getRepository']
+        arguments:
+            - 'C3net\CoreBundle\Entity\UserGroup'

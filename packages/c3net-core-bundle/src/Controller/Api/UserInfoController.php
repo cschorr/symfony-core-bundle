@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace C3net\CoreBundle\Controller\Api;
+
+use C3net\CoreBundle\Service\JWTUserService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+
+class UserInfoController extends AbstractController
+{
+    /**
+     * @deprecated Use GET /users/me endpoint instead. This endpoint will be removed in a future version.
+     */
+    #[Route('/api/userinfo', name: 'api_userinfo', methods: ['POST'])]
+    public function userInfoFromToken(
+        Request $request,
+        JWTUserService $jwtUserService,
+    ): JsonResponse {
+        // Extract token from Authorization header
+        $authHeader = $request->headers->get('Authorization');
+
+        if (null === $authHeader || '' === $authHeader || '0' === $authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            return $this->json(['error' => 'Authorization header with Bearer token required'], 400);
+        }
+
+        // Remove "Bearer " prefix to get the actual token
+        $token = substr($authHeader, 7);
+
+        if ('' === $token || '0' === $token) {
+            return $this->json(['error' => 'Token required'], 400);
+        }
+
+        $user = $jwtUserService->getUserFromToken($token);
+
+        if (null === $user) {
+            return $this->json(['error' => 'Invalid token'], 401);
+        }
+
+        return $this->json([
+            'id' => method_exists($user, 'getId') ? $user->getId() : null,
+            'username' => $user->getUserIdentifier(),
+            'roles' => $user->getRoles(),
+            'firstName' => method_exists($user, 'getNameFirst') ? $user->getNameFirst() : null,
+            'lastName' => method_exists($user, 'getNameLast') ? $user->getNameLast() : null,
+            'isActive' => method_exists($user, 'isActive') ? $user->isActive() : true,
+            'isLocked' => method_exists($user, 'isLocked') ? $user->isLocked() : false,
+        ]);
+    }
+}

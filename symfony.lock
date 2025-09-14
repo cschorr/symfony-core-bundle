@@ -27,6 +27,9 @@
             "src/ApiResource/.gitignore"
         ]
     },
+    "c3net/core-bundle": {
+        "version": "dev-feature/extract-core-bundle"
+    },
     "damienharper/auditor-bundle": {
         "version": "6.2",
         "recipe": {
