@@ -92,7 +92,7 @@ class DuplicateService
 
             // For OneToMany relationships, we might want to skip the inverse side
             // to avoid issues with bidirectional relationships during duplication
-            if (\Doctrine\ORM\Mapping\ClassMetadata::ONE_TO_MANY === $associationMapping['type']) {
+            if (ClassMetadata::ONE_TO_MANY === $associationMapping['type']) {
                 // For now, we'll include OneToMany relationships but handle them carefully
                 // They will be processed by processDuplicatedValue
             }

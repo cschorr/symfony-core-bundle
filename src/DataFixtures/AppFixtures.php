@@ -26,7 +26,6 @@ class AppFixtures extends Fixture
 
     private array $userGroups = [];
 
-
     private array $categories = [];
 
     private array $companies = [];
@@ -57,7 +56,6 @@ class AppFixtures extends Fixture
         $this->createProjectFixtures($manager);
         $this->createCampaignFixtures($manager); // Create campaigns after projects
     }
-
 
     private function createCategoryFixtures(ObjectManager $manager): void
     {
@@ -349,7 +347,6 @@ class AppFixtures extends Fixture
 
         $manager->flush();
     }
-
 
     private function createCompanyGroupFixtures(ObjectManager $manager): void
     {
