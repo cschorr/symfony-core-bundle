@@ -60,6 +60,9 @@ class Category extends AbstractEntity
     #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?Category $parent = null;
 
+    /**
+     * @var Collection<int, Category>
+     */
     #[ORM\OneToMany(targetEntity: Category::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['lft' => 'ASC'])]
     private Collection $children;
@@ -106,6 +109,9 @@ class Category extends AbstractEntity
         return $this->children;
     }
 
+    /**
+     * @param Collection<int, Category> $children
+     */
     public function setChildren(Collection $children): void
     {
         $this->children = $children;

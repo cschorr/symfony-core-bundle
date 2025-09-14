@@ -22,20 +22,28 @@ class AppFixtures extends Fixture
 {
     private const string DEFAULT_PASSWORD = 'pass_1234';
 
+    /** @var array<string, User> */
     private array $users = [];
 
+    /** @var array<string, UserGroup> */
     private array $userGroups = [];
 
+    /** @var array<string, Category> */
     private array $categories = [];
 
+    /** @var array<string, Company> */
     private array $companies = [];
 
+    /** @var array<string, Contact> */
     private array $contacts = [];
 
+    /** @var array<string, CompanyGroup> */
     private array $companyGroups = [];
 
+    /** @var array<string, Campaign> */
     private array $campaigns = [];
 
+    /** @var array<string, Project> */
     private array $projects = [];
 
     public function __construct(
@@ -314,7 +322,7 @@ class AppFixtures extends Fixture
             $company = null;
 
             // Get company if specified
-            if (isset($userData['company']) && null !== $userData['company']) {
+            if (isset($userData['company'])) {
                 $company = $this->companies[$userData['company']] ?? null;
             }
 
@@ -1232,15 +1240,15 @@ class AppFixtures extends Fixture
                 ->setCell($contactData['cell'])
                 ->setCompany($company);
 
-            if (isset($contactData['academicTitle']) && ('' !== $contactData['academicTitle'] && '0' !== $contactData['academicTitle'])) {
+            if (isset($contactData['academicTitle'])) {
                 $contact->setAcademicTitle($contactData['academicTitle']);
             }
 
-            if (isset($contactData['position']) && ('' !== $contactData['position'] && '0' !== $contactData['position'])) {
+            if (isset($contactData['position'])) {
                 $contact->setPosition($contactData['position']);
             }
 
-            if (isset($contactData['department']) && ('' !== $contactData['department'] && '0' !== $contactData['department'])) {
+            if (isset($contactData['department'])) {
                 $contact->setDepartment($contactData['department']);
             }
 
@@ -1602,7 +1610,7 @@ class AppFixtures extends Fixture
                 ->setClient($client)
                 ->setAssignee($assignee)
                 ->setCategory($category)
-                ->setDueDate($projectData['dueDate'] ?? null);
+                ->setDueDate($projectData['dueDate']);
 
             $manager->persist($project);
             $this->projects['project_' . $index] = $project;

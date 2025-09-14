@@ -23,6 +23,9 @@ enum UserRole: string
     // Custom roles used in fixtures or features
     case ROLE_CONTENT_CREATOR = 'ROLE_CONTENT_CREATOR';
 
+    /**
+     * @return list<string>
+     */
     public static function values(): array
     {
         return array_map(static fn (self $r) => $r->value, self::cases());
