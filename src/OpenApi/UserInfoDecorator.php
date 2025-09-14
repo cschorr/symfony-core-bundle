@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\OpenApi;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Model;
+use ApiPlatform\OpenApi\OpenApi;
 
-final class UserInfoDecorator implements OpenApiFactoryInterface
+final readonly class UserInfoDecorator implements OpenApiFactoryInterface
 {
     public function __construct(
-        private OpenApiFactoryInterface $decorated
+        private OpenApiFactoryInterface $decorated,
     ) {
     }
+
     public function __invoke(array $context = []): OpenApi
     {
         $openApi = $this->decorated->__invoke($context);
@@ -30,38 +33,38 @@ final class UserInfoDecorator implements OpenApiFactoryInterface
                                         'id' => [
                                             'type' => 'string',
                                             'format' => 'uuid',
-                                            'example' => '550e8400-e29b-41d4-a716-446655440000'
+                                            'example' => '550e8400-e29b-41d4-a716-446655440000',
                                         ],
                                         'username' => [
                                             'type' => 'string',
-                                            'example' => 'john.doe'
+                                            'example' => 'john.doe',
                                         ],
                                         'roles' => [
                                             'type' => 'array',
                                             'items' => ['type' => 'string'],
-                                            'example' => ['ROLE_USER', 'ROLE_ADMIN']
+                                            'example' => ['ROLE_USER', 'ROLE_ADMIN'],
                                         ],
                                         'firstName' => [
                                             'type' => 'string',
                                             'nullable' => true,
-                                            'example' => 'John'
+                                            'example' => 'John',
                                         ],
                                         'lastName' => [
                                             'type' => 'string',
                                             'nullable' => true,
-                                            'example' => 'Doe'
+                                            'example' => 'Doe',
                                         ],
                                         'isActive' => [
                                             'type' => 'boolean',
-                                            'example' => true
+                                            'example' => true,
                                         ],
                                         'isLocked' => [
                                             'type' => 'boolean',
-                                            'example' => false
+                                            'example' => false,
                                         ],
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
                         ])
                     ),
                     '400' => new Model\Response(
@@ -73,11 +76,11 @@ final class UserInfoDecorator implements OpenApiFactoryInterface
                                     'properties' => [
                                         'error' => [
                                             'type' => 'string',
-                                            'example' => 'Authorization header with Bearer token required'
-                                        ]
-                                    ]
-                                ]
-                            ]
+                                            'example' => 'Authorization header with Bearer token required',
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ])
                     ),
                     '401' => new Model\Response(
@@ -89,11 +92,11 @@ final class UserInfoDecorator implements OpenApiFactoryInterface
                                     'properties' => [
                                         'error' => [
                                             'type' => 'string',
-                                            'example' => 'Invalid token'
-                                        ]
-                                    ]
-                                ]
-                            ]
+                                            'example' => 'Invalid token',
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ])
                     ),
                 ],
@@ -107,9 +110,9 @@ final class UserInfoDecorator implements OpenApiFactoryInterface
                         required: true,
                         schema: [
                             'type' => 'string',
-                            'example' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...'
+                            'example' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...',
                         ]
-                    )
+                    ),
                 ]
             )
         );

@@ -91,11 +91,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **HTTPS certificate warnings**: Normal for development - FrankenPHP uses self-signed certificates
 
 ### Code Quality & Testing
+#### Direct Tool Usage
 - **PHPStan**: `docker compose exec php vendor/bin/phpstan analyse` (level 8, configured in `phpstan.dist.neon`)
 - **PHP CS Fixer**: `docker compose exec php vendor/bin/php-cs-fixer fix` (PSR-12 standards)
 - **PHP_CodeSniffer**: `docker compose exec php vendor/bin/phpcs` (PSR-12 standards)
 - **PHPUnit**: `docker compose exec php vendor/bin/phpunit` (tests in `/tests` directory)
 - **Rector**: `docker compose exec php vendor/bin/rector process` (configured in `rector.php`)
+
+#### Composer Scripts (Recommended)
+- **Code Style**: `docker compose exec php composer cs-check` / `composer cs-fix`
+- **Static Analysis**: `docker compose exec php composer phpstan`
+- **Code Standards**: `docker compose exec php composer phpcs`
+- **Code Modernization**: `docker compose exec php composer rector-check` / `composer rector-fix`
+- **Security**: `docker compose exec php composer security-audit`
+- **All Checks**: `docker compose exec php composer check-all`
+- **Auto-Fix All**: `docker compose exec php composer fix-all`
 
 ### API Documentation
 - **OpenAPI/Swagger**: `bin/console api:openapi:export` - Generates dynamic REST API documentation
@@ -168,12 +178,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `StringNameTrait`, `StringCodeTrait`, `StringNotesTrait`: Common string fields
   - Set traits: `SetAddressTrait`, `SetCommunicationTrait` for complex field groups
 
-### Admin Interface (EasyAdmin v4)
-- **AbstractCrudController**: Custom base controller extending EasyAdmin's AbstractCrudController
-- **Permission-based access**: Domain entity permissions with voter system
-- **Duplicate functionality**: Built-in entity duplication with `DuplicateService`
-- **Automatic relationship syncing**: Handles bidirectional entity relationships
-- **Translation support**: All UI elements are translatable
+### API-First Architecture
+- **Pure API Platform**: Full GraphQL and REST API implementation
+- **No admin interface**: Clean API-only architecture focused on headless/decoupled applications
+- **JWT Authentication**: Stateless authentication for API clients
 
 ### API Platform Integration
 - **FrankenPHP**: Modern PHP application server with built-in HTTP/2, HTTP/3, and Mercure support
@@ -185,10 +193,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Caddy**: Automatic HTTPS with self-signed certificates for development
 
 ### Key Services
-- **PermissionService**: Manages domain entity permissions
-- **DuplicateService**: Deep copying of entities with relationship handling  
-- **NavigationService**: Dynamic admin menu generation
+- **UserPermissionService**: Manages domain entity permissions for API access
+- **RelationshipSyncService**: Handles bidirectional entity relationships
 - **LocaleService**: Internationalization support
+- **JWTUserService**: JWT token management and user authentication
 
 ### Security & Authentication
 - JWT-based API authentication
@@ -198,9 +206,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Important Notes
 
-- **EasyAdmin state management**: Pay attention to EasyAdmin's internal state when modifying admin controllers
+- **API-First Design**: This is a headless Symfony application focused on API Platform
 - **Entity relationships**: Use `RelationshipSyncService` for bidirectional relationship management
 - **Doctrine lifecycle**: AbstractEntity handles timestamp initialization in constructor
 - **Soft delete**: All entities inherit soft delete functionality via Gedmo
 - **Audit logging**: Damienharper/auditor-bundle tracks entity changes
-- **Error handling**: Foreign key constraint violations are handled gracefully in admin interface
+- **Error handling**: API Platform handles validation and constraint violations automatically

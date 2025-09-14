@@ -6,11 +6,13 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
-use App\Entity\Traits\Set\SetNamePersonTrait;
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\Set\SetAddressTrait;
 use App\Entity\Traits\Set\SetCommunicationTrait;
-use ApiPlatform\Metadata\ApiResource;
+use App\Entity\Traits\Set\SetNamePersonTrait;
 use App\Repository\ContactRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ContactRepository::class)]
@@ -37,6 +39,24 @@ class Contact extends AbstractEntity
     #[ORM\ManyToOne(targetEntity: Company::class)]
     private ?Company $company = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $position = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $department = null;
+
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'contact')]
+    private Collection $projects;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->projects = new ArrayCollection();
+    }
+
     #[\Override]
     public function __toString(): string
     {
@@ -51,6 +71,57 @@ class Contact extends AbstractEntity
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getPosition(): ?string
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?string $position): static
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getDepartment(): ?string
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?string $department): static
+    {
+        $this->department = $department;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): static
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
+            $project->addContact($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): static
+    {
+        if ($this->projects->removeElement($project)) {
+            $project->removeContact($this);
+        }
 
         return $this;
     }

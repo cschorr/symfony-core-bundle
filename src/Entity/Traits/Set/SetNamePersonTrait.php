@@ -23,6 +23,7 @@ trait SetNamePersonTrait
         if ($this->academicTitle) {
             return $this->academicTitle . ' ' . $this->nameFirst . ' ' . $this->nameLast;
         }
+
         return $this->nameFirst . ' ' . $this->nameLast;
     }
 
@@ -31,6 +32,7 @@ trait SetNamePersonTrait
         if ($this->academicTitle) {
             return $this->academicTitle . ' ' . $this->nameFirst . ' ' . $this->nameLast;
         }
+
         return $this->nameFirst . ' ' . $this->nameLast;
     }
 
@@ -39,6 +41,7 @@ trait SetNamePersonTrait
         if ($this->academicTitle) {
             return $this->academicTitle . ' ' . $this->nameLast . ', ' . $this->nameFirst;
         }
+
         return $this->nameLast . ', ' . $this->nameFirst;
     }
 

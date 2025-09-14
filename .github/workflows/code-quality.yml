@@ -1,0 +1,60 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  code-quality:
+    name: Code Quality Tools
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker images
+      uses: docker/bake-action@v6
+      with:
+        pull: true
+        load: true
+        files: |
+          compose.yaml
+          compose.override.yaml
+        set: |
+          php.cache-from=type=gha,scope=php-${{github.ref}}
+          php.cache-from=type=gha,scope=php-refs/heads/main
+
+    - name: Start services
+      run: docker compose up --wait --no-build --wait-timeout 300
+
+    - name: Show container logs on failure
+      if: failure()
+      run: docker compose logs
+
+    - name: Validate Composer
+      run: docker compose exec -T php composer composer-validate
+
+    - name: Security Audit
+      run: docker compose exec -T php composer security-audit
+
+    - name: Check Code Style
+      run: docker compose exec -T php composer cs-check
+
+    - name: Run PHPStan
+      run: docker compose exec -T php composer phpstan -- --error-format=github
+
+    - name: Run PHP_CodeSniffer
+      run: docker compose exec -T php composer phpcs
+
+    - name: Check Code Upgrades
+      run: docker compose exec -T php composer rector-check

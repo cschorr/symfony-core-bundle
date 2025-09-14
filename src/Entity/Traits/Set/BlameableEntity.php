@@ -7,7 +7,6 @@ namespace App\Entity\Traits\Set;
 use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
  * Trait for blamable objects.
@@ -28,7 +27,7 @@ trait BlameableEntity
     #[Gedmo\Blameable(on: 'update')]
     private ?User $updatedBy = null;
 
-    public function getCreatedBy()
+    public function getCreatedBy(): ?User
     {
         return $this->createdBy;
     }
@@ -40,7 +39,7 @@ trait BlameableEntity
         return $this;
     }
 
-    public function getUpdatedBy()
+    public function getUpdatedBy(): ?User
     {
         return $this->updatedBy;
     }

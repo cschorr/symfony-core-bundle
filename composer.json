@@ -9,9 +9,9 @@
         "php": ">=8.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "api-platform/doctrine-orm": "*",
+        "api-platform/doctrine-orm": "^4.1.23",
         "api-platform/graphql": "^4.1",
-        "api-platform/symfony": "*",
+        "api-platform/symfony": "^4.1.23",
         "damienharper/auditor-bundle": "^6.2",
         "deployer/deployer": "^7.5",
         "doctrine/dbal": "^3",
@@ -19,7 +19,6 @@
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.5",
-        "easycorp/easyadmin-bundle": "^4.24",
         "gesdinet/jwt-refresh-token-bundle": "^1.5",
         "lexik/jwt-authentication-bundle": "^3.1",
         "nelmio/cors-bundle": "^2.5",
@@ -109,6 +108,46 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "cs-check": [
+            "php-cs-fixer fix --dry-run --diff --verbose"
+        ],
+        "cs-fix": [
+            "php-cs-fixer fix"
+        ],
+        "phpstan": [
+            "phpstan analyse"
+        ],
+        "phpcs": [
+            "phpcs"
+        ],
+        "rector-check": [
+            "rector process --dry-run"
+        ],
+        "rector-fix": [
+            "rector process"
+        ],
+        "security-audit": [
+            "composer audit --abandoned=ignore"
+        ],
+        "composer-validate": [
+            "composer validate --strict"
+        ],
+        "test": [
+            "phpunit"
+        ],
+        "check-all": [
+            "@composer-validate",
+            "@security-audit",
+            "@cs-check",
+            "@phpstan",
+            "@phpcs",
+            "@rector-check",
+            "@test"
+        ],
+        "fix-all": [
+            "@cs-fix",
+            "@rector-fix"
         ]
     },
     "conflict": {

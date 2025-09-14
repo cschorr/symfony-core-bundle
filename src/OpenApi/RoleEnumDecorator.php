@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 // src/OpenApi/RoleEnumDecorator.php
+
 namespace App\OpenApi;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\OpenApi;
 use App\Enum\UserRole;
 
-final class RoleEnumDecorator implements OpenApiFactoryInterface
+final readonly class RoleEnumDecorator implements OpenApiFactoryInterface
 {
     public function __construct(private OpenApiFactoryInterface $decorated)
     {
@@ -19,9 +22,6 @@ final class RoleEnumDecorator implements OpenApiFactoryInterface
 
         $enumValues = UserRole::values(); // ['ROLE_USER', ...]
         $components = $openApi->getComponents();
-        if (!$components) {
-            return $openApi;
-        }
 
         // Schemas is: array<string, \ArrayObject>
         $schemas = $components->getSchemas() ?? [];
@@ -29,6 +29,7 @@ final class RoleEnumDecorator implements OpenApiFactoryInterface
             if (!$schema instanceof \ArrayObject) {
                 continue;
             }
+
             $schemaArr = $schema->getArrayCopy();
 
             // Only if the schema has a "roles" property

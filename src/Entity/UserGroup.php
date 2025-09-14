@@ -16,7 +16,6 @@ use App\Repository\UserGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -39,7 +38,7 @@ class UserGroup extends AbstractEntity
      *
      * @var list<string>|null
      */
-    #[ORM\Column(type: 'json', nullable: true)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::JSON, nullable: true)]
     #[Assert\Choice(callback: [UserRole::class, 'values'], multiple: true)]
     #[Assert\Unique]
     private ?array $roles = null;
@@ -54,17 +53,9 @@ class UserGroup extends AbstractEntity
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'userGroups')]
     private Collection $users;
 
-    /**
-     * @var Collection<int, UserGroupDomainEntityPermission>
-     */
-    #[ORM\OneToMany(targetEntity: UserGroupDomainEntityPermission::class, mappedBy: 'userGroup', cascade: ['persist', 'remove'])]
-    #[Groups(['user:read'])]
-    private Collection $userGroupDomainEntityPermissions;
-
     public function __construct()
     {
         parent::__construct();
-        $this->userGroupDomainEntityPermissions = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
 
@@ -85,13 +76,14 @@ class UserGroup extends AbstractEntity
      */
     public function setRoles(?array $roles): static
     {
-        if ($roles === null) {
+        if (null === $roles) {
             $this->roles = null;
+
             return $this;
         }
 
         $this->roles = array_values(array_unique(array_map(
-            static fn(string|UserRole $r) => $r instanceof UserRole ? $r->value : (string) $r,
+            static fn (string|UserRole $r) => $r instanceof UserRole ? $r->value : (string) $r,
             $roles
         )));
 
@@ -107,9 +99,9 @@ class UserGroup extends AbstractEntity
     public function getRoleEnums(): array
     {
         $stored = $this->roles ?? [];
-        return array_values(
-            array_map(static fn(string $r) => UserRole::from($r), $stored)
-        );
+
+        // No need for array_values since $stored is already a list
+        return array_map(static fn (string $r) => UserRole::from($r), $stored);
     }
 
     /**
@@ -119,7 +111,7 @@ class UserGroup extends AbstractEntity
      */
     public function setRolesFromEnums(array $roles): static
     {
-        $this->roles = array_values(array_unique(array_map(static fn(UserRole $r) => $r->value, $roles)));
+        $this->roles = array_values(array_unique(array_map(static fn (UserRole $r) => $r->value, $roles)));
 
         return $this;
     }
