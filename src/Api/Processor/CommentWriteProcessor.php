@@ -32,22 +32,24 @@ final readonly class CommentWriteProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        if ($data instanceof Comment) {
-            $user = $this->security->getUser();
-            if (!$user instanceof User) {
-                throw new \LogicException('User must be authenticated to create a comment');
-            }
+        if (!$data instanceof Comment) {
+            return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+        }
 
-            $limit = $this->commentsLimiter->create($user->getUserIdentifier())->consume(1);
-            if (!$limit->isAccepted()) {
-                $retryAfter = $limit->getRetryAfter();
-                $retry = null !== $retryAfter ? $retryAfter->getTimestamp() : null;
-                throw new TooManyRequestsHttpException($retry ? max(1, $retry - time()) : null, 'Comment rate limit exceeded');
-            }
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('User must be authenticated to create a comment');
+        }
 
-            if (null === $data->getAuthor()) {
-                $data->setAuthor($user);
-            }
+        $limit = $this->commentsLimiter->create($user->getUserIdentifier())->consume(1);
+        if (!$limit->isAccepted()) {
+            $retryAfter = $limit->getRetryAfter();
+            $retry = $retryAfter->getTimestamp();
+            throw new TooManyRequestsHttpException($retry ? max(1, $retry - time()) : null, 'Comment rate limit exceeded');
+        }
+
+        if (null === $data->getAuthor()) {
+            $data->setAuthor($user);
         }
 
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);

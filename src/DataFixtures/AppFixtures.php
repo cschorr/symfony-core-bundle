@@ -9,11 +9,9 @@ use App\Entity\Category;
 use App\Entity\Company;
 use App\Entity\CompanyGroup;
 use App\Entity\Contact;
-use App\Entity\DomainEntityPermission;
 use App\Entity\Project;
 use App\Entity\User;
 use App\Entity\UserGroup;
-use App\Entity\UserGroupDomainEntityPermission;
 use App\Enum\ProjectStatus;
 use App\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -28,7 +26,6 @@ class AppFixtures extends Fixture
 
     private array $userGroups = [];
 
-    private array $domainEntityPermission = [];
 
     private array $categories = [];
 
@@ -51,76 +48,16 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // Order is important for dependencies
-        $this->createDomainEntityFixtures($manager);
         $this->createCategoryFixtures($manager);
         $this->createUserGroupFixtures($manager);
         $this->createCompanyGroupFixtures($manager); // Create groups before companies
         $this->createCompanyFixtures($manager); // Create companies before users for proper assignment
         $this->createUserFixtures($manager);
-        $this->createPermissionFixtures($manager);
         $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
         $this->createCampaignFixtures($manager); // Create campaigns after projects
     }
 
-    private function createDomainEntityFixtures(ObjectManager $manager): void
-    {
-        $domainEntityData = [
-            'DomainEntityPermission' => [
-                'name' => 'SystemEntities',
-                'text' => 'System entities and configuration',
-                'icon' => 'fas fa-list',
-            ],
-            'User' => [
-                'name' => 'Users',
-                'text' => 'User management',
-                'icon' => 'fas fa-users',
-            ],
-            'UserGroup' => [
-                'name' => 'Usergroups',
-                'text' => 'Usergroup management',
-                'icon' => 'fas fa-users',
-            ],
-            'Company' => [
-                'name' => 'Companies',
-                'text' => 'Clients, suppliers, partners etc.',
-                'icon' => 'fas fa-building',
-            ],
-            'CompanyGroup' => [
-                'name' => 'CompanyGroups',
-                'text' => 'Groups of companies',
-                'icon' => 'fas fa-layer-group',
-            ],
-            'Contact' => [
-                'name' => 'Contacts',
-                'text' => 'Contact persons',
-                'icon' => 'fas fa-users',
-            ],
-            'Project' => [
-                'name' => 'Projects',
-                'text' => 'Manage projects',
-                'icon' => 'fas fa-project-diagram',
-            ],
-            'Category' => [
-                'name' => 'Categories',
-                'text' => 'Manage categories',
-                'icon' => 'fas fa-tags',
-            ],
-        ];
-
-        foreach ($domainEntityData as $code => $data) {
-            $domainEntityPermission = (new DomainEntityPermission())
-                ->setName($data['name'])
-                ->setCode($code)
-                ->setText($data['text'])
-                ->setIcon($data['icon']);
-
-            $manager->persist($domainEntityPermission);
-            $this->domainEntityPermission[$code] = $domainEntityPermission;
-        }
-
-        $manager->flush();
-    }
 
     private function createCategoryFixtures(ObjectManager $manager): void
     {
@@ -413,78 +350,6 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 
-    private function createPermissionFixtures(ObjectManager $manager): void
-    {
-        $adminPermissions = [
-            'User' => ['read' => true, 'write' => true],
-            'UserGroup' => ['read' => true, 'write' => true],
-            'Company' => ['read' => true, 'write' => true],
-            'DomainEntityPermission' => ['read' => true, 'write' => true],
-            'CompanyGroup' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => true],
-            'Category' => ['read' => true, 'write' => true],
-        ];
-
-        $demoPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'UserGroup' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => false],
-            'Category' => ['read' => true, 'write' => true],
-        ];
-
-        $developerPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => false],
-            'Project' => ['read' => true, 'write' => true],
-        ];
-
-        $marketingPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'UserGroup' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => true],
-        ];
-
-        $consultantPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'UserGroup' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => true],
-            'CompanyGroup' => ['read' => true, 'write' => false],
-        ];
-
-        $this->createUserGroupPermissions($manager, $this->userGroups['external'], $adminPermissions);
-        $this->createUserGroupPermissions($manager, $this->userGroups['basic'], $demoPermissions);
-        $this->createUserGroupPermissions($manager, $this->userGroups['advanced'], $developerPermissions);
-        $this->createUserGroupPermissions($manager, $this->userGroups['manager'], $marketingPermissions);
-        $this->createUserGroupPermissions($manager, $this->userGroups['admin'], $consultantPermissions);
-
-        $manager->flush();
-    }
-
-    private function createUserGroupPermissions(ObjectManager $manager, UserGroup $userGroup, array $permissions): void
-    {
-        foreach ($permissions as $entityCode => $rights) {
-            $domainEntityPermission = $this->domainEntityPermission[$entityCode] ?? null;
-            if (!$domainEntityPermission) {
-                continue;
-            }
-
-            $existingPermission = $manager->getRepository(UserGroupDomainEntityPermission::class)
-                ->findOneBy(['userGroup' => $userGroup, 'domainEntityPermission' => $domainEntityPermission]);
-
-            if (null === $existingPermission) {
-                $permission = (new UserGroupDomainEntityPermission())
-                    ->setUserGroup($userGroup)
-                    ->setDomainEntityPermission($domainEntityPermission)
-                    ->setCanRead($rights['read'])
-                    ->setCanWrite($rights['write']);
-
-                $manager->persist($permission);
-            }
-        }
-    }
 
     private function createCompanyGroupFixtures(ObjectManager $manager): void
     {

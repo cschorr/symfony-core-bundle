@@ -35,32 +35,34 @@ final readonly class VoteWriteProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        if ($data instanceof Vote) {
-            $user = $this->security->getUser();
-            if (!$user instanceof User) {
-                throw new \LogicException('User must be authenticated to vote');
-            }
+        if (!$data instanceof Vote) {
+            return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+        }
 
-            $limit = $this->votesLimiter->create($user->getUserIdentifier())->consume(1);
-            if (!$limit->isAccepted()) {
-                $retryAfter = $limit->getRetryAfter();
-                $retry = null !== $retryAfter ? $retryAfter->getTimestamp() : null;
-                throw new TooManyRequestsHttpException($retry ? max(1, $retry - time()) : null, 'Vote rate limit exceeded');
-            }
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('User must be authenticated to vote');
+        }
 
-            $data->setVoter($user);
+        $limit = $this->votesLimiter->create($user->getUserIdentifier())->consume(1);
+        if (!$limit->isAccepted()) {
+            $retryAfter = $limit->getRetryAfter();
+            $retry = $retryAfter->getTimestamp();
+            throw new TooManyRequestsHttpException($retry ? max(1, $retry - time()) : null, 'Vote rate limit exceeded');
+        }
 
-            if (!\in_array($data->getValue(), [-1, 1], true)) {
-                throw new BadRequestHttpException('value must be -1 or 1');
-            }
+        $data->setVoter($user);
 
-            // „POST wenn schon vorhanden" → als Update behandeln
-            $existing = $this->votes->findOneBy(['comment' => $data->getComment(), 'voter' => $user]);
-            if ($existing instanceof Vote && $existing !== $data) {
-                $existing->setValue($data->getValue());
+        if (!\in_array($data->getValue(), [-1, 1], true)) {
+            throw new BadRequestHttpException('value must be -1 or 1');
+        }
 
-                return $this->persistProcessor->process($existing, $operation, $uriVariables, $context);
-            }
+        // „POST wenn schon vorhanden" → als Update behandeln
+        $existing = $this->votes->findOneBy(['comment' => $data->getComment(), 'voter' => $user]);
+        if ($existing instanceof Vote && $existing !== $data) {
+            $existing->setValue($data->getValue());
+
+            return $this->persistProcessor->process($existing, $operation, $uriVariables, $context);
         }
 
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
