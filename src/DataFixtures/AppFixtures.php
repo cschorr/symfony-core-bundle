@@ -474,7 +474,7 @@ class AppFixtures extends Fixture
             $existingPermission = $manager->getRepository(UserGroupDomainEntityPermission::class)
                 ->findOneBy(['userGroup' => $userGroup, 'domainEntityPermission' => $domainEntityPermission]);
 
-            if ($existingPermission === null) {
+            if (null === $existingPermission) {
                 $permission = (new UserGroupDomainEntityPermission())
                     ->setUserGroup($userGroup)
                     ->setDomainEntityPermission($domainEntityPermission)
@@ -1370,15 +1370,15 @@ class AppFixtures extends Fixture
                 ->setCell($contactData['cell'])
                 ->setCompany($company);
 
-            if (isset($contactData['academicTitle']) && ($contactData['academicTitle'] !== '' && $contactData['academicTitle'] !== '0')) {
+            if (isset($contactData['academicTitle']) && ('' !== $contactData['academicTitle'] && '0' !== $contactData['academicTitle'])) {
                 $contact->setAcademicTitle($contactData['academicTitle']);
             }
 
-            if (isset($contactData['position']) && ($contactData['position'] !== '' && $contactData['position'] !== '0')) {
+            if (isset($contactData['position']) && ('' !== $contactData['position'] && '0' !== $contactData['position'])) {
                 $contact->setPosition($contactData['position']);
             }
 
-            if (isset($contactData['department']) && ($contactData['department'] !== '' && $contactData['department'] !== '0')) {
+            if (isset($contactData['department']) && ('' !== $contactData['department'] && '0' !== $contactData['department'])) {
                 $contact->setDepartment($contactData['department']);
             }
 

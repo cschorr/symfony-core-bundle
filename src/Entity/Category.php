@@ -99,7 +99,7 @@ class Category extends AbstractEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \App\Entity\Category>
+     * @return Collection<int, Category>
      */
     public function getChildren(): Collection
     {
