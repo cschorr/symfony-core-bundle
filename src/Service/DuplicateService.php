@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -55,10 +56,7 @@ class DuplicateService
         // Handle special naming for duplicated entities
         $this->handleDuplicateNaming($duplicatedEntity, $entity);
 
-        // Ensure we return an object
-        if (!is_object($duplicatedEntity)) {
-            throw new \RuntimeException('DuplicateService failed to create object, got: ' . gettype($duplicatedEntity));
-        }
+        // $duplicatedEntity is guaranteed to be an object at this point
 
         return $duplicatedEntity;
     }
@@ -66,7 +64,10 @@ class DuplicateService
     /**
      * Check if a property should be skipped during duplication.
      */
-    private function shouldSkipProperty(string $property, $metadata): bool
+    /**
+     * @param ClassMetadata<object> $metadata
+     */
+    private function shouldSkipProperty(string $property, ClassMetadata $metadata): bool
     {
         // Skip ID field
         if (in_array($property, $metadata->getIdentifier(), true)) {
@@ -103,7 +104,7 @@ class DuplicateService
     /**
      * Process the value for duplication (handle special cases).
      */
-    private function processDuplicatedValue($value, string $property, object $originalEntity)
+    private function processDuplicatedValue(mixed $value, string $property, object $originalEntity): mixed
     {
         // Handle collections - for duplication, we usually want to preserve existing relationships
         if ($value instanceof \Doctrine\Common\Collections\Collection) {
@@ -113,11 +114,9 @@ class DuplicateService
             // For duplication, we want to preserve the relationships to existing entities
             // However, we need to be careful about bidirectional relationships
             foreach ($value as $entity) {
-                if (is_object($entity)) {
-                    $managedEntity = $this->ensureManagedEntity($entity);
-                    if ($managedEntity) {
-                        $newCollection->add($managedEntity);
-                    }
+                $managedEntity = $this->ensureManagedEntity($entity);
+                if ($managedEntity) {
+                    $newCollection->add($managedEntity);
                 }
             }
 
@@ -140,7 +139,7 @@ class DuplicateService
     /**
      * Ensure an entity is managed by the EntityManager.
      */
-    private function ensureManagedEntity($entity)
+    private function ensureManagedEntity(mixed $entity): mixed
     {
         if (!is_object($entity)) {
             return $entity;
@@ -168,6 +167,7 @@ class DuplicateService
 
             if ([] !== $identifier) {
                 // Find the managed entity by ID
+                /** @var class-string $entityClass */
                 $managedEntity = $this->entityManager->find($entityClass, $identifier);
                 if (null !== $managedEntity) {
                     return $managedEntity;

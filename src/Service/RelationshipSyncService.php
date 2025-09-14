@@ -91,6 +91,10 @@ class RelationshipSyncService
         }
 
         $firstItem = $currentCollection->first();
+        if ($firstItem === false) {
+            return;
+        }
+        
         $itemClass = $firstItem::class;
 
         // Find all items that were previously assigned to this entity

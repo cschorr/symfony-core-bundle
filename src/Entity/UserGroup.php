@@ -54,17 +54,10 @@ class UserGroup extends AbstractEntity
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'userGroups')]
     private Collection $users;
 
-    /**
-     * @var Collection<int, UserGroupDomainEntityPermission>
-     */
-    #[ORM\OneToMany(targetEntity: UserGroupDomainEntityPermission::class, mappedBy: 'userGroup', cascade: ['persist', 'remove'])]
-    #[Groups(['user:read'])]
-    private Collection $userGroupDomainEntityPermissions;
 
     public function __construct()
     {
         parent::__construct();
-        $this->userGroupDomainEntityPermissions = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
 
@@ -172,33 +165,4 @@ class UserGroup extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @return Collection<int, UserGroupDomainEntityPermission>
-     */
-    public function getUserGroupDomainEntityPermissions(): Collection
-    {
-        return $this->userGroupDomainEntityPermissions;
-    }
-
-    public function addUserGroupDomainEntityPermission(UserGroupDomainEntityPermission $permission): static
-    {
-        if (!$this->userGroupDomainEntityPermissions->contains($permission)) {
-            $this->userGroupDomainEntityPermissions->add($permission);
-            $permission->setUserGroup($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserGroupDomainEntityPermission(UserGroupDomainEntityPermission $permission): static
-    {
-        if ($this->userGroupDomainEntityPermissions->removeElement($permission)) {
-            // set the owning side to null (unless already changed)
-            if ($permission->getUserGroup() === $this) {
-                $permission->setUserGroup(null);
-            }
-        }
-
-        return $this;
-    }
 }
