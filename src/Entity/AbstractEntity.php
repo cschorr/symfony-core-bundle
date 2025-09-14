@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
-use App\Entity\Traits\Set\BlameableEntity;
-use App\Entity\Traits\Single\BoolActiveTrait;
-use App\Entity\Traits\Single\StringNotesTrait;
-use App\Entity\Traits\Single\UuidTrait;
+use C3net\CoreBundle\Entity\Traits\Set\BlameableEntity;
+use C3net\CoreBundle\Entity\Traits\Single\BoolActiveTrait;
+use C3net\CoreBundle\Entity\Traits\Single\StringNotesTrait;
+use C3net\CoreBundle\Entity\Traits\Single\UuidTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;

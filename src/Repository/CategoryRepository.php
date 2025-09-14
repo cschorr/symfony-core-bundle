@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace C3net\CoreBundle\Repository;
 
-use App\Entity\Category;
+use C3net\CoreBundle\Entity\Category;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 
 /**

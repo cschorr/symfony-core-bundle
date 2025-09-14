@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace C3net\CoreBundle\Controller;
 
-use App\Entity\Project;
+use C3net\CoreBundle\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

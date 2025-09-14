@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace C3net\CoreBundle\Repository;
 
-use App\Entity\Campaign;
+use C3net\CoreBundle\Entity\Campaign;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

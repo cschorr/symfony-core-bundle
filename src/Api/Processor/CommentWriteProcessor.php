@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Api\Processor;
+namespace C3net\CoreBundle\Api\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Entity\Comment;
-use App\Entity\User;
+use C3net\CoreBundle\Entity\Comment;
+use C3net\CoreBundle\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;

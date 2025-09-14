@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain;
+namespace C3net\CoreBundle\Domain;
 
-use App\Entity\Comment;
-use App\Entity\Vote;
+use C3net\CoreBundle\Entity\Comment;
+use C3net\CoreBundle\Entity\Vote;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class CommentScoreUpdater

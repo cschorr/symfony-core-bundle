@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener;
+namespace C3net\CoreBundle\EventListener;
 
-use App\Entity\User;
+use C3net\CoreBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;

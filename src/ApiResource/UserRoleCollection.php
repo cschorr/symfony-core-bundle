@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\ApiResource;
+namespace C3net\CoreBundle\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use App\State\UserRoleProvider;
+use C3net\CoreBundle\State\UserRoleProvider;
 
 #[ApiResource(
     shortName: 'UserRoles',

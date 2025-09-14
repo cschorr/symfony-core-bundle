@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Entity\Traits\Set;
+namespace C3net\CoreBundle\Entity\Traits\Set;
 
-use App\Entity\User;
+use C3net\CoreBundle\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 

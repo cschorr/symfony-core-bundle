@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace C3net\CoreBundle\Repository;
 
-use App\Entity\CompanyGroup;
+use C3net\CoreBundle\Entity\CompanyGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\OpenApi;
+namespace C3net\CoreBundle\OpenApi;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model\Server;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Api;
+namespace C3net\CoreBundle\Controller\Api;
 
-use App\Service\JWTUserService;
+use C3net\CoreBundle\Service\JWTUserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

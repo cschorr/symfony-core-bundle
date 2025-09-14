@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata as API;
-use App\Api\Processor\CommentWriteProcessor;
-use App\Entity\Traits\Set\BlameableEntity;
-use App\Entity\Traits\Single\BoolActiveTrait;
-use App\Entity\Traits\Single\UuidTrait;
-use App\Repository\CommentRepository;
+use C3net\CoreBundle\Api\Processor\CommentWriteProcessor;
+use C3net\CoreBundle\Entity\Traits\Set\BlameableEntity;
+use C3net\CoreBundle\Entity\Traits\Single\BoolActiveTrait;
+use C3net\CoreBundle\Entity\Traits\Single\UuidTrait;
+use C3net\CoreBundle\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;

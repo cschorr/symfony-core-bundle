@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use App\Entity\Traits\Set\SetAddressTrait;
-use App\Entity\Traits\Set\SetCommunicationTrait;
-use App\Entity\Traits\Set\SetNamePersonTrait;
-use App\Repository\ContactRepository;
+use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
+use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
+use C3net\CoreBundle\Entity\Traits\Set\SetNamePersonTrait;
+use C3net\CoreBundle\Repository\ContactRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

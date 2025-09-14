@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Doctrine\Listener;
+namespace C3net\CoreBundle\Doctrine\Listener;
 
-use App\Domain\CommentScoreUpdater;
-use App\Entity\Vote;
+use C3net\CoreBundle\Domain\CommentScoreUpdater;
+use C3net\CoreBundle\Entity\Vote;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\EntityManagerInterface;

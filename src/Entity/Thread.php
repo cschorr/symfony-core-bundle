@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata as API;
-use App\Entity\Traits\Single\BoolActiveTrait;
-use App\Entity\Traits\Single\UuidTrait;
-use App\Enum\DomainEntityType;
-use App\Repository\ThreadRepository;
+use C3net\CoreBundle\Entity\Traits\Single\BoolActiveTrait;
+use C3net\CoreBundle\Entity\Traits\Single\UuidTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
+use C3net\CoreBundle\Repository\ThreadRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;

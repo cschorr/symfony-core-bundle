@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\State;
+namespace C3net\CoreBundle\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\UserRoleCollection;
-use App\Enum\UserRole;
+use C3net\CoreBundle\ApiResource\UserRoleCollection;
+use C3net\CoreBundle\Enum\UserRole;
 
 /**
  * @implements ProviderInterface<UserRoleCollection>

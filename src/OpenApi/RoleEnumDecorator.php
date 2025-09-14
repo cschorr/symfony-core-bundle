@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 // src/OpenApi/RoleEnumDecorator.php
 
-namespace App\OpenApi;
+namespace C3net\CoreBundle\OpenApi;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\OpenApi;
-use App\Enum\UserRole;
+use C3net\CoreBundle\Enum\UserRole;
 
 final readonly class RoleEnumDecorator implements OpenApiFactoryInterface
 {

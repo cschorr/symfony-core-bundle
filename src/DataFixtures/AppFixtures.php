@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\DataFixtures;
+namespace C3net\CoreBundle\DataFixtures;
 
-use App\Entity\Campaign;
-use App\Entity\Category;
-use App\Entity\Company;
-use App\Entity\CompanyGroup;
-use App\Entity\Contact;
-use App\Entity\Project;
-use App\Entity\User;
-use App\Entity\UserGroup;
-use App\Enum\ProjectStatus;
-use App\Repository\UserGroupRepository;
+use C3net\CoreBundle\Entity\Campaign;
+use C3net\CoreBundle\Entity\Category;
+use C3net\CoreBundle\Entity\Company;
+use C3net\CoreBundle\Entity\CompanyGroup;
+use C3net\CoreBundle\Entity\Contact;
+use C3net\CoreBundle\Entity\Project;
+use C3net\CoreBundle\Entity\User;
+use C3net\CoreBundle\Entity\UserGroup;
+use C3net\CoreBundle\Enum\ProjectStatus;
+use C3net\CoreBundle\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;

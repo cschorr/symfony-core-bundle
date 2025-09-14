@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Repository\NotificationRepository;
+use C3net\CoreBundle\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]

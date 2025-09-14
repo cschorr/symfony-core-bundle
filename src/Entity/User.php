@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use App\Entity\Traits\Set\SetCommunicationTrait;
-use App\Entity\Traits\Set\SetNamePersonTrait;
-use App\Enum\UserRole;
-use App\Repository\UserRepository;
-use App\State\UserCurrentProvider;
+use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
+use C3net\CoreBundle\Entity\Traits\Set\SetNamePersonTrait;
+use C3net\CoreBundle\Enum\UserRole;
+use C3net\CoreBundle\Repository\UserRepository;
+use C3net\CoreBundle\State\UserCurrentProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

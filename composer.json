@@ -1,10 +1,15 @@
 {
-    "name": "symfony/skeleton",
-    "type": "project",
+    "name": "c3net/core-bundle",
+    "type": "symfony-bundle",
+    "description": "C3net Core Bundle - Comprehensive business and project management bundle for Symfony applications with API Platform",
+    "keywords": ["symfony", "bundle", "api-platform", "business", "project-management", "crm"],
     "license": "MIT",
-    "description": "A minimal Symfony project recommended to create bare bones applications",
-    "minimum-stability": "stable",
-    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "C3net Team",
+            "email": "info@c3net.de"
+        }
+    ],
     "require": {
         "php": ">=8.4",
         "ext-ctype": "*",
@@ -13,7 +18,6 @@
         "api-platform/graphql": "^4.1",
         "api-platform/symfony": "^4.1.23",
         "damienharper/auditor-bundle": "^6.2",
-        "deployer/deployer": "^7.5",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.15",
         "doctrine/doctrine-fixtures-bundle": "^4.1",
@@ -24,19 +28,14 @@
         "nelmio/cors-bundle": "^2.5",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.1",
-        "runtime/frankenphp-symfony": "^0.2",
         "sentry/sentry-symfony": "^5.3",
         "stof/doctrine-extensions-bundle": "^1.14",
         "symfony/asset": "7.3.*",
-        "symfony/asset-mapper": "7.3.*",
         "symfony/console": "7.3.*",
         "symfony/doctrine-messenger": "7.3.*",
-        "symfony/dotenv": "7.3.*",
         "symfony/expression-language": "7.3.*",
-        "symfony/flex": "^2",
         "symfony/form": "7.3.*",
         "symfony/framework-bundle": "7.3.*",
-        "symfony/mercure-bundle": "^0.3.5",
         "symfony/http-client": "7.3.*",
         "symfony/intl": "7.3.*",
         "symfony/mailer": "7.3.*",
@@ -50,7 +49,6 @@
         "symfony/runtime": "7.3.*",
         "symfony/security-bundle": "7.3.*",
         "symfony/serializer": "7.3.*",
-        "symfony/stimulus-bundle": "^2.27",
         "symfony/string": "7.3.*",
         "symfony/translation": "7.3.*",
         "symfony/twig-bundle": "7.3.*",
@@ -61,118 +59,35 @@
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^12.2",
+        "symfony/browser-kit": "7.3.*",
+        "symfony/css-selector": "7.3.*",
+        "symfony/phpunit-bridge": "7.3.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "C3net\\CoreBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "C3net\\CoreBundle\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.3.*"
+        }
+    },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": {
             "*": "dist"
         },
-        "allow-plugins": {
-            "php-http/discovery": true,
-            "symfony/flex": true,
-            "symfony/runtime": true
-        },
-        "bump-after-update": true,
         "sort-packages": true
     },
-    "autoload": {
-        "psr-4": {
-            "App\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "App\\Tests\\": "tests/"
-        }
-    },
-    "replace": {
-        "paragonie/random_compat": "2.*",
-        "symfony/polyfill-ctype": "*",
-        "symfony/polyfill-iconv": "*",
-        "symfony/polyfill-intl-grapheme": "*",
-        "symfony/polyfill-intl-normalizer": "*",
-        "symfony/polyfill-mbstring": "*",
-        "symfony/polyfill-php84": "*",
-        "symfony/polyfill-php83": "*",
-        "symfony/polyfill-php82": "*",
-        "symfony/polyfill-php81": "*",
-        "symfony/polyfill-php80": "*"
-    },
-    "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "importmap:install": "symfony-cmd"
-        },
-        "post-install-cmd": [
-            "@auto-scripts"
-        ],
-        "post-update-cmd": [
-            "@auto-scripts"
-        ],
-        "cs-check": [
-            "php-cs-fixer fix --dry-run --diff --verbose"
-        ],
-        "cs-fix": [
-            "php-cs-fixer fix"
-        ],
-        "phpstan": [
-            "phpstan analyse"
-        ],
-        "phpcs": [
-            "phpcs"
-        ],
-        "rector-check": [
-            "rector process --dry-run"
-        ],
-        "rector-fix": [
-            "rector process"
-        ],
-        "security-audit": [
-            "composer audit --abandoned=ignore"
-        ],
-        "composer-validate": [
-            "composer validate --strict"
-        ],
-        "test": [
-            "phpunit"
-        ],
-        "check-all": [
-            "@composer-validate",
-            "@security-audit",
-            "@cs-check",
-            "@phpstan",
-            "@phpcs",
-            "@rector-check",
-            "@test"
-        ],
-        "fix-all": [
-            "@cs-fix",
-            "@rector-fix"
-        ]
-    },
-    "conflict": {
-        "symfony/symfony": "*"
-    },
-    "extra": {
-        "symfony": {
-            "allow-contrib": true,
-            "require": "7.3.*",
-            "docker": true
-        }
-    },
-    "require-dev": {
-        "api-platform/schema-generator": "^5.0",
-        "friendsofphp/php-cs-fixer": "^3.84",
-        "phpstan/phpstan": "*",
-        "phpunit/phpunit": "^12.2",
-        "rector/rector": "^2.1",
-        "squizlabs/php_codesniffer": "^3.13",
-        "symfony/browser-kit": "7.3.*",
-        "symfony/css-selector": "7.3.*",
-        "symfony/debug-bundle": "7.3.*",
-        "symfony/maker-bundle": "^1.0",
-        "symfony/stopwatch": "7.3.*",
-        "symfony/var-dumper": "7.2.*",
-        "symfony/web-profiler-bundle": "7.3.*"
-    }
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

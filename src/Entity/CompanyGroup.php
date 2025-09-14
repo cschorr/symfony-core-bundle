@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -10,9 +10,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Entity\Traits\Single\StringCodeTrait;
-use App\Entity\Traits\Single\StringNameTrait;
-use App\Repository\CompanyGroupRepository;
+use C3net\CoreBundle\Entity\Traits\Single\StringCodeTrait;
+use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
+use C3net\CoreBundle\Repository\CompanyGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

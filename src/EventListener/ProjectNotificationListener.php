@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener;
+namespace C3net\CoreBundle\EventListener;
 
-use App\Entity\Notification;
-use App\Entity\Project;
+use C3net\CoreBundle\Entity\Notification;
+use C3net\CoreBundle\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Events;

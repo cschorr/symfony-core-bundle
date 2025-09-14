@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\State;
+namespace C3net\CoreBundle\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Entity\User;
+use C3net\CoreBundle\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 

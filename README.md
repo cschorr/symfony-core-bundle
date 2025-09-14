@@ -1,194 +1,201 @@
-# Globe TV Backend
+# C3net Core Bundle
 
-A comprehensive business and project management API built with Symfony and API Platform, featuring company management, project tracking, and real-time collaboration tools.
+A comprehensive Symfony bundle providing business and project management functionality with API Platform integration.
 
-## 🚀 Quick Start
+## Features
 
-### Prerequisites
-- Docker and Docker Compose
-- Git
-
-### Installation
-
-1. **Clone and navigate to the project**:
-   ```bash
-   git clone <repository-url>
-   cd globe-tv-backend
-   ```
-
-2. **Create environment file**:
-   ```bash
-   cp .env.local.example .env.local
-   # Edit .env.local with your configuration
-   ```
-
-3. **Build and start containers**:
-   ```bash
-   docker compose build --no-cache
-   docker compose up -d
-   ```
-
-4. **Install dependencies and initialize database**:
-   ```bash
-   docker compose exec php composer install
-   docker compose exec php bin/kickstart.sh
-   ```
-
-5. **Verify installation**: Visit https://localhost/api
-
-## ✨ Features
-
-- **Dual API Support**: REST and GraphQL endpoints with automatic documentation
-- **Authentication**: JWT-based auth with refresh tokens
-- **Real-time Updates**: Mercure hub for live data synchronization
-- **API-First Architecture**: Pure headless backend designed for decoupled applications
-- **Entity Management**: Companies, contacts, projects with rich relationships
-- **Permission System**: Role-based access control with JWT authentication
+### Core Entities
+- **User Management**: Complete user system with roles, permissions, and groups
+- **Company & Contact Management**: Business relationship tracking
+- **Project Management**: Project lifecycle with assignments and tracking
+- **Category System**: Flexible categorization for entities
+- **Comment System**: Threaded commenting with voting
 - **Audit Logging**: Complete change tracking for all entities
 
-## 🏗️ Core Entities
+### Technical Features
+- **API Platform Integration**: Auto-generated REST and GraphQL APIs
+- **JWT Authentication**: Secure token-based authentication with refresh tokens
+- **Advanced Security**: Role-based access control with custom voters
+- **Entity Traits**: Reusable traits for common functionality (UUID, timestamps, soft delete, etc.)
+- **EasyAdmin Integration**: Administrative interface for entity management
+- **Internationalization**: Full translation support
+- **Real-time Features**: Mercure integration for live updates
 
-- **Companies**: Business entities with contact information and address details
-- **Contacts**: Individual people with position, department, and company relationships
-- **Projects**: Trackable initiatives with status, timeline, and company associations
-- **User Management**: Users with role-based access control and JWT authentication
+## Installation
 
-## 🛠️ Development
+Install the bundle via Composer:
 
-### Docker Commands
 ```bash
-# Start services
-docker compose up -d
-
-# View logs
-docker compose logs -f php
-
-# Execute PHP commands
-docker compose exec php [command]
-
-# Database access
-docker compose exec database mariadb -u app -p!ChangeMe! app
-
-# Stop services
-docker compose down
+composer require c3net/core-bundle
 ```
 
-### Database Management
-```bash
-# Rebuild database (current development phase)
-docker compose exec php bin/kickstart.sh
+## Configuration
 
-# Direct database connection
-docker compose exec database mariadb -u app -p!ChangeMe! app
+Add the bundle to your `config/bundles.php`:
+
+```php
+<?php
+
+return [
+    // ... other bundles
+    C3net\CoreBundle\C3netCoreBundle::class => ['all' => true],
+];
 ```
 
-### Code Quality & Testing
-```bash
-# Static analysis
-docker compose exec php vendor/bin/phpstan analyse
+### Basic Configuration
 
-# Code formatting
-docker compose exec php vendor/bin/php-cs-fixer fix
+Create `config/packages/c3net_core.yaml`:
 
-# Run tests
-docker compose exec php vendor/bin/phpunit
-
-# Code refactoring
-docker compose exec php vendor/bin/rector process
+```yaml
+c3net_core:
+    api_platform:
+        enable_swagger: true
+        title: 'My API'
+        version: '1.0.0'
+        description: 'My API description'
+    
+    jwt:
+        enabled: true
+        ttl: 3600
+        algorithm: 'RS256'
+    
+    audit:
+        enabled: true
+        ignored_columns: ['createdAt', 'updatedAt']
+    
+    entity_traits:
+        auto_uuid: true
+        auto_timestamps: true
+        auto_soft_delete: true
+        auto_blameable: true
+    
+    cors:
+        enabled: true
+        allow_origin: '^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
 ```
 
-## 📚 API Documentation
+### Database Setup
 
-### REST API
-- **Endpoints**: https://localhost/api
-- **OpenAPI Export**: `docker compose exec php bin/console api:openapi:export`
-- **Features**: Pagination, filtering, sorting, embedded relationships
+Run the migrations:
 
-### GraphQL API
-- **Endpoint**: https://localhost/api/graphql
-- **Schema Export**: `docker compose exec php bin/console app:graphql:export`
-- **Features**: Introspection, mutations, subscriptions
+```bash
+php bin/console doctrine:migrations:migrate
+```
+
+Load the fixtures (optional):
+
+```bash
+php bin/console doctrine:fixtures:load
+```
+
+## Usage
+
+### API Endpoints
+
+The bundle automatically exposes API endpoints for all entities:
+
+- `GET /api/users/me` - Get current user information
+- `GET /api/companies` - List companies
+- `GET /api/projects` - List projects
+- `GET /api/contacts` - List contacts
+- And many more...
+
+### GraphQL
+
+GraphQL endpoint is available at `/api/graphql` with full schema introspection.
 
 ### Authentication
-```bash
-# Generate JWT keypair
-docker compose exec php bin/console lexik:jwt:generate-keypair
 
-# Obtain token via POST /api/auth
+Use JWT authentication:
+
+```bash
+# Login
+curl -X POST /api/auth \
+  -H "Content-Type: application/json" \
+  -d '{"username":"user@example.com","password":"password"}'
+
+# Use the returned token
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" /api/users/me
+```
+
+## Entity System
+
+### Core Traits
+
+All entities can use these traits:
+
+- `UuidTrait`: UUID primary keys
+- `BoolActiveTrait`: Active/inactive status
+- `BlameableEntity`: Created/updated by user tracking
+- `StringNameTrait`, `StringCodeTrait`, `StringNotesTrait`: Common string fields
+- Set traits: `SetAddressTrait`, `SetCommunicationTrait` for complex field groups
+
+### Custom Entities
+
+Extend `AbstractEntity` for new entities:
+
+```php
+<?php
+
+namespace App\Entity;
+
+use C3net\CoreBundle\Entity\AbstractEntity;
+use C3net\CoreBundle\Entity\Traits\StringNameTrait;
+
+class MyEntity extends AbstractEntity
 {
-  "email": "user@example.com",
-  "password": "password"
+    use StringNameTrait;
+    
+    // Your custom properties and methods
 }
 ```
 
-## 🏛️ Architecture
+## Security
 
-### Entity System
-- **AbstractEntity**: Base class with UUID, timestamps, soft delete, audit trails
-- **Trait Composition**: Reusable traits for common functionality (StringNameTrait, SetAddressTrait, etc.)
-- **Relationships**: Bidirectional entity relationships with automatic synchronization
+### User Roles
 
-### Technology Stack
-- **Backend**: Symfony 7 with API Platform 4
-- **Database**: MariaDB 11.4.2
-- **Server**: FrankenPHP 8.4 with built-in Mercure hub
-- **Container**: Docker Compose development environment
-- **Security**: JWT authentication, RBAC, CORS configuration
+Built-in user roles:
+- `ROLE_USER`: Basic authenticated user
+- `ROLE_ADMIN`: Administrative access
+- `ROLE_SUPER_ADMIN`: Full system access
 
-### Key Services
-- **RelationshipSyncService**: Bidirectional entity relationship management
-- **JWTUserService**: JWT token management and user authentication  
-- **API Platform Processors**: Custom write operations and data validation
+### Permissions
 
-## 🚀 Deployment
+Fine-grained permissions per entity with voter system.
 
-### Environment Configuration
-Create `.env.local` with production values:
-```env
-APP_SECRET=your-random-32-char-string
-DATABASE_URL=mysql://user:pass@host:port/db?serverVersion=11.4.2-MariaDB
-JWT_PASSPHRASE=your-jwt-passphrase
-MERCURE_JWT_SECRET=your-mercure-secret
-CORS_ALLOW_ORIGIN=^https://your-domain\.com$
+## Development
+
+### Running Tests
+
+```bash
+vendor/bin/phpunit
 ```
 
-### Container Access
-- **API**: https://localhost (HTTPS with self-signed cert)
-- **Database**: localhost:3307 (external), database:3306 (internal)
-- **GraphQL**: https://localhost/api/graphql
+### Code Quality
 
-## 🤝 Contributing
+```bash
+# PHP CS Fixer
+vendor/bin/php-cs-fixer fix
 
-### Development Workflow
-1. Create feature branch
-2. Make changes following PSR-12 standards
-3. Run quality checks: `vendor/bin/phpstan analyse`
-4. Test changes: `vendor/bin/phpunit`
-5. Submit pull request
+# PHPStan
+vendor/bin/phpstan analyse
 
-### Code Standards
-- PHP 8.4+ with strict types
-- PSR-12 coding standards
-- PHPStan level 8 analysis
-- Comprehensive PHPUnit tests
+# All checks
+composer check-all
+```
 
-## 📖 Documentation
+## Contributing
 
-For detailed development information, see [CLAUDE.md](./CLAUDE.md) which contains:
-- Comprehensive setup instructions
-- Container details and troubleshooting
-- Architecture deep-dive
-- Service descriptions
-- Development best practices
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-## 🆘 Support
+## License
 
-For issues and questions:
-1. Check logs: `docker compose logs php`
-2. Verify container status: `docker compose ps`
-3. Review [CLAUDE.md](./CLAUDE.md) for detailed troubleshooting
-4. Create an issue in the repository
+This bundle is released under the MIT License. See the bundled LICENSE file for details.
 
----
+## Support
 
-Built with ❤️ using Symfony, API Platform, and modern PHP practices.
+For support, please contact info@c3net.de or create an issue on GitHub.

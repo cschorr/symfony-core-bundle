@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata as API;
-use App\Api\Processor\VoteDeleteProcessor;
-use App\Api\Processor\VoteWriteProcessor;
-use App\Entity\Traits\Set\BlameableEntity;
-use App\Entity\Traits\Single\BoolActiveTrait;
-use App\Entity\Traits\Single\UuidTrait;
-use App\Repository\VoteRepository;
+use C3net\CoreBundle\Api\Processor\VoteDeleteProcessor;
+use C3net\CoreBundle\Api\Processor\VoteWriteProcessor;
+use C3net\CoreBundle\Entity\Traits\Set\BlameableEntity;
+use C3net\CoreBundle\Entity\Traits\Single\BoolActiveTrait;
+use C3net\CoreBundle\Entity\Traits\Single\UuidTrait;
+use C3net\CoreBundle\Repository\VoteRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;

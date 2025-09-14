@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entity\Traits\Single;
+namespace C3net\CoreBundle\Entity\Traits\Single;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;

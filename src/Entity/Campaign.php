@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Entity\Traits\Set\SetStartEndTrait;
-use App\Entity\Traits\Single\StringCodeTrait;
-use App\Entity\Traits\Single\StringNameTrait;
-use App\Repository\CampaignRepository;
+use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
+use C3net\CoreBundle\Entity\Traits\Single\StringCodeTrait;
+use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
+use C3net\CoreBundle\Repository\CampaignRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
