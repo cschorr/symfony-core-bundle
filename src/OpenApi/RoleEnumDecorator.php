@@ -22,9 +22,6 @@ final readonly class RoleEnumDecorator implements OpenApiFactoryInterface
 
         $enumValues = UserRole::values(); // ['ROLE_USER', ...]
         $components = $openApi->getComponents();
-        if (!$components) {
-            return $openApi;
-        }
 
         // Schemas is: array<string, \ArrayObject>
         $schemas = $components->getSchemas() ?? [];

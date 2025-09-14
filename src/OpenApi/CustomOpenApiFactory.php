@@ -19,7 +19,7 @@ final readonly class CustomOpenApiFactory implements OpenApiFactoryInterface
         $openApi = ($this->decorated)($context);
 
         // keep any existing servers and add yours
-        $servers = $openApi->getServers() ?? [];
+        $servers = $openApi->getServers();
         $servers[] = new Server('https://api.example.com', 'Production API');
         $stagingUrl = getenv('STAGING_API_URL');
         if ($stagingUrl) {

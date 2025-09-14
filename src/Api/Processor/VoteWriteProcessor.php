@@ -35,6 +35,8 @@ final readonly class VoteWriteProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
+        // Remove the redundant instanceof check - $data is already typed as Vote via generics
+        // If $data is not a Vote, we pass it through to the persist processor
         if (!$data instanceof Vote) {
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }

@@ -8,6 +8,7 @@ use App\Domain\CommentScoreUpdater;
 use App\Entity\Vote;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 #[AsEntityListener(event: Events::postPersist, entity: Vote::class)]
@@ -19,26 +20,40 @@ final readonly class VoteScoreListener
     {
     }
 
+    /**
+     * @param LifecycleEventArgs<EntityManagerInterface> $args
+     */
     public function postPersist(Vote $vote, LifecycleEventArgs $args): void
     {
         $this->touch($vote, $args);
     }
 
+    /**
+     * @param LifecycleEventArgs<EntityManagerInterface> $args
+     */
     public function postUpdate(Vote $vote, LifecycleEventArgs $args): void
     {
         $this->touch($vote, $args);
     }
 
+    /**
+     * @param LifecycleEventArgs<EntityManagerInterface> $args
+     */
     public function postRemove(Vote $vote, LifecycleEventArgs $args): void
     {
         $this->touch($vote, $args);
     }
 
+    /**
+     * @param LifecycleEventArgs<EntityManagerInterface> $args
+     */
     private function touch(Vote $vote, LifecycleEventArgs $args): void
     {
         $em = $args->getObjectManager();
         $comment = $vote->getComment();
-        $this->updater->recomputeFor($comment);
-        $em->flush(); // counters materialisieren
+        if (null !== $comment) {
+            $this->updater->recomputeFor($comment);
+            $em->flush(); // counters materialisieren
+        }
     }
 }

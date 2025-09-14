@@ -161,7 +161,7 @@ class Project extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->getName() ?? 'Unnamed Project';
+        return $this->getName() ?: 'Unnamed Project';
     }
 
     public function getCategory(): ?Category

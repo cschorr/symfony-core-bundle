@@ -27,7 +27,7 @@ trait BlameableEntity
     #[Gedmo\Blameable(on: 'update')]
     private ?User $updatedBy = null;
 
-    public function getCreatedBy()
+    public function getCreatedBy(): ?User
     {
         return $this->createdBy;
     }
@@ -39,7 +39,7 @@ trait BlameableEntity
         return $this;
     }
 
-    public function getUpdatedBy()
+    public function getUpdatedBy(): ?User
     {
         return $this->updatedBy;
     }
