@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Api;
 
 use App\Service\JWTUserService;
@@ -8,31 +10,33 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api', name: 'api_')]
 class UserInfoController extends AbstractController
 {
-    #[Route('/userinfo', name: 'userinfo', methods: ['POST'])]
+    /**
+     * @deprecated Use GET /users/me endpoint instead. This endpoint will be removed in a future version.
+     */
+    #[Route('/api/userinfo', name: 'api_userinfo', methods: ['POST'])]
     public function userInfoFromToken(
         Request $request,
-        JWTUserService $jwtUserService
+        JWTUserService $jwtUserService,
     ): JsonResponse {
         // Extract token from Authorization header
         $authHeader = $request->headers->get('Authorization');
 
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+        if (null === $authHeader || '' === $authHeader || '0' === $authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return $this->json(['error' => 'Authorization header with Bearer token required'], 400);
         }
 
         // Remove "Bearer " prefix to get the actual token
         $token = substr($authHeader, 7);
 
-        if (empty($token)) {
+        if ('' === $token || '0' === $token) {
             return $this->json(['error' => 'Token required'], 400);
         }
 
         $user = $jwtUserService->getUserFromToken($token);
 
-        if (!$user) {
+        if (null === $user) {
             return $this->json(['error' => 'Invalid token'], 401);
         }
 

@@ -16,7 +16,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ApiResource(
@@ -43,7 +42,7 @@ class Project extends AbstractEntity
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'enum' => ['planning', 'in_progress', 'on_hold', 'completed', 'cancelled']
+            'enum' => ['planning', 'in_progress', 'on_hold', 'completed', 'cancelled'],
         ]
     )]
     private ProjectStatus $status = ProjectStatus::PLANNING;
@@ -56,6 +55,7 @@ class Project extends AbstractEntity
     public function setStatus(ProjectStatus $status): static
     {
         $this->status = $status;
+
         return $this;
     }
 
@@ -83,10 +83,17 @@ class Project extends AbstractEntity
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dueDate = null;
 
+    /**
+     * @var Collection<int, Contact>
+     */
+    #[ORM\ManyToMany(targetEntity: Contact::class, inversedBy: 'projects')]
+    private Collection $contact;
+
     public function __construct()
     {
         parent::__construct();
         $this->notifications = new ArrayCollection();
+        $this->contact = new ArrayCollection();
     }
 
     // Fixed status helper methods
@@ -154,7 +161,7 @@ class Project extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->getName() ?? 'Unnamed Project';
+        return $this->getName() ?: 'Unnamed Project';
     }
 
     public function getCategory(): ?Category
@@ -219,6 +226,30 @@ class Project extends AbstractEntity
     public function setDueDate(?\DateTimeImmutable $dueDate): static
     {
         $this->dueDate = $dueDate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Contact>
+     */
+    public function getContact(): Collection
+    {
+        return $this->contact;
+    }
+
+    public function addContact(Contact $contact): static
+    {
+        if (!$this->contact->contains($contact)) {
+            $this->contact->add($contact);
+        }
+
+        return $this;
+    }
+
+    public function removeContact(Contact $contact): static
+    {
+        $this->contact->removeElement($contact);
 
         return $this;
     }

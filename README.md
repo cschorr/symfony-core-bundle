@@ -41,18 +41,17 @@ A comprehensive business and project management API built with Symfony and API P
 - **Dual API Support**: REST and GraphQL endpoints with automatic documentation
 - **Authentication**: JWT-based auth with refresh tokens
 - **Real-time Updates**: Mercure hub for live data synchronization
-- **Admin Interface**: EasyAdmin v4 for content management
-- **Entity Management**: Companies, contacts, projects, campaigns with rich relationships
-- **Permission System**: Role-based access control with domain entity permissions
+- **API-First Architecture**: Pure headless backend designed for decoupled applications
+- **Entity Management**: Companies, contacts, projects with rich relationships
+- **Permission System**: Role-based access control with JWT authentication
 - **Audit Logging**: Complete change tracking for all entities
 
 ## 🏗️ Core Entities
 
 - **Companies**: Business entities with contact information and address details
-- **Contacts**: Individual people associated with companies
+- **Contacts**: Individual people with position, department, and company relationships
 - **Projects**: Trackable initiatives with status, timeline, and company associations
-- **Campaigns**: Marketing or business campaigns
-- **User Management**: Users, groups, and granular permissions
+- **User Management**: Users with role-based access control and JWT authentication
 
 ## 🛠️ Development
 
@@ -137,10 +136,9 @@ docker compose exec php bin/console lexik:jwt:generate-keypair
 - **Security**: JWT authentication, RBAC, CORS configuration
 
 ### Key Services
-- **PermissionService**: Domain entity permission management
-- **DuplicateService**: Deep entity copying with relationship handling
-- **NavigationService**: Dynamic admin menu generation
-- **LocaleService**: Internationalization support
+- **RelationshipSyncService**: Bidirectional entity relationship management
+- **JWTUserService**: JWT token management and user authentication  
+- **API Platform Processors**: Custom write operations and data validation
 
 ## 🚀 Deployment
 
@@ -157,7 +155,7 @@ CORS_ALLOW_ORIGIN=^https://your-domain\.com$
 ### Container Access
 - **API**: https://localhost (HTTPS with self-signed cert)
 - **Database**: localhost:3307 (external), database:3306 (internal)
-- **Admin**: https://localhost/admin
+- **GraphQL**: https://localhost/api/graphql
 
 ## 🤝 Contributing
 

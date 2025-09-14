@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata as API;
@@ -9,8 +11,8 @@ use App\Enum\DomainEntityType;
 use App\Repository\ThreadRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ThreadRepository::class)]
 #[API\ApiResource(
@@ -32,42 +34,50 @@ class Thread
 
     #[ORM\Column(type: Types::STRING, enumType: DomainEntityType::class)]
     #[Assert\NotBlank]
-    #[Groups(['thread:read','thread:write','comment:read'])]
+    #[Groups(['thread:read', 'thread:write', 'comment:read'])]
     private DomainEntityType $resourceType;
 
     #[ORM\Column(length: 128)]
-    #[Groups(['thread:read','thread:write','comment:read'])]
+    #[Groups(['thread:read', 'thread:write', 'comment:read'])]
     private string $resourceId;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['thread:read','thread:write'])]
+    #[Groups(['thread:read', 'thread:write'])]
     private ?string $title = null;
 
     public function getResourceType(): DomainEntityType
     {
         return $this->resourceType;
     }
+
     public function setResourceType(DomainEntityType $v): self
     {
         $this->resourceType = $v;
+
         return $this;
     }
+
     public function getResourceId(): string
     {
         return $this->resourceId;
     }
+
     public function setResourceId(string $v): self
     {
         $this->resourceId = $v;
+
         return $this;
     }
+
     public function getTitle(): ?string
     {
         return $this->title;
     }
+
     public function setTitle(?string $v): self
     {
         $this->title = $v;
+
         return $this;
     }
 }

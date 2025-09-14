@@ -17,7 +17,7 @@ class SentryTestController extends AbstractController
     }
 
     #[Route(path: '/_sentry-test', name: 'sentry_test')]
-    public function testLog()
+    public function testLog(): never
     {
         // Restrict access to development and staging environments
         $environment = $this->getParameter('kernel.environment');

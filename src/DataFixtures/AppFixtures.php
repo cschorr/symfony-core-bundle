@@ -10,10 +10,8 @@ use App\Entity\Company;
 use App\Entity\CompanyGroup;
 use App\Entity\Contact;
 use App\Entity\Project;
-use App\Entity\DomainEntityPermission;
 use App\Entity\User;
 use App\Entity\UserGroup;
-use App\Entity\UserGroupDomainEntityPermission;
 use App\Enum\ProjectStatus;
 use App\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -22,15 +20,30 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    private const DEFAULT_PASSWORD = 'pass_1234';
+    private const string DEFAULT_PASSWORD = 'pass_1234';
+
+    /** @var array<string, User> */
     private array $users = [];
+
+    /** @var array<string, UserGroup> */
     private array $userGroups = [];
-    private array $domainEntityPermission = [];
+
+    /** @var array<string, Category> */
     private array $categories = [];
+
+    /** @var array<string, Company> */
     private array $companies = [];
+
+    /** @var array<string, Contact> */
     private array $contacts = [];
+
+    /** @var array<string, CompanyGroup> */
     private array $companyGroups = [];
+
+    /** @var array<string, Campaign> */
     private array $campaigns = [];
+
+    /** @var array<string, Project> */
     private array $projects = [];
 
     public function __construct(
@@ -42,75 +55,14 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // Order is important for dependencies
-        $this->createDomainEntityFixtures($manager);
         $this->createCategoryFixtures($manager);
         $this->createUserGroupFixtures($manager);
         $this->createCompanyGroupFixtures($manager); // Create groups before companies
         $this->createCompanyFixtures($manager); // Create companies before users for proper assignment
         $this->createUserFixtures($manager);
-        $this->createPermissionFixtures($manager);
         $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
         $this->createCampaignFixtures($manager); // Create campaigns after projects
-    }
-
-    private function createDomainEntityFixtures(ObjectManager $manager): void
-    {
-        $domainEntityData = [
-            'DomainEntityPermission' => [
-                'name' => 'SystemEntities',
-                'text' => 'System entities and configuration',
-                'icon' => 'fas fa-list',
-            ],
-            'User' => [
-                'name' => 'Users',
-                'text' => 'User management',
-                'icon' => 'fas fa-users',
-            ],
-            'UserGroup' => [
-                'name' => 'Usergroups',
-                'text' => 'Usergroup management',
-                'icon' => 'fas fa-users',
-            ],
-            'Company' => [
-                'name' => 'Companies',
-                'text' => 'Clients, suppliers, partners etc.',
-                'icon' => 'fas fa-building',
-            ],
-            'CompanyGroup' => [
-                'name' => 'CompanyGroups',
-                'text' => 'Groups of companies',
-                'icon' => 'fas fa-layer-group',
-            ],
-            'Contact' => [
-                'name' => 'Contacts',
-                'text' => 'Contact persons',
-                'icon' => 'fas fa-users',
-            ],
-            'Project' => [
-                'name' => 'Projects',
-                'text' => 'Manage projects',
-                'icon' => 'fas fa-project-diagram',
-            ],
-            'Category' => [
-                'name' => 'Categories',
-                'text' => 'Manage categories',
-                'icon' => 'fas fa-tags',
-            ],
-        ];
-
-        foreach ($domainEntityData as $code => $data) {
-            $domainEntityPermission = (new DomainEntityPermission())
-                ->setName($data['name'])
-                ->setCode($code)
-                ->setText($data['text'])
-                ->setIcon($data['icon']);
-
-            $manager->persist($domainEntityPermission);
-            $this->domainEntityPermission[$code] = $domainEntityPermission;
-        }
-
-        $manager->flush();
     }
 
     private function createCategoryFixtures(ObjectManager $manager): void
@@ -370,19 +322,12 @@ class AppFixtures extends Fixture
             $company = null;
 
             // Get company if specified
-            if (isset($userData['company']) && $userData['company'] !== null) {
+            if (isset($userData['company'])) {
                 $company = $this->companies[$userData['company']] ?? null;
             }
 
             if (!$category) {
-                throw new \Exception(
-                    sprintf(
-                        'Category "%s" not found for user "%s". Available categories: %s',
-                        $userData['category'],
-                        $key,
-                        implode(', ', array_keys($this->categories))
-                    )
-                );
+                throw new \Exception(sprintf('Category "%s" not found for user "%s". Available categories: %s', $userData['category'], $key, implode(', ', array_keys($this->categories))));
             }
 
             $user = new User();
@@ -409,79 +354,6 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
-    }
-
-    private function createPermissionFixtures(ObjectManager $manager): void
-    {
-        $adminPermissions = [
-            'User' => ['read' => true, 'write' => true],
-            'UserGroup' => ['read' => true, 'write' => true],
-            'Company' => ['read' => true, 'write' => true],
-            'DomainEntityPermission' => ['read' => true, 'write' => true],
-            'CompanyGroup' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => true],
-            'Category' => ['read' => true, 'write' => true],
-        ];
-
-        $demoPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'UserGroup' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => false],
-            'Category' => ['read' => true, 'write' => true],
-        ];
-
-        $developerPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => false],
-            'Project' => ['read' => true, 'write' => true],
-        ];
-
-        $marketingPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'UserGroup' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => true],
-        ];
-
-        $consultantPermissions = [
-            'User' => ['read' => true, 'write' => false],
-            'UserGroup' => ['read' => true, 'write' => false],
-            'Company' => ['read' => true, 'write' => true],
-            'Project' => ['read' => true, 'write' => true],
-            'CompanyGroup' => ['read' => true, 'write' => false],
-        ];
-
-        $this->createUserGroupPermissions($manager, $this->userGroups['external'], $adminPermissions);
-        $this->createUserGroupPermissions($manager, $this->userGroups['basic'], $demoPermissions);
-        $this->createUserGroupPermissions($manager, $this->userGroups['advanced'], $developerPermissions);
-        $this->createUserGroupPermissions($manager, $this->userGroups['manager'], $marketingPermissions);
-        $this->createUserGroupPermissions($manager, $this->userGroups['admin'], $consultantPermissions);
-
-        $manager->flush();
-    }
-
-    private function createUserGroupPermissions(ObjectManager $manager, UserGroup $userGroup, array $permissions): void
-    {
-        foreach ($permissions as $entityCode => $rights) {
-            $domainEntityPermission = $this->domainEntityPermission[$entityCode] ?? null;
-            if (!$domainEntityPermission) {
-                continue;
-            }
-
-            $existingPermission = $manager->getRepository(UserGroupDomainEntityPermission::class)
-                ->findOneBy(['userGroup' => $userGroup, 'domainEntityPermission' => $domainEntityPermission]);
-
-            if (!$existingPermission) {
-                $permission = (new UserGroupDomainEntityPermission())
-                    ->setUserGroup($userGroup)
-                    ->setDomainEntityPermission($domainEntityPermission)
-                    ->setCanRead($rights['read'])
-                    ->setCanWrite($rights['write']);
-
-                $manager->persist($permission);
-            }
-        }
     }
 
     private function createCompanyGroupFixtures(ObjectManager $manager): void
@@ -768,7 +640,7 @@ class AppFixtures extends Fixture
         foreach ($companiesData as $index => $data) {
             $category = $this->categories[$data['category']] ?? null;
             $group = $this->companyGroups[$data['group']] ?? null;
-            
+
             // Randomly assign a demo logo
             $randomLogo = $demoLogos[array_rand($demoLogos)];
 
@@ -786,7 +658,7 @@ class AppFixtures extends Fixture
                 ->setImagePath($randomLogo);
 
             $manager->persist($company);
-            $this->companies["company_{$index}"] = $company;
+            $this->companies['company_' . $index] = $company;
         }
 
         $manager->flush();
@@ -804,6 +676,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2001',
                 'company' => 'company_0',
                 'academicTitle' => null,
+                'position' => 'Chief Technology Officer',
+                'department' => 'Technology',
             ],
             [
                 'firstName' => 'Jane',
@@ -813,6 +687,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2002',
                 'company' => 'company_1',
                 'academicTitle' => 'Ms.',
+                'position' => 'Senior Software Engineer',
+                'department' => 'Engineering',
             ],
             [
                 'firstName' => 'Alice',
@@ -822,6 +698,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2003',
                 'company' => 'company_2',
                 'academicTitle' => 'Dr.',
+                'position' => 'Director of Research',
+                'department' => 'Research & Development',
             ],
             // 50 additional contacts
             [
@@ -832,6 +710,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2004',
                 'company' => 'company_0',
                 'academicTitle' => null,
+                'position' => 'Systems Architect',
+                'department' => 'Engineering',
             ],
             [
                 'firstName' => 'Sarah',
@@ -841,6 +721,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2005',
                 'company' => 'company_1',
                 'academicTitle' => 'Dr.',
+                'position' => 'VP of Innovation',
+                'department' => 'Research & Development',
             ],
             [
                 'firstName' => 'Robert',
@@ -850,6 +732,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2006',
                 'company' => 'company_2',
                 'academicTitle' => 'Prof.',
+                'position' => 'Chief Financial Officer',
+                'department' => 'Finance',
             ],
             [
                 'firstName' => 'Emma',
@@ -859,6 +743,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 2007',
                 'company' => 'company_3',
                 'academicTitle' => null,
+                'position' => 'Product Manager',
+                'department' => 'Product Management',
             ],
             [
                 'firstName' => 'David',
@@ -868,6 +754,8 @@ class AppFixtures extends Fixture
                 'cell' => '+44 7700 900001',
                 'company' => 'company_4',
                 'academicTitle' => 'Mr.',
+                'position' => 'Sales Director',
+                'department' => 'Sales',
             ],
             [
                 'firstName' => 'Jessica',
@@ -877,6 +765,8 @@ class AppFixtures extends Fixture
                 'cell' => '+49 170 123456',
                 'company' => 'company_5',
                 'academicTitle' => 'Dr.',
+                'position' => 'Head of Marketing',
+                'department' => 'Marketing',
             ],
             [
                 'firstName' => 'Christopher',
@@ -886,6 +776,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 416 555 0301',
                 'company' => 'company_6',
                 'academicTitle' => null,
+                'position' => 'DevOps Engineer',
+                'department' => 'IT Operations',
             ],
             [
                 'firstName' => 'Amanda',
@@ -895,6 +787,8 @@ class AppFixtures extends Fixture
                 'cell' => '+81 90 1234 5678',
                 'company' => 'company_7',
                 'academicTitle' => 'Ms.',
+                'position' => 'UX Designer',
+                'department' => 'Design',
             ],
             [
                 'firstName' => 'Daniel',
@@ -904,6 +798,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 0501',
                 'company' => 'company_8',
                 'academicTitle' => null,
+                'position' => 'Quality Assurance Lead',
+                'department' => 'Quality Assurance',
             ],
             [
                 'firstName' => 'Lisa',
@@ -913,6 +809,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 415 555 0601',
                 'company' => 'company_9',
                 'academicTitle' => 'Dr.',
+                'position' => 'Data Scientist',
+                'department' => 'Analytics',
             ],
             [
                 'firstName' => 'Matthew',
@@ -922,6 +820,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 0701',
                 'company' => 'company_10',
                 'academicTitle' => null,
+                'position' => 'Business Analyst',
+                'department' => 'Business Development',
             ],
             [
                 'firstName' => 'Ashley',
@@ -931,6 +831,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 206 555 0801',
                 'company' => 'company_11',
                 'academicTitle' => 'Ms.',
+                'position' => 'HR Manager',
+                'department' => 'Human Resources',
             ],
             [
                 'firstName' => 'James',
@@ -940,6 +842,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 555 0901',
                 'company' => 'company_12',
                 'academicTitle' => 'Prof.',
+                'position' => 'Legal Counsel',
+                'department' => 'Legal',
             ],
             [
                 'firstName' => 'Michelle',
@@ -949,6 +853,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 773 555 1001',
                 'company' => 'company_13',
                 'academicTitle' => null,
+                'position' => 'Project Manager',
+                'department' => 'Project Management',
             ],
             [
                 'firstName' => 'Ryan',
@@ -958,6 +864,8 @@ class AppFixtures extends Fixture
                 'cell' => '+1 213 555 1101',
                 'company' => 'company_14',
                 'academicTitle' => 'Dr.',
+                'position' => 'Research Scientist',
+                'department' => 'Research & Development',
             ],
             [
                 'firstName' => 'Stephanie',
@@ -967,6 +875,8 @@ class AppFixtures extends Fixture
                 'cell' => '+33 6 12 34 56 78',
                 'company' => 'company_15',
                 'academicTitle' => 'Ms.',
+                'position' => 'Compliance Officer',
+                'department' => 'Compliance',
             ],
             [
                 'firstName' => 'Kevin',
@@ -976,6 +886,8 @@ class AppFixtures extends Fixture
                 'cell' => '+27 82 123 4567',
                 'company' => 'company_16',
                 'academicTitle' => null,
+                'position' => 'Account Manager',
+                'department' => 'Sales',
             ],
             [
                 'firstName' => 'Nicole',
@@ -985,6 +897,8 @@ class AppFixtures extends Fixture
                 'cell' => '+61 4 1234 5678',
                 'company' => 'company_17',
                 'academicTitle' => 'Dr.',
+                'position' => 'Content Strategist',
+                'department' => 'Marketing',
             ],
             [
                 'firstName' => 'Brandon',
@@ -994,6 +908,8 @@ class AppFixtures extends Fixture
                 'cell' => '+44 7700 900002',
                 'company' => 'company_18',
                 'academicTitle' => null,
+                'position' => 'Creative Director',
+                'department' => 'Creative',
             ],
             // Additional contacts for larger companies
             [
@@ -1324,12 +1240,20 @@ class AppFixtures extends Fixture
                 ->setCell($contactData['cell'])
                 ->setCompany($company);
 
-            if (!empty($contactData['academicTitle'])) {
+            if (isset($contactData['academicTitle'])) {
                 $contact->setAcademicTitle($contactData['academicTitle']);
             }
 
+            if (isset($contactData['position'])) {
+                $contact->setPosition($contactData['position']);
+            }
+
+            if (isset($contactData['department'])) {
+                $contact->setDepartment($contactData['department']);
+            }
+
             $manager->persist($contact);
-            $this->contacts["contact_{$index}"] = $contact;
+            $this->contacts['contact_' . $index] = $contact;
         }
 
         $manager->flush();
@@ -1686,10 +1610,10 @@ class AppFixtures extends Fixture
                 ->setClient($client)
                 ->setAssignee($assignee)
                 ->setCategory($category)
-                ->setDueDate($projectData['dueDate'] ?? null);
+                ->setDueDate($projectData['dueDate']);
 
             $manager->persist($project);
-            $this->projects["project_{$index}"] = $project;
+            $this->projects['project_' . $index] = $project;
         }
 
         $manager->flush();
@@ -1760,7 +1684,7 @@ class AppFixtures extends Fixture
             }
 
             $manager->persist($campaign);
-            $this->campaigns["campaign_{$index}"] = $campaign;
+            $this->campaigns['campaign_' . $index] = $campaign;
         }
 
         $manager->flush();

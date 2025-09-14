@@ -16,7 +16,6 @@ use App\Repository\CompanyGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: CompanyGroupRepository::class)]
 #[ApiResource(
@@ -78,6 +77,6 @@ class CompanyGroup extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->getName() ?? 'Unnamed Group';
+        return $this->getName() ?: 'Unnamed Group';
     }
 }

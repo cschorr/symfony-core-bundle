@@ -67,7 +67,7 @@ class Company extends AbstractEntity
     #[ORM\ManyToOne(targetEntity: Category::class)]
     private ?Category $category = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     private ?string $imagePath = null;
 
     public function __construct()
@@ -80,7 +80,7 @@ class Company extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->getName() ?? 'Unnamed Company';
+        return $this->getName() ?: 'Unnamed Company';
     }
 
     public function getCompanyGroup(): ?CompanyGroup
@@ -169,10 +169,10 @@ class Company extends AbstractEntity
 
     public function getImagePath(): ?string
     {
-        if ($this->imagePath === null) {
+        if (null === $this->imagePath) {
             return null;
         }
-        
+
         return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($this->imagePath, '/');
     }
 

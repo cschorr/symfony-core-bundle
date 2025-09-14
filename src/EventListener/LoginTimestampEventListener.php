@@ -10,10 +10,10 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 #[AsEventListener(event: LoginSuccessEvent::class)]
-final class LoginTimestampEventListener
+final readonly class LoginTimestampEventListener
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
     }
 

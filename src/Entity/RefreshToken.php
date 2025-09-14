@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\Operation;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken as BaseRefreshToken;
 
 #[Entity]
-#[Table(name: "refresh_tokens")]
+#[Table(name: 'refresh_tokens')]
 #[ApiResource(
     operations: [
         new Post(
@@ -22,7 +22,7 @@ use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken as BaseRefreshToken;
                 summary: 'Create a new refresh token',
                 description: 'This endpoint allows clients to obtain a new refresh token for authentication purposes.'
             )
-        )
+        ),
     ]
 )]
 class RefreshToken extends BaseRefreshToken
