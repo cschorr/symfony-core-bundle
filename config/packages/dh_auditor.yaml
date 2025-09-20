@@ -11,11 +11,11 @@ dh_auditor:
                 - 'createdAt'
                 - 'updatedAt'
 
-            # audited entities
+            # audited entities  
             entities:
-                App\Entity\Category: ~
-                App\Entity\Company: ~
-                App\Entity\CompanyGroup: ~
-                App\Entity\Contact: ~
-                App\Entity\Project: ~
-                App\Entity\User: ~
+                C3net\CoreBundle\Entity\Category: ~
+                C3net\CoreBundle\Entity\Company: ~
+                C3net\CoreBundle\Entity\CompanyGroup: ~
+                C3net\CoreBundle\Entity\Contact: ~
+                C3net\CoreBundle\Entity\Project: ~
+                C3net\CoreBundle\Entity\User: ~

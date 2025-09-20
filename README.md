@@ -198,4 +198,4 @@ This bundle is released under the MIT License. See the bundled LICENSE file for 
 
 ## Support
 
-For support, please contact info@c3net.de or create an issue on GitHub.## Submodule Test
+For support, please contact info@c3net.de or create an issue on GitHub.

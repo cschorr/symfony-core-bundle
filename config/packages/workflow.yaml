@@ -8,7 +8,7 @@ framework:
                 type: 'method'
                 property: 'status'
             supports:
-                - App\Entity\Project
+                - C3net\CoreBundle\Entity\Project
             initial_marking: draft
             places:
                 - draft

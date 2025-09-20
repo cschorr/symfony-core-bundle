@@ -16,7 +16,7 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         identity_generation_preferences:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
-        auto_mapping: true
+        auto_mapping: false
         mappings:
             App:
                 type: attribute
@@ -24,6 +24,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            C3net\CoreBundle:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/vendor/c3net/core-bundle/src/Entity'
+                prefix: 'C3net\CoreBundle\Entity'
+                alias: CoreBundle
         controller_resolver:
             auto_mapping: false
         filters:

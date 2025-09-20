@@ -10,8 +10,11 @@ services:
         exclude:
             - '../src/Entity/'
             - '../src/Enum/'
-            - '../src/DataFixtures/'
-            - '../src/Repository/'
+
+    # Console Commands
+    C3net\CoreBundle\Command\:
+        resource: '../src/Command/'
+        tags: ['console.command']
 
     # Controllers
     C3net\CoreBundle\Controller\:
@@ -26,19 +29,17 @@ services:
     C3net\CoreBundle\EventListener\:
         resource: '../src/EventListener/'
 
-    # Repositories (exclude from auto-registration, handled by Doctrine)
-    # C3net\CoreBundle\Repository\:
-    #     resource: '../src/Repository/'
-    #     tags: ['doctrine.repository_service']
+    # Repositories should NOT be autowired - they're handled by Doctrine
+    # Services that need repositories should inject EntityManagerInterface instead
 
     # Services
     C3net\CoreBundle\Service\:
         resource: '../src/Service/'
 
-    # Data Fixtures
-    C3net\CoreBundle\DataFixtures\:
-        resource: '../src/DataFixtures/'
-        tags: ['doctrine.fixture.orm']
+    # Data Fixtures - temporarily disabled due to repository dependency issues
+    # C3net\CoreBundle\DataFixtures\:
+    #     resource: '../src/DataFixtures/'
+    #     tags: ['doctrine.fixture.orm']
 
     # Doctrine Listeners
     C3net\CoreBundle\Doctrine\Listener\:
@@ -60,18 +61,5 @@ services:
     C3net\CoreBundle\OpenApi\:
         resource: '../src/OpenApi/'
 
-    # Specific repository services that are needed by other services
-    C3net\CoreBundle\Repository\VoteRepository:
-        factory: ['@doctrine.orm.entity_manager', 'getRepository']
-        arguments:
-            - 'C3net\CoreBundle\Entity\Vote'
-
-    C3net\CoreBundle\Repository\UserRepository:
-        factory: ['@doctrine.orm.entity_manager', 'getRepository']
-        arguments:
-            - 'C3net\CoreBundle\Entity\User'
-
-    C3net\CoreBundle\Repository\UserGroupRepository:
-        factory: ['@doctrine.orm.entity_manager', 'getRepository']
-        arguments:
-            - 'C3net\CoreBundle\Entity\UserGroup'
+    # Repository services are handled automatically by Doctrine
+    # No need to manually define them as services

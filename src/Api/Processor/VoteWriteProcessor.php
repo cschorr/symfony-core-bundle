@@ -9,6 +9,7 @@ use ApiPlatform\State\ProcessorInterface;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Entity\Vote;
 use C3net\CoreBundle\Repository\VoteRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -18,19 +19,24 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 /**
  * @implements ProcessorInterface<Vote, Vote>
  */
-final readonly class VoteWriteProcessor implements ProcessorInterface
+final class VoteWriteProcessor implements ProcessorInterface
 {
     /**
      * @param ProcessorInterface<Vote, Vote> $persistProcessor
      */
+    private VoteRepository $votes;
+
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
-        private ProcessorInterface $persistProcessor,
-        private Security $security,
+        private readonly ProcessorInterface $persistProcessor,
+        private readonly Security $security,
         #[Autowire(service: 'limiter.votes_per_10m')]
-        private RateLimiterFactory $votesLimiter,
-        private VoteRepository $votes,
+        private readonly RateLimiterFactory $votesLimiter,
+        private readonly EntityManagerInterface $entityManager,
     ) {
+        /** @var VoteRepository $votes */
+        $votes = $entityManager->getRepository(Vote::class);
+        $this->votes = $votes;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
