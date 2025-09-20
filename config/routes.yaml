@@ -1,0 +1,6 @@
+# Core Bundle Routes Configuration
+c3net_core_controllers:
+    resource: '../src/Controller/'
+    type: attribute
+    prefix: /
+    name_prefix: c3net_core_
