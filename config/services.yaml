@@ -61,5 +61,13 @@ services:
     C3net\CoreBundle\OpenApi\:
         resource: '../src/OpenApi/'
 
+    # OpenAPI Decorators
+    C3net\CoreBundle\OpenApi\UserInfoDecorator:
+        decorates: 'api_platform.openapi.factory'
+        arguments:
+            - '@.inner'
+        tags:
+            - { name: 'api_platform.openapi.factory.decorator', priority: 10 }
+
     # Repository services are handled automatically by Doctrine
     # No need to manually define them as services

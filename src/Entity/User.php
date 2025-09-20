@@ -24,15 +24,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     shortName: 'User',
     description: 'Represents a user in the system, with roles and permissions.',
-    operations: [
-        new Get(
-            uriTemplate: '/users/me',
-            read: false,
-            provider: UserCurrentProvider::class,
-            normalizationContext: ['groups' => ['user:read']],
-            security: 'is_granted("ROLE_USER")'
-        ),
-    ]
 )]
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -40,7 +31,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     use SetNamePersonTrait;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -50,31 +40,25 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      * @var Collection<int, Project>
      */
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'assignee')]
-    #[Groups(['user:read'])]
     private Collection $projects;
 
     #[ORM\ManyToOne(inversedBy: 'employees')]
-    #[Groups(['user:read', 'user:write'])]
     private ?Company $company = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
-    #[Groups(['user:read'])]
     private ?Category $category = null;
 
     /**
      * @var Collection<int, UserGroup>
      */
     #[ORM\ManyToMany(targetEntity: UserGroup::class, inversedBy: 'users')]
-    #[Groups(['user:read'])]
     private Collection $userGroups;
 
     #[ORM\Column(nullable: false, options: ['default' => false])]
-    #[Groups(['user:read'])]
     private bool $locked = false;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read'])]
     private ?\DateTimeImmutable $lastLogin = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -86,7 +70,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     // Stored as list of strings in DB; use helper methods to work with UserRole enums.
     /** @var list<string>|null */
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::JSON, nullable: true)]
-    #[Groups(['user:read'])]
     private ?array $roles = null;
 
     /**

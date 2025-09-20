@@ -13,7 +13,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserInfoController extends AbstractController
 {
     /**
-     * @deprecated Use GET /users/me endpoint instead. This endpoint will be removed in a future version.
+     * Get current user information from JWT token.
+     *
+     * This endpoint retrieves user information based on the provided JWT token in the Authorization header.
+     * The endpoint is documented via the UserInfoDecorator class for OpenAPI/Swagger.
+     *
+     * @deprecated Use GET /api/users/me endpoint instead. This endpoint will be removed in a future version.
      */
     #[Route('/api/userinfo', name: 'api_userinfo', methods: ['POST'])]
     public function userInfoFromToken(
