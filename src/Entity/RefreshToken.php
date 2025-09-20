@@ -26,16 +26,6 @@ use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken as BaseRefreshToken;
 )]
 class RefreshToken extends BaseRefreshToken
 {
-    /**
-     * @var int|null
-     */
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    protected $id;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    // ID property is inherited from Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken
+    // which is properly mapped via XML configuration in doctrine.yaml
 }
