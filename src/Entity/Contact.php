@@ -10,11 +10,15 @@ use ApiPlatform\Metadata\ApiResource;
 use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetNamePersonTrait;
+use C3net\CoreBundle\Entity\Traits\Tree\NestedTreeTrait;
 use C3net\CoreBundle\Repository\ContactRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
+#[Gedmo\Tree(type: 'nested')]
+#[ORM\Table(name: 'contacts')]
 #[ORM\Entity(repositoryClass: ContactRepository::class)]
 #[ApiResource(
     paginationClientEnabled: true,
@@ -35,6 +39,7 @@ class Contact extends AbstractEntity
     use SetNamePersonTrait;
     use SetCommunicationTrait;
     use SetAddressTrait;
+    use NestedTreeTrait;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]
     private ?Company $company = null;
@@ -54,6 +59,7 @@ class Contact extends AbstractEntity
     public function __construct()
     {
         parent::__construct();
+        $this->initializeTreeCollections();
         $this->projects = new ArrayCollection();
     }
 
