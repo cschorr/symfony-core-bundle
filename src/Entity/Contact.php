@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
@@ -32,6 +33,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
     properties: [
         'title' => 'ASC',
         'year' => 'DESC',
+    ],
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'company' => 'exact',
     ],
 )]
 class Contact extends AbstractEntity

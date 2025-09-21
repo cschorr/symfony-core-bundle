@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -34,6 +35,12 @@ use Doctrine\ORM\Mapping as ORM;
     properties: [
         'title' => 'ASC',
         'year' => 'DESC',
+    ],
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'client' => 'exact',
     ],
 )]
 class Project extends AbstractEntity
