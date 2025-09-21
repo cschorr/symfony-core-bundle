@@ -18,6 +18,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
+#[ORM\InheritanceType('JOINED')]
+#[ORM\DiscriminatorColumn(name: 'project_type', type: 'string')]
+#[ORM\DiscriminatorMap(['project' => Project::class, 'audio_project' => 'App\Entity\AudioProject', 'video_project' => 'App\Entity\VideoProject'])]
 #[ApiResource(
     mercure: true,
     paginationClientEnabled: true,
