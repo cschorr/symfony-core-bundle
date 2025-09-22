@@ -85,7 +85,10 @@
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true
