@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace C3net\CoreBundle\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -18,12 +22,59 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new Get(uriTemplate: '/audit-logs/{id}'),
         new GetCollection(uriTemplate: '/audit-logs'),
+        new GetCollection(
+            uriTemplate: '/audit-logs/authors',
+            provider: 'C3net\CoreBundle\State\AuditLogAuthorsProvider',
+            name: 'audit_logs_get_authors',
+        ),
+        new GetCollection(
+            uriTemplate: '/audit-logs/resources',
+            provider: 'C3net\CoreBundle\State\AuditLogResourcesProvider',
+            name: 'audit_logs_get_resources',
+        ),
+        new GetCollection(
+            uriTemplate: '/audit-logs/actions',
+            provider: 'C3net\CoreBundle\State\AuditLogActionsProvider',
+            name: 'audit_logs_get_actions',
+        ),
+        new GetCollection(
+            uriTemplate: '/audit-logs/filters',
+            provider: 'C3net\CoreBundle\State\AuditLogFiltersProvider',
+            name: 'audit_logs_get_filters',
+        ),
         new Post(uriTemplate: '/audit-logs'),
         new Put(uriTemplate: '/audit-logs/{id}'),
         new Delete(uriTemplate: '/audit-logs/{id}'),
     ],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationEnabled: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100,
 )]
-class AuditLogs
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'author' => 'exact',
+        'resource' => 'partial',
+        'action' => 'exact',
+    ],
+)]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: [
+        'createdAt',
+    ],
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'createdAt' => 'DESC',
+        'resource' => 'ASC',
+        'action' => 'ASC',
+    ],
+)]
+class AuditLogs extends AbstractEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
