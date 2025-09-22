@@ -33,7 +33,7 @@ class AuditLogs
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $resource = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $meta = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -42,10 +42,10 @@ class AuditLogs
     #[ORM\ManyToOne(inversedBy: 'auditLogs')]
     private ?User $author = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $data = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $previousData = null;
 
     public function getId(): ?int
