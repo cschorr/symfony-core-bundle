@@ -76,11 +76,6 @@ use Doctrine\ORM\Mapping as ORM;
 )]
 class AuditLogs extends AbstractEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $resource = null;
 
@@ -98,11 +93,6 @@ class AuditLogs extends AbstractEntity
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $previousData = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getResource(): ?string
     {
