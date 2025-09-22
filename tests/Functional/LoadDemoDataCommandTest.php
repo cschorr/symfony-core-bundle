@@ -264,20 +264,38 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $this->commandTester->execute([]);
 
         $campaigns = $this->entityManager->getRepository(Campaign::class)->findAll();
-        $this->assertGreaterThanOrEqual(3, count($campaigns));
+        $this->assertGreaterThanOrEqual(8, count($campaigns)); // Now expecting 8 campaigns
 
         $campaignNames = array_map(fn($c) => $c->getName(), $campaigns);
         $this->assertContains('Digital Transformation 2025', $campaignNames);
         $this->assertContains('Global Marketing Excellence', $campaignNames);
         $this->assertContains('Enterprise Security & Compliance', $campaignNames);
+        $this->assertContains('Innovation Lab 2024', $campaignNames);
+        $this->assertContains('Customer Experience Revolution', $campaignNames);
+        $this->assertContains('Sustainable Operations Initiative', $campaignNames);
+        $this->assertContains('Financial Technology Modernization', $campaignNames);
+        $this->assertContains('Healthcare Technology Advancement', $campaignNames);
+
+        // Verify campaign codes are set
+        $campaignCodes = array_map(fn($c) => $c->getCode(), $campaigns);
+        $this->assertContains('DT2025', $campaignCodes);
+        $this->assertContains('GME2024', $campaignCodes);
+        $this->assertContains('ESC2024', $campaignCodes);
+        $this->assertContains('INNO2024', $campaignCodes);
 
         // Verify campaign-project relationships
         $digitalTransformation = $this->entityManager->getRepository(Campaign::class)
             ->findOneBy(['name' => 'Digital Transformation 2025']);
         $this->assertNotNull($digitalTransformation);
+        $this->assertSame('DT2025', $digitalTransformation->getCode());
         $this->assertNotNull($digitalTransformation->getCategory());
         $this->assertGreaterThan(0, count($digitalTransformation->getProjects()));
         $this->assertNotEmpty($digitalTransformation->getDescription());
+        $this->assertNotNull($digitalTransformation->getStartDate());
+        $this->assertNotNull($digitalTransformation->getEndDate());
+
+        // Verify date ranges are logical
+        $this->assertTrue($digitalTransformation->getStartDate() < $digitalTransformation->getEndDate());
 
         // Verify projects are properly assigned to campaigns
         $assignedProjects = $digitalTransformation->getProjects();
@@ -287,6 +305,22 @@ class LoadDemoDataCommandTest extends KernelTestCase
             $this->assertNotNull($project->getName());
             $this->assertNotNull($project->getClient());
         }
+
+        // Test another campaign with different category
+        $innovationLab = $this->entityManager->getRepository(Campaign::class)
+            ->findOneBy(['code' => 'INNO2024']);
+        $this->assertNotNull($innovationLab);
+        $this->assertSame('Innovation Lab 2024', $innovationLab->getName());
+        $this->assertNotNull($innovationLab->getStartDate());
+        $this->assertNotNull($innovationLab->getEndDate());
+        $this->assertStringContainsString('Research and development', $innovationLab->getDescription());
+
+        // Test campaign with consulting category
+        $sustainableOps = $this->entityManager->getRepository(Campaign::class)
+            ->findOneBy(['code' => 'SOI2024']);
+        $this->assertNotNull($sustainableOps);
+        $this->assertStringContainsString('Environmental sustainability', $sustainableOps->getDescription());
+        $this->assertGreaterThan(0, count($sustainableOps->getProjects()));
     }
 
     public function testDataIntegrityAndConstraints(): void

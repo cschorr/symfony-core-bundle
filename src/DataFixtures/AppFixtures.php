@@ -1624,9 +1624,11 @@ class AppFixtures extends Fixture
         $campaignsData = [
             [
                 'name' => 'Digital Transformation 2025',
-                'description' => 'Comprehensive digital transformation initiative focusing on modernizing legacy systems and implementing cutting-edge technologies across multiple client organizations.',
+                'code' => 'DT2025',
+                'description' => 'Comprehensive digital transformation initiative focusing on modernizing legacy systems and implementing cutting-edge technologies across multiple client organizations. This strategic campaign encompasses AI integration, cloud migration, and automation solutions.',
                 'category' => 'main1', // Technology
-                'manager' => 'admin',
+                'startDate' => new \DateTimeImmutable('2024-01-15'),
+                'endDate' => new \DateTimeImmutable('2025-12-31'),
                 'projects' => [
                     'project_0', // E-Commerce Platform
                     'project_1', // AI Security System
@@ -1638,9 +1640,11 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Global Marketing Excellence',
-                'description' => 'Multi-company marketing campaign focusing on brand management, digital marketing automation, and content creation strategies for international markets.',
+                'code' => 'GME2024',
+                'description' => 'Multi-company marketing campaign focusing on brand management, digital marketing automation, and content creation strategies for international markets. Includes social media optimization, SEO enhancement, and customer engagement analytics.',
                 'category' => 'main3', // Marketing & Sales
-                'manager' => 'manager', // Emma Davis
+                'startDate' => new \DateTimeImmutable('2024-03-01'),
+                'endDate' => new \DateTimeImmutable('2024-11-30'),
                 'projects' => [
                     'project_11', // Digital Marketing Campaign
                     'project_13', // Global Distribution Network
@@ -1651,9 +1655,11 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Enterprise Security & Compliance',
-                'description' => 'Strategic initiative to enhance security infrastructure and ensure regulatory compliance across all client operations, including legal document management and corporate intelligence systems.',
+                'code' => 'ESC2024',
+                'description' => 'Strategic initiative to enhance security infrastructure and ensure regulatory compliance across all client operations. Includes legal document management, corporate intelligence systems, and comprehensive audit trail implementation.',
                 'category' => 'main2', // Business Services
-                'manager' => 'external', // Robert Thompson
+                'startDate' => new \DateTimeImmutable('2024-02-01'),
+                'endDate' => new \DateTimeImmutable('2025-01-31'),
                 'projects' => [
                     'project_2', // Automated Defense Network
                     'project_6', // Corporate Security Upgrade
@@ -1663,17 +1669,92 @@ class AppFixtures extends Fixture
                     'project_5', // Business Process Optimization
                 ],
             ],
+            [
+                'name' => 'Innovation Lab 2024',
+                'code' => 'INNO2024',
+                'description' => 'Research and development initiative focused on emerging technologies and innovative solutions. Exploring quantum computing, neural interfaces, blockchain integration, and advanced data analytics for next-generation applications.',
+                'category' => 'main1', // Technology
+                'startDate' => new \DateTimeImmutable('2024-01-01'),
+                'endDate' => new \DateTimeImmutable('2024-12-31'),
+                'projects' => [
+                    'project_14', // Neural Interface Development
+                    'project_16', // Microservices Architecture
+                    'project_17', // Quantum Realm Analytics
+                    'project_27', // AI Content Generation
+                ],
+            ],
+            [
+                'name' => 'Customer Experience Revolution',
+                'code' => 'CXR2024',
+                'description' => 'Comprehensive customer experience enhancement campaign focusing on user interface optimization, customer journey mapping, and personalization technologies. Aimed at increasing customer satisfaction and retention across all touchpoints.',
+                'category' => 'main3', // Marketing & Sales
+                'startDate' => new \DateTimeImmutable('2024-04-01'),
+                'endDate' => new \DateTimeImmutable('2025-03-31'),
+                'projects' => [
+                    'project_8', // Enterprise CMS
+                    'project_12', // Pharmaceutical Research Portal
+                    'project_16', // Mobile Commerce App
+                    'project_24', // Web Portal Redesign
+                ],
+            ],
+            [
+                'name' => 'Sustainable Operations Initiative',
+                'code' => 'SOI2024',
+                'description' => 'Environmental sustainability and operational efficiency campaign focusing on green technologies, energy optimization, and sustainable business practices. Includes carbon footprint reduction and renewable energy integration projects.',
+                'category' => 'main4', // Consulting
+                'startDate' => new \DateTimeImmutable('2024-06-01'),
+                'endDate' => new \DateTimeImmutable('2025-05-31'),
+                'projects' => [
+                    'project_21', // Green Arrow Logistics
+                    'project_5', // Business Process Optimization
+                    'project_20', // Iron Fist Training Platform
+                ],
+            ],
+            [
+                'name' => 'Financial Technology Modernization',
+                'code' => 'FINTECH2024',
+                'description' => 'Comprehensive financial technology upgrade campaign focusing on banking solutions, payment processing, and financial analytics. Includes blockchain integration, cryptocurrency support, and advanced fraud detection systems.',
+                'category' => 'sub4', // Financial Services
+                'startDate' => new \DateTimeImmutable('2024-05-01'),
+                'endDate' => new \DateTimeImmutable('2025-04-30'),
+                'projects' => [
+                    'project_4', // Mobile Banking App
+                    'project_7', // Financial Portfolio Management
+                    'project_19', // Financial Analytics Platform
+                ],
+            ],
+            [
+                'name' => 'Healthcare Technology Advancement',
+                'code' => 'HEALTH2024',
+                'description' => 'Medical and healthcare technology enhancement initiative focusing on patient care optimization, medical data analytics, and telemedicine solutions. Includes clinical trial management and pharmaceutical research platforms.',
+                'category' => 'main2', // Business Services
+                'startDate' => new \DateTimeImmutable('2024-07-01'),
+                'endDate' => new \DateTimeImmutable('2025-06-30'),
+                'projects' => [
+                    'project_12', // Pharmaceutical Research Portal
+                    'project_25', // Pharmaceutical CRM
+                    'project_26', // Clinical Trial Management
+                ],
+            ],
         ];
 
         foreach ($campaignsData as $index => $campaignData) {
             $category = $this->categories[$campaignData['category']] ?? null;
-            $manager_user = $this->users[$campaignData['manager']] ?? null;
 
             $campaign = (new Campaign())
                 ->setName($campaignData['name'])
+                ->setCode($campaignData['code'])
                 ->setDescription($campaignData['description'])
                 ->setCategory($category)
             ;
+
+            // Set start and end dates if provided
+            if (isset($campaignData['startDate'])) {
+                $campaign->setStartDate($campaignData['startDate']);
+            }
+            if (isset($campaignData['endDate'])) {
+                $campaign->setEndDate($campaignData['endDate']);
+            }
 
             // Assign projects to campaign
             foreach ($campaignData['projects'] as $projectKey) {
