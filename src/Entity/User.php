@@ -52,7 +52,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     /**
      * @var Collection<int, UserGroup>
      */
-    #[ORM\ManyToMany(targetEntity: UserGroup::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: UserGroup::class, mappedBy: 'users')]
     private Collection $userGroups;
 
     #[ORM\Column(nullable: false, options: ['default' => false])]
@@ -252,16 +252,16 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     public function addUserGroup(UserGroup $userGroup): static
     {
-        if (!$this->userGroups->contains($userGroup)) {
-            $this->userGroups->add($userGroup);
-        }
+        // Delegate to the owning side (UserGroup)
+        $userGroup->addUser($this);
 
         return $this;
     }
 
     public function removeUserGroup(UserGroup $userGroup): static
     {
-        $this->userGroups->removeElement($userGroup);
+        // Delegate to the owning side (UserGroup)
+        $userGroup->removeUser($this);
 
         return $this;
     }

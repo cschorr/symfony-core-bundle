@@ -24,8 +24,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(uriTemplate: '/user-groups/{id}'),
         new GetCollection(uriTemplate: '/user-groups'),
-        new Post(uriTemplate: '/user-groups'),
-        new Put(uriTemplate: '/user-groups/{id}'),
+        new Post(uriTemplate: '/user-groups', processor: 'C3net\CoreBundle\State\UserGroupWriteProcessor'),
+        new Put(uriTemplate: '/user-groups/{id}', processor: 'C3net\CoreBundle\State\UserGroupWriteProcessor'),
         new Delete(uriTemplate: '/user-groups/{id}'),
     ]
 )]
@@ -50,7 +50,8 @@ class UserGroup extends AbstractEntity
     /**
      * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'userGroups')]
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'userGroups')]
+    #[ORM\JoinTable(name: 'user_user_group')]
     private Collection $users;
 
     public function __construct()
@@ -148,7 +149,10 @@ class UserGroup extends AbstractEntity
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->addUserGroup($this);
+            // Since UserGroup is now the owning side, we need to update the inverse side manually
+            if (!$user->getUserGroups()->contains($this)) {
+                $user->getUserGroups()->add($this);
+            }
         }
 
         return $this;
@@ -157,7 +161,8 @@ class UserGroup extends AbstractEntity
     public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
-            $user->removeUserGroup($this);
+            // Update the inverse side
+            $user->getUserGroups()->removeElement($this);
         }
 
         return $this;
