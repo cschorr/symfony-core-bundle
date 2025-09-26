@@ -33,6 +33,7 @@ use Doctrine\ORM\Mapping as ORM;
         'employees' => 'partial',
         'name' => 'partial',
         'city' => 'partial',
+        'department' => 'partial',
     ]
 )]
 #[ApiFilter(
@@ -69,6 +70,9 @@ class Company extends AbstractEntity
 
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     private ?string $imagePath = null;
+
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
+    private ?string $department = null;
 
     public function __construct()
     {
@@ -179,6 +183,18 @@ class Company extends AbstractEntity
     public function setImagePath(?string $imagePath): static
     {
         $this->imagePath = $imagePath;
+
+        return $this;
+    }
+
+    public function getDepartment(): ?string
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?string $department): static
+    {
+        $this->department = $department;
 
         return $this;
     }

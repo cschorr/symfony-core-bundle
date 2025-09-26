@@ -38,7 +38,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
-        'company' => 'exact',
+        'company' => 'partial',
     ],
 )]
 class Contact extends AbstractEntity
@@ -56,6 +56,9 @@ class Contact extends AbstractEntity
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $department = null;
+
+    #[ORM\ManyToOne(targetEntity: Contact::class)]
+    private ?Contact $standin = null;
 
     /**
      * @var Collection<int, Project>
@@ -135,6 +138,18 @@ class Contact extends AbstractEntity
         if ($this->projects->removeElement($project)) {
             $project->removeContact($this);
         }
+
+        return $this;
+    }
+
+    public function getStandin(): ?Contact
+    {
+        return $this->standin;
+    }
+
+    public function setStandin(?Contact $standin): static
+    {
+        $this->standin = $standin;
 
         return $this;
     }

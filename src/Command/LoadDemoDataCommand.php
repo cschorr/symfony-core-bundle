@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Command;
 
 use C3net\CoreBundle\DataFixtures\CoreDefaultsFixtures;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,6 +46,12 @@ class LoadDemoDataCommand extends Command
                 'p',
                 InputOption::VALUE_NONE,
                 'Purge existing data before loading demo data (use with caution!)'
+            )
+            ->addOption(
+                'drop-create-schema',
+                'd',
+                InputOption::VALUE_NONE,
+                'Drop and recreate database schema before loading demo data'
             );
     }
 
@@ -53,8 +61,9 @@ class LoadDemoDataCommand extends Command
 
         $io->title('C3net Core Bundle Demo Data Loader');
 
-        // Check if we should purge existing data
+        // Check if we should purge existing data or drop/create schema
         $shouldPurge = $input->getOption('purge');
+        $shouldDropCreateSchema = $input->getOption('drop-create-schema');
 
         // Check for existing data
         $userCount = $this->entityManager->getRepository(\C3net\CoreBundle\Entity\User::class)->count([]);
@@ -93,10 +102,14 @@ class LoadDemoDataCommand extends Command
         }
 
         try {
-            if ($shouldPurge) {
+            if ($shouldDropCreateSchema) {
+                $io->section('Dropping and recreating database schema...');
+                $this->dropAndCreateSchema($io);
+            } elseif ($shouldPurge) {
                 $io->section('Purging existing data...');
                 $this->purgeData($io);
             }
+
 
             $io->section('Loading demo data...');
 
@@ -106,7 +119,30 @@ class LoadDemoDataCommand extends Command
             // Create and execute fixtures
             $fixtures = new CoreDefaultsFixtures($this->passwordHasher, $userGroupRepository);
 
-            $fixtures->load($this->entityManager);
+            // Temporarily disable SQL logging to improve performance during bulk operations
+            $this->entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
+
+            try {
+                $fixtures->load($this->entityManager);
+            } catch (\Exception $e) {
+                // Check if this is a Mercure-related error that we can safely ignore during fixture loading
+                if (str_contains($e->getMessage(), 'Failed to send an update') ||
+                    str_contains($e->getMessage(), 'mercure') ||
+                    str_contains($e->getMessage(), 'Mercure')) {
+                    $io->warning([
+                        'Mercure update failed during demo data loading.',
+                        'This is usually harmless during fixture loading as real-time updates are not critical.',
+                        'Demo data loading will continue...'
+                    ]);
+                    if ($io->isVerbose()) {
+                        $io->text('Error details: ' . $e->getMessage());
+                    }
+                    // Continue with success since Mercure failures during fixture loading are not critical
+                } else {
+                    // Re-throw non-Mercure related exceptions
+                    throw $e;
+                }
+            }
 
             $io->success([
                 'Demo data has been successfully loaded!',
@@ -185,4 +221,28 @@ class LoadDemoDataCommand extends Command
         $io->text('');
         $io->success('Existing data has been purged.');
     }
+
+    private function dropAndCreateSchema(SymfonyStyle $io): void
+    {
+        $schemaTool = new SchemaTool($this->entityManager);
+        $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
+
+        try {
+            // Drop the schema
+            $io->text('Dropping database schema...');
+            $schemaTool->dropSchema($metadata);
+            $io->text(' ✓ Schema dropped successfully');
+
+            // Create the schema
+            $io->text('Creating database schema...');
+            $schemaTool->createSchema($metadata);
+            $io->text(' ✓ Schema created successfully');
+
+            $io->text('');
+            $io->success('Database schema has been recreated.');
+        } catch (Exception $e) {
+            throw new \RuntimeException(sprintf('Failed to drop/create schema: %s', $e->getMessage()), 0, $e);
+        }
+    }
+
 }
