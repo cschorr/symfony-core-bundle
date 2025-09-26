@@ -69,5 +69,12 @@ services:
         tags:
             - { name: 'api_platform.openapi.factory.decorator', priority: 10 }
 
+    # State Processors
+    C3net\CoreBundle\State\UserGroupWriteProcessor:
+        decorates: 'api_platform.doctrine.orm.state.persist_processor'
+        arguments:
+            - '@.inner'
+            - '@doctrine.orm.entity_manager'
+
     # Repository services are handled automatically by Doctrine
     # No need to manually define them as services
