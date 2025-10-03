@@ -21,59 +21,58 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
         $invoicesData = [
             // TXN-2025-0001: PAID - Full invoice, paid
             [
-                'transaction' => 'transaction_0',
+                'transaction' => 'TXN-2025-0001',
                 'invoiceNumber' => 'INV-2025-0001',
                 'type' => InvoiceType::FULL,
-                'paymentStatus' => PaymentStatus::PAID, // FIXED: PaymentStatus not InvoicePaymentStatus
+                'paymentStatus' => PaymentStatus::PAID,
                 'dueDate' => new \DateTimeImmutable('-10 days'),
-                'offer' => 'offer_0',
+                'offer' => 'OFF-2025-0001-V1',
             ],
             // TXN-2025-0002: PAID - Full invoice, paid
             [
-                'transaction' => 'transaction_1',
+                'transaction' => 'TXN-2025-0002',
                 'invoiceNumber' => 'INV-2025-0002',
                 'type' => InvoiceType::FULL,
-                'paymentStatus' => PaymentStatus::PAID, // FIXED: PaymentStatus not InvoicePaymentStatus
+                'paymentStatus' => PaymentStatus::PAID,
                 'dueDate' => new \DateTimeImmutable('-5 days'),
-                'offer' => 'offer_1',
+                'offer' => 'OFF-2025-0002-V1',
             ],
             // TXN-2025-0005: INVOICED - Full invoice, unpaid
             [
-                'transaction' => 'transaction_4',
+                'transaction' => 'TXN-2025-0005',
                 'invoiceNumber' => 'INV-2025-0003',
                 'type' => InvoiceType::FULL,
-                'paymentStatus' => PaymentStatus::UNPAID, // FIXED: PaymentStatus not InvoicePaymentStatus
+                'paymentStatus' => PaymentStatus::UNPAID,
                 'dueDate' => new \DateTimeImmutable('+14 days'),
-                'offer' => 'offer_4',
+                'offer' => 'OFF-2025-0005-V1',
             ],
             // TXN-2025-0009: PAID - Deposit + Final invoices
             [
-                'transaction' => 'transaction_8',
+                'transaction' => 'TXN-2025-0009',
                 'invoiceNumber' => 'INV-2025-0004',
                 'type' => InvoiceType::DEPOSIT,
-                'paymentStatus' => PaymentStatus::PAID, // FIXED: PaymentStatus not InvoicePaymentStatus
+                'paymentStatus' => PaymentStatus::PAID,
                 'dueDate' => new \DateTimeImmutable('-30 days'),
-                'offer' => 'offer_5',
+                'offer' => 'OFF-2025-0009-V1',
                 'depositPercentage' => 30,
             ],
             [
-                'transaction' => 'transaction_8',
+                'transaction' => 'TXN-2025-0009',
                 'invoiceNumber' => 'INV-2025-0005',
                 'type' => InvoiceType::FINAL,
-                'paymentStatus' => PaymentStatus::PAID, // FIXED: PaymentStatus not InvoicePaymentStatus
+                'paymentStatus' => PaymentStatus::PAID,
                 'dueDate' => new \DateTimeImmutable('-7 days'),
-                'offer' => 'offer_5',
+                'offer' => 'OFF-2025-0009-V1',
                 'depositPercentage' => 70,
             ],
         ];
 
         foreach ($invoicesData as $index => $invoiceData) {
-            $transaction = $this->getReference($invoiceData['transaction'], Transaction::class);
-            $offer = $this->getReference($invoiceData['offer'], Offer::class);
+            $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $invoiceData['transaction']]);
+            $offer = $manager->getRepository(Offer::class)->findOneBy(['offerNumber' => $invoiceData['offer']]);
 
             $invoice = (new Invoice())
                 ->setInvoiceNumber($invoiceData['invoiceNumber'])
-                // REMOVED: ->setTitle() - Invoice doesn't have this method
                 ->setInvoiceType($invoiceData['type'])
                 ->setPaymentStatus($invoiceData['paymentStatus'])
                 ->setDueDate($invoiceData['dueDate'])
@@ -83,43 +82,42 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
             $depositPercentage = $invoiceData['depositPercentage'] ?? 100;
 
             if ($invoiceData['type'] === InvoiceType::DEPOSIT) {
-                $subtotal = \bcmul($offer->getSubtotal(), (string)($depositPercentage / 100), 2); // FIXED: Added backslash
+                $subtotal = \bcmul($offer->getSubtotal(), (string)($depositPercentage / 100), 2);
             } elseif ($invoiceData['type'] === InvoiceType::FINAL) {
-                $subtotal = \bcmul($offer->getSubtotal(), (string)($depositPercentage / 100), 2); // FIXED: Added backslash
+                $subtotal = \bcmul($offer->getSubtotal(), (string)($depositPercentage / 100), 2);
             } else {
                 $subtotal = $offer->getSubtotal();
             }
 
             $invoice->setSubtotal($subtotal);
             $invoice->setTaxRate($offer->getTaxRate());
-            $taxAmount = \bcmul($subtotal, \bcdiv($offer->getTaxRate(), '100', 4), 2); // FIXED: Added backslashes
+            $taxAmount = \bcmul($subtotal, \bcdiv($offer->getTaxRate(), '100', 4), 2);
             $invoice->setTaxAmount($taxAmount);
-            $invoice->setTotalAmount(\bcadd($subtotal, $taxAmount, 2)); // FIXED: setTotalAmount() not setTotal(), added backslash
+            $invoice->setTotalAmount(\bcadd($subtotal, $taxAmount, 2));
 
             // Add invoice items matching the offer
             $itemCount = 0;
             $position = 1;
-            foreach ($offer->getItems() as $offerItem) { // FIXED: getItems() not getOfferItems()
+            foreach ($offer->getItems() as $offerItem) {
                 $quantity = $offerItem->getQuantity();
                 $unitPrice = $offerItem->getUnitPrice();
 
                 // Adjust quantity for deposit/final invoices
                 if ($invoiceData['type'] === InvoiceType::DEPOSIT || $invoiceData['type'] === InvoiceType::FINAL) {
-                    $quantity = \bcmul($quantity, (string)($depositPercentage / 100), 2); // FIXED: Added backslash
+                    $quantity = \bcmul($quantity, (string)($depositPercentage / 100), 2);
                 }
 
-                $totalPrice = \bcmul($quantity, $unitPrice, 2); // FIXED: Added backslash
+                $totalPrice = \bcmul($quantity, $unitPrice, 2);
 
                 $invoiceItem = (new InvoiceItem())
                     ->setDescription($offerItem->getDescription())
                     ->setQuantity($quantity)
                     ->setUnitPrice($unitPrice)
-                    ->setUnit($offerItem->getUnit()) // ADDED: setUnit()
-                    ->setTotalPrice($totalPrice) // ADDED: setTotalPrice()
-                    ->setPosition($position++) // ADDED: setPosition()
-                    ->setInvoice($invoice);
+                    ->setUnit($offerItem->getUnit())
+                    ->setTotalPrice($totalPrice)
+                    ->setPosition($position++);
 
-                $manager->persist($invoiceItem);
+                $invoice->addItem($invoiceItem);
                 $itemCount++;
 
                 // Limit items to avoid too many in deposit invoices
@@ -129,7 +127,6 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
             }
 
             $manager->persist($invoice);
-            $this->addReference('invoice_' . $index, $invoice);
         }
 
         $manager->flush();

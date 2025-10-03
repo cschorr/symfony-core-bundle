@@ -19,7 +19,7 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
         $offersData = [
             // TXN-2025-0001: PAID - Should have accepted offer
             [
-                'transaction' => 'transaction_0',
+                'transaction' => 'TXN-2025-0001',
                 'offerNumber' => 'OFF-2025-0001-V1',
                 'status' => OfferStatus::ACCEPTED,
                 'validUntil' => new \DateTimeImmutable('+30 days'),
@@ -32,7 +32,7 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
             ],
             // TXN-2025-0002: PAID - Should have accepted offer
             [
-                'transaction' => 'transaction_1',
+                'transaction' => 'TXN-2025-0002',
                 'offerNumber' => 'OFF-2025-0002-V1',
                 'status' => OfferStatus::ACCEPTED,
                 'validUntil' => new \DateTimeImmutable('+30 days'),
@@ -44,7 +44,7 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
             ],
             // TXN-2025-0003: IN_PRODUCTION - Accepted offer
             [
-                'transaction' => 'transaction_2',
+                'transaction' => 'TXN-2025-0003',
                 'offerNumber' => 'OFF-2025-0003-V1',
                 'status' => OfferStatus::ACCEPTED,
                 'validUntil' => new \DateTimeImmutable('+45 days'),
@@ -55,7 +55,7 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
             ],
             // TXN-2025-0004: DELIVERED - Accepted offer
             [
-                'transaction' => 'transaction_3',
+                'transaction' => 'TXN-2025-0004',
                 'offerNumber' => 'OFF-2025-0004-V1',
                 'status' => OfferStatus::ACCEPTED,
                 'validUntil' => new \DateTimeImmutable('+30 days'),
@@ -66,7 +66,7 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
             ],
             // TXN-2025-0005: INVOICED - Accepted offer
             [
-                'transaction' => 'transaction_4',
+                'transaction' => 'TXN-2025-0005',
                 'offerNumber' => 'OFF-2025-0005-V1',
                 'status' => OfferStatus::ACCEPTED,
                 'validUntil' => new \DateTimeImmutable('+30 days'),
@@ -77,7 +77,7 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
             ],
             // TXN-2025-0009: PAID - Accepted offer with deposit/final invoices
             [
-                'transaction' => 'transaction_8',
+                'transaction' => 'TXN-2025-0009',
                 'offerNumber' => 'OFF-2025-0009-V1',
                 'status' => OfferStatus::ACCEPTED,
                 'validUntil' => new \DateTimeImmutable('+30 days'),
@@ -89,11 +89,10 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
         ];
 
         foreach ($offersData as $index => $offerData) {
-            $transaction = $this->getReference($offerData['transaction'], Transaction::class);
+            $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $offerData['transaction']]);
 
             $offer = (new Offer())
                 ->setOfferNumber($offerData['offerNumber'])
-                // REMOVED: ->setTitle() - Offer doesn't have this method
                 ->setStatus($offerData['status'])
                 ->setValidUntil($offerData['validUntil'])
                 ->setTransaction($transaction);
@@ -102,31 +101,27 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
             $subtotal = '0.00';
             $position = 1;
             foreach ($offerData['items'] as $itemData) {
-                $itemTotal = \bcmul($itemData['quantity'], $itemData['unitPrice'], 2); // FIXED: Added backslash
-                $subtotal = \bcadd($subtotal, $itemTotal, 2); // FIXED: Added backslash
+                $itemTotal = \bcmul($itemData['quantity'], $itemData['unitPrice'], 2);
+                $subtotal = \bcadd($subtotal, $itemTotal, 2);
 
                 $offerItem = (new OfferItem())
                     ->setDescription($itemData['description'])
                     ->setQuantity($itemData['quantity'])
                     ->setUnitPrice($itemData['unitPrice'])
-                    ->setUnit($itemData['unit']) // ADDED: setUnit()
-                    ->setTotalPrice($itemTotal) // ADDED: setTotalPrice()
-                    ->setPosition($position++) // ADDED: setPosition()
-                    ->setOffer($offer);
+                    ->setUnit($itemData['unit'])
+                    ->setTotalPrice($itemTotal)
+                    ->setPosition($position++);
 
-                $manager->persist($offerItem);
+                $offer->addItem($offerItem);
             }
 
             $offer->setSubtotal($subtotal);
             $offer->setTaxRate('19.00'); // Standard VAT
-            $taxAmount = \bcmul($subtotal, '0.19', 2); // FIXED: Added backslash
+            $taxAmount = \bcmul($subtotal, '0.19', 2);
             $offer->setTaxAmount($taxAmount);
-            $offer->setTotalAmount(\bcadd($subtotal, $taxAmount, 2)); // FIXED: setTotalAmount() not setTotal(), added backslash
+            $offer->setTotalAmount(\bcadd($subtotal, $taxAmount, 2));
 
             $manager->persist($offer);
-            $this->addReference('offer_' . $index, $offer);
-
-            // REMOVED: $transaction->setAcceptedOffer() - method doesn't exist
         }
 
         $manager->flush();
