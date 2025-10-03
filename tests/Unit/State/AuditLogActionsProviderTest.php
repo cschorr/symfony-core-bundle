@@ -29,7 +29,7 @@ class AuditLogActionsProviderTest extends TestCase
             ['action' => 'create'],
             ['action' => 'update'],
             ['action' => 'delete'],
-            ['action' => 'view']
+            ['action' => 'view'],
         ];
 
         $expectedResult = ['create', 'update', 'delete', 'view'];
@@ -61,7 +61,7 @@ class AuditLogActionsProviderTest extends TestCase
         $repositoryResult = [
             ['action' => 'create', 'other_field' => 'ignored'],
             ['action' => 'update', 'another_field' => 'also_ignored'],
-            ['action' => 'delete']
+            ['action' => 'delete'],
         ];
 
         $expectedResult = ['create', 'update', 'delete'];
@@ -78,7 +78,7 @@ class AuditLogActionsProviderTest extends TestCase
     public function testProvideHandlesSingleAction(): void
     {
         $repositoryResult = [
-            ['action' => 'create']
+            ['action' => 'create'],
         ];
 
         $expectedResult = ['create'];
@@ -100,7 +100,7 @@ class AuditLogActionsProviderTest extends TestCase
             ['action' => 'export-csv'],
             ['action' => 'import.xlsx'],
             ['action' => 'user:login'],
-            ['action' => 'admin/approve']
+            ['action' => 'admin/approve'],
         ];
 
         $expectedResult = [
@@ -109,7 +109,7 @@ class AuditLogActionsProviderTest extends TestCase
             'export-csv',
             'import.xlsx',
             'user:login',
-            'admin/approve'
+            'admin/approve',
         ];
 
         $this->repository
@@ -130,7 +130,7 @@ class AuditLogActionsProviderTest extends TestCase
             ['action' => 'delete'],
             ['action' => 'list'],
             ['action' => 'show'],
-            ['action' => 'edit']
+            ['action' => 'edit'],
         ];
 
         $expectedResult = ['create', 'read', 'update', 'delete', 'list', 'show', 'edit'];
@@ -174,7 +174,7 @@ class AuditLogActionsProviderTest extends TestCase
         $repositoryResult = [];
         $expectedResult = [];
 
-        for ($i = 1; $i <= 300; $i++) {
+        for ($i = 1; $i <= 300; ++$i) {
             $action = "action_{$i}";
             $repositoryResult[] = ['action' => $action];
             $expectedResult[] = $action;
@@ -196,7 +196,7 @@ class AuditLogActionsProviderTest extends TestCase
         $repositoryResult = [
             ['action' => 'create'],
             ['action' => null], // This should be filtered by repository
-            ['action' => 'update']
+            ['action' => 'update'],
         ];
 
         $expectedResult = ['create', null, 'update'];
@@ -215,7 +215,7 @@ class AuditLogActionsProviderTest extends TestCase
         $repositoryResult = [
             ['action' => 'create'],
             ['action' => ''], // Empty string
-            ['action' => 'update']
+            ['action' => 'update'],
         ];
 
         $expectedResult = ['create', '', 'update'];
@@ -234,7 +234,7 @@ class AuditLogActionsProviderTest extends TestCase
         $repositoryResult = [
             ['action' => 'create'],
             ['action' => 'update'],
-            ['action' => 'delete']
+            ['action' => 'delete'],
         ];
 
         $this->repository
@@ -259,7 +259,7 @@ class AuditLogActionsProviderTest extends TestCase
             ['action' => 'associate'],
             ['action' => 'dissociate'],
             ['action' => 'soft_delete'],
-            ['action' => 'restore']
+            ['action' => 'restore'],
         ];
 
         $expectedResult = [
@@ -269,7 +269,7 @@ class AuditLogActionsProviderTest extends TestCase
             'associate',
             'dissociate',
             'soft_delete',
-            'restore'
+            'restore',
         ];
 
         $this->repository
@@ -289,7 +289,7 @@ class AuditLogActionsProviderTest extends TestCase
             ['action' => 'create'],
             ['action' => 'Create'],
             ['action' => 'UPDATE'],
-            ['action' => 'update']
+            ['action' => 'update'],
         ];
 
         $expectedResult = ['CREATE', 'create', 'Create', 'UPDATE', 'update'];

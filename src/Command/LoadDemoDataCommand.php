@@ -80,6 +80,7 @@ class LoadDemoDataCommand extends Command
 
                 if (!$helper->ask($input, $output, $question)) {
                     $io->note('Operation cancelled.');
+
                     return Command::SUCCESS;
                 }
             }
@@ -97,6 +98,7 @@ class LoadDemoDataCommand extends Command
 
             if (!$helper->ask($input, $output, $question)) {
                 $io->note('Operation cancelled.');
+
                 return Command::SUCCESS;
             }
         }
@@ -109,7 +111,6 @@ class LoadDemoDataCommand extends Command
                 $io->section('Purging existing data...');
                 $this->purgeData($io);
             }
-
 
             $io->section('Loading demo data...');
 
@@ -126,18 +127,18 @@ class LoadDemoDataCommand extends Command
                 $fixtures->load($this->entityManager);
             } catch (\Exception $e) {
                 // Check if this is a Mercure-related error that we can safely ignore during fixture loading
-                if (str_contains($e->getMessage(), 'Failed to send an update') ||
-                    str_contains($e->getMessage(), 'mercure') ||
-                    str_contains($e->getMessage(), 'Mercure')) {
+                if (str_contains($e->getMessage(), 'Failed to send an update')
+                    || str_contains($e->getMessage(), 'mercure')
+                    || str_contains($e->getMessage(), 'Mercure')) {
                     $io->warning([
                         'Mercure update failed during demo data loading.',
                         'This is usually harmless during fixture loading as real-time updates are not critical.',
-                        'Demo data loading will continue...'
+                        'Demo data loading will continue...',
                     ]);
                     if ($io->isVerbose()) {
                         $io->text('Error details: ' . $e->getMessage());
                     }
-                    // Continue with success since Mercure failures during fixture loading are not critical
+                // Continue with success since Mercure failures during fixture loading are not critical
                 } else {
                     // Re-throw non-Mercure related exceptions
                     throw $e;
@@ -244,5 +245,4 @@ class LoadDemoDataCommand extends Command
             throw new \RuntimeException(sprintf('Failed to drop/create schema: %s', $e->getMessage()), 0, $e);
         }
     }
-
 }

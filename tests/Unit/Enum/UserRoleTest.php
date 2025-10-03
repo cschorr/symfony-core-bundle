@@ -69,17 +69,17 @@ class UserRoleTest extends TestCase
     public function testCases(): void
     {
         $cases = UserRole::cases();
-        
+
         $this->assertIsArray($cases);
         $this->assertNotEmpty($cases);
-        
+
         // Test that all cases are UserRole instances
         foreach ($cases as $case) {
             $this->assertInstanceOf(UserRole::class, $case);
         }
-        
+
         // Test specific cases are present
-        $caseValues = array_map(fn(UserRole $role) => $role->value, $cases);
+        $caseValues = array_map(fn (UserRole $role) => $role->value, $cases);
         $this->assertContains('ROLE_USER', $caseValues);
         $this->assertContains('ROLE_ADMIN', $caseValues);
         $this->assertContains('ROLE_MANAGER', $caseValues);
@@ -89,15 +89,15 @@ class UserRoleTest extends TestCase
     public function testValuesMethod(): void
     {
         $values = UserRole::values();
-        
+
         $this->assertIsArray($values);
         $this->assertNotEmpty($values);
-        
+
         // Test that all values are strings
         foreach ($values as $value) {
             $this->assertIsString($value);
         }
-        
+
         // Test specific values are present
         $this->assertContains('ROLE_USER', $values);
         $this->assertContains('ROLE_ADMIN', $values);
@@ -118,9 +118,9 @@ class UserRoleTest extends TestCase
     {
         $cases = UserRole::cases();
         $values = UserRole::values();
-        
+
         $this->assertCount(count($cases), $values);
-        
+
         foreach ($cases as $case) {
             $this->assertContains($case->value, $values);
         }
@@ -132,9 +132,9 @@ class UserRoleTest extends TestCase
         $adminRoles = [
             UserRole::ROLE_SUPER_ADMIN,
             UserRole::ROLE_ADMIN,
-            UserRole::ROLE_ALLOWED_TO_SWITCH
+            UserRole::ROLE_ALLOWED_TO_SWITCH,
         ];
-        
+
         foreach ($adminRoles as $role) {
             $this->assertInstanceOf(UserRole::class, $role);
         }
@@ -151,9 +151,9 @@ class UserRoleTest extends TestCase
             UserRole::ROLE_PROJECT_MANAGEMENT,
             UserRole::ROLE_EDITOR,
             UserRole::ROLE_EXTERNAL,
-            UserRole::ROLE_CONTENT_CREATOR
+            UserRole::ROLE_CONTENT_CREATOR,
         ];
-        
+
         foreach ($businessRoles as $role) {
             $this->assertInstanceOf(UserRole::class, $role);
             $this->assertStringStartsWith('ROLE_', $role->value);
@@ -179,7 +179,7 @@ class UserRoleTest extends TestCase
     {
         $values = UserRole::values();
         $uniqueValues = array_unique($values);
-        
+
         $this->assertCount(count($uniqueValues), $values, 'All role values should be unique');
     }
 
@@ -187,7 +187,7 @@ class UserRoleTest extends TestCase
     {
         $expectedRoles = [
             'ROLE_USER',
-            'ROLE_ADMIN', 
+            'ROLE_ADMIN',
             'ROLE_MODERATOR',
             'ROLE_SUPER_ADMIN',
             'ROLE_ALLOWED_TO_SWITCH',
@@ -198,20 +198,20 @@ class UserRoleTest extends TestCase
             'ROLE_PROJECT_MANAGEMENT',
             'ROLE_EDITOR',
             'ROLE_EXTERNAL',
-            'ROLE_CONTENT_CREATOR'
+            'ROLE_CONTENT_CREATOR',
         ];
-        
+
         $this->assertCount(count($expectedRoles), UserRole::cases());
     }
 
     public function testEnumSerialization(): void
     {
         $role = UserRole::ROLE_ADMIN;
-        
+
         // Test JSON serialization
         $json = json_encode($role);
         $this->assertSame('"ROLE_ADMIN"', $json);
-        
+
         // Test string casting
         $this->assertSame('ROLE_ADMIN', (string) $role->value);
     }
@@ -221,7 +221,7 @@ class UserRoleTest extends TestCase
         $role1 = UserRole::ROLE_ADMIN;
         $role2 = UserRole::ROLE_ADMIN;
         $role3 = UserRole::ROLE_USER;
-        
+
         $this->assertSame($role1, $role2);
         $this->assertNotSame($role1, $role3);
         $this->assertTrue($role1 === $role2);
@@ -231,10 +231,10 @@ class UserRoleTest extends TestCase
     public function testMethodReturnTypes(): void
     {
         $values = UserRole::values();
-        
+
         // Test return type annotation
         $this->assertIsArray($values);
-        
+
         // Verify it returns list<string> as documented
         $this->assertTrue(array_is_list($values));
         foreach ($values as $value) {

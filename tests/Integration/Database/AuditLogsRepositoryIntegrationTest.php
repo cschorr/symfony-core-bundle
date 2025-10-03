@@ -40,7 +40,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
         $authors = $this->auditLogsRepository->findUniqueAuthors();
 
         $this->assertCount(3, $authors); // Should be unique authors
-        
+
         $authorIds = array_column($authors, 'author_id');
         $this->assertContains($user1->getId(), $authorIds);
         $this->assertContains($user2->getId(), $authorIds);
@@ -72,7 +72,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
 
         $resourceNames = array_column($resources, 'resource');
         $uniqueResources = array_unique($resourceNames);
-        
+
         $this->assertCount(count($uniqueResources), $resources); // Should be unique
         $this->assertContains('User', $resourceNames);
         $this->assertContains('Project', $resourceNames);
@@ -95,7 +95,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
 
         $actionNames = array_column($actions, 'action');
         $uniqueActions = array_unique($actionNames);
-        
+
         $this->assertCount(count($uniqueActions), $actions); // Should be unique
         $this->assertContains('create', $actionNames);
         $this->assertContains('update', $actionNames);
@@ -137,7 +137,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
 
         // Create multiple logs with known order
         $logs = [];
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $logs[] = $this->createTestAuditLog($user, 'User', "action_{$i}");
             usleep(1000); // Ensure different microsecond timestamps
         }
@@ -171,8 +171,8 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
             'user_agent' => 'Mozilla/5.0...',
             'nested' => [
                 'key1' => 'value1',
-                'key2' => ['nested_array' => [1, 2, 3]]
-            ]
+                'key2' => ['nested_array' => [1, 2, 3]],
+            ],
         ];
 
         $complexData = [
@@ -181,14 +181,14 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
             'field3' => true,
             'complex_object' => [
                 'property1' => 'prop_value',
-                'property2' => ['array', 'of', 'strings']
-            ]
+                'property2' => ['array', 'of', 'strings'],
+            ],
         ];
 
         $previousData = [
             'field1' => 'old_value1',
             'field2' => 24,
-            'field3' => false
+            'field3' => false,
         ];
 
         $auditLog = $this->createTestAuditLog($user, 'User', 'update');
@@ -208,7 +208,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
         $this->assertSame($previousData, $retrievedLog->getPreviousData());
 
         // Test querying by JSON fields (if supported by database)
-        if ($this->entityManager->getConnection()->getDatabasePlatform()->getName() !== 'sqlite') {
+        if ('sqlite' !== $this->entityManager->getConnection()->getDatabasePlatform()->getName()) {
             $qb = $this->auditLogsRepository->createQueryBuilder('al');
             $qb->where("JSON_EXTRACT(al.meta, '$.request_id') = :requestId")
                ->setParameter('requestId', 'req-123');
@@ -225,21 +225,21 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
 
         // Create a reasonable number of audit logs for performance testing
         $batchSize = 100;
-        for ($i = 0; $i < $batchSize; $i++) {
+        for ($i = 0; $i < $batchSize; ++$i) {
             $this->createTestAuditLog($user, 'PerformanceTest', "action_{$i}");
-            
+
             // Flush periodically to avoid memory issues
-            if ($i % 20 === 0) {
+            if (0 === $i % 20) {
                 $this->entityManager->flush();
             }
         }
         $this->entityManager->flush();
 
         $startTime = microtime(true);
-        
+
         // Test performance of unique authors query
         $authors = $this->auditLogsRepository->findUniqueAuthors();
-        
+
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
 
@@ -247,10 +247,10 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
         $this->assertGreaterThanOrEqual(1, count($authors));
 
         $startTime = microtime(true);
-        
+
         // Test performance of unique resources query
         $resources = $this->auditLogsRepository->findUniqueResources();
-        
+
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
 
@@ -298,7 +298,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
 
         // Test that unique methods return properly formatted data
         $authors = $this->auditLogsRepository->findUniqueAuthors();
-        
+
         foreach ($authors as $author) {
             $this->assertIsArray($author);
             $this->assertArrayHasKey('author_id', $author);
@@ -309,7 +309,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
         }
 
         $resources = $this->auditLogsRepository->findUniqueResources();
-        
+
         foreach ($resources as $resource) {
             $this->assertIsArray($resource);
             $this->assertArrayHasKey('resource', $resource);
@@ -317,7 +317,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
         }
 
         $actions = $this->auditLogsRepository->findUniqueActions();
-        
+
         foreach ($actions as $action) {
             $this->assertIsArray($action);
             $this->assertArrayHasKey('action', $action);
@@ -360,7 +360,7 @@ class AuditLogsRepositoryIntegrationTest extends KernelTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         // Clean up test data
         $this->entityManager->getConnection()->executeStatement('DELETE FROM audit_logs WHERE resource IN ("User", "Project", "Company", "Category", "PerformanceTest", "TestResource")');
         $this->entityManager->getConnection()->executeStatement('DELETE FROM user WHERE email LIKE "%@test.com"');

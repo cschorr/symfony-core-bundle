@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use C3net\CoreBundle\Entity\Category;
+use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Entity\UserGroup;
-use C3net\CoreBundle\Entity\Company;
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Enum\UserRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Functional tests for complete user management workflows
+ * Functional tests for complete user management workflows.
  */
 class UserWorkflowTest extends ApiTestCase
 {
@@ -41,7 +41,7 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'lifecycle@workflow.test',
@@ -52,8 +52,8 @@ class UserWorkflowTest extends ApiTestCase
                 'roles' => [UserRole::ROLE_EDITOR->value],
                 'company' => '/api/companies/' . $company->getId(),
                 'category' => '/api/categories/' . $category->getId(),
-                'userGroups' => ['/api/user_groups/' . $userGroup->getId()]
-            ]
+                'userGroups' => ['/api/user_groups/' . $userGroup->getId()],
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(201);
@@ -72,17 +72,17 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('PATCH', '/api/users/' . $userId, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/merge-patch+json'
+                'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
                 'nameFirst' => 'John Updated',
                 'notes' => 'Updated during lifecycle test',
-                'roles' => [UserRole::ROLE_EDITOR->value, UserRole::ROLE_MANAGER->value]
-            ]
+                'roles' => [UserRole::ROLE_EDITOR->value, UserRole::ROLE_MANAGER->value],
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
-        
+
         // Verify update
         $this->entityManager->refresh($createdUser);
         $this->assertSame('John Updated', $createdUser->getNameFirst());
@@ -92,14 +92,14 @@ class UserWorkflowTest extends ApiTestCase
         // 5. Test user authentication (login simulation)
         $newUserToken = $this->getAuthToken($createdUser);
         $response = static::createClient()->request('GET', '/api/users/' . $userId, [
-            'headers' => ['Authorization' => 'Bearer ' . $newUserToken]
+            'headers' => ['Authorization' => 'Bearer ' . $newUserToken],
         ]);
 
         $this->assertResponseIsSuccessful();
 
         // 6. Test user accessing their own data
         $response = static::createClient()->request('GET', '/api/users/me', [
-            'headers' => ['Authorization' => 'Bearer ' . $newUserToken]
+            'headers' => ['Authorization' => 'Bearer ' . $newUserToken],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -110,40 +110,40 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('PATCH', '/api/users/' . $userId, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/merge-patch+json'
+                'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
-                'active' => false
-            ]
+                'active' => false,
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
-        
+
         // Verify deactivation
         $this->entityManager->refresh($createdUser);
         $this->assertFalse($createdUser->isActive());
 
         // 8. Test that deactivated user cannot authenticate
         $response = static::createClient()->request('GET', '/api/users/me', [
-            'headers' => ['Authorization' => 'Bearer ' . $newUserToken]
+            'headers' => ['Authorization' => 'Bearer ' . $newUserToken],
         ]);
 
         $this->assertResponseStatusCodeSame(401); // Should be unauthorized
 
         // 9. Soft delete user
         $response = static::createClient()->request('DELETE', '/api/users/' . $userId, [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseStatusCodeSame(204);
-        
+
         // Verify soft delete
         $this->entityManager->refresh($createdUser);
         $this->assertNotNull($createdUser->getDeletedAt());
 
         // 10. Verify deleted user is not accessible
         $response = static::createClient()->request('GET', '/api/users/' . $userId, [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseStatusCodeSame(404);
@@ -162,7 +162,7 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'groupmember@workflow.test',
@@ -170,8 +170,8 @@ class UserWorkflowTest extends ApiTestCase
                 'nameLast' => 'Member',
                 'password' => 'password123',
                 'active' => true,
-                'userGroups' => ['/api/user_groups/' . $editorGroup->getId()]
-            ]
+                'userGroups' => ['/api/user_groups/' . $editorGroup->getId()],
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(201);
@@ -186,23 +186,23 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('PATCH', '/api/users/' . $userId, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/merge-patch+json'
+                'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
                 'userGroups' => [
                     '/api/user_groups/' . $editorGroup->getId(),
-                    '/api/user_groups/' . $managerGroup->getId()
-                ]
-            ]
+                    '/api/user_groups/' . $managerGroup->getId(),
+                ],
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
-        
+
         // Verify multiple group membership
         $this->entityManager->refresh($user);
         $this->assertCount(2, $user->getUserGroups());
-        
-        $groupNames = $user->getUserGroups()->map(fn($group) => $group->getName())->toArray();
+
+        $groupNames = $user->getUserGroups()->map(fn ($group) => $group->getName())->toArray();
         $this->assertContains('Editors', $groupNames);
         $this->assertContains('Managers', $groupNames);
 
@@ -210,15 +210,15 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('PATCH', '/api/users/' . $userId, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/merge-patch+json'
+                'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
-                'userGroups' => ['/api/user_groups/' . $managerGroup->getId()]
-            ]
+                'userGroups' => ['/api/user_groups/' . $managerGroup->getId()],
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
-        
+
         // Verify group removal
         $this->entityManager->refresh($user);
         $this->assertCount(1, $user->getUserGroups());
@@ -234,7 +234,7 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'escalation@workflow.test',
@@ -242,8 +242,8 @@ class UserWorkflowTest extends ApiTestCase
                 'nameLast' => 'Test',
                 'password' => 'password123',
                 'active' => true,
-                'roles' => [UserRole::ROLE_USER->value]
-            ]
+                'roles' => [UserRole::ROLE_USER->value],
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(201);
@@ -257,12 +257,12 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $userToken,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'unauthorized@workflow.test',
-                'password' => 'password123'
-            ]
+                'password' => 'password123',
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(403);
@@ -271,11 +271,11 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('PATCH', '/api/users/' . $userId, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/merge-patch+json'
+                'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
-                'roles' => [UserRole::ROLE_EDITOR->value]
-            ]
+                'roles' => [UserRole::ROLE_EDITOR->value],
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -288,12 +288,12 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $editorToken,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'stillunauthorized@workflow.test',
-                'password' => 'password123'
-            ]
+                'password' => 'password123',
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(403);
@@ -302,11 +302,11 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('PATCH', '/api/users/' . $userId, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/merge-patch+json'
+                'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
-                'roles' => [UserRole::ROLE_ADMIN->value]
-            ]
+                'roles' => [UserRole::ROLE_ADMIN->value],
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -319,15 +319,15 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $adminToken,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'nowauthorized@workflow.test',
                 'nameFirst' => 'Now',
                 'nameLast' => 'Authorized',
                 'password' => 'password123',
-                'active' => true
-            ]
+                'active' => true,
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(201);
@@ -343,14 +343,14 @@ class UserWorkflowTest extends ApiTestCase
         $userIds = [];
 
         // Create multiple users
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 5; ++$i) {
             $email = "bulkuser{$i}@workflow.test";
             $userEmails[] = $email;
 
             $response = static::createClient()->request('POST', '/api/users', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
+                    'Content-Type' => 'application/ld+json',
                 ],
                 'json' => [
                     'email' => $email,
@@ -359,8 +359,8 @@ class UserWorkflowTest extends ApiTestCase
                     'password' => 'password123',
                     'active' => true,
                     'roles' => [UserRole::ROLE_USER->value],
-                    'company' => '/api/companies/' . $company->getId()
-                ]
+                    'company' => '/api/companies/' . $company->getId(),
+                ],
             ]);
 
             $this->assertResponseStatusCodeSame(201);
@@ -370,7 +370,7 @@ class UserWorkflowTest extends ApiTestCase
 
         // Verify all users were created
         $response = static::createClient()->request('GET', '/api/users?company=' . $company->getId(), [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -382,11 +382,11 @@ class UserWorkflowTest extends ApiTestCase
             $response = static::createClient()->request('PATCH', '/api/users/' . $userId, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/merge-patch+json'
+                    'Content-Type' => 'application/merge-patch+json',
                 ],
                 'json' => [
-                    'roles' => [UserRole::ROLE_EDITOR->value]
-                ]
+                    'roles' => [UserRole::ROLE_EDITOR->value],
+                ],
             ]);
 
             $this->assertResponseIsSuccessful();
@@ -403,11 +403,11 @@ class UserWorkflowTest extends ApiTestCase
             $response = static::createClient()->request('PATCH', '/api/users/' . $userId, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/merge-patch+json'
+                    'Content-Type' => 'application/merge-patch+json',
                 ],
                 'json' => [
-                    'active' => false
-                ]
+                    'active' => false,
+                ],
             ]);
 
             $this->assertResponseIsSuccessful();
@@ -415,7 +415,7 @@ class UserWorkflowTest extends ApiTestCase
 
         // Verify bulk deactivation
         $response = static::createClient()->request('GET', '/api/users?active=false&company=' . $company->getId(), [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -432,8 +432,8 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/userinfo', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/json'
-            ]
+                'Content-Type' => 'application/json',
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -457,15 +457,15 @@ class UserWorkflowTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/userinfo', [
             'headers' => [
                 'Authorization' => 'Bearer invalid-token',
-                'Content-Type' => 'application/json'
-            ]
+                'Content-Type' => 'application/json',
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(401);
 
         // Test without authorization header
         $response = static::createClient()->request('POST', '/api/userinfo', [
-            'headers' => ['Content-Type' => 'application/json']
+            'headers' => ['Content-Type' => 'application/json'],
         ]);
 
         $this->assertResponseStatusCodeSame(400);
@@ -541,7 +541,7 @@ class UserWorkflowTest extends ApiTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         // Clean up test data
         $this->entityManager->getConnection()->executeStatement('DELETE FROM user WHERE email LIKE "%@workflow.test"');
         $this->entityManager->getConnection()->executeStatement('DELETE FROM company WHERE name = "Test Company"');

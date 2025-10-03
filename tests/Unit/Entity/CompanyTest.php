@@ -23,11 +23,11 @@ class CompanyTest extends TestCase
     public function testConstructor(): void
     {
         $company = new Company();
-        
+
         // Test that collections are initialized
         $this->assertCount(0, $company->getProjects());
         $this->assertCount(0, $company->getEmployees());
-        
+
         // Test inherited AbstractEntity properties
         $this->assertNotNull($company->getCreatedAt());
         $this->assertNotNull($company->getUpdatedAt());
@@ -43,18 +43,18 @@ class CompanyTest extends TestCase
     public function testNameTrait(): void
     {
         $name = 'Acme Corporation';
-        
+
         $this->company->setName($name);
-        
+
         $this->assertSame($name, $this->company->getName());
     }
 
     public function testNameExtensionTrait(): void
     {
         $nameExtension = 'LLC';
-        
+
         $this->company->setNameExtension($nameExtension);
-        
+
         $this->assertSame($nameExtension, $this->company->getNameExtension());
     }
 
@@ -63,11 +63,11 @@ class CompanyTest extends TestCase
         $email = 'contact@acme.com';
         $phone = '+1-555-123-4567';
         $website = 'https://acme.com';
-        
+
         $this->company->setCommunicationEmail($email);
         $this->company->setCommunicationPhone($phone);
         $this->company->setCommunicationWebsite($website);
-        
+
         $this->assertSame($email, $this->company->getCommunicationEmail());
         $this->assertSame($phone, $this->company->getCommunicationPhone());
         $this->assertSame($website, $this->company->getCommunicationWebsite());
@@ -79,12 +79,12 @@ class CompanyTest extends TestCase
         $city = 'New York';
         $zipCode = '10001';
         $country = 'USA';
-        
+
         $this->company->setAddressStreet($street);
         $this->company->setAddressCity($city);
         $this->company->setAddressZipCode($zipCode);
         $this->company->setAddressCountry($country);
-        
+
         $this->assertSame($street, $this->company->getAddressStreet());
         $this->assertSame($city, $this->company->getAddressCity());
         $this->assertSame($zipCode, $this->company->getAddressZipCode());
@@ -94,31 +94,31 @@ class CompanyTest extends TestCase
     public function testCompanyGroupRelationship(): void
     {
         $this->assertNull($this->company->getCompanyGroup());
-        
+
         $companyGroup = new CompanyGroup();
         $this->company->setCompanyGroup($companyGroup);
-        
+
         $this->assertSame($companyGroup, $this->company->getCompanyGroup());
     }
 
     public function testCategoryRelationship(): void
     {
         $this->assertNull($this->company->getCategory());
-        
+
         $category = new Category();
         $this->company->setCategory($category);
-        
+
         $this->assertSame($category, $this->company->getCategory());
     }
 
     public function testImagePathProperty(): void
     {
         $this->assertNull($this->company->getImagePath());
-        
+
         // Test with simple path
         $imagePath = 'uploads/company-logo.jpg';
         $this->company->setImagePath($imagePath);
-        
+
         // Note: getImagePath() builds full URL, but we're testing the setter
         $this->assertStringContainsString($imagePath, $this->company->getImagePath());
     }
@@ -127,7 +127,7 @@ class CompanyTest extends TestCase
     {
         $this->company->setImagePath('test.jpg');
         $this->company->setImagePath(null);
-        
+
         $this->assertNull($this->company->getImagePath());
     }
 
@@ -135,20 +135,20 @@ class CompanyTest extends TestCase
     {
         $project1 = new Project();
         $project2 = new Project();
-        
+
         // Add projects
         $this->company->addProject($project1);
         $this->company->addProject($project2);
-        
+
         $this->assertCount(2, $this->company->getProjects());
         $this->assertTrue($this->company->getProjects()->contains($project1));
         $this->assertTrue($this->company->getProjects()->contains($project2));
         $this->assertSame($this->company, $project1->getClient());
         $this->assertSame($this->company, $project2->getClient());
-        
+
         // Remove project
         $this->company->removeProject($project1);
-        
+
         $this->assertCount(1, $this->company->getProjects());
         $this->assertFalse($this->company->getProjects()->contains($project1));
         $this->assertNull($project1->getClient());
@@ -157,10 +157,10 @@ class CompanyTest extends TestCase
     public function testProjectsNoDuplicates(): void
     {
         $project = new Project();
-        
+
         $this->company->addProject($project);
         $this->company->addProject($project); // Add same project again
-        
+
         $this->assertCount(1, $this->company->getProjects());
     }
 
@@ -168,20 +168,20 @@ class CompanyTest extends TestCase
     {
         $employee1 = new User();
         $employee2 = new User();
-        
+
         // Add employees
         $this->company->addEmployee($employee1);
         $this->company->addEmployee($employee2);
-        
+
         $this->assertCount(2, $this->company->getEmployees());
         $this->assertTrue($this->company->getEmployees()->contains($employee1));
         $this->assertTrue($this->company->getEmployees()->contains($employee2));
         $this->assertSame($this->company, $employee1->getCompany());
         $this->assertSame($this->company, $employee2->getCompany());
-        
+
         // Remove employee
         $this->company->removeEmployee($employee1);
-        
+
         $this->assertCount(1, $this->company->getEmployees());
         $this->assertFalse($this->company->getEmployees()->contains($employee1));
         $this->assertNull($employee1->getCompany());
@@ -190,10 +190,10 @@ class CompanyTest extends TestCase
     public function testEmployeesNoDuplicates(): void
     {
         $employee = new User();
-        
+
         $this->company->addEmployee($employee);
         $this->company->addEmployee($employee); // Add same employee again
-        
+
         $this->assertCount(1, $this->company->getEmployees());
     }
 
@@ -201,7 +201,7 @@ class CompanyTest extends TestCase
     {
         $companyName = 'Test Corporation';
         $this->company->setName($companyName);
-        
+
         $this->assertSame($companyName, (string) $this->company);
     }
 
@@ -214,44 +214,44 @@ class CompanyTest extends TestCase
     public function testToStringWithEmptyName(): void
     {
         $this->company->setName('');
-        
+
         $this->assertSame('Unnamed Company', (string) $this->company);
     }
 
     public function testCompleteCompanySetup(): void
     {
         $company = new Company();
-        
+
         // Set basic info
         $company->setName('Complete Test Corp')
                 ->setNameExtension('Inc.');
-        
+
         // Set communication info
         $company->setCommunicationEmail('test@company.com')
                 ->setCommunicationPhone('+1-555-TEST')
                 ->setCommunicationWebsite('https://company.com');
-        
+
         // Set address
         $company->setAddressStreet('123 Business Ave')
                 ->setAddressCity('Business City')
                 ->setAddressZipCode('12345')
                 ->setAddressCountry('USA');
-        
+
         // Set relationships
         $companyGroup = new CompanyGroup();
         $category = new Category();
         $company->setCompanyGroup($companyGroup)
                 ->setCategory($category);
-        
+
         // Set image
         $company->setImagePath('logos/company.png');
-        
+
         // Add employees and projects
         $employee = new User();
         $project = new Project();
         $company->addEmployee($employee)
                 ->addProject($project);
-        
+
         // Verify complete setup
         $this->assertSame('Complete Test Corp', $company->getName());
         $this->assertSame('Inc.', $company->getNameExtension());
@@ -275,17 +275,17 @@ class CompanyTest extends TestCase
         // Mock server variables for URL generation
         $_SERVER['REQUEST_SCHEME'] = 'https';
         $_SERVER['HTTP_HOST'] = 'example.com';
-        
+
         $imagePath = 'uploads/logo.jpg';
         $this->company->setImagePath($imagePath);
-        
+
         $expectedUrl = 'https://example.com/uploads/logo.jpg';
         $this->assertSame($expectedUrl, $this->company->getImagePath());
-        
+
         // Test with leading slash
         $this->company->setImagePath('/uploads/logo.jpg');
         $this->assertSame($expectedUrl, $this->company->getImagePath());
-        
+
         // Clean up
         unset($_SERVER['REQUEST_SCHEME'], $_SERVER['HTTP_HOST']);
     }
@@ -294,18 +294,18 @@ class CompanyTest extends TestCase
     {
         $employee = new User();
         $project = new Project();
-        
+
         // Test bidirectional employee relationship
         $this->company->addEmployee($employee);
         $this->assertSame($this->company, $employee->getCompany());
-        
+
         $this->company->removeEmployee($employee);
         $this->assertNull($employee->getCompany());
-        
+
         // Test bidirectional project relationship
         $this->company->addProject($project);
         $this->assertSame($this->company, $project->getClient());
-        
+
         $this->company->removeProject($project);
         $this->assertNull($project->getClient());
     }
@@ -316,12 +316,12 @@ class CompanyTest extends TestCase
         $this->assertTrue($this->company->isActive());
         $this->company->setActive(false);
         $this->assertFalse($this->company->isActive());
-        
+
         // Test inherited notes
         $notes = 'Important company notes';
         $this->company->setNotes($notes);
         $this->assertSame($notes, $this->company->getNotes());
-        
+
         // Test inherited timestamps
         $this->assertNotNull($this->company->getCreatedAt());
         $this->assertNotNull($this->company->getUpdatedAt());
@@ -331,7 +331,7 @@ class CompanyTest extends TestCase
     {
         $this->company->setName('Acme Corporation');
         $this->company->setNameExtension('LLC');
-        
+
         // While there's no explicit getFullName method, we can test the components
         $fullName = $this->company->getName() . ' ' . $this->company->getNameExtension();
         $this->assertSame('Acme Corporation LLC', $fullName);

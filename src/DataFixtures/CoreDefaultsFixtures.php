@@ -909,7 +909,6 @@ class CoreDefaultsFixtures extends Fixture
                 'parent_key' => 'contact_14', // Lucius Fox
             ],
 
-
             // Additional flat contacts for other companies
             [
                 'firstName' => 'Emma',

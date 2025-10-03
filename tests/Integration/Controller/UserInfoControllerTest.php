@@ -13,7 +13,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Integration test for UserInfoController
- * Tests the actual HTTP endpoint with real dependencies
+ * Tests the actual HTTP endpoint with real dependencies.
  */
 class UserInfoControllerTest extends WebTestCase
 {
@@ -37,7 +37,7 @@ class UserInfoControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -66,11 +66,11 @@ class UserInfoControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('error', $data);
         $this->assertSame('Authorization header with Bearer token required', $data['error']);
@@ -79,15 +79,15 @@ class UserInfoControllerTest extends WebTestCase
     public function testUserInfoWithInvalidAuthorizationHeader(): void
     {
         $client = static::createClient();
-        
+
         // Test without Bearer prefix
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Basic some-token',
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('error', $data);
         $this->assertSame('Authorization header with Bearer token required', $data['error']);
@@ -98,11 +98,11 @@ class UserInfoControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ',
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('error', $data);
         $this->assertSame('Token required', $data['error']);
@@ -113,11 +113,11 @@ class UserInfoControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer invalid-token-12345',
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseStatusCodeSame(401);
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('error', $data);
         $this->assertSame('Invalid token', $data['error']);
@@ -131,11 +131,11 @@ class UserInfoControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $expiredToken,
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseStatusCodeSame(401);
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('error', $data);
         $this->assertSame('Invalid token', $data['error']);
@@ -146,17 +146,17 @@ class UserInfoControllerTest extends WebTestCase
         $user = $this->createTestUser('inactive@test.com');
         $user->setActive(false);
         $this->entityManager->flush();
-        
+
         $token = $this->generateValidToken($user);
 
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseIsSuccessful();
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertFalse($data['isActive']);
         $this->assertSame('inactive@test.com', $data['username']);
@@ -169,7 +169,7 @@ class UserInfoControllerTest extends WebTestCase
             [UserRole::ROLE_EDITOR->value],
             [UserRole::ROLE_MANAGER->value],
             [UserRole::ROLE_ADMIN->value],
-            [UserRole::ROLE_ADMIN->value, UserRole::ROLE_MANAGER->value] // Multiple roles
+            [UserRole::ROLE_ADMIN->value, UserRole::ROLE_MANAGER->value], // Multiple roles
         ];
 
         foreach ($testCases as $index => $roles) {
@@ -179,18 +179,18 @@ class UserInfoControllerTest extends WebTestCase
             $client = static::createClient();
             $client->request('POST', '/api/userinfo', [], [], [
                 'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-                'CONTENT_TYPE' => 'application/json'
+                'CONTENT_TYPE' => 'application/json',
             ]);
 
             $this->assertResponseIsSuccessful();
-            
+
             $data = json_decode($client->getResponse()->getContent(), true);
             $this->assertArrayHasKey('roles', $data);
-            
+
             foreach ($roles as $role) {
                 $this->assertContains($role, $data['roles']);
             }
-            
+
             // All users should have ROLE_USER
             $this->assertContains(UserRole::ROLE_USER->value, $data['roles']);
         }
@@ -202,17 +202,17 @@ class UserInfoControllerTest extends WebTestCase
         $user->setNameFirst('John');
         $user->setNameLast('Doe');
         $this->entityManager->flush();
-        
+
         $token = $this->generateValidToken($user);
 
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseIsSuccessful();
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
 
         // Verify all expected fields are present
@@ -243,17 +243,17 @@ class UserInfoControllerTest extends WebTestCase
         $user->setNameFirst(null);
         $user->setNameLast(null);
         $this->entityManager->flush();
-        
+
         $token = $this->generateValidToken($user);
 
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseIsSuccessful();
-        
+
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertNull($data['firstName']);
         $this->assertNull($data['lastName']);
@@ -269,14 +269,14 @@ class UserInfoControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('POST', '/api/userinfo', [], [], [
             'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-            'CONTENT_TYPE' => 'application/json'
+            'CONTENT_TYPE' => 'application/json',
         ]);
 
         $this->assertResponseIsSuccessful();
-        
+
         // Check if deprecation warning is present in headers
         $response = $client->getResponse();
-        
+
         // This would depend on how deprecation warnings are implemented
         // For now, just verify the endpoint still works
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
@@ -288,22 +288,22 @@ class UserInfoControllerTest extends WebTestCase
         $token = $this->generateValidToken($user);
 
         $client = static::createClient();
-        
+
         $startTime = microtime(true);
-        
+
         // Make multiple requests to test performance
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $client->request('POST', '/api/userinfo', [], [], [
                 'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-                'CONTENT_TYPE' => 'application/json'
+                'CONTENT_TYPE' => 'application/json',
             ]);
-            
+
             $this->assertResponseIsSuccessful();
         }
-        
+
         $endTime = microtime(true);
         $totalTime = $endTime - $startTime;
-        
+
         // Should complete 10 requests in reasonable time
         $this->assertLessThan(5.0, $totalTime, 'UserInfo endpoint should handle 10 requests within 5 seconds');
     }
@@ -312,25 +312,25 @@ class UserInfoControllerTest extends WebTestCase
     {
         $users = [];
         $tokens = [];
-        
+
         // Create multiple users and tokens
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $user = $this->createTestUser("concurrent{$i}@test.com");
             $users[] = $user;
             $tokens[] = $this->generateValidToken($user);
         }
 
         $client = static::createClient();
-        
+
         // Make concurrent-like requests (simulated by rapid sequential requests)
         foreach ($tokens as $index => $token) {
             $client->request('POST', '/api/userinfo', [], [], [
                 'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-                'CONTENT_TYPE' => 'application/json'
+                'CONTENT_TYPE' => 'application/json',
             ]);
-            
+
             $this->assertResponseIsSuccessful();
-            
+
             $data = json_decode($client->getResponse()->getContent(), true);
             $this->assertSame($users[$index]->getId(), $data['id']);
             $this->assertSame("concurrent{$index}@test.com", $data['username']);
@@ -369,7 +369,7 @@ class UserInfoControllerTest extends WebTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         // Clean up test data
         $this->entityManager->getConnection()->executeStatement('DELETE FROM user WHERE email LIKE "%@test.com"');
     }

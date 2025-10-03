@@ -11,7 +11,7 @@ use C3net\CoreBundle\Repository\AuditLogsRepository;
 class AuditLogFiltersProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly AuditLogsRepository $auditLogsRepository
+        private readonly AuditLogsRepository $auditLogsRepository,
     ) {
     }
 
@@ -35,8 +35,8 @@ class AuditLogFiltersProvider implements ProviderInterface
         }, $authors);
 
         // Extract resources and actions
-        $resourceList = array_map(fn($item) => $item['resource'], $resources);
-        $actionList = array_map(fn($item) => $item['action'], $actions);
+        $resourceList = array_map(fn ($item) => $item['resource'], $resources);
+        $actionList = array_map(fn ($item) => $item['action'], $actions);
 
         return [
             'authors' => $formattedAuthors,

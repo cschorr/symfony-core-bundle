@@ -54,11 +54,11 @@ class ProjectStatusTest extends TestCase
     public function testCases(): void
     {
         $cases = ProjectStatus::cases();
-        
+
         $this->assertCount(5, $cases);
         $this->assertContainsOnlyInstancesOf(ProjectStatus::class, $cases);
-        
-        $values = array_map(fn(ProjectStatus $status) => $status->value, $cases);
+
+        $values = array_map(fn (ProjectStatus $status) => $status->value, $cases);
         $this->assertContains('planning', $values);
         $this->assertContains('in_progress', $values);
         $this->assertContains('on_hold', $values);
@@ -88,7 +88,7 @@ class ProjectStatusTest extends TestCase
     {
         foreach (ProjectStatus::cases() as $status) {
             $label = $status->getLabel();
-            
+
             $this->assertIsString($label);
             $this->assertNotEmpty($label);
             $this->assertMatchesRegularExpression('/^[A-Z][a-z\s]*$/', $label, "Label '{$label}' should be properly formatted");
@@ -98,10 +98,10 @@ class ProjectStatusTest extends TestCase
     public function testBadgeClassesAreValidBootstrapClasses(): void
     {
         $validClasses = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
-        
+
         foreach (ProjectStatus::cases() as $status) {
             $badgeClass = $status->getBadgeClass();
-            
+
             $this->assertIsString($badgeClass);
             $this->assertContains($badgeClass, $validClasses, "Badge class '{$badgeClass}' should be a valid Bootstrap class");
         }
@@ -113,19 +113,19 @@ class ProjectStatusTest extends TestCase
         $progressiveStatuses = [
             ProjectStatus::PLANNING,
             ProjectStatus::IN_PROGRESS,
-            ProjectStatus::COMPLETED
+            ProjectStatus::COMPLETED,
         ];
-        
+
         foreach ($progressiveStatuses as $status) {
             $this->assertInstanceOf(ProjectStatus::class, $status);
         }
-        
+
         // Test alternative statuses
         $alternativeStatuses = [
             ProjectStatus::ON_HOLD,
-            ProjectStatus::CANCELLED
+            ProjectStatus::CANCELLED,
         ];
-        
+
         foreach ($alternativeStatuses as $status) {
             $this->assertInstanceOf(ProjectStatus::class, $status);
         }
@@ -136,7 +136,7 @@ class ProjectStatusTest extends TestCase
         $status1 = ProjectStatus::IN_PROGRESS;
         $status2 = ProjectStatus::IN_PROGRESS;
         $status3 = ProjectStatus::COMPLETED;
-        
+
         $this->assertSame($status1, $status2);
         $this->assertNotSame($status1, $status3);
         $this->assertTrue($status1 === $status2);
@@ -145,28 +145,28 @@ class ProjectStatusTest extends TestCase
 
     public function testAllStatusesHaveUniqueValues(): void
     {
-        $values = array_map(fn(ProjectStatus $status) => $status->value, ProjectStatus::cases());
+        $values = array_map(fn (ProjectStatus $status) => $status->value, ProjectStatus::cases());
         $uniqueValues = array_unique($values);
-        
+
         $this->assertCount(count($uniqueValues), $values, 'All status values should be unique');
     }
 
     public function testAllStatusesHaveUniqueLabels(): void
     {
-        $labels = array_map(fn(ProjectStatus $status) => $status->getLabel(), ProjectStatus::cases());
+        $labels = array_map(fn (ProjectStatus $status) => $status->getLabel(), ProjectStatus::cases());
         $uniqueLabels = array_unique($labels);
-        
+
         $this->assertCount(count($uniqueLabels), $labels, 'All status labels should be unique');
     }
 
     public function testEnumSerialization(): void
     {
         $status = ProjectStatus::IN_PROGRESS;
-        
+
         // Test JSON serialization
         $json = json_encode($status);
         $this->assertSame('"in_progress"', $json);
-        
+
         // Test string value
         $this->assertSame('in_progress', $status->value);
     }
@@ -179,8 +179,8 @@ class ProjectStatusTest extends TestCase
             $this->assertIsString($label);
             $this->assertNotEmpty($label);
         }
-        
-        // Test that getBadgeClass() handles all cases  
+
+        // Test that getBadgeClass() handles all cases
         foreach (ProjectStatus::cases() as $status) {
             $badgeClass = $status->getBadgeClass();
             $this->assertIsString($badgeClass);
@@ -210,7 +210,7 @@ class ProjectStatusTest extends TestCase
     public function testMethodReturnTypes(): void
     {
         $status = ProjectStatus::IN_PROGRESS;
-        
+
         $this->assertIsString($status->getLabel());
         $this->assertIsString($status->getBadgeClass());
         $this->assertIsString($status->value);
@@ -224,9 +224,9 @@ class ProjectStatusTest extends TestCase
             ProjectStatus::IN_PROGRESS => ['In Progress', 'primary'],
             ProjectStatus::ON_HOLD => ['On Hold', 'warning'],
             ProjectStatus::COMPLETED => ['Completed', 'success'],
-            ProjectStatus::CANCELLED => ['Cancelled', 'danger']
+            ProjectStatus::CANCELLED => ['Cancelled', 'danger'],
         ];
-        
+
         foreach ($statuses as $status => [$expectedLabel, $expectedBadgeClass]) {
             $this->assertSame($expectedLabel, $status->getLabel());
             $this->assertSame($expectedBadgeClass, $status->getBadgeClass());

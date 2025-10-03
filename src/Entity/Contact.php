@@ -38,7 +38,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
-        'company' => 'partial',
+        'company' => 'exact',
+        'standin' => 'exact',
     ],
 )]
 class Contact extends AbstractEntity

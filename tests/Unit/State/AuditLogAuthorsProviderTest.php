@@ -31,15 +31,15 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'john@example.com',
                 'firstname' => 'John',
-                'lastname' => 'Doe'
+                'lastname' => 'Doe',
             ],
             [
                 'author_id' => 2,
                 'id' => 2,
                 'email' => 'jane@example.com',
                 'firstname' => 'Jane',
-                'lastname' => 'Smith'
-            ]
+                'lastname' => 'Smith',
+            ],
         ];
 
         $expectedResult = [
@@ -50,7 +50,7 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'email' => 'john@example.com',
                 'firstname' => 'John',
                 'lastname' => 'Doe',
-                'fullname' => 'John Doe'
+                'fullname' => 'John Doe',
             ],
             [
                 '@id' => '/api/users/2',
@@ -59,8 +59,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'email' => 'jane@example.com',
                 'firstname' => 'Jane',
                 'lastname' => 'Smith',
-                'fullname' => 'Jane Smith'
-            ]
+                'fullname' => 'Jane Smith',
+            ],
         ];
 
         $this->repository
@@ -93,8 +93,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'john@example.com',
                 'firstname' => null,
-                'lastname' => 'Doe'
-            ]
+                'lastname' => 'Doe',
+            ],
         ];
 
         $expectedResult = [
@@ -105,8 +105,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'email' => 'john@example.com',
                 'firstname' => null,
                 'lastname' => 'Doe',
-                'fullname' => 'Doe'
-            ]
+                'fullname' => 'Doe',
+            ],
         ];
 
         $this->repository
@@ -127,8 +127,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'john@example.com',
                 'firstname' => 'John',
-                'lastname' => null
-            ]
+                'lastname' => null,
+            ],
         ];
 
         $expectedResult = [
@@ -139,8 +139,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'email' => 'john@example.com',
                 'firstname' => 'John',
                 'lastname' => null,
-                'fullname' => 'John'
-            ]
+                'fullname' => 'John',
+            ],
         ];
 
         $this->repository
@@ -161,8 +161,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'john@example.com',
                 'firstname' => null,
-                'lastname' => null
-            ]
+                'lastname' => null,
+            ],
         ];
 
         $expectedResult = [
@@ -173,8 +173,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'email' => 'john@example.com',
                 'firstname' => null,
                 'lastname' => null,
-                'fullname' => ''
-            ]
+                'fullname' => '',
+            ],
         ];
 
         $this->repository
@@ -195,8 +195,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'john@example.com',
                 'firstname' => '',
-                'lastname' => ''
-            ]
+                'lastname' => '',
+            ],
         ];
 
         $expectedResult = [
@@ -207,8 +207,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'email' => 'john@example.com',
                 'firstname' => '',
                 'lastname' => '',
-                'fullname' => ''
-            ]
+                'fullname' => '',
+            ],
         ];
 
         $this->repository
@@ -229,8 +229,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'id' => 123,
                 'email' => 'test@example.com',
                 'firstname' => 'Test',
-                'lastname' => 'User'
-            ]
+                'lastname' => 'User',
+            ],
         ];
 
         $this->repository
@@ -243,13 +243,13 @@ class AuditLogAuthorsProviderTest extends TestCase
         $this->assertCount(1, $result);
 
         $author = $result[0];
-        
+
         // Check API Platform format
         $this->assertArrayHasKey('@id', $author);
         $this->assertArrayHasKey('@type', $author);
         $this->assertSame('/api/users/123', $author['@id']);
         $this->assertSame('User', $author['@type']);
-        
+
         // Check all expected fields are present
         $this->assertArrayHasKey('id', $author);
         $this->assertArrayHasKey('email', $author);
@@ -290,8 +290,8 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'test@example.com',
                 'firstname' => '  John  ',
-                'lastname' => '  Doe  '
-            ]
+                'lastname' => '  Doe  ',
+            ],
         ];
 
         $this->repository
@@ -310,13 +310,13 @@ class AuditLogAuthorsProviderTest extends TestCase
         $repositoryResult = [];
         $expectedResult = [];
 
-        for ($i = 1; $i <= 1000; $i++) {
+        for ($i = 1; $i <= 1000; ++$i) {
             $repositoryResult[] = [
                 'author_id' => $i,
                 'id' => $i,
                 'email' => "user{$i}@example.com",
                 'firstname' => "First{$i}",
-                'lastname' => "Last{$i}"
+                'lastname' => "Last{$i}",
             ];
 
             $expectedResult[] = [
@@ -326,7 +326,7 @@ class AuditLogAuthorsProviderTest extends TestCase
                 'email' => "user{$i}@example.com",
                 'firstname' => "First{$i}",
                 'lastname' => "Last{$i}",
-                'fullname' => "First{$i} Last{$i}"
+                'fullname' => "First{$i} Last{$i}",
             ];
         }
 

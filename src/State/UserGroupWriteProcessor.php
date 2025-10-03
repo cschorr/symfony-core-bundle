@@ -33,14 +33,14 @@ final readonly class UserGroupWriteProcessor implements ProcessorInterface
     private function processUserRelationships(UserGroup $userGroup): void
     {
         $currentUsers = $userGroup->getUsers();
-        
+
         foreach ($currentUsers as $user) {
             // Ensure the user exists in the EntityManager
             if (!$this->entityManager->contains($user)) {
                 // If the user has an ID, merge it to get the managed entity
-                if ($user->getId() !== null) {
+                if (null !== $user->getId()) {
                     $managedUser = $this->entityManager->find(User::class, $user->getId());
-                    if ($managedUser !== null) {
+                    if (null !== $managedUser) {
                         // Replace the user in the collection with the managed entity
                         $userGroup->removeUser($user);
                         $userGroup->addUser($managedUser);

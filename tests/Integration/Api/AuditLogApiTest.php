@@ -30,7 +30,7 @@ class AuditLogApiTest extends ApiTestCase
         $token = $this->getAuthToken($adminUser);
 
         $response = static::createClient()->request('GET', '/api/audit_logs', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -48,7 +48,7 @@ class AuditLogApiTest extends ApiTestCase
         $token = $this->getAuthToken($adminUser);
 
         $response = static::createClient()->request('GET', '/api/audit_logs/' . $auditLog->getId(), [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -57,7 +57,7 @@ class AuditLogApiTest extends ApiTestCase
             '@type' => 'AuditLogs',
             '@id' => '/api/audit_logs/' . $auditLog->getId(),
             'resource' => 'User',
-            'action' => 'create'
+            'action' => 'create',
         ]);
     }
 
@@ -66,42 +66,42 @@ class AuditLogApiTest extends ApiTestCase
         $adminUser = $this->createTestUser('admin@test.com', [UserRole::ROLE_ADMIN->value]);
         $user1 = $this->createTestUser('user1@test.com');
         $user2 = $this->createTestUser('user2@test.com');
-        
+
         $this->createTestAuditLog($user1, 'User', 'create');
         $this->createTestAuditLog($user2, 'Project', 'update');
         $this->createTestAuditLog($user1, 'Company', 'delete');
-        
+
         $token = $this->getAuthToken($adminUser);
 
         // Filter by resource
         $response = static::createClient()->request('GET', '/api/audit_logs?resource=User', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
         $this->assertGreaterThanOrEqual(1, count($data['hydra:member']));
-        
+
         foreach ($data['hydra:member'] as $item) {
             $this->assertSame('User', $item['resource']);
         }
 
         // Filter by action
         $response = static::createClient()->request('GET', '/api/audit_logs?action=create', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
         $this->assertGreaterThanOrEqual(1, count($data['hydra:member']));
-        
+
         foreach ($data['hydra:member'] as $item) {
             $this->assertSame('create', $item['action']);
         }
 
         // Filter by author
         $response = static::createClient()->request('GET', '/api/audit_logs?author=' . $user1->getId(), [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -115,17 +115,17 @@ class AuditLogApiTest extends ApiTestCase
         $token = $this->getAuthToken($adminUser);
 
         // Create multiple audit logs
-        for ($i = 0; $i < 25; $i++) {
+        for ($i = 0; $i < 25; ++$i) {
             $this->createTestAuditLog($adminUser, 'User', 'test_action_' . $i);
         }
 
         $response = static::createClient()->request('GET', '/api/audit_logs?page=1', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        
+
         $this->assertArrayHasKey('hydra:view', $data);
         $this->assertArrayHasKey('hydra:first', $data['hydra:view']);
         $this->assertArrayHasKey('hydra:totalItems', $data);
@@ -144,12 +144,12 @@ class AuditLogApiTest extends ApiTestCase
 
         // Test ordering by createdAt descending (newest first)
         $response = static::createClient()->request('GET', '/api/audit_logs?order[createdAt]=desc', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        
+
         if (count($data['hydra:member']) >= 2) {
             $firstItem = $data['hydra:member'][0];
             $secondItem = $data['hydra:member'][1];
@@ -167,12 +167,12 @@ class AuditLogApiTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/audit_logs', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'resource' => 'Test',
-                'action' => 'create'
-            ]
+                'action' => 'create',
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(405); // Method Not Allowed
@@ -181,18 +181,18 @@ class AuditLogApiTest extends ApiTestCase
         static::createClient()->request('PUT', '/api/audit_logs/' . $auditLog->getId(), [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
-                'action' => 'updated'
-            ]
+                'action' => 'updated',
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(405);
 
         // Test that DELETE is not allowed
         static::createClient()->request('DELETE', '/api/audit_logs/' . $auditLog->getId(), [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseStatusCodeSame(405);
@@ -203,22 +203,22 @@ class AuditLogApiTest extends ApiTestCase
         $adminUser = $this->createTestUser('admin@test.com', [UserRole::ROLE_ADMIN->value]);
         $user1 = $this->createTestUser('user1@test.com', [], 'John', 'Doe');
         $user2 = $this->createTestUser('user2@test.com', [], 'Jane', 'Smith');
-        
+
         $this->createTestAuditLog($user1);
         $this->createTestAuditLog($user2);
-        
+
         $token = $this->getAuthToken($adminUser);
 
         $response = static::createClient()->request('GET', '/api/audit_log_authors', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        
+
         $this->assertIsArray($data);
         $this->assertGreaterThanOrEqual(2, count($data));
-        
+
         // Check that each author has the expected structure
         foreach ($data as $author) {
             $this->assertArrayHasKey('@id', $author);
@@ -233,20 +233,20 @@ class AuditLogApiTest extends ApiTestCase
     public function testAuditLogResourcesEndpoint(): void
     {
         $adminUser = $this->createTestUser('admin@test.com', [UserRole::ROLE_ADMIN->value]);
-        
+
         $this->createTestAuditLog($adminUser, 'User', 'create');
         $this->createTestAuditLog($adminUser, 'Project', 'update');
         $this->createTestAuditLog($adminUser, 'Company', 'delete');
-        
+
         $token = $this->getAuthToken($adminUser);
 
         $response = static::createClient()->request('GET', '/api/audit_log_resources', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        
+
         $this->assertIsArray($data);
         $this->assertContains('User', $data);
         $this->assertContains('Project', $data);
@@ -256,20 +256,20 @@ class AuditLogApiTest extends ApiTestCase
     public function testAuditLogActionsEndpoint(): void
     {
         $adminUser = $this->createTestUser('admin@test.com', [UserRole::ROLE_ADMIN->value]);
-        
+
         $this->createTestAuditLog($adminUser, 'User', 'create');
         $this->createTestAuditLog($adminUser, 'User', 'update');
         $this->createTestAuditLog($adminUser, 'User', 'delete');
-        
+
         $token = $this->getAuthToken($adminUser);
 
         $response = static::createClient()->request('GET', '/api/audit_log_actions', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        
+
         $this->assertIsArray($data);
         $this->assertContains('create', $data);
         $this->assertContains('update', $data);
@@ -280,28 +280,28 @@ class AuditLogApiTest extends ApiTestCase
     {
         $adminUser = $this->createTestUser('admin@test.com', [UserRole::ROLE_ADMIN->value]);
         $user1 = $this->createTestUser('user1@test.com', [], 'John', 'Doe');
-        
+
         $this->createTestAuditLog($user1, 'User', 'create');
         $this->createTestAuditLog($adminUser, 'Project', 'update');
-        
+
         $token = $this->getAuthToken($adminUser);
 
         $response = static::createClient()->request('GET', '/api/audit_log_filters', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
         $data = $response->toArray();
-        
+
         $this->assertIsArray($data);
         $this->assertArrayHasKey('authors', $data);
         $this->assertArrayHasKey('resources', $data);
         $this->assertArrayHasKey('actions', $data);
-        
+
         $this->assertIsArray($data['authors']);
         $this->assertIsArray($data['resources']);
         $this->assertIsArray($data['actions']);
-        
+
         $this->assertGreaterThanOrEqual(2, count($data['authors']));
         $this->assertContains('User', $data['resources']);
         $this->assertContains('Project', $data['resources']);
@@ -350,7 +350,7 @@ class AuditLogApiTest extends ApiTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         // Clean up test data
         $this->entityManager->getConnection()->executeStatement('DELETE FROM audit_logs WHERE resource IN ("User", "Project", "Company") AND action LIKE "test_action_%"');
         $this->entityManager->getConnection()->executeStatement('DELETE FROM user WHERE email LIKE "%@test.com"');
