@@ -19,25 +19,25 @@ class CampaignFixtures extends Fixture implements DependentFixtureInterface
             [
                 'name' => 'Digital Transformation 2025',
                 'description' => 'Comprehensive digital transformation initiative focusing on modernizing legacy systems and implementing cutting-edge technologies across multiple client organizations.',
-                'category' => 'main1',
-                'projects' => ['project_0', 'project_1', 'project_3', 'project_9', 'project_15'],
+                'category' => 'Technology',
+                'projects' => ['E-Commerce Platform', 'AI Security System', 'Mobile Banking App', 'Scientific Data Analysis', 'Quantum Computing Research'],
             ],
             [
                 'name' => 'Global Marketing Excellence',
                 'description' => 'Multi-company marketing campaign focusing on brand management, digital marketing automation, and content creation strategies for international markets.',
-                'category' => 'main3',
-                'projects' => ['project_11', 'project_13'],
+                'category' => 'Marketing & Sales',
+                'projects' => ['Digital Marketing Campaign', 'Global Distribution Network'],
             ],
             [
                 'name' => 'Enterprise Security & Compliance',
                 'description' => 'Strategic initiative to enhance security infrastructure and ensure regulatory compliance across all client operations.',
-                'category' => 'main2',
-                'projects' => ['project_2', 'project_6', 'project_5'],
+                'category' => 'Business Services',
+                'projects' => ['Automated Defense Network', 'Corporate Security Upgrade', 'Arc Reactor Monitoring'],
             ],
         ];
 
         foreach ($campaignsData as $index => $campaignData) {
-            $category = $this->getReference($campaignData['category'], Category::class);
+            $category = $manager->getRepository(Category::class)->findOneBy(['name' => $campaignData['category']]);
 
             $campaign = (new Campaign())
                 ->setName($campaignData['name'])
@@ -46,15 +46,14 @@ class CampaignFixtures extends Fixture implements DependentFixtureInterface
             ;
 
             // Assign projects to campaign
-            foreach ($campaignData['projects'] as $projectKey) {
-                if ($this->hasReference($projectKey)) {
-                    $project = $this->getReference($projectKey, Project::class);
+            foreach ($campaignData['projects'] as $projectName) {
+                $project = $manager->getRepository(Project::class)->findOneBy(['name' => $projectName]);
+                if ($project) {
                     $campaign->addProject($project);
                 }
             }
 
             $manager->persist($campaign);
-            $this->addReference('campaign_' . $index, $campaign);
         }
 
         $manager->flush();
