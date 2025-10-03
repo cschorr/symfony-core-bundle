@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
+use C3net\CoreBundle\Enum\BillingStatus;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use C3net\CoreBundle\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -90,8 +91,32 @@ class Project extends AbstractEntity
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?Campaign $campaign = null;
 
+    #[ORM\ManyToOne(inversedBy: 'projects')]
+    private ?Transaction $transaction = null;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dueDate = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
+    private ?string $estimatedHours = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
+    private ?string $actualHours = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $estimatedCost = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $actualCost = null;
+
+    #[ORM\Column(type: Types::STRING, length: 32, nullable: true, enumType: BillingStatus::class)]
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'enum' => ['not_billed', 'billed', 'paid'],
+        ]
+    )]
+    private ?BillingStatus $billingStatus = null;
 
     /**
      * @var Collection<int, Contact>
@@ -262,5 +287,93 @@ class Project extends AbstractEntity
         $this->contact->removeElement($contact);
 
         return $this;
+    }
+
+    public function getTransaction(): ?Transaction
+    {
+        return $this->transaction;
+    }
+
+    public function setTransaction(?Transaction $transaction): static
+    {
+        $this->transaction = $transaction;
+
+        return $this;
+    }
+
+    public function getEstimatedHours(): ?string
+    {
+        return $this->estimatedHours;
+    }
+
+    public function setEstimatedHours(?string $estimatedHours): static
+    {
+        $this->estimatedHours = $estimatedHours;
+
+        return $this;
+    }
+
+    public function getActualHours(): ?string
+    {
+        return $this->actualHours;
+    }
+
+    public function setActualHours(?string $actualHours): static
+    {
+        $this->actualHours = $actualHours;
+
+        return $this;
+    }
+
+    public function getEstimatedCost(): ?string
+    {
+        return $this->estimatedCost;
+    }
+
+    public function setEstimatedCost(?string $estimatedCost): static
+    {
+        $this->estimatedCost = $estimatedCost;
+
+        return $this;
+    }
+
+    public function getActualCost(): ?string
+    {
+        return $this->actualCost;
+    }
+
+    public function setActualCost(?string $actualCost): static
+    {
+        $this->actualCost = $actualCost;
+
+        return $this;
+    }
+
+    public function getBillingStatus(): ?BillingStatus
+    {
+        return $this->billingStatus;
+    }
+
+    public function setBillingStatus(?BillingStatus $billingStatus): static
+    {
+        $this->billingStatus = $billingStatus;
+
+        return $this;
+    }
+
+    // Helper methods for billing status
+    public function isNotBilled(): bool
+    {
+        return BillingStatus::NOT_BILLED === $this->billingStatus;
+    }
+
+    public function isBilled(): bool
+    {
+        return BillingStatus::BILLED === $this->billingStatus;
+    }
+
+    public function isBillingPaid(): bool
+    {
+        return BillingStatus::PAID === $this->billingStatus;
     }
 }
