@@ -19,6 +19,7 @@ use C3net\CoreBundle\DataFixtures\UserGroupFixtures;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,7 +37,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class LoadDemoDataCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private EntityManagerInterface $entityManager,
+        private readonly ManagerRegistry $managerRegistry,
         private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
         parent::__construct();
@@ -128,45 +130,55 @@ class LoadDemoDataCommand extends Command
             // Temporarily disable SQL logging to improve performance
             $this->entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
 
-            try {
-                // Load fixtures in dependency order
-                $userGroupRepository = $this->entityManager->getRepository(\C3net\CoreBundle\Entity\UserGroup::class);
+            // Load fixtures in dependency order
+            $fixtures = [
+                new CategoryFixtures(),
+                new UserGroupFixtures(),
+                new CompanyGroupFixtures(),
+                new CompanyFixtures(),
+                new UserFixtures($this->passwordHasher),
+                new ContactFixtures(),
+                new ProjectFixtures(),
+                new CampaignFixtures(),
+                new TransactionFixtures(),
+                new OfferFixtures(),
+                new InvoiceFixtures(),
+                new DocumentFixtures(),
+            ];
 
-                $fixtures = [
-                    new CategoryFixtures(),
-                    new UserGroupFixtures(),
-                    new CompanyGroupFixtures(),
-                    new CompanyFixtures(),
-                    new UserFixtures($this->passwordHasher, $userGroupRepository),
-                    new ContactFixtures(),
-                    new ProjectFixtures(),
-                    new CampaignFixtures(),
-                    new TransactionFixtures(),
-                    new OfferFixtures(),
-                    new InvoiceFixtures(),
-                    new DocumentFixtures(),
-                ];
+            $hasMercureWarning = false;
 
-                foreach ($fixtures as $fixture) {
+            foreach ($fixtures as $fixture) {
+                try {
                     $fixture->load($this->entityManager);
-                }
-            } catch (\Exception $e) {
-                // Check if this is a Mercure-related error that we can safely ignore during fixture loading
-                if (str_contains($e->getMessage(), 'Failed to send an update')
-                    || str_contains($e->getMessage(), 'mercure')
-                    || str_contains($e->getMessage(), 'Mercure')) {
-                    $io->warning([
-                        'Mercure update failed during demo data loading.',
-                        'This is usually harmless during fixture loading as real-time updates are not critical.',
-                        'Demo data loading will continue...',
-                    ]);
-                    if ($io->isVerbose()) {
-                        $io->text('Error details: ' . $e->getMessage());
+                } catch (\Exception $e) {
+                    // Check if this is a Mercure-related error that we can safely ignore during fixture loading
+                    if (str_contains($e->getMessage(), 'Failed to send an update')
+                        || str_contains($e->getMessage(), 'mercure')
+                        || str_contains($e->getMessage(), 'Mercure')
+                        || str_contains($e->getMessage(), 'The EntityManager is closed')) {
+                        if (!$hasMercureWarning) {
+                            $io->warning([
+                                'Mercure update failed during demo data loading.',
+                                'This is usually harmless during fixture loading as real-time updates are not critical.',
+                                'Attempting to continue with fresh EntityManager...',
+                            ]);
+                            if ($io->isVerbose()) {
+                                $io->text('Error details: ' . $e->getMessage());
+                            }
+                            $hasMercureWarning = true;
+                        }
+
+                        // If EntityManager is closed, we need to reset it
+                        if (!$this->entityManager->isOpen()) {
+                            $this->managerRegistry->resetManager();
+                            $this->entityManager = $this->managerRegistry->getManager();
+                        }
+                    // Continue loading next fixture since Mercure failures during fixture loading are not critical
+                    } else {
+                        // Re-throw non-Mercure related exceptions
+                        throw $e;
                     }
-                // Continue with success since Mercure failures during fixture loading are not critical
-                } else {
-                    // Re-throw non-Mercure related exceptions
-                    throw $e;
                 }
             }
 
