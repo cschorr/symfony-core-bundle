@@ -58,14 +58,34 @@ class Project extends AbstractEntity
     )]
     private ProjectStatus $status = ProjectStatus::PLANNING;
 
-    public function getStatus(): ProjectStatus
+    /**
+     * Get status - returns string for workflow compatibility, enum for application code.
+     * The return type allows both for flexibility.
+     */
+    public function getStatus(): ProjectStatus|string
+    {
+        // Return string value for workflow compatibility
+        return $this->status->value;
+    }
+
+    /**
+     * Get status enum for type-safe access.
+     */
+    public function getStatusEnum(): ProjectStatus
     {
         return $this->status;
     }
 
-    public function setStatus(ProjectStatus $status): static
+    /**
+     * Set status from enum or string (for Symfony Workflow).
+     */
+    public function setStatus(ProjectStatus|string $status): static
     {
-        $this->status = $status;
+        if (is_string($status)) {
+            $this->status = ProjectStatus::from($status);
+        } else {
+            $this->status = $status;
+        }
 
         return $this;
     }
