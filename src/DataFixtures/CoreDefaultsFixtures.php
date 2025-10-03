@@ -19,11 +19,13 @@ use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Entity\UserGroup;
 use C3net\CoreBundle\Enum\DocumentType;
-use C3net\CoreBundle\Enum\InvoicePaymentStatus;
+use C3net\CoreBundle\Enum\InvoiceStatus;
 use C3net\CoreBundle\Enum\InvoiceType;
 use C3net\CoreBundle\Enum\OfferStatus;
+use C3net\CoreBundle\Enum\PaymentStatus;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use C3net\CoreBundle\Enum\TransactionStatus;
+use C3net\CoreBundle\Enum\TransactionType;
 use C3net\CoreBundle\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -1631,11 +1633,12 @@ class CoreDefaultsFixtures extends Fixture
         foreach ($transactionsData as $index => $data) {
             $transaction = (new Transaction())
                 ->setTransactionNumber($data['number'])
-                ->setTitle($data['title'])
+                ->setName($data['title'])
                 ->setDescription($data['description'])
+                ->setTransactionType(TransactionType::PROJECT)
                 ->setStatus($data['status'])
                 ->setCustomer($this->companies[$data['customer']])
-                ->setAssignedUser($this->users[$data['assignedUser']])
+                ->setAssignedTo($this->users[$data['assignedUser']])
                 ->setCategory($this->categories[$data['category']])
                 ->setCurrency($data['currency']);
 
