@@ -180,14 +180,34 @@ class Transaction extends AbstractEntity
         return $this;
     }
 
-    public function getStatus(): TransactionStatus
+    /**
+     * Get status - returns string for workflow compatibility, enum for application code
+     * The return type allows both for flexibility.
+     */
+    public function getStatus(): TransactionStatus|string
+    {
+        // Return string value for workflow compatibility
+        return $this->status->value;
+    }
+
+    /**
+     * Get status enum for type-safe access.
+     */
+    public function getStatusEnum(): TransactionStatus
     {
         return $this->status;
     }
 
-    public function setStatus(TransactionStatus $status): static
+    /**
+     * Set status from enum or string (for Symfony Workflow).
+     */
+    public function setStatus(TransactionStatus|string $status): static
     {
-        $this->status = $status;
+        if (is_string($status)) {
+            $this->status = TransactionStatus::from($status);
+        } else {
+            $this->status = $status;
+        }
 
         return $this;
     }
