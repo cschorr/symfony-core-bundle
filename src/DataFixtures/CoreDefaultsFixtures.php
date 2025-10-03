@@ -9,10 +9,21 @@ use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\CompanyGroup;
 use C3net\CoreBundle\Entity\Contact;
+use C3net\CoreBundle\Entity\Document;
+use C3net\CoreBundle\Entity\Invoice;
+use C3net\CoreBundle\Entity\InvoiceItem;
+use C3net\CoreBundle\Entity\Offer;
+use C3net\CoreBundle\Entity\OfferItem;
 use C3net\CoreBundle\Entity\Project;
+use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Entity\UserGroup;
+use C3net\CoreBundle\Enum\DocumentType;
+use C3net\CoreBundle\Enum\InvoicePaymentStatus;
+use C3net\CoreBundle\Enum\InvoiceType;
+use C3net\CoreBundle\Enum\OfferStatus;
 use C3net\CoreBundle\Enum\ProjectStatus;
+use C3net\CoreBundle\Enum\TransactionStatus;
 use C3net\CoreBundle\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -46,6 +57,18 @@ class CoreDefaultsFixtures extends Fixture
     /** @var array<string, Project> */
     private array $projects = [];
 
+    /** @var array<string, Transaction> */
+    private array $transactions = [];
+
+    /** @var array<string, Offer> */
+    private array $offers = [];
+
+    /** @var array<string, Invoice> */
+    private array $invoices = [];
+
+    /** @var array<string, Document> */
+    private array $documents = [];
+
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
         private readonly UserGroupRepository $userGroupRepository,
@@ -63,6 +86,10 @@ class CoreDefaultsFixtures extends Fixture
         $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
         $this->createCampaignFixtures($manager); // Create campaigns after projects
+        $this->createTransactionFixtures($manager); // Create transactions
+        $this->createOfferFixtures($manager); // Create offers for transactions
+        $this->createInvoiceFixtures($manager); // Create invoices for transactions
+        $this->createDocumentFixtures($manager); // Create documents for transactions
     }
 
     private function createCategoryFixtures(ObjectManager $manager): void
@@ -1396,6 +1423,837 @@ class CoreDefaultsFixtures extends Fixture
 
             $manager->persist($campaign);
             $this->campaigns['campaign_' . $index] = $campaign;
+        }
+
+        $manager->flush();
+    }
+
+    private function createTransactionFixtures(ObjectManager $manager): void
+    {
+        $transactionsData = [
+            // Complete workflow: DRAFT -> QUOTED -> ORDERED -> IN_PRODUCTION -> DELIVERED -> INVOICED -> PAID
+            [
+                'number' => 'TXN-2025-0001',
+                'title' => 'E-Commerce Platform Development',
+                'description' => 'Full-stack e-commerce platform with payment gateway integration',
+                'status' => TransactionStatus::PAID,
+                'customer' => 'company_0', // Cyberdyne Systems
+                'contact' => 'contact_0', // John Doe
+                'assignedUser' => 'editor',
+                'category' => 'sub1',
+                'currency' => 'USD',
+                'project' => 'project_0',
+            ],
+            // Complete workflow
+            [
+                'number' => 'TXN-2025-0002',
+                'title' => 'Mobile Banking Application',
+                'description' => 'Secure mobile banking app with biometric authentication',
+                'status' => TransactionStatus::PAID,
+                'customer' => 'company_1', // Stark Industries
+                'contact' => 'contact_6', // Jane Smith
+                'assignedUser' => 'teamlead',
+                'category' => 'sub2',
+                'currency' => 'USD',
+                'project' => 'project_3',
+            ],
+            // In production stage
+            [
+                'number' => 'TXN-2025-0003',
+                'title' => 'Corporate Security Upgrade',
+                'description' => 'Enterprise-wide security system implementation',
+                'status' => TransactionStatus::IN_PRODUCTION,
+                'customer' => 'company_2', // Wayne Enterprises
+                'contact' => 'contact_12', // Alice Johnson
+                'assignedUser' => 'external',
+                'category' => 'main2',
+                'currency' => 'USD',
+                'project' => 'project_6',
+            ],
+            // Delivered, awaiting invoice
+            [
+                'number' => 'TXN-2025-0004',
+                'title' => 'R&D Dashboard System',
+                'description' => 'Real-time analytics and reporting dashboard',
+                'status' => TransactionStatus::DELIVERED,
+                'customer' => 'company_3', // Oscorp
+                'contact' => 'contact_18', // Emma Martinez
+                'assignedUser' => 'demo',
+                'category' => 'sub3',
+                'currency' => 'USD',
+                'project' => 'project_8',
+            ],
+            // Invoiced but not yet paid
+            [
+                'number' => 'TXN-2025-0005',
+                'title' => 'Digital Marketing Campaign',
+                'description' => 'Comprehensive digital marketing strategy',
+                'status' => TransactionStatus::INVOICED,
+                'customer' => 'company_5', // Umbrella Corporation
+                'contact' => null,
+                'assignedUser' => 'manager',
+                'category' => 'sub6',
+                'currency' => 'EUR',
+                'project' => 'project_11',
+            ],
+            // Ordered, starting production
+            [
+                'number' => 'TXN-2025-0006',
+                'title' => 'Mobile Commerce App',
+                'description' => 'Cross-platform mobile commerce application',
+                'status' => TransactionStatus::ORDERED,
+                'customer' => 'company_8', // Parker Industries
+                'contact' => null,
+                'assignedUser' => 'dev1',
+                'category' => 'sub2',
+                'currency' => 'USD',
+                'project' => 'project_16',
+            ],
+            // Quoted, awaiting customer decision
+            [
+                'number' => 'TXN-2025-0007',
+                'title' => 'Financial Analytics Platform',
+                'description' => 'Real-time financial data analytics and reporting',
+                'status' => TransactionStatus::QUOTED,
+                'customer' => 'company_11', // Queen Industries
+                'contact' => null,
+                'assignedUser' => 'consultant1',
+                'category' => 'sub4',
+                'currency' => 'USD',
+                'project' => 'project_21',
+            ],
+            // Draft stage
+            [
+                'number' => 'TXN-2025-0008',
+                'title' => 'Legal Compliance Platform',
+                'description' => 'Multi-jurisdictional legal compliance management',
+                'status' => TransactionStatus::DRAFT,
+                'customer' => 'company_15', // Seegson Corporation
+                'contact' => null,
+                'assignedUser' => 'external',
+                'category' => 'sub5',
+                'currency' => 'EUR',
+                'project' => 'project_26',
+            ],
+            // Complete workflow
+            [
+                'number' => 'TXN-2025-0009',
+                'title' => 'Pharmaceutical CRM System',
+                'description' => 'Customer relationship management for pharmaceutical industry',
+                'status' => TransactionStatus::PAID,
+                'customer' => 'company_16', // Tricell Pharmaceuticals
+                'contact' => null,
+                'assignedUser' => 'marketing1',
+                'category' => 'sub6',
+                'currency' => 'EUR',
+                'project' => 'project_25',
+            ],
+            // Quoted stage with multiple revisions
+            [
+                'number' => 'TXN-2025-0010',
+                'title' => 'Quantum Computing Research',
+                'description' => 'Advanced quantum computing solutions development',
+                'status' => TransactionStatus::QUOTED,
+                'customer' => 'company_7', // NeuralLink Systems
+                'contact' => null,
+                'assignedUser' => 'admin',
+                'category' => 'sub3',
+                'currency' => 'EUR',
+                'project' => 'project_15',
+            ],
+            // In production
+            [
+                'number' => 'TXN-2025-0011',
+                'title' => 'Web Portal Redesign',
+                'description' => 'Complete corporate web portal redesign',
+                'status' => TransactionStatus::IN_PRODUCTION,
+                'customer' => 'company_13', // Kord Industries
+                'contact' => null,
+                'assignedUser' => 'editor',
+                'category' => 'sub1',
+                'currency' => 'USD',
+                'project' => 'project_24',
+            ],
+            // Draft stage
+            [
+                'number' => 'TXN-2025-0012',
+                'title' => 'Neural Interface Development',
+                'description' => 'Advanced AI-driven neural interface system',
+                'status' => TransactionStatus::DRAFT,
+                'customer' => 'company_6', // GeneDyne Technologies
+                'contact' => null,
+                'assignedUser' => 'teamlead',
+                'category' => 'main1',
+                'currency' => 'USD',
+                'project' => 'project_14',
+            ],
+            // Ordered
+            [
+                'number' => 'TXN-2025-0013',
+                'title' => 'Global Marketing Automation',
+                'description' => 'Multi-channel marketing automation platform',
+                'status' => TransactionStatus::ORDERED,
+                'customer' => 'company_18', // Blue Umbrella Ltd
+                'contact' => null,
+                'assignedUser' => 'manager',
+                'category' => 'main3',
+                'currency' => 'EUR',
+                'project' => 'project_28',
+            ],
+            // Invoiced
+            [
+                'number' => 'TXN-2025-0014',
+                'title' => 'Microservices Architecture Migration',
+                'description' => 'Complete migration to microservices architecture',
+                'status' => TransactionStatus::INVOICED,
+                'customer' => 'company_9', // Pym Technologies
+                'contact' => null,
+                'assignedUser' => 'dev2',
+                'category' => 'sub3',
+                'currency' => 'USD',
+                'project' => 'project_18',
+            ],
+            // Delivered
+            [
+                'number' => 'TXN-2025-0015',
+                'title' => 'AI Content Generation System',
+                'description' => 'AI-powered content creation and management',
+                'status' => TransactionStatus::DELIVERED,
+                'customer' => 'company_17', // TerraSave International
+                'contact' => null,
+                'assignedUser' => 'admin',
+                'category' => 'sub7',
+                'currency' => 'EUR',
+                'project' => 'project_27',
+            ],
+        ];
+
+        foreach ($transactionsData as $index => $data) {
+            $transaction = (new Transaction())
+                ->setTransactionNumber($data['number'])
+                ->setTitle($data['title'])
+                ->setDescription($data['description'])
+                ->setStatus($data['status'])
+                ->setCustomer($this->companies[$data['customer']])
+                ->setAssignedUser($this->users[$data['assignedUser']])
+                ->setCategory($this->categories[$data['category']])
+                ->setCurrency($data['currency']);
+
+            if (isset($data['contact']) && $data['contact']) {
+                $transaction->setPrimaryContact($this->contacts[$data['contact']]);
+            }
+
+            if (isset($data['project'])) {
+                $transaction->addProject($this->projects[$data['project']]);
+            }
+
+            $manager->persist($transaction);
+            $this->transactions['transaction_' . $index] = $transaction;
+        }
+
+        $manager->flush();
+    }
+
+    private function createOfferFixtures(ObjectManager $manager): void
+    {
+        $offersData = [
+            // TXN-2025-0001: PAID - Should have accepted offer
+            [
+                'transaction' => 'transaction_0',
+                'offerNumber' => 'OFF-2025-0001-V1',
+                'title' => 'E-Commerce Platform Development - Initial Offer',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'Frontend Development (React/Next.js)', 'quantity' => '120', 'unitPrice' => '150.00'],
+                    ['description' => 'Backend API Development (Symfony)', 'quantity' => '100', 'unitPrice' => '150.00'],
+                    ['description' => 'Payment Gateway Integration', 'quantity' => '40', 'unitPrice' => '175.00'],
+                    ['description' => 'Testing & Quality Assurance', 'quantity' => '30', 'unitPrice' => '125.00'],
+                ],
+            ],
+            // TXN-2025-0002: PAID - Should have accepted offer
+            [
+                'transaction' => 'transaction_1',
+                'offerNumber' => 'OFF-2025-0002-V1',
+                'title' => 'Mobile Banking App - Initial Offer',
+                'status' => OfferStatus::REJECTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'iOS Development', 'quantity' => '100', 'unitPrice' => '160.00'],
+                    ['description' => 'Android Development', 'quantity' => '100', 'unitPrice' => '160.00'],
+                    ['description' => 'Biometric Authentication Module', 'quantity' => '40', 'unitPrice' => '180.00'],
+                ],
+            ],
+            [
+                'transaction' => 'transaction_1',
+                'offerNumber' => 'OFF-2025-0002-V2',
+                'title' => 'Mobile Banking App - Revised Offer',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'iOS Development', 'quantity' => '120', 'unitPrice' => '150.00'],
+                    ['description' => 'Android Development', 'quantity' => '120', 'unitPrice' => '150.00'],
+                    ['description' => 'Biometric Authentication Module', 'quantity' => '50', 'unitPrice' => '170.00'],
+                    ['description' => 'Security Audit & Penetration Testing', 'quantity' => '20', 'unitPrice' => '200.00'],
+                ],
+            ],
+            // TXN-2025-0003: IN_PRODUCTION - Should have accepted offer
+            [
+                'transaction' => 'transaction_2',
+                'offerNumber' => 'OFF-2025-0003-V1',
+                'title' => 'Corporate Security Upgrade - Proposal',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+45 days'),
+                'items' => [
+                    ['description' => 'Security Infrastructure Assessment', 'quantity' => '40', 'unitPrice' => '200.00'],
+                    ['description' => 'Security System Implementation', 'quantity' => '160', 'unitPrice' => '180.00'],
+                    ['description' => 'Employee Training & Documentation', 'quantity' => '24', 'unitPrice' => '150.00'],
+                ],
+            ],
+            // TXN-2025-0004: DELIVERED - Should have accepted offer
+            [
+                'transaction' => 'transaction_3',
+                'offerNumber' => 'OFF-2025-0004-V1',
+                'title' => 'R&D Dashboard System - Development Proposal',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'Dashboard UI/UX Design', 'quantity' => '40', 'unitPrice' => '140.00'],
+                    ['description' => 'Real-time Analytics Engine', 'quantity' => '80', 'unitPrice' => '165.00'],
+                    ['description' => 'Data Visualization Components', 'quantity' => '50', 'unitPrice' => '155.00'],
+                ],
+            ],
+            // TXN-2025-0005: INVOICED - Should have accepted offer
+            [
+                'transaction' => 'transaction_4',
+                'offerNumber' => 'OFF-2025-0005-V1',
+                'title' => 'Digital Marketing Campaign - Strategy & Implementation',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'Marketing Strategy Development', 'quantity' => '30', 'unitPrice' => '180.00'],
+                    ['description' => 'Content Creation & SEO', 'quantity' => '60', 'unitPrice' => '145.00'],
+                    ['description' => 'Social Media Campaign Management', 'quantity' => '40', 'unitPrice' => '135.00'],
+                    ['description' => 'Analytics & Reporting', 'quantity' => '20', 'unitPrice' => '150.00'],
+                ],
+            ],
+            // TXN-2025-0006: ORDERED - Should have accepted offer
+            [
+                'transaction' => 'transaction_5',
+                'offerNumber' => 'OFF-2025-0006-V1',
+                'title' => 'Mobile Commerce App - Development Quote',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'Cross-Platform Development (Flutter)', 'quantity' => '140', 'unitPrice' => '155.00'],
+                    ['description' => 'E-commerce Integration', 'quantity' => '60', 'unitPrice' => '165.00'],
+                    ['description' => 'Payment Processing Setup', 'quantity' => '30', 'unitPrice' => '180.00'],
+                ],
+            ],
+            // TXN-2025-0007: QUOTED - Should have sent offers with revisions
+            [
+                'transaction' => 'transaction_6',
+                'offerNumber' => 'OFF-2025-0007-V1',
+                'title' => 'Financial Analytics Platform - Initial Proposal',
+                'status' => OfferStatus::SENT,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'Platform Architecture & Design', 'quantity' => '60', 'unitPrice' => '190.00'],
+                    ['description' => 'Analytics Engine Development', 'quantity' => '120', 'unitPrice' => '175.00'],
+                    ['description' => 'Reporting Dashboard', 'quantity' => '70', 'unitPrice' => '160.00'],
+                ],
+            ],
+            [
+                'transaction' => 'transaction_6',
+                'offerNumber' => 'OFF-2025-0007-V2',
+                'title' => 'Financial Analytics Platform - Revised Proposal',
+                'status' => OfferStatus::SENT,
+                'validUntil' => new \DateTimeImmutable('+45 days'),
+                'items' => [
+                    ['description' => 'Platform Architecture & Design', 'quantity' => '50', 'unitPrice' => '190.00'],
+                    ['description' => 'Analytics Engine Development', 'quantity' => '100', 'unitPrice' => '175.00'],
+                    ['description' => 'Reporting Dashboard', 'quantity' => '60', 'unitPrice' => '160.00'],
+                    ['description' => 'Data Integration Module', 'quantity' => '40', 'unitPrice' => '170.00'],
+                ],
+            ],
+            // TXN-2025-0008: DRAFT - Draft offer
+            [
+                'transaction' => 'transaction_7',
+                'offerNumber' => 'OFF-2025-0008-V1',
+                'title' => 'Legal Compliance Platform - Preliminary Quote',
+                'status' => OfferStatus::DRAFT,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'Compliance Requirements Analysis', 'quantity' => '40', 'unitPrice' => '200.00'],
+                    ['description' => 'Platform Development', 'quantity' => '150', 'unitPrice' => '180.00'],
+                ],
+            ],
+            // TXN-2025-0009: PAID - Should have accepted offer
+            [
+                'transaction' => 'transaction_8',
+                'offerNumber' => 'OFF-2025-0009-V1',
+                'title' => 'Pharmaceutical CRM System - Development Quote',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'CRM System Development', 'quantity' => '100', 'unitPrice' => '165.00'],
+                    ['description' => 'Industry-Specific Customization', 'quantity' => '60', 'unitPrice' => '175.00'],
+                    ['description' => 'Integration & Migration', 'quantity' => '40', 'unitPrice' => '170.00'],
+                    ['description' => 'Training & Support', 'quantity' => '20', 'unitPrice' => '140.00'],
+                ],
+            ],
+            // TXN-2025-0010: QUOTED - Multiple revisions
+            [
+                'transaction' => 'transaction_9',
+                'offerNumber' => 'OFF-2025-0010-V1',
+                'title' => 'Quantum Computing Research - Initial Proposal',
+                'status' => OfferStatus::REJECTED,
+                'validUntil' => new \DateTimeImmutable('+60 days'),
+                'items' => [
+                    ['description' => 'Research & Feasibility Study', 'quantity' => '80', 'unitPrice' => '250.00'],
+                    ['description' => 'Prototype Development', 'quantity' => '200', 'unitPrice' => '225.00'],
+                ],
+            ],
+            [
+                'transaction' => 'transaction_9',
+                'offerNumber' => 'OFF-2025-0010-V2',
+                'title' => 'Quantum Computing Research - Revised Proposal',
+                'status' => OfferStatus::SENT,
+                'validUntil' => new \DateTimeImmutable('+60 days'),
+                'items' => [
+                    ['description' => 'Research & Feasibility Study', 'quantity' => '60', 'unitPrice' => '250.00'],
+                    ['description' => 'Prototype Development - Phase 1', 'quantity' => '120', 'unitPrice' => '225.00'],
+                    ['description' => 'Prototype Development - Phase 2', 'quantity' => '100', 'unitPrice' => '225.00'],
+                    ['description' => 'Documentation & Knowledge Transfer', 'quantity' => '30', 'unitPrice' => '200.00'],
+                ],
+            ],
+            // TXN-2025-0011: IN_PRODUCTION - Should have accepted offer
+            [
+                'transaction' => 'transaction_10',
+                'offerNumber' => 'OFF-2025-0011-V1',
+                'title' => 'Web Portal Redesign - Design & Development',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'UI/UX Design & Prototyping', 'quantity' => '60', 'unitPrice' => '145.00'],
+                    ['description' => 'Frontend Development', 'quantity' => '90', 'unitPrice' => '155.00'],
+                    ['description' => 'Backend Integration', 'quantity' => '50', 'unitPrice' => '160.00'],
+                ],
+            ],
+            // TXN-2025-0013: ORDERED - Should have accepted offer
+            [
+                'transaction' => 'transaction_12',
+                'offerNumber' => 'OFF-2025-0013-V1',
+                'title' => 'Global Marketing Automation - Platform Setup',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'Platform Setup & Configuration', 'quantity' => '40', 'unitPrice' => '170.00'],
+                    ['description' => 'Multi-Channel Integration', 'quantity' => '80', 'unitPrice' => '165.00'],
+                    ['description' => 'Workflow Automation Development', 'quantity' => '60', 'unitPrice' => '175.00'],
+                    ['description' => 'Training & Documentation', 'quantity' => '20', 'unitPrice' => '145.00'],
+                ],
+            ],
+            // TXN-2025-0014: INVOICED - Should have accepted offer
+            [
+                'transaction' => 'transaction_13',
+                'offerNumber' => 'OFF-2025-0014-V1',
+                'title' => 'Microservices Architecture Migration',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+45 days'),
+                'items' => [
+                    ['description' => 'Architecture Planning & Design', 'quantity' => '50', 'unitPrice' => '185.00'],
+                    ['description' => 'Microservices Development', 'quantity' => '150', 'unitPrice' => '170.00'],
+                    ['description' => 'Migration & Testing', 'quantity' => '60', 'unitPrice' => '175.00'],
+                ],
+            ],
+            // TXN-2025-0015: DELIVERED - Should have accepted offer
+            [
+                'transaction' => 'transaction_14',
+                'offerNumber' => 'OFF-2025-0015-V1',
+                'title' => 'AI Content Generation System',
+                'status' => OfferStatus::ACCEPTED,
+                'validUntil' => new \DateTimeImmutable('+30 days'),
+                'items' => [
+                    ['description' => 'AI Model Training & Integration', 'quantity' => '80', 'unitPrice' => '190.00'],
+                    ['description' => 'Content Management System', 'quantity' => '70', 'unitPrice' => '165.00'],
+                    ['description' => 'API Development & Documentation', 'quantity' => '40', 'unitPrice' => '170.00'],
+                ],
+            ],
+        ];
+
+        foreach ($offersData as $index => $offerData) {
+            $transaction = $this->transactions[$offerData['transaction']];
+
+            $offer = (new Offer())
+                ->setOfferNumber($offerData['offerNumber'])
+                ->setTitle($offerData['title'])
+                ->setStatus($offerData['status'])
+                ->setValidUntil($offerData['validUntil'])
+                ->setTransaction($transaction);
+
+            // Calculate totals
+            $subtotal = '0.00';
+            foreach ($offerData['items'] as $itemData) {
+                $itemTotal = bcmul($itemData['quantity'], $itemData['unitPrice'], 2);
+                $subtotal = bcadd($subtotal, $itemTotal, 2);
+
+                $offerItem = (new OfferItem())
+                    ->setDescription($itemData['description'])
+                    ->setQuantity($itemData['quantity'])
+                    ->setUnitPrice($itemData['unitPrice'])
+                    ->setOffer($offer);
+
+                $manager->persist($offerItem);
+            }
+
+            $offer->setSubtotal($subtotal);
+            $offer->setTaxRate('19.00'); // Standard VAT
+            $taxAmount = bcmul($subtotal, '0.19', 2);
+            $offer->setTaxAmount($taxAmount);
+            $offer->setTotal(bcadd($subtotal, $taxAmount, 2));
+
+            $manager->persist($offer);
+            $this->offers['offer_' . $index] = $offer;
+
+            // Link accepted offer to transaction
+            if ($offerData['status'] === OfferStatus::ACCEPTED) {
+                $transaction->setAcceptedOffer($offer);
+                $manager->persist($transaction);
+            }
+        }
+
+        $manager->flush();
+    }
+
+    private function createInvoiceFixtures(ObjectManager $manager): void
+    {
+        $invoicesData = [
+            // TXN-2025-0001: PAID - Full invoice, paid
+            [
+                'transaction' => 'transaction_0',
+                'invoiceNumber' => 'INV-2025-0001',
+                'title' => 'E-Commerce Platform Development - Final Invoice',
+                'type' => InvoiceType::FULL,
+                'paymentStatus' => InvoicePaymentStatus::PAID,
+                'dueDate' => new \DateTimeImmutable('-10 days'),
+                'offer' => 'offer_0',
+            ],
+            // TXN-2025-0002: PAID - Full invoice, paid
+            [
+                'transaction' => 'transaction_1',
+                'invoiceNumber' => 'INV-2025-0002',
+                'title' => 'Mobile Banking App - Final Invoice',
+                'type' => InvoiceType::FULL,
+                'paymentStatus' => InvoicePaymentStatus::PAID,
+                'dueDate' => new \DateTimeImmutable('-5 days'),
+                'offer' => 'offer_2',
+            ],
+            // TXN-2025-0005: INVOICED - Full invoice, unpaid
+            [
+                'transaction' => 'transaction_4',
+                'invoiceNumber' => 'INV-2025-0003',
+                'title' => 'Digital Marketing Campaign - Invoice',
+                'type' => InvoiceType::FULL,
+                'paymentStatus' => InvoicePaymentStatus::UNPAID,
+                'dueDate' => new \DateTimeImmutable('+14 days'),
+                'offer' => 'offer_5',
+            ],
+            // TXN-2025-0009: PAID - Deposit + Final invoices
+            [
+                'transaction' => 'transaction_8',
+                'invoiceNumber' => 'INV-2025-0004',
+                'title' => 'Pharmaceutical CRM System - Deposit Invoice',
+                'type' => InvoiceType::DEPOSIT,
+                'paymentStatus' => InvoicePaymentStatus::PAID,
+                'dueDate' => new \DateTimeImmutable('-30 days'),
+                'offer' => 'offer_10',
+                'depositPercentage' => 30,
+            ],
+            [
+                'transaction' => 'transaction_8',
+                'invoiceNumber' => 'INV-2025-0005',
+                'title' => 'Pharmaceutical CRM System - Final Invoice',
+                'type' => InvoiceType::FINAL,
+                'paymentStatus' => InvoicePaymentStatus::PAID,
+                'dueDate' => new \DateTimeImmutable('-7 days'),
+                'offer' => 'offer_10',
+                'depositPercentage' => 70,
+            ],
+            // TXN-2025-0014: INVOICED - Partial payment
+            [
+                'transaction' => 'transaction_13',
+                'invoiceNumber' => 'INV-2025-0006',
+                'title' => 'Microservices Architecture Migration - Invoice',
+                'type' => InvoiceType::FULL,
+                'paymentStatus' => InvoicePaymentStatus::PARTIAL,
+                'dueDate' => new \DateTimeImmutable('+7 days'),
+                'offer' => 'offer_15',
+            ],
+        ];
+
+        foreach ($invoicesData as $index => $invoiceData) {
+            $transaction = $this->transactions[$invoiceData['transaction']];
+            $offer = $this->offers[$invoiceData['offer']];
+
+            $invoice = (new Invoice())
+                ->setInvoiceNumber($invoiceData['invoiceNumber'])
+                ->setTitle($invoiceData['title'])
+                ->setType($invoiceData['type'])
+                ->setPaymentStatus($invoiceData['paymentStatus'])
+                ->setDueDate($invoiceData['dueDate'])
+                ->setTransaction($transaction);
+
+            // Calculate invoice amounts based on type
+            $offerTotal = $offer->getTotal();
+            $depositPercentage = $invoiceData['depositPercentage'] ?? 100;
+
+            if ($invoiceData['type'] === InvoiceType::DEPOSIT) {
+                $subtotal = bcmul($offer->getSubtotal(), (string)($depositPercentage / 100), 2);
+            } elseif ($invoiceData['type'] === InvoiceType::FINAL) {
+                $subtotal = bcmul($offer->getSubtotal(), (string)($depositPercentage / 100), 2);
+            } else {
+                $subtotal = $offer->getSubtotal();
+            }
+
+            $invoice->setSubtotal($subtotal);
+            $invoice->setTaxRate($offer->getTaxRate());
+            $taxAmount = bcmul($subtotal, bcdiv($offer->getTaxRate(), '100', 4), 2);
+            $invoice->setTaxAmount($taxAmount);
+            $invoice->setTotal(bcadd($subtotal, $taxAmount, 2));
+
+            // Add invoice items matching the offer
+            $itemCount = 0;
+            foreach ($offer->getOfferItems() as $offerItem) {
+                $quantity = $offerItem->getQuantity();
+                $unitPrice = $offerItem->getUnitPrice();
+
+                // Adjust quantity for deposit/final invoices
+                if ($invoiceData['type'] === InvoiceType::DEPOSIT || $invoiceData['type'] === InvoiceType::FINAL) {
+                    $quantity = bcmul($quantity, (string)($depositPercentage / 100), 2);
+                }
+
+                $invoiceItem = (new InvoiceItem())
+                    ->setDescription($offerItem->getDescription())
+                    ->setQuantity($quantity)
+                    ->setUnitPrice($unitPrice)
+                    ->setInvoice($invoice);
+
+                $manager->persist($invoiceItem);
+                $itemCount++;
+
+                // Limit items to avoid too many in deposit invoices
+                if ($itemCount >= 5) {
+                    break;
+                }
+            }
+
+            $manager->persist($invoice);
+            $this->invoices['invoice_' . $index] = $invoice;
+        }
+
+        $manager->flush();
+    }
+
+    private function createDocumentFixtures(ObjectManager $manager): void
+    {
+        $documentsData = [
+            // TXN-2025-0001: Complete project - multiple documents
+            [
+                'transaction' => 'transaction_0',
+                'project' => 'project_0',
+                'title' => 'Project Brief - E-Commerce Platform',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/ecommerce-platform-brief.pdf',
+            ],
+            [
+                'transaction' => 'transaction_0',
+                'project' => 'project_0',
+                'title' => 'Development Contract',
+                'type' => DocumentType::CONTRACT,
+                'filePath' => '/documents/contracts/contract-txn-2025-0001.pdf',
+            ],
+            [
+                'transaction' => 'transaction_0',
+                'project' => null,
+                'title' => 'Offer Document OFF-2025-0001-V1',
+                'type' => DocumentType::OFFER_PDF,
+                'filePath' => '/documents/offers/offer-2025-0001-v1.pdf',
+            ],
+            [
+                'transaction' => 'transaction_0',
+                'project' => null,
+                'title' => 'Invoice INV-2025-0001',
+                'type' => DocumentType::INVOICE_PDF,
+                'filePath' => '/documents/invoices/invoice-2025-0001.pdf',
+            ],
+            // TXN-2025-0002: Complete project
+            [
+                'transaction' => 'transaction_1',
+                'project' => 'project_3',
+                'title' => 'Mobile Banking App - Requirements',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/mobile-banking-requirements.pdf',
+            ],
+            [
+                'transaction' => 'transaction_1',
+                'project' => 'project_3',
+                'title' => 'Security Audit Report',
+                'type' => DocumentType::DELIVERABLE,
+                'filePath' => '/documents/deliverables/security-audit-mobile-banking.pdf',
+            ],
+            [
+                'transaction' => 'transaction_1',
+                'project' => null,
+                'title' => 'Invoice INV-2025-0002',
+                'type' => DocumentType::INVOICE_PDF,
+                'filePath' => '/documents/invoices/invoice-2025-0002.pdf',
+            ],
+            // TXN-2025-0003: In production
+            [
+                'transaction' => 'transaction_2',
+                'project' => 'project_6',
+                'title' => 'Corporate Security - Project Brief',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/corporate-security-brief.pdf',
+            ],
+            [
+                'transaction' => 'transaction_2',
+                'project' => null,
+                'title' => 'Service Agreement',
+                'type' => DocumentType::CONTRACT,
+                'filePath' => '/documents/contracts/contract-txn-2025-0003.pdf',
+            ],
+            // TXN-2025-0004: Delivered
+            [
+                'transaction' => 'transaction_3',
+                'project' => 'project_8',
+                'title' => 'R&D Dashboard - Specifications',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/rnd-dashboard-specs.pdf',
+            ],
+            [
+                'transaction' => 'transaction_3',
+                'project' => 'project_8',
+                'title' => 'Dashboard User Manual',
+                'type' => DocumentType::DELIVERABLE,
+                'filePath' => '/documents/deliverables/dashboard-user-manual.pdf',
+            ],
+            // TXN-2025-0005: Invoiced
+            [
+                'transaction' => 'transaction_4',
+                'project' => 'project_11',
+                'title' => 'Marketing Campaign Strategy',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/marketing-campaign-strategy.pdf',
+            ],
+            [
+                'transaction' => 'transaction_4',
+                'project' => null,
+                'title' => 'Invoice INV-2025-0003',
+                'type' => DocumentType::INVOICE_PDF,
+                'filePath' => '/documents/invoices/invoice-2025-0003.pdf',
+            ],
+            // TXN-2025-0006: Ordered
+            [
+                'transaction' => 'transaction_5',
+                'project' => 'project_16',
+                'title' => 'Mobile Commerce App - Technical Specifications',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/mobile-commerce-specs.pdf',
+            ],
+            [
+                'transaction' => 'transaction_5',
+                'project' => null,
+                'title' => 'Development Agreement',
+                'type' => DocumentType::CONTRACT,
+                'filePath' => '/documents/contracts/contract-txn-2025-0006.pdf',
+            ],
+            // TXN-2025-0007: Quoted
+            [
+                'transaction' => 'transaction_6',
+                'project' => 'project_21',
+                'title' => 'Financial Analytics - Initial Brief',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/financial-analytics-brief.pdf',
+            ],
+            [
+                'transaction' => 'transaction_6',
+                'project' => null,
+                'title' => 'Offer Document OFF-2025-0007-V2',
+                'type' => DocumentType::OFFER_PDF,
+                'filePath' => '/documents/offers/offer-2025-0007-v2.pdf',
+            ],
+            // TXN-2025-0009: Paid
+            [
+                'transaction' => 'transaction_8',
+                'project' => 'project_25',
+                'title' => 'Pharmaceutical CRM - Requirements',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/pharma-crm-requirements.pdf',
+            ],
+            [
+                'transaction' => 'transaction_8',
+                'project' => 'project_25',
+                'title' => 'CRM Implementation Guide',
+                'type' => DocumentType::DELIVERABLE,
+                'filePath' => '/documents/deliverables/crm-implementation-guide.pdf',
+            ],
+            [
+                'transaction' => 'transaction_8',
+                'project' => null,
+                'title' => 'Invoice INV-2025-0004 (Deposit)',
+                'type' => DocumentType::INVOICE_PDF,
+                'filePath' => '/documents/invoices/invoice-2025-0004.pdf',
+            ],
+            [
+                'transaction' => 'transaction_8',
+                'project' => null,
+                'title' => 'Invoice INV-2025-0005 (Final)',
+                'type' => DocumentType::INVOICE_PDF,
+                'filePath' => '/documents/invoices/invoice-2025-0005.pdf',
+            ],
+            // TXN-2025-0011: In production
+            [
+                'transaction' => 'transaction_10',
+                'project' => 'project_24',
+                'title' => 'Web Portal Redesign - Design Mockups',
+                'type' => DocumentType::DELIVERABLE,
+                'filePath' => '/documents/deliverables/portal-design-mockups.pdf',
+            ],
+            // TXN-2025-0014: Invoiced
+            [
+                'transaction' => 'transaction_13',
+                'project' => 'project_18',
+                'title' => 'Microservices Architecture Plan',
+                'type' => DocumentType::BRIEF,
+                'filePath' => '/documents/briefs/microservices-architecture.pdf',
+            ],
+            [
+                'transaction' => 'transaction_13',
+                'project' => null,
+                'title' => 'Invoice INV-2025-0006',
+                'type' => DocumentType::INVOICE_PDF,
+                'filePath' => '/documents/invoices/invoice-2025-0006.pdf',
+            ],
+        ];
+
+        foreach ($documentsData as $index => $documentData) {
+            $transaction = $this->transactions[$documentData['transaction']];
+            $project = isset($documentData['project']) ? $this->projects[$documentData['project']] : null;
+
+            $document = (new Document())
+                ->setTitle($documentData['title'])
+                ->setType($documentData['type'])
+                ->setFilePath($documentData['filePath'])
+                ->setTransaction($transaction);
+
+            if ($project) {
+                $document->setProject($project);
+            }
+
+            $manager->persist($document);
+            $this->documents['document_' . $index] = $document;
         }
 
         $manager->flush();
