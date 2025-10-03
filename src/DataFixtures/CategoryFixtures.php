@@ -43,7 +43,6 @@ class CategoryFixtures extends Fixture
                 ->setIcon($data['icon']);
 
             $manager->persist($category);
-            $this->addReference($key, $category);
         }
 
         $manager->flush();
@@ -54,56 +53,61 @@ class CategoryFixtures extends Fixture
                 'name' => 'Web Development',
                 'color' => 'lightblue',
                 'icon' => 'fas fa-globe',
-                'parent' => 'main1',
+                'parent' => 'Technology',
             ],
             'sub2' => [
                 'name' => 'Mobile Development',
                 'color' => 'lightblue',
                 'icon' => 'fas fa-mobile-alt',
-                'parent' => 'main1',
+                'parent' => 'Technology',
             ],
             'sub3' => [
                 'name' => 'Software Solutions',
                 'color' => 'lightblue',
                 'icon' => 'fas fa-code',
-                'parent' => 'main1',
+                'parent' => 'Technology',
             ],
             'sub4' => [
                 'name' => 'Financial Services',
                 'color' => 'lightred',
                 'icon' => 'fas fa-coins',
-                'parent' => 'main2',
+                'parent' => 'Business Services',
             ],
             'sub5' => [
                 'name' => 'Legal Services',
                 'color' => 'lightred',
                 'icon' => 'fas fa-gavel',
-                'parent' => 'main2',
+                'parent' => 'Business Services',
             ],
             'sub6' => [
                 'name' => 'Digital Marketing',
                 'color' => 'lightgreen',
                 'icon' => 'fas fa-chart-line',
-                'parent' => 'main3',
+                'parent' => 'Marketing & Sales',
             ],
             'sub7' => [
                 'name' => 'Content Creation',
                 'color' => 'lightgreen',
                 'icon' => 'fas fa-pen-fancy',
-                'parent' => 'main3',
+                'parent' => 'Marketing & Sales',
             ],
         ];
 
         foreach ($subCategoriesData as $key => $data) {
+            $parent = $manager->getRepository(Category::class)->findOneBy(['name' => $data['parent']]);
+
+            if (!$parent) {
+                throw new \RuntimeException(sprintf('Parent category "%s" not found for subcategory "%s"', $data['parent'], $data['name']));
+            }
+
             $category = (new Category())
                 ->setName($data['name'])
                 ->setColor($data['color'])
                 ->setIcon($data['icon']);
 
-            $category->setParent($this->getReference($data['parent'], Category::class));
+            $category->setParent($parent);
 
             $manager->persist($category);
-            $this->addReference($key, $category);
         }
 
         $manager->flush();

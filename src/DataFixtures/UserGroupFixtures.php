@@ -49,7 +49,6 @@ class UserGroupFixtures extends Fixture
             ;
 
             $manager->persist($userGroup);
-            $this->addReference('user_group_' . $key, $userGroup);
         }
 
         $manager->flush();

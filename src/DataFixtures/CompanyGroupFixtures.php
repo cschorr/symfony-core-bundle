@@ -26,7 +26,6 @@ class CompanyGroupFixtures extends Fixture
                 ->setName($data['name'])
                 ->setCode($data['code']);
             $manager->persist($group);
-            $this->addReference('company_group_' . $key, $group);
         }
 
         $manager->flush();
