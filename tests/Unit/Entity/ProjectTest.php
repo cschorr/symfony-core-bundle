@@ -32,7 +32,7 @@ class ProjectTest extends TestCase
         $this->assertCount(0, $project->getContact());
 
         // Test default status
-        $this->assertSame(ProjectStatus::PLANNING, $project->getStatus());
+        $this->assertSame(ProjectStatus::PLANNING, $project->getStatusEnum());
         $this->assertTrue($project->isPlanning());
 
         // Test inherited AbstractEntity properties
@@ -50,20 +50,20 @@ class ProjectTest extends TestCase
     public function testStatusProperty(): void
     {
         // Test default status
-        $this->assertSame(ProjectStatus::PLANNING, $this->project->getStatus());
+        $this->assertSame(ProjectStatus::PLANNING, $this->project->getStatusEnum());
 
         // Test setting different statuses
         $this->project->setStatus(ProjectStatus::IN_PROGRESS);
-        $this->assertSame(ProjectStatus::IN_PROGRESS, $this->project->getStatus());
+        $this->assertSame(ProjectStatus::IN_PROGRESS, $this->project->getStatusEnum());
 
         $this->project->setStatus(ProjectStatus::COMPLETED);
-        $this->assertSame(ProjectStatus::COMPLETED, $this->project->getStatus());
+        $this->assertSame(ProjectStatus::COMPLETED, $this->project->getStatusEnum());
 
         $this->project->setStatus(ProjectStatus::CANCELLED);
-        $this->assertSame(ProjectStatus::CANCELLED, $this->project->getStatus());
+        $this->assertSame(ProjectStatus::CANCELLED, $this->project->getStatusEnum());
 
         $this->project->setStatus(ProjectStatus::ON_HOLD);
-        $this->assertSame(ProjectStatus::ON_HOLD, $this->project->getStatus());
+        $this->assertSame(ProjectStatus::ON_HOLD, $this->project->getStatusEnum());
     }
 
     public function testStatusHelperMethods(): void
