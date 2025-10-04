@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Entity\User;
+use C3net\CoreBundle\Service\TransactionNumberGenerator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -23,6 +24,7 @@ final readonly class TransactionWriteProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
         private Security $security,
+        private TransactionNumberGenerator $numberGenerator,
     ) {
     }
 
@@ -32,9 +34,9 @@ final readonly class TransactionWriteProcessor implements ProcessorInterface
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }
 
-        // Auto-generate transaction number if not set
+        // Auto-generate transaction number if not set using the robust generator service
         if (null === $data->getTransactionNumber()) {
-            $data->setTransactionNumber($this->generateTransactionNumber());
+            $data->setTransactionNumber($this->numberGenerator->generate());
         }
 
         // Set assigned user if not set
@@ -44,13 +46,5 @@ final readonly class TransactionWriteProcessor implements ProcessorInterface
         }
 
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-    }
-
-    private function generateTransactionNumber(): string
-    {
-        $year = date('Y');
-        $random = str_pad((string) random_int(1, 9999), 4, '0', STR_PAD_LEFT);
-
-        return sprintf('TXN-%s-%s', $year, $random);
     }
 }
