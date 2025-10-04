@@ -22,7 +22,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'project_type', type: 'string')]
-#[ORM\DiscriminatorMap(['project' => Project::class, 'audio_project' => 'App\Entity\AudioProject', 'video_project' => 'App\Entity\VideoProject'])]
 #[ApiResource(
     mercure: true,
     paginationClientEnabled: true,
@@ -34,14 +33,19 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'title' => 'ASC',
-        'year' => 'DESC',
+        'name' => 'ASC',
+        'dueDate' => 'DESC',
+        'status' => 'ASC',
     ],
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
+        'name' => 'partial',
         'client' => 'exact',
+        'assignee' => 'exact',
+        'status' => 'exact',
+        'category' => 'exact',
     ],
 )]
 class Project extends AbstractEntity
