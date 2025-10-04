@@ -16,6 +16,7 @@ use C3net\CoreBundle\DataFixtures\ProjectFixtures;
 use C3net\CoreBundle\DataFixtures\TransactionFixtures;
 use C3net\CoreBundle\DataFixtures\UserFixtures;
 use C3net\CoreBundle\DataFixtures\UserGroupFixtures;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -146,6 +147,10 @@ class LoadDemoDataCommand extends Command
                 new DocumentFixtures(),
             ];
 
+            // Load app-specific fixtures if they exist
+            $appFixtures = $this->getAppFixtures();
+            $fixtures = array_merge($fixtures, $appFixtures);
+
             $hasMercureWarning = false;
 
             foreach ($fixtures as $fixture) {
@@ -182,7 +187,7 @@ class LoadDemoDataCommand extends Command
                 }
             }
 
-            $io->success([
+            $successMessages = [
                 'Demo data has been successfully loaded!',
                 '',
                 'The following demo users have been created:',
@@ -205,7 +210,17 @@ class LoadDemoDataCommand extends Command
                 '  - 6 Offers with multiple versions',
                 '  - 5 Invoices (Full, Deposit, Final)',
                 '  - 12 Documents (Briefs, Contracts, Deliverables)',
-            ]);
+            ];
+
+            // Add app-specific fixtures to success message
+            if (class_exists('App\DataFixtures\AudioProjectFixtures')) {
+                $successMessages[] = '  - 5 Audio Projects (Radio, Podcast, Voiceover, etc.)';
+            }
+            if (class_exists('App\DataFixtures\VideoProjectFixtures')) {
+                $successMessages[] = '  - 8 Video Projects (Corporate, Promotional, Training, etc.)';
+            }
+
+            $io->success($successMessages);
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
@@ -285,5 +300,27 @@ class LoadDemoDataCommand extends Command
         } catch (Exception $e) {
             throw new \RuntimeException(sprintf('Failed to drop/create schema: %s', $e->getMessage()), 0, $e);
         }
+    }
+
+    /**
+     * Get app-specific fixtures from App\DataFixtures namespace
+     *
+     * @return Fixture[]
+     */
+    private function getAppFixtures(): array
+    {
+        $appFixtures = [];
+
+        // Check if AudioProjectFixtures exists
+        if (class_exists('App\DataFixtures\AudioProjectFixtures')) {
+            $appFixtures[] = new \App\DataFixtures\AudioProjectFixtures();
+        }
+
+        // Check if VideoProjectFixtures exists
+        if (class_exists('App\DataFixtures\VideoProjectFixtures')) {
+            $appFixtures[] = new \App\DataFixtures\VideoProjectFixtures();
+        }
+
+        return $appFixtures;
     }
 }
