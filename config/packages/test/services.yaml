@@ -1,0 +1,15 @@
+services:
+    # Make services public in test environment for direct container access
+    _defaults:
+        public: true
+
+    # Explicitly make commonly used test services public
+    Doctrine\ORM\EntityManagerInterface:
+        public: true
+        alias: doctrine.orm.entity_manager
+
+    Symfony\Component\Security\Core\Security:
+        public: true
+
+    Symfony\Bundle\SecurityBundle\Security:
+        public: true
