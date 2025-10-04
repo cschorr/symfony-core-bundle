@@ -8,8 +8,8 @@ final readonly class FilterOptions
 {
     /**
      * @param array<int, AuthorSummary> $authors
-     * @param array<int, string> $resources
-     * @param array<int, string> $actions
+     * @param array<int, string>        $resources
+     * @param array<int, string>        $actions
      */
     public function __construct(
         public array $authors,
