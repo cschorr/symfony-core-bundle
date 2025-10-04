@@ -29,7 +29,7 @@ class AuditLogFiltersProvider implements ProviderInterface
         // Map authors to AuthorSummary value objects
         $authorSummaries = array_map(function ($author) {
             return new AuthorSummary(
-                id: $author['id'],
+                id: (string) $author['id'],
                 email: $author['email'],
                 firstname: $author['firstname'],
                 lastname: $author['lastname'],
