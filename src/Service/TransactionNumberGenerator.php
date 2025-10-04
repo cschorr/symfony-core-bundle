@@ -54,9 +54,7 @@ class TransactionNumberGenerator
             ++$retries;
         }
 
-        throw new \RuntimeException(
-            sprintf('Failed to generate unique transaction number after %d retries', self::MAX_RETRIES)
-        );
+        throw new \RuntimeException(sprintf('Failed to generate unique transaction number after %d retries', self::MAX_RETRIES));
     }
 
     /**
