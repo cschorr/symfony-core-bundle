@@ -360,17 +360,17 @@ class AppFixtures extends Fixture
     {
         // Themed groups from comics and motion pictures
         $groups = [
-            'skynet' => ['name' => 'Skynet Group', 'code' => 'SKYNET'],
-            'marvel' => ['name' => 'Marvel Group', 'code' => 'MARVEL'],
-            'dc' => ['name' => 'DC Group', 'code' => 'DC'],
-            'weyland' => ['name' => 'Weyland-Yutani Group', 'code' => 'WEYLAND'],
-            'umbrella' => ['name' => 'Umbrella Group', 'code' => 'UMBRELLA'],
+            'skynet' => ['name' => 'Skynet Group', 'shortcode' => 'SKYNET'],
+            'marvel' => ['name' => 'Marvel Group', 'shortcode' => 'MARVEL'],
+            'dc' => ['name' => 'DC Group', 'shortcode' => 'DC'],
+            'weyland' => ['name' => 'Weyland-Yutani Group', 'shortcode' => 'WEYLAND'],
+            'umbrella' => ['name' => 'Umbrella Group', 'shortcode' => 'UMBRELLA'],
         ];
 
         foreach ($groups as $key => $data) {
             $group = (new CompanyGroup())
                 ->setName($data['name'])
-                ->setCode($data['code']);
+                ->setShortcode($data['shortcode']);
             $manager->persist($group);
             $this->companyGroups[$key] = $group;
         }
@@ -1699,7 +1699,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Sustainable Operations Initiative',
-                'code' => 'SOI2024',
+                'shortcode' => 'SOI2024',
                 'description' => 'Environmental sustainability and operational efficiency campaign focusing on green technologies, energy optimization, and sustainable business practices. Includes carbon footprint reduction and renewable energy integration projects.',
                 'category' => 'main4', // Consulting
                 'startDate' => new \DateTimeImmutable('2024-06-01'),
@@ -1712,7 +1712,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Financial Technology Modernization',
-                'code' => 'FINTECH2024',
+                'shortcode' => 'FINTECH2024',
                 'description' => 'Comprehensive financial technology upgrade campaign focusing on banking solutions, payment processing, and financial analytics. Includes blockchain integration, cryptocurrency support, and advanced fraud detection systems.',
                 'category' => 'sub4', // Financial Services
                 'startDate' => new \DateTimeImmutable('2024-05-01'),
@@ -1725,7 +1725,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Healthcare Technology Advancement',
-                'code' => 'HEALTH2024',
+                'shortcode' => 'HEALTH2024',
                 'description' => 'Medical and healthcare technology enhancement initiative focusing on patient care optimization, medical data analytics, and telemedicine solutions. Includes clinical trial management and pharmaceutical research platforms.',
                 'category' => 'main2', // Business Services
                 'startDate' => new \DateTimeImmutable('2024-07-01'),
@@ -1743,7 +1743,7 @@ class AppFixtures extends Fixture
 
             $campaign = (new Campaign())
                 ->setName($campaignData['name'])
-                ->setCode($campaignData['code'])
+                ->setShortcode($campaignData['shortcode'])
                 ->setDescription($campaignData['description'])
                 ->setCategory($category)
             ;

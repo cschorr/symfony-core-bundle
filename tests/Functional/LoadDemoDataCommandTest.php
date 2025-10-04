@@ -276,18 +276,18 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $this->assertContains('Financial Technology Modernization', $campaignNames);
         $this->assertContains('Healthcare Technology Advancement', $campaignNames);
 
-        // Verify campaign codes are set
-        $campaignCodes = array_map(fn ($c) => $c->getCode(), $campaigns);
-        $this->assertContains('DT2025', $campaignCodes);
-        $this->assertContains('GME2024', $campaignCodes);
-        $this->assertContains('ESC2024', $campaignCodes);
-        $this->assertContains('INNO2024', $campaignCodes);
+        // Verify campaign shortcodes are set
+        $campaignShortcodes = array_map(fn ($c) => $c->getShortcode(), $campaigns);
+        $this->assertContains('DT2025', $campaignShortcodes);
+        $this->assertContains('GME2024', $campaignShortcodes);
+        $this->assertContains('ESC2024', $campaignShortcodes);
+        $this->assertContains('INNO2024', $campaignShortcodes);
 
         // Verify campaign-project relationships
         $digitalTransformation = $this->entityManager->getRepository(Campaign::class)
             ->findOneBy(['name' => 'Digital Transformation 2025']);
         $this->assertNotNull($digitalTransformation);
-        $this->assertSame('DT2025', $digitalTransformation->getCode());
+        $this->assertSame('DT2025', $digitalTransformation->getShortcode());
         $this->assertNotNull($digitalTransformation->getCategory());
         $this->assertGreaterThan(0, count($digitalTransformation->getProjects()));
         $this->assertNotEmpty($digitalTransformation->getDescription());

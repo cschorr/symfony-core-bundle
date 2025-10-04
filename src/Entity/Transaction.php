@@ -10,8 +10,8 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
-use C3net\CoreBundle\Entity\Traits\Single\StringCodeTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
+use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
 use C3net\CoreBundle\Enum\TransactionStatus;
 use C3net\CoreBundle\Enum\TransactionType;
 use C3net\CoreBundle\Repository\TransactionRepository;
@@ -50,7 +50,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Transaction extends AbstractEntity
 {
     use StringNameTrait;
-    use StringCodeTrait;
+    use StringShortcodeTrait;
     use SetStartEndTrait;
 
     #[ORM\Column(type: Types::STRING, length: 50, unique: true)]

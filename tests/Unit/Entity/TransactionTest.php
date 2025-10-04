@@ -610,10 +610,10 @@ class TransactionTest extends TestCase
         $this->transaction->setName($name);
         $this->assertSame($name, $this->transaction->getName());
 
-        // Test StringCodeTrait
-        $code = 'TRX001';
-        $this->transaction->setCode($code);
-        $this->assertSame($code, $this->transaction->getCode());
+        // Test StringShortcodeTrait
+        $shortcode = 'TRX001';
+        $this->transaction->setShortcode($shortcode);
+        $this->assertSame($shortcode, $this->transaction->getShortcode());
 
         // Test SetStartEndTrait
         $startDate = new \DateTimeImmutable('2025-01-01');

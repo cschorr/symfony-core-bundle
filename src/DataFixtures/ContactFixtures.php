@@ -64,9 +64,9 @@ class ContactFixtures extends Fixture implements DependentFixtureInterface
             }
 
             if (isset($contactData['department']) && $contactData['department']) {
-                // Find department by code within the contact's company
+                // Find department by shortcode within the contact's company
                 $department = $manager->getRepository(Department::class)->findOneBy([
-                    'code' => $contactData['department'],
+                    'shortcode' => $contactData['department'],
                     'company' => $company,
                 ]);
 

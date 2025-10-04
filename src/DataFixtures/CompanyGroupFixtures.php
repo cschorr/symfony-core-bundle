@@ -14,17 +14,17 @@ class CompanyGroupFixtures extends Fixture
     {
         // Themed groups from comics and motion pictures
         $groups = [
-            'skynet' => ['name' => 'Skynet Group', 'code' => 'SKYNET'],
-            'marvel' => ['name' => 'Marvel Group', 'code' => 'MARVEL'],
-            'dc' => ['name' => 'DC Group', 'code' => 'DC'],
-            'weyland' => ['name' => 'Weyland-Yutani Group', 'code' => 'WEYLAND'],
-            'umbrella' => ['name' => 'Umbrella Group', 'code' => 'UMBRELLA'],
+            'skynet' => ['name' => 'Skynet Group', 'shortcode' => 'SKYNET'],
+            'marvel' => ['name' => 'Marvel Group', 'shortcode' => 'MARVEL'],
+            'dc' => ['name' => 'DC Group', 'shortcode' => 'DC'],
+            'weyland' => ['name' => 'Weyland-Yutani Group', 'shortcode' => 'WEYLAND'],
+            'umbrella' => ['name' => 'Umbrella Group', 'shortcode' => 'UMBRELLA'],
         ];
 
         foreach ($groups as $key => $data) {
             $group = (new CompanyGroup())
                 ->setName($data['name'])
-                ->setCode($data['code']);
+                ->setShortcode($data['shortcode']);
             $manager->persist($group);
         }
 

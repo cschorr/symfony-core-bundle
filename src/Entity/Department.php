@@ -8,8 +8,8 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use C3net\CoreBundle\Entity\Traits\Single\StringCodeTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
+use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
 use C3net\CoreBundle\Repository\DepartmentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -27,7 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
     filterClass: SearchFilter::class,
     properties: [
         'name' => 'partial',
-        'code' => 'partial',
+        'shortcode' => 'partial',
         'company' => 'exact',
         'contacts' => 'exact',
     ]
@@ -36,13 +36,13 @@ use Doctrine\ORM\Mapping as ORM;
     filterClass: OrderFilter::class,
     properties: [
         'name' => 'ASC',
-        'code' => 'ASC',
+        'shortcode' => 'ASC',
     ],
 )]
 class Department extends AbstractEntity
 {
     use StringNameTrait;
-    use StringCodeTrait;
+    use StringShortcodeTrait;
 
     #[ORM\ManyToOne(inversedBy: 'departments')]
     #[ORM\JoinColumn(nullable: false)]

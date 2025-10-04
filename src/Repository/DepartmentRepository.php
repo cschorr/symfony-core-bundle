@@ -34,14 +34,14 @@ class DepartmentRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find department by code within a company.
+     * Find department by shortcode within a company.
      */
-    public function findByCodeAndCompany(string $code, string $companyId): ?Department
+    public function findByShortcodeAndCompany(string $shortcode, string $companyId): ?Department
     {
         return $this->createQueryBuilder('d')
-            ->andWhere('d.code = :code')
+            ->andWhere('d.shortcode = :shortcode')
             ->andWhere('d.company = :companyId')
-            ->setParameter('code', $code)
+            ->setParameter('shortcode', $shortcode)
             ->setParameter('companyId', $companyId)
             ->getQuery()
             ->getOneOrNullResult();

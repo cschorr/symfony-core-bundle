@@ -18,19 +18,19 @@ class DepartmentFixtures extends Fixture implements DependentFixtureInterface
             // Cyberdyne Systems Departments
             [
                 'name' => 'Research & Development',
-                'code' => 'RND',
+                'shortcode' => 'RND',
                 'notes' => 'Advanced AI and robotics research',
                 'company' => 'Cyberdyne Systems',
             ],
             [
                 'name' => 'Marketing',
-                'code' => 'MKT',
+                'shortcode' => 'MKT',
                 'notes' => 'Product marketing and brand management',
                 'company' => 'Cyberdyne Systems',
             ],
             [
                 'name' => 'Engineering',
-                'code' => 'ENG',
+                'shortcode' => 'ENG',
                 'notes' => 'Systems engineering and product development',
                 'company' => 'Cyberdyne Systems',
             ],
@@ -38,13 +38,13 @@ class DepartmentFixtures extends Fixture implements DependentFixtureInterface
             // Stark Industries Departments
             [
                 'name' => 'Advanced Technology',
-                'code' => 'ADVTECH',
+                'shortcode' => 'ADVTECH',
                 'notes' => 'Next-generation technology development',
                 'company' => 'Stark Industries',
             ],
             [
                 'name' => 'Public Relations',
-                'code' => 'PR',
+                'shortcode' => 'PR',
                 'notes' => 'Media relations and corporate communications',
                 'company' => 'Stark Industries',
             ],
@@ -52,13 +52,13 @@ class DepartmentFixtures extends Fixture implements DependentFixtureInterface
             // Wayne Enterprises Departments
             [
                 'name' => 'Applied Sciences',
-                'code' => 'SCI',
+                'shortcode' => 'SCI',
                 'notes' => 'Scientific research and development',
                 'company' => 'Wayne Enterprises',
             ],
             [
                 'name' => 'Corporate',
-                'code' => 'CORP',
+                'shortcode' => 'CORP',
                 'notes' => 'Corporate management and strategy',
                 'company' => 'Wayne Enterprises',
             ],
@@ -74,7 +74,7 @@ class DepartmentFixtures extends Fixture implements DependentFixtureInterface
 
             $department = new Department();
             $department->setName($data['name']);
-            $department->setCode($data['code']);
+            $department->setShortcode($data['shortcode']);
             $department->setNotes($data['notes']);
             $department->setCompany($company);
 
