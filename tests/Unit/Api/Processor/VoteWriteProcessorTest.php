@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\RateLimiter\Limit;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
 class VoteWriteProcessorTest extends TestCase
 {
@@ -35,7 +36,18 @@ class VoteWriteProcessorTest extends TestCase
     {
         $this->persistProcessor = $this->createMock(ProcessorInterface::class);
         $this->security = $this->createMock(Security::class);
-        $this->rateLimiterFactory = $this->createMock(RateLimiterFactory::class);
+
+        // RateLimiterFactory is final, so we create a real instance with in-memory storage
+        $this->rateLimiterFactory = new RateLimiterFactory(
+            [
+                'id' => 'vote_limiter',
+                'policy' => 'sliding_window',
+                'limit' => 5,
+                'interval' => '1 minute',
+            ],
+            new InMemoryStorage()
+        );
+
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->voteRepository = $this->createMock(VoteRepository::class);
         $this->operation = $this->createMock(Operation::class);
