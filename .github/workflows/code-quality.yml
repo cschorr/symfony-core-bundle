@@ -19,16 +19,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        submodules: false  # Don't checkout submodules yet
-
-    - name: Setup Git for submodules
-      run: |
-        git config --global url."https://${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
-      if: ${{ secrets.SUBMODULE_TOKEN != '' }}
-
-    - name: Checkout submodules
-      run: git submodule update --init --recursive
-      if: ${{ secrets.SUBMODULE_TOKEN != '' }}
+        submodules: recursive
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
