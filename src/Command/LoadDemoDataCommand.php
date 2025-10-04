@@ -147,39 +147,84 @@ class LoadDemoDataCommand extends Command
             ];
 
             $hasMercureWarning = false;
+            $entityManagerResetCount = 0;
 
             foreach ($fixtures as $fixture) {
+                $fixtureClass = $fixture::class;
+
+                if ($io->isVerbose()) {
+                    $io->text(sprintf('Loading fixture: %s', basename(str_replace('\\', '/', $fixtureClass))));
+                }
+
                 try {
                     $fixture->load($this->entityManager);
                 } catch (\Exception $e) {
-                    // Check if this is a Mercure-related error that we can safely ignore during fixture loading
-                    if (str_contains($e->getMessage(), 'Failed to send an update')
-                        || str_contains($e->getMessage(), 'mercure')
-                        || str_contains($e->getMessage(), 'Mercure')
-                        || str_contains($e->getMessage(), 'The EntityManager is closed')) {
+                    $errorMessage = $e->getMessage();
+                    $isMercureError = str_contains($errorMessage, 'Failed to send an update')
+                        || str_contains($errorMessage, 'mercure')
+                        || str_contains($errorMessage, 'Mercure');
+                    $isEntityManagerClosed = str_contains($errorMessage, 'The EntityManager is closed');
+
+                    // Check if this is a Mercure-related error or closed EntityManager
+                    if ($isMercureError || $isEntityManagerClosed) {
+                        // Log specific error type
                         if (!$hasMercureWarning) {
-                            $io->warning([
-                                'Mercure update failed during demo data loading.',
-                                'This is usually harmless during fixture loading as real-time updates are not critical.',
-                                'Attempting to continue with fresh EntityManager...',
-                            ]);
-                            if ($io->isVerbose()) {
-                                $io->text('Error details: ' . $e->getMessage());
+                            $warningMessages = ['Demo data loading encountered recoverable errors:'];
+
+                            if ($isMercureError) {
+                                $warningMessages[] = '• Mercure real-time updates failed (non-critical during fixture loading)';
                             }
+
+                            if ($isEntityManagerClosed) {
+                                $warningMessages[] = '• EntityManager was closed (will be reset automatically)';
+                            }
+
+                            $warningMessages[] = 'Continuing with data loading...';
+                            $io->warning($warningMessages);
+
                             $hasMercureWarning = true;
                         }
 
-                        // If EntityManager is closed, we need to reset it
+                        // If EntityManager is closed, reset it and log the occurrence
                         if (!$this->entityManager->isOpen()) {
+                            ++$entityManagerResetCount;
+
+                            if ($io->isVerbose()) {
+                                $io->text(sprintf(
+                                    '[DEBUG] Resetting EntityManager (occurrence #%d) after fixture: %s',
+                                    $entityManagerResetCount,
+                                    basename(str_replace('\\', '/', $fixtureClass))
+                                ));
+                            }
+
                             $this->managerRegistry->resetManager();
                             $this->entityManager = $this->managerRegistry->getManager();
+
+                            if ($io->isVerbose()) {
+                                $io->text('[DEBUG] EntityManager reset successful, continuing fixture loading');
+                            }
+                        }
+
+                        // Log detailed error in verbose mode
+                        if ($io->isVerbose()) {
+                            $io->text(sprintf('[DEBUG] Error details: %s', $errorMessage));
+                            $io->text(sprintf('[DEBUG] Error occurred in: %s', $fixtureClass));
                         }
                     // Continue loading next fixture since Mercure failures during fixture loading are not critical
                     } else {
-                        // Re-throw non-Mercure related exceptions
+                        // Re-throw non-Mercure/non-EntityManager related exceptions
+                        $io->error(sprintf('Critical error in fixture %s', $fixtureClass));
                         throw $e;
                     }
                 }
+            }
+
+            // Log summary of EntityManager resets if any occurred
+            if ($entityManagerResetCount > 0 && $io->isVerbose()) {
+                $io->note(sprintf(
+                    'EntityManager was reset %d time(s) during fixture loading',
+                    $entityManagerResetCount
+                ));
             }
 
             $io->success([
