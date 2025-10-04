@@ -30,7 +30,7 @@ class UserApiTest extends ApiTestCase
         $token = $this->getAuthToken($adminUser);
 
         $response = static::createClient()->request('GET', '/api/users', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -48,7 +48,7 @@ class UserApiTest extends ApiTestCase
         $token = $this->getAuthToken($adminUser);
 
         $response = static::createClient()->request('GET', '/api/users/' . $testUser->getId(), [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -68,7 +68,7 @@ class UserApiTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'newuser@test.com',
@@ -76,8 +76,8 @@ class UserApiTest extends ApiTestCase
                 'nameLast' => 'User',
                 'password' => 'password123',
                 'active' => true,
-                'roles' => [UserRole::ROLE_USER->value]
-            ]
+                'roles' => [UserRole::ROLE_USER->value],
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(201);
@@ -87,7 +87,7 @@ class UserApiTest extends ApiTestCase
             'email' => 'newuser@test.com',
             'nameFirst' => 'New',
             'nameLast' => 'User',
-            'active' => true
+            'active' => true,
         ]);
 
         // Verify user was created in database
@@ -105,18 +105,18 @@ class UserApiTest extends ApiTestCase
         $response = static::createClient()->request('PATCH', '/api/users/' . $testUser->getId(), [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/merge-patch+json'
+                'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
                 'nameFirst' => 'Updated',
-                'nameLast' => 'Name'
-            ]
+                'nameLast' => 'Name',
+            ],
         ]);
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
             'nameFirst' => 'Updated',
-            'nameLast' => 'Name'
+            'nameLast' => 'Name',
         ]);
 
         // Verify changes in database
@@ -132,7 +132,7 @@ class UserApiTest extends ApiTestCase
         $token = $this->getAuthToken($adminUser);
 
         static::createClient()->request('DELETE', '/api/users/' . $testUser->getId(), [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseStatusCodeSame(204);
@@ -156,12 +156,12 @@ class UserApiTest extends ApiTestCase
         static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'forbidden@test.com',
-                'password' => 'password123'
-            ]
+                'password' => 'password123',
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(403);
@@ -175,17 +175,17 @@ class UserApiTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'invalid-email',
-                'password' => '123' // Too short
-            ]
+                'password' => '123', // Too short
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(422);
         $this->assertJsonContains([
-            '@type' => 'ConstraintViolationList'
+            '@type' => 'ConstraintViolationList',
         ]);
     }
 
@@ -205,7 +205,7 @@ class UserApiTest extends ApiTestCase
         $response = static::createClient()->request('POST', '/api/users', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/ld+json'
+                'Content-Type' => 'application/ld+json',
             ],
             'json' => [
                 'email' => 'groupuser@test.com',
@@ -213,12 +213,12 @@ class UserApiTest extends ApiTestCase
                 'nameLast' => 'User',
                 'password' => 'password123',
                 'active' => true,
-                'userGroups' => ['/api/user_groups/' . $userGroup->getId()]
-            ]
+                'userGroups' => ['/api/user_groups/' . $userGroup->getId()],
+            ],
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        
+
         $createdUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => 'groupuser@test.com']);
         $this->assertNotNull($createdUser);
         $this->assertCount(1, $createdUser->getUserGroups());
@@ -234,7 +234,7 @@ class UserApiTest extends ApiTestCase
 
         // Test filtering by email
         $response = static::createClient()->request('GET', '/api/users?email=john@example.com', [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -244,7 +244,7 @@ class UserApiTest extends ApiTestCase
 
         // Test filtering by role
         $response = static::createClient()->request('GET', '/api/users?roles[]=' . UserRole::ROLE_EDITOR->value, [
-            'headers' => ['Authorization' => 'Bearer ' . $token]
+            'headers' => ['Authorization' => 'Bearer ' . $token],
         ]);
 
         $this->assertResponseIsSuccessful();
@@ -278,7 +278,7 @@ class UserApiTest extends ApiTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         // Clean up test data
         $this->entityManager->getConnection()->executeStatement('DELETE FROM user WHERE email LIKE "%@test.com" OR email LIKE "%@example.com"');
         $this->entityManager->getConnection()->executeStatement('DELETE FROM user_group WHERE name = "Test Group"');

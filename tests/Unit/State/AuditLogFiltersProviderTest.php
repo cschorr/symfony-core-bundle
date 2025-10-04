@@ -31,27 +31,27 @@ class AuditLogFiltersProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'john@example.com',
                 'firstname' => 'John',
-                'lastname' => 'Doe'
+                'lastname' => 'Doe',
             ],
             [
                 'author_id' => 2,
                 'id' => 2,
                 'email' => 'jane@example.com',
                 'firstname' => 'Jane',
-                'lastname' => 'Smith'
-            ]
+                'lastname' => 'Smith',
+            ],
         ];
 
         $resourcesResult = [
             ['resource' => 'User'],
             ['resource' => 'Project'],
-            ['resource' => 'Company']
+            ['resource' => 'Company'],
         ];
 
         $actionsResult = [
             ['action' => 'create'],
             ['action' => 'update'],
-            ['action' => 'delete']
+            ['action' => 'delete'],
         ];
 
         $expectedResult = [
@@ -63,7 +63,7 @@ class AuditLogFiltersProviderTest extends TestCase
                     'email' => 'john@example.com',
                     'firstname' => 'John',
                     'lastname' => 'Doe',
-                    'fullname' => 'John Doe'
+                    'fullname' => 'John Doe',
                 ],
                 [
                     '@id' => '/api/users/2',
@@ -72,11 +72,11 @@ class AuditLogFiltersProviderTest extends TestCase
                     'email' => 'jane@example.com',
                     'firstname' => 'Jane',
                     'lastname' => 'Smith',
-                    'fullname' => 'Jane Smith'
-                ]
+                    'fullname' => 'Jane Smith',
+                ],
             ],
             'resources' => ['User', 'Project', 'Company'],
-            'actions' => ['create', 'update', 'delete']
+            'actions' => ['create', 'update', 'delete'],
         ];
 
         $this->repository
@@ -116,7 +116,7 @@ class AuditLogFiltersProviderTest extends TestCase
         $expectedResult = [
             'authors' => [],
             'resources' => [],
-            'actions' => []
+            'actions' => [],
         ];
 
         $result = $this->provider->provide($this->operation);
@@ -132,8 +132,8 @@ class AuditLogFiltersProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'john@example.com',
                 'firstname' => 'John',
-                'lastname' => 'Doe'
-            ]
+                'lastname' => 'Doe',
+            ],
         ];
 
         $this->repository
@@ -157,11 +157,11 @@ class AuditLogFiltersProviderTest extends TestCase
                     'email' => 'john@example.com',
                     'firstname' => 'John',
                     'lastname' => 'Doe',
-                    'fullname' => 'John Doe'
-                ]
+                    'fullname' => 'John Doe',
+                ],
             ],
             'resources' => [],
-            'actions' => ['create']
+            'actions' => ['create'],
         ];
 
         $result = $this->provider->provide($this->operation);
@@ -177,8 +177,8 @@ class AuditLogFiltersProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'john@example.com',
                 'firstname' => null,
-                'lastname' => null
-            ]
+                'lastname' => null,
+            ],
         ];
 
         $this->repository
@@ -209,8 +209,8 @@ class AuditLogFiltersProviderTest extends TestCase
                 'id' => 123,
                 'email' => 'test@example.com',
                 'firstname' => 'Test',
-                'lastname' => 'User'
-            ]
+                'lastname' => 'User',
+            ],
         ];
 
         $this->repository
@@ -338,17 +338,17 @@ class AuditLogFiltersProviderTest extends TestCase
         $resourcesResult = [];
         $actionsResult = [];
 
-        for ($i = 1; $i <= 100; $i++) {
+        for ($i = 1; $i <= 100; ++$i) {
             $authorsResult[] = [
                 'author_id' => $i,
                 'id' => $i,
                 'email' => "user{$i}@example.com",
                 'firstname' => "First{$i}",
-                'lastname' => "Last{$i}"
+                'lastname' => "Last{$i}",
             ];
         }
 
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 50; ++$i) {
             $resourcesResult[] = ['resource' => "Resource{$i}"];
             $actionsResult[] = ['action' => "action{$i}"];
         }
@@ -380,19 +380,19 @@ class AuditLogFiltersProviderTest extends TestCase
                 'id' => 1,
                 'email' => 'user@example.com',
                 'firstname' => '  John  ',
-                'lastname' => '  Doe  '
-            ]
+                'lastname' => '  Doe  ',
+            ],
         ];
 
         $resourcesResult = [
             ['resource' => 'App\\Entity\\User'],
-            ['resource' => 'Custom-Resource_Type']
+            ['resource' => 'Custom-Resource_Type'],
         ];
 
         $actionsResult = [
             ['action' => 'soft_delete'],
             ['action' => 'bulk:update'],
-            ['action' => 'export/csv']
+            ['action' => 'export/csv'],
         ];
 
         $this->repository

@@ -11,7 +11,7 @@ use C3net\CoreBundle\Repository\AuditLogsRepository;
 class AuditLogResourcesProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly AuditLogsRepository $auditLogsRepository
+        private readonly AuditLogsRepository $auditLogsRepository,
     ) {
     }
 
@@ -20,6 +20,6 @@ class AuditLogResourcesProvider implements ProviderInterface
         $resources = $this->auditLogsRepository->findUniqueResources();
 
         // Extract just the resource values
-        return array_map(fn($item) => $item['resource'], $resources);
+        return array_map(fn ($item) => $item['resource'], $resources);
     }
 }

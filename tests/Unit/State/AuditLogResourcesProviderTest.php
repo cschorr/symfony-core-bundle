@@ -29,7 +29,7 @@ class AuditLogResourcesProviderTest extends TestCase
             ['resource' => 'User'],
             ['resource' => 'Project'],
             ['resource' => 'Company'],
-            ['resource' => 'Category']
+            ['resource' => 'Category'],
         ];
 
         $expectedResult = ['User', 'Project', 'Company', 'Category'];
@@ -61,7 +61,7 @@ class AuditLogResourcesProviderTest extends TestCase
         $repositoryResult = [
             ['resource' => 'User', 'other_field' => 'ignored'],
             ['resource' => 'Project', 'another_field' => 'also_ignored'],
-            ['resource' => 'Company']
+            ['resource' => 'Company'],
         ];
 
         $expectedResult = ['User', 'Project', 'Company'];
@@ -78,7 +78,7 @@ class AuditLogResourcesProviderTest extends TestCase
     public function testProvideHandlesSingleResource(): void
     {
         $repositoryResult = [
-            ['resource' => 'User']
+            ['resource' => 'User'],
         ];
 
         $expectedResult = ['User'];
@@ -98,14 +98,14 @@ class AuditLogResourcesProviderTest extends TestCase
             ['resource' => 'App\\Entity\\User'],
             ['resource' => 'My\\Custom\\Entity\\Project'],
             ['resource' => 'Company_V2'],
-            ['resource' => 'Category-Type']
+            ['resource' => 'Category-Type'],
         ];
 
         $expectedResult = [
             'App\\Entity\\User',
             'My\\Custom\\Entity\\Project',
             'Company_V2',
-            'Category-Type'
+            'Category-Type',
         ];
 
         $this->repository
@@ -147,7 +147,7 @@ class AuditLogResourcesProviderTest extends TestCase
         $repositoryResult = [];
         $expectedResult = [];
 
-        for ($i = 1; $i <= 500; $i++) {
+        for ($i = 1; $i <= 500; ++$i) {
             $resource = "Resource{$i}";
             $repositoryResult[] = ['resource' => $resource];
             $expectedResult[] = $resource;
@@ -169,7 +169,7 @@ class AuditLogResourcesProviderTest extends TestCase
         $repositoryResult = [
             ['resource' => 'User'],
             ['resource' => null], // This should be filtered by repository
-            ['resource' => 'Project']
+            ['resource' => 'Project'],
         ];
 
         $expectedResult = ['User', null, 'Project'];
@@ -188,7 +188,7 @@ class AuditLogResourcesProviderTest extends TestCase
         $repositoryResult = [
             ['resource' => 'User'],
             ['resource' => ''], // Empty string
-            ['resource' => 'Project']
+            ['resource' => 'Project'],
         ];
 
         $expectedResult = ['User', '', 'Project'];
@@ -207,7 +207,7 @@ class AuditLogResourcesProviderTest extends TestCase
         $repositoryResult = [
             ['resource' => 'User'],
             ['resource' => 'Project'],
-            ['resource' => 'Company']
+            ['resource' => 'Company'],
         ];
 
         $this->repository
@@ -233,7 +233,7 @@ class AuditLogResourcesProviderTest extends TestCase
             ['resource' => 'UserGroup'],
             ['resource' => 'CompanyGroup'],
             ['resource' => 'Contact'],
-            ['resource' => 'Campaign']
+            ['resource' => 'Campaign'],
         ];
 
         $expectedResult = [
@@ -244,7 +244,7 @@ class AuditLogResourcesProviderTest extends TestCase
             'UserGroup',
             'CompanyGroup',
             'Contact',
-            'Campaign'
+            'Campaign',
         ];
 
         $this->repository

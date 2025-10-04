@@ -44,9 +44,7 @@ class AuditLogsRepository extends ServiceEntityRepository
     //    }
 
     /**
-     * Get all unique authors from audit logs
-     *
-     * @return array
+     * Get all unique authors from audit logs.
      */
     public function findUniqueAuthors(): array
     {
@@ -62,9 +60,7 @@ class AuditLogsRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get all unique resources from audit logs
-     *
-     * @return array
+     * Get all unique resources from audit logs.
      */
     public function findUniqueResources(): array
     {
@@ -77,9 +73,7 @@ class AuditLogsRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get all unique actions from audit logs
-     *
-     * @return array
+     * Get all unique actions from audit logs.
      */
     public function findUniqueActions(): array
     {

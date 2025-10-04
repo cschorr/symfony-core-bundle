@@ -85,7 +85,7 @@ class VoteWriteProcessorTest extends TestCase
     public function testProcessThrowsExceptionWhenUserNotAuthenticated(): void
     {
         $vote = new Vote();
-        
+
         $this->security
             ->method('getUser')
             ->willReturn(null);
@@ -100,7 +100,7 @@ class VoteWriteProcessorTest extends TestCase
     {
         $vote = new Vote();
         $nonUserObject = new \stdClass();
-        
+
         $this->security
             ->method('getUser')
             ->willReturn($nonUserObject);
@@ -185,7 +185,7 @@ class VoteWriteProcessorTest extends TestCase
         $vote->setValue(1);
         $comment = new Comment();
         $vote->setComment($comment);
-        
+
         $user = new User();
         $user->setEmail('test@example.com');
 
@@ -215,7 +215,7 @@ class VoteWriteProcessorTest extends TestCase
         $vote->setValue(-1);
         $comment = new Comment();
         $vote->setComment($comment);
-        
+
         $user = new User();
         $user->setEmail('test@example.com');
 
@@ -246,7 +246,7 @@ class VoteWriteProcessorTest extends TestCase
         $newVote->setValue(1);
         $comment = new Comment();
         $newVote->setComment($comment);
-        
+
         $user = new User();
         $user->setEmail('test@example.com');
 
@@ -282,7 +282,7 @@ class VoteWriteProcessorTest extends TestCase
         $vote->setValue(1);
         $comment = new Comment();
         $vote->setComment($comment);
-        
+
         $user = new User();
         $user->setEmail('test@example.com');
 
@@ -312,7 +312,7 @@ class VoteWriteProcessorTest extends TestCase
         $vote->setValue(1);
         $comment = new Comment();
         $vote->setComment($comment);
-        
+
         $user = new User();
         $user->setEmail('test@example.com');
 
@@ -342,7 +342,7 @@ class VoteWriteProcessorTest extends TestCase
         $vote->setValue(1);
         $comment = new Comment();
         $vote->setComment($comment);
-        
+
         $user = new User();
         $user->setEmail('voter@example.com');
 

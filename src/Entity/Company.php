@@ -65,6 +65,12 @@ class Company extends AbstractEntity
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'company')]
     private Collection $employees;
 
+    /**
+     * @var Collection<int, Transaction>
+     */
+    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'customer')]
+    private Collection $transactions;
+
     #[ORM\ManyToOne(targetEntity: Category::class)]
     private ?Category $category = null;
 
@@ -79,6 +85,7 @@ class Company extends AbstractEntity
         parent::__construct();
         $this->projects = new ArrayCollection();
         $this->employees = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     #[\Override]
@@ -195,6 +202,35 @@ class Company extends AbstractEntity
     public function setDepartment(?string $department): static
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Transaction>
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): static
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions->add($transaction);
+            $transaction->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): static
+    {
+        if ($this->transactions->removeElement($transaction)) {
+            if ($transaction->getCustomer() === $this) {
+                $transaction->setCustomer(null);
+            }
+        }
 
         return $this;
     }

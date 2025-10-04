@@ -35,3 +35,48 @@ framework:
                 reopen:
                     from: [completed, cancelled]
                     to: draft
+
+        transaction_status:
+            type: 'state_machine'
+            audit_trail:
+                enabled: true
+            marking_store:
+                type: 'method'
+                property: 'status'
+            supports:
+                - C3net\CoreBundle\Entity\Transaction
+            initial_marking: draft
+            places:
+                - draft
+                - quoted
+                - ordered
+                - in_production
+                - delivered
+                - invoiced
+                - paid
+                - cancelled
+            transitions:
+                quote:
+                    from: draft
+                    to: quoted
+                order:
+                    from: quoted
+                    to: ordered
+                start_production:
+                    from: ordered
+                    to: in_production
+                deliver:
+                    from: in_production
+                    to: delivered
+                invoice:
+                    from: delivered
+                    to: invoiced
+                mark_paid:
+                    from: invoiced
+                    to: paid
+                cancel:
+                    from: [draft, quoted, ordered, in_production]
+                    to: cancelled
+                reopen:
+                    from: cancelled
+                    to: draft

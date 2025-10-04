@@ -24,7 +24,7 @@ class UserRepositoryTest extends TestCase
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
-        
+
         $this->managerRegistry
             ->method('getManagerForClass')
             ->with(User::class)
@@ -56,7 +56,7 @@ class UserRepositoryTest extends TestCase
         // Verify that constructor is called with User::class
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        
+
         $managerRegistry
             ->expects($this->once())
             ->method('getManagerForClass')
@@ -71,43 +71,43 @@ class UserRepositoryTest extends TestCase
         $user = new User();
         $user->setEmail('test@example.com');
         $newPassword = 'newHashedPassword123';
-        
+
         $this->entityManager
             ->expects($this->once())
             ->method('persist')
             ->with($user);
-            
+
         $this->entityManager
             ->expects($this->once())
             ->method('flush');
-        
+
         $this->repository->upgradePassword($user, $newPassword);
-        
+
         $this->assertSame($newPassword, $user->getPassword());
     }
 
     public function testUpgradePasswordThrowsExceptionForInvalidUser(): void
     {
         $invalidUser = new MockInvalidUser();
-        
+
         $this->expectException(UnsupportedUserException::class);
         $this->expectExceptionMessage('Instances of "' . MockInvalidUser::class . '" are not supported.');
-        
+
         $this->repository->upgradePassword($invalidUser, 'newPassword');
     }
 
     public function testUpgradePasswordDoesNotCallPersistForInvalidUser(): void
     {
         $invalidUser = new MockInvalidUser();
-        
+
         $this->entityManager
             ->expects($this->never())
             ->method('persist');
-            
+
         $this->entityManager
             ->expects($this->never())
             ->method('flush');
-        
+
         try {
             $this->repository->upgradePassword($invalidUser, 'newPassword');
         } catch (UnsupportedUserException $e) {
@@ -118,9 +118,9 @@ class UserRepositoryTest extends TestCase
     public function testRepositoryHasCorrectMethods(): void
     {
         $reflection = new \ReflectionClass(UserRepository::class);
-        
+
         $this->assertTrue($reflection->hasMethod('upgradePassword'));
-        
+
         $upgradePasswordMethod = $reflection->getMethod('upgradePassword');
         $this->assertTrue($upgradePasswordMethod->isPublic());
         $this->assertCount(2, $upgradePasswordMethod->getParameters());
@@ -130,12 +130,12 @@ class UserRepositoryTest extends TestCase
     {
         $reflection = new \ReflectionClass(UserRepository::class);
         $method = $reflection->getMethod('upgradePassword');
-        
+
         $parameters = $method->getParameters();
-        
+
         $this->assertSame('user', $parameters[0]->getName());
         $this->assertSame('newHashedPassword', $parameters[1]->getName());
-        
+
         $this->assertSame(
             PasswordAuthenticatedUserInterface::class,
             $parameters[0]->getType()?->getName()
@@ -148,7 +148,7 @@ class UserRepositoryTest extends TestCase
     {
         $reflection = new \ReflectionClass(UserRepository::class);
         $interfaces = $reflection->getInterfaceNames();
-        
+
         $this->assertContains(PasswordUpgraderInterface::class, $interfaces);
     }
 
@@ -156,7 +156,7 @@ class UserRepositoryTest extends TestCase
     {
         // Test that the repository implements the correct interface for Symfony Security
         $this->assertInstanceOf(PasswordUpgraderInterface::class, $this->repository);
-        
+
         // Test that upgradePassword method exists and is callable
         $this->assertTrue(method_exists($this->repository, 'upgradePassword'));
         $this->assertTrue(is_callable([$this->repository, 'upgradePassword']));
@@ -168,9 +168,9 @@ class UserRepositoryTest extends TestCase
         $user->setEmail('persistence@example.com');
         $originalPassword = 'oldPassword';
         $newPassword = 'newHashedPassword456';
-        
+
         $user->setPassword($originalPassword);
-        
+
         // Verify persist and flush are called in correct order
         $this->entityManager
             ->expects($this->once())
@@ -178,13 +178,13 @@ class UserRepositoryTest extends TestCase
             ->with($this->callback(function (User $persistedUser) use ($user) {
                 return $persistedUser === $user;
             }));
-            
+
         $this->entityManager
             ->expects($this->once())
             ->method('flush');
-        
+
         $this->repository->upgradePassword($user, $newPassword);
-        
+
         // Verify password was actually changed
         $this->assertSame($newPassword, $user->getPassword());
         $this->assertNotSame($originalPassword, $user->getPassword());
@@ -194,21 +194,21 @@ class UserRepositoryTest extends TestCase
     {
         $user = new User();
         $user->setEmail('complex@example.com');
-        
+
         // Test with complex password including special characters
         $complexPassword = '$2y$13$abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
-        
+
         $this->entityManager
             ->expects($this->once())
             ->method('persist')
             ->with($user);
-            
+
         $this->entityManager
             ->expects($this->once())
             ->method('flush');
-        
+
         $this->repository->upgradePassword($user, $complexPassword);
-        
+
         $this->assertSame($complexPassword, $user->getPassword());
     }
 
@@ -217,25 +217,25 @@ class UserRepositoryTest extends TestCase
         $user = new User();
         $user->setEmail('existing@example.com');
         $user->setPassword('existingPassword');
-        
+
         // Simulate an existing user with existing data
         $user->setNameFirst('John');
         $user->setNameLast('Doe');
         $user->setActive(true);
-        
+
         $newPassword = 'upgradedPassword789';
-        
+
         $this->entityManager
             ->expects($this->once())
             ->method('persist')
             ->with($user);
-            
+
         $this->entityManager
             ->expects($this->once())
             ->method('flush');
-        
+
         $this->repository->upgradePassword($user, $newPassword);
-        
+
         // Verify only password changed, other data intact
         $this->assertSame($newPassword, $user->getPassword());
         $this->assertSame('John', $user->getNameFirst());
@@ -246,10 +246,10 @@ class UserRepositoryTest extends TestCase
     public function testRepositoryInheritanceChain(): void
     {
         $reflection = new \ReflectionClass(UserRepository::class);
-        
+
         // Test inheritance chain
         $this->assertTrue($reflection->isSubclassOf(\Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository::class));
-        
+
         // Test that it has access to inherited methods
         $this->assertTrue(method_exists($this->repository, 'find'));
         $this->assertTrue(method_exists($this->repository, 'findAll'));

@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Trait for implementing Gedmo Nested Tree behavior
+ * Trait for implementing Gedmo Nested Tree behavior.
  *
  * This trait provides all necessary properties and methods for entities
  * that need to be organized in a nested tree structure using the
@@ -52,7 +52,7 @@ trait NestedTreeTrait
 
     /**
      * Initialize the children collection
-     * This should be called in the entity's constructor
+     * This should be called in the entity's constructor.
      */
     protected function initializeTreeCollections(): void
     {
@@ -121,15 +121,15 @@ trait NestedTreeTrait
     }
 
     /**
-     * Check if this node is a root node
+     * Check if this node is a root node.
      */
     public function isRoot(): bool
     {
-        return $this->parent === null;
+        return null === $this->parent;
     }
 
     /**
-     * Check if this node is a leaf node (has no children)
+     * Check if this node is a leaf node (has no children).
      */
     public function isLeaf(): bool
     {
@@ -137,7 +137,7 @@ trait NestedTreeTrait
     }
 
     /**
-     * Get the depth level of this node in the tree
+     * Get the depth level of this node in the tree.
      */
     public function getLevel(): ?int
     {

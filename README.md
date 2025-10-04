@@ -1,4 +1,4 @@
-# C3net Core Bundle
+# Symfony C3net Core Bundle
 
 A comprehensive Symfony bundle providing business and project management functionality with API Platform integration.
 

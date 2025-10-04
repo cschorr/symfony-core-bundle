@@ -11,7 +11,7 @@ use C3net\CoreBundle\Repository\AuditLogsRepository;
 class AuditLogAuthorsProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly AuditLogsRepository $auditLogsRepository
+        private readonly AuditLogsRepository $auditLogsRepository,
     ) {
     }
 

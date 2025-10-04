@@ -34,6 +34,9 @@ class Campaign extends AbstractEntity
     #[ORM\ManyToOne(inversedBy: 'campaigns')]
     private ?Category $category = null;
 
+    #[ORM\ManyToOne(inversedBy: 'campaigns')]
+    private ?Transaction $transaction = null;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
@@ -90,6 +93,18 @@ class Campaign extends AbstractEntity
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getTransaction(): ?Transaction
+    {
+        return $this->transaction;
+    }
+
+    public function setTransaction(?Transaction $transaction): static
+    {
+        $this->transaction = $transaction;
 
         return $this;
     }

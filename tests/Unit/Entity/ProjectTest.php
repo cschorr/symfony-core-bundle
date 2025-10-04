@@ -26,15 +26,15 @@ class ProjectTest extends TestCase
     public function testConstructor(): void
     {
         $project = new Project();
-        
+
         // Test that collections are initialized
         $this->assertCount(0, $project->getNotifications());
         $this->assertCount(0, $project->getContact());
-        
+
         // Test default status
-        $this->assertSame(ProjectStatus::PLANNING, $project->getStatus());
+        $this->assertSame(ProjectStatus::PLANNING, $project->getStatusEnum());
         $this->assertTrue($project->isPlanning());
-        
+
         // Test inherited AbstractEntity properties
         $this->assertNotNull($project->getCreatedAt());
         $this->assertNotNull($project->getUpdatedAt());
@@ -50,20 +50,20 @@ class ProjectTest extends TestCase
     public function testStatusProperty(): void
     {
         // Test default status
-        $this->assertSame(ProjectStatus::PLANNING, $this->project->getStatus());
-        
+        $this->assertSame(ProjectStatus::PLANNING, $this->project->getStatusEnum());
+
         // Test setting different statuses
         $this->project->setStatus(ProjectStatus::IN_PROGRESS);
-        $this->assertSame(ProjectStatus::IN_PROGRESS, $this->project->getStatus());
-        
+        $this->assertSame(ProjectStatus::IN_PROGRESS, $this->project->getStatusEnum());
+
         $this->project->setStatus(ProjectStatus::COMPLETED);
-        $this->assertSame(ProjectStatus::COMPLETED, $this->project->getStatus());
-        
+        $this->assertSame(ProjectStatus::COMPLETED, $this->project->getStatusEnum());
+
         $this->project->setStatus(ProjectStatus::CANCELLED);
-        $this->assertSame(ProjectStatus::CANCELLED, $this->project->getStatus());
-        
+        $this->assertSame(ProjectStatus::CANCELLED, $this->project->getStatusEnum());
+
         $this->project->setStatus(ProjectStatus::ON_HOLD);
-        $this->assertSame(ProjectStatus::ON_HOLD, $this->project->getStatus());
+        $this->assertSame(ProjectStatus::ON_HOLD, $this->project->getStatusEnum());
     }
 
     public function testStatusHelperMethods(): void
@@ -75,7 +75,7 @@ class ProjectTest extends TestCase
         $this->assertFalse($this->project->isCompleted());
         $this->assertFalse($this->project->isCancelled());
         $this->assertFalse($this->project->isOnHold());
-        
+
         // Test in progress status
         $this->project->setStatus(ProjectStatus::IN_PROGRESS);
         $this->assertFalse($this->project->isPlanning());
@@ -83,7 +83,7 @@ class ProjectTest extends TestCase
         $this->assertFalse($this->project->isCompleted());
         $this->assertFalse($this->project->isCancelled());
         $this->assertFalse($this->project->isOnHold());
-        
+
         // Test completed status
         $this->project->setStatus(ProjectStatus::COMPLETED);
         $this->assertFalse($this->project->isPlanning());
@@ -91,7 +91,7 @@ class ProjectTest extends TestCase
         $this->assertTrue($this->project->isCompleted());
         $this->assertFalse($this->project->isCancelled());
         $this->assertFalse($this->project->isOnHold());
-        
+
         // Test cancelled status
         $this->project->setStatus(ProjectStatus::CANCELLED);
         $this->assertFalse($this->project->isPlanning());
@@ -99,7 +99,7 @@ class ProjectTest extends TestCase
         $this->assertFalse($this->project->isCompleted());
         $this->assertTrue($this->project->isCancelled());
         $this->assertFalse($this->project->isOnHold());
-        
+
         // Test on hold status
         $this->project->setStatus(ProjectStatus::ON_HOLD);
         $this->assertFalse($this->project->isPlanning());
@@ -112,9 +112,9 @@ class ProjectTest extends TestCase
     public function testNameTrait(): void
     {
         $name = 'Test Project';
-        
+
         $this->project->setName($name);
-        
+
         $this->assertSame($name, $this->project->getName());
     }
 
@@ -122,10 +122,10 @@ class ProjectTest extends TestCase
     {
         $startDate = new \DateTimeImmutable('2025-01-01');
         $endDate = new \DateTimeImmutable('2025-12-31');
-        
+
         $this->project->setStartDate($startDate);
         $this->project->setEndDate($endDate);
-        
+
         $this->assertSame($startDate, $this->project->getStartDate());
         $this->assertSame($endDate, $this->project->getEndDate());
     }
@@ -133,39 +133,39 @@ class ProjectTest extends TestCase
     public function testAssigneeRelationship(): void
     {
         $this->assertNull($this->project->getAssignee());
-        
+
         $user = new User();
         $this->project->setAssignee($user);
-        
+
         $this->assertSame($user, $this->project->getAssignee());
     }
 
     public function testClientRelationship(): void
     {
         $this->assertNull($this->project->getClient());
-        
+
         $company = new Company();
         $this->project->setClient($company);
-        
+
         $this->assertSame($company, $this->project->getClient());
     }
 
     public function testDescriptionProperty(): void
     {
         $this->assertNull($this->project->getDescription());
-        
+
         $description = 'This is a detailed project description.';
         $this->project->setDescription($description);
-        
+
         $this->assertSame($description, $this->project->getDescription());
     }
 
     public function testDescriptionHandlesLargeText(): void
     {
         $largeDescription = str_repeat('This is a very long description. ', 100);
-        
+
         $this->project->setDescription($largeDescription);
-        
+
         $this->assertSame($largeDescription, $this->project->getDescription());
         $this->assertGreaterThan(1000, strlen($this->project->getDescription()));
     }
@@ -173,30 +173,30 @@ class ProjectTest extends TestCase
     public function testCategoryRelationship(): void
     {
         $this->assertNull($this->project->getCategory());
-        
+
         $category = new Category();
         $this->project->setCategory($category);
-        
+
         $this->assertSame($category, $this->project->getCategory());
     }
 
     public function testCampaignRelationship(): void
     {
         $this->assertNull($this->project->getCampaign());
-        
+
         $campaign = new Campaign();
         $this->project->setCampaign($campaign);
-        
+
         $this->assertSame($campaign, $this->project->getCampaign());
     }
 
     public function testDueDateProperty(): void
     {
         $this->assertNull($this->project->getDueDate());
-        
+
         $dueDate = new \DateTimeImmutable('2025-06-30');
         $this->project->setDueDate($dueDate);
-        
+
         $this->assertSame($dueDate, $this->project->getDueDate());
     }
 
@@ -204,20 +204,20 @@ class ProjectTest extends TestCase
     {
         $notification1 = new Notification();
         $notification2 = new Notification();
-        
+
         // Add notifications
         $this->project->addNotification($notification1);
         $this->project->addNotification($notification2);
-        
+
         $this->assertCount(2, $this->project->getNotifications());
         $this->assertTrue($this->project->getNotifications()->contains($notification1));
         $this->assertTrue($this->project->getNotifications()->contains($notification2));
         $this->assertSame($this->project, $notification1->getProject());
         $this->assertSame($this->project, $notification2->getProject());
-        
+
         // Remove notification
         $this->project->removeNotification($notification1);
-        
+
         $this->assertCount(1, $this->project->getNotifications());
         $this->assertFalse($this->project->getNotifications()->contains($notification1));
         $this->assertNull($notification1->getProject());
@@ -226,10 +226,10 @@ class ProjectTest extends TestCase
     public function testNotificationsNoDuplicates(): void
     {
         $notification = new Notification();
-        
+
         $this->project->addNotification($notification);
         $this->project->addNotification($notification); // Add same notification again
-        
+
         $this->assertCount(1, $this->project->getNotifications());
     }
 
@@ -237,18 +237,18 @@ class ProjectTest extends TestCase
     {
         $contact1 = new Contact();
         $contact2 = new Contact();
-        
+
         // Add contacts
         $this->project->addContact($contact1);
         $this->project->addContact($contact2);
-        
+
         $this->assertCount(2, $this->project->getContact());
         $this->assertTrue($this->project->getContact()->contains($contact1));
         $this->assertTrue($this->project->getContact()->contains($contact2));
-        
+
         // Remove contact
         $this->project->removeContact($contact1);
-        
+
         $this->assertCount(1, $this->project->getContact());
         $this->assertFalse($this->project->getContact()->contains($contact1));
     }
@@ -256,10 +256,10 @@ class ProjectTest extends TestCase
     public function testContactsNoDuplicates(): void
     {
         $contact = new Contact();
-        
+
         $this->project->addContact($contact);
         $this->project->addContact($contact); // Add same contact again
-        
+
         $this->assertCount(1, $this->project->getContact());
     }
 
@@ -267,7 +267,7 @@ class ProjectTest extends TestCase
     {
         $projectName = 'My Test Project';
         $this->project->setName($projectName);
-        
+
         $this->assertSame($projectName, (string) $this->project);
     }
 
@@ -280,46 +280,46 @@ class ProjectTest extends TestCase
     public function testToStringWithEmptyName(): void
     {
         $this->project->setName('');
-        
+
         $this->assertSame('Unnamed Project', (string) $this->project);
     }
 
     public function testCompleteProjectWorkflow(): void
     {
         $project = new Project();
-        
+
         // Set up complete project
         $project->setName('Complete Test Project')
                 ->setDescription('A comprehensive test project')
                 ->setStatus(ProjectStatus::IN_PROGRESS);
-        
+
         // Set dates
         $startDate = new \DateTimeImmutable('2025-01-01');
         $endDate = new \DateTimeImmutable('2025-12-31');
         $dueDate = new \DateTimeImmutable('2025-11-30');
-        
+
         $project->setStartDate($startDate)
                 ->setEndDate($endDate)
                 ->setDueDate($dueDate);
-        
+
         // Set relationships
         $assignee = new User();
         $client = new Company();
         $category = new Category();
         $campaign = new Campaign();
-        
+
         $project->setAssignee($assignee)
                 ->setClient($client)
                 ->setCategory($category)
                 ->setCampaign($campaign);
-        
+
         // Add contacts and notifications
         $contact = new Contact();
         $notification = new Notification();
-        
+
         $project->addContact($contact)
                 ->addNotification($notification);
-        
+
         // Verify complete setup
         $this->assertSame('Complete Test Project', $project->getName());
         $this->assertSame('A comprehensive test project', $project->getDescription());
@@ -340,19 +340,19 @@ class ProjectTest extends TestCase
     {
         // Test typical project lifecycle
         $this->assertTrue($this->project->isPlanning());
-        
+
         // Start project
         $this->project->setStatus(ProjectStatus::IN_PROGRESS);
         $this->assertTrue($this->project->isInProgress());
-        
+
         // Put on hold
         $this->project->setStatus(ProjectStatus::ON_HOLD);
         $this->assertTrue($this->project->isOnHold());
-        
+
         // Resume project
         $this->project->setStatus(ProjectStatus::IN_PROGRESS);
         $this->assertTrue($this->project->isInProgress());
-        
+
         // Complete project
         $this->project->setStatus(ProjectStatus::COMPLETED);
         $this->assertTrue($this->project->isCompleted());
@@ -362,7 +362,7 @@ class ProjectTest extends TestCase
     {
         $this->project->setStatus(ProjectStatus::IN_PROGRESS);
         $this->assertTrue($this->project->isInProgress());
-        
+
         // Cancel project
         $this->project->setStatus(ProjectStatus::CANCELLED);
         $this->assertTrue($this->project->isCancelled());
@@ -374,7 +374,7 @@ class ProjectTest extends TestCase
     {
         // Test inherited active status from AbstractEntity
         $this->assertTrue($this->project->isActive());
-        
+
         $this->project->setActive(false);
         $this->assertFalse($this->project->isActive());
     }
@@ -384,7 +384,7 @@ class ProjectTest extends TestCase
         // Test inherited notes from AbstractEntity
         $notes = 'Internal project notes';
         $this->project->setNotes($notes);
-        
+
         $this->assertSame($notes, $this->project->getNotes());
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * Functional test for the LoadDemoDataCommand
- * Tests the complete demo data loading workflow
+ * Tests the complete demo data loading workflow.
  */
 class LoadDemoDataCommandTest extends KernelTestCase
 {
@@ -58,11 +58,11 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $this->commandTester->execute([]);
 
         $categories = $this->entityManager->getRepository(Category::class)->findAll();
-        
+
         $this->assertGreaterThanOrEqual(4, count($categories)); // At least main categories
-        
+
         // Check for specific main categories
-        $categoryNames = array_map(fn($c) => $c->getName(), $categories);
+        $categoryNames = array_map(fn ($c) => $c->getName(), $categories);
         $this->assertContains('Technology', $categoryNames);
         $this->assertContains('Business Services', $categoryNames);
         $this->assertContains('Marketing & Sales', $categoryNames);
@@ -87,10 +87,10 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $this->commandTester->execute([]);
 
         $userGroups = $this->entityManager->getRepository(UserGroup::class)->findAll();
-        
+
         $this->assertGreaterThanOrEqual(5, count($userGroups));
-        
-        $groupNames = array_map(fn($g) => $g->getName(), $userGroups);
+
+        $groupNames = array_map(fn ($g) => $g->getName(), $userGroups);
         $this->assertContains('External Users', $groupNames);
         $this->assertContains('Editor', $groupNames);
         $this->assertContains('Teamlead', $groupNames);
@@ -119,7 +119,7 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $companyGroups = $this->entityManager->getRepository(CompanyGroup::class)->findAll();
         $this->assertGreaterThanOrEqual(5, count($companyGroups));
 
-        $groupNames = array_map(fn($g) => $g->getName(), $companyGroups);
+        $groupNames = array_map(fn ($g) => $g->getName(), $companyGroups);
         $this->assertContains('Skynet Group', $groupNames);
         $this->assertContains('Marvel Group', $groupNames);
         $this->assertContains('DC Group', $groupNames);
@@ -128,7 +128,7 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $companies = $this->entityManager->getRepository(Company::class)->findAll();
         $this->assertGreaterThanOrEqual(10, count($companies));
 
-        $companyNames = array_map(fn($c) => $c->getName(), $companies);
+        $companyNames = array_map(fn ($c) => $c->getName(), $companies);
         $this->assertContains('Cyberdyne Systems', $companyNames);
         $this->assertContains('Stark Industries', $companyNames);
         $this->assertContains('Wayne Enterprises', $companyNames);
@@ -157,7 +157,7 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $users = $this->entityManager->getRepository(User::class)->findAll();
         $this->assertGreaterThanOrEqual(10, count($users));
 
-        $userEmails = array_map(fn($u) => $u->getEmail(), $users);
+        $userEmails = array_map(fn ($u) => $u->getEmail(), $users);
         $this->assertContains('admin@example.com', $userEmails);
         $this->assertContains('editor@example.com', $userEmails);
         $this->assertContains('teamlead@example.com', $userEmails);
@@ -174,7 +174,7 @@ class LoadDemoDataCommandTest extends KernelTestCase
 
         // Verify user-group relationships
         $this->assertGreaterThan(0, count($adminUser->getUserGroups()));
-        $groupNames = $adminUser->getUserGroups()->map(fn($g) => $g->getName())->toArray();
+        $groupNames = $adminUser->getUserGroups()->map(fn ($g) => $g->getName())->toArray();
         $this->assertContains('Admin', $groupNames);
 
         // Verify user-company relationships
@@ -208,14 +208,14 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $this->assertNotEmpty($johnDoe->getCell());
 
         // Verify contacts have proper company assignments
-        $contactsWithCompanies = array_filter($contacts, fn($c) => $c->getCompany() !== null);
+        $contactsWithCompanies = array_filter($contacts, fn ($c) => null !== $c->getCompany());
         $this->assertSame(count($contacts), count($contactsWithCompanies));
 
         // Check for contacts with positions and departments
-        $contactsWithPositions = array_filter($contacts, fn($c) => !empty($c->getPosition()));
+        $contactsWithPositions = array_filter($contacts, fn ($c) => !empty($c->getPosition()));
         $this->assertGreaterThan(0, count($contactsWithPositions));
 
-        $contactsWithDepartments = array_filter($contacts, fn($c) => !empty($c->getDepartment()));
+        $contactsWithDepartments = array_filter($contacts, fn ($c) => !empty($c->getDepartment()));
         $this->assertGreaterThan(0, count($contactsWithDepartments));
     }
 
@@ -227,7 +227,7 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $projects = $this->entityManager->getRepository(Project::class)->findAll();
         $this->assertGreaterThanOrEqual(25, count($projects)); // Expecting many projects
 
-        $projectNames = array_map(fn($p) => $p->getName(), $projects);
+        $projectNames = array_map(fn ($p) => $p->getName(), $projects);
         $this->assertContains('E-Commerce Platform', $projectNames);
         $this->assertContains('Mobile Banking App', $projectNames);
         $this->assertContains('AI Security System', $projectNames);
@@ -251,9 +251,9 @@ class LoadDemoDataCommandTest extends KernelTestCase
         if ($assigneeCompany && $clientCompany) {
             // In some cases, assignee should be from the same company or related company
             $this->assertTrue(
-                $assigneeCompany->getId() === $clientCompany->getId() ||
-                $assigneeCompany->getCompanyGroup() === $clientCompany->getCompanyGroup() ||
-                true // Allow external assignees
+                $assigneeCompany->getId() === $clientCompany->getId()
+                || $assigneeCompany->getCompanyGroup() === $clientCompany->getCompanyGroup()
+                || true // Allow external assignees
             );
         }
     }
@@ -266,7 +266,7 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $campaigns = $this->entityManager->getRepository(Campaign::class)->findAll();
         $this->assertGreaterThanOrEqual(8, count($campaigns)); // Now expecting 8 campaigns
 
-        $campaignNames = array_map(fn($c) => $c->getName(), $campaigns);
+        $campaignNames = array_map(fn ($c) => $c->getName(), $campaigns);
         $this->assertContains('Digital Transformation 2025', $campaignNames);
         $this->assertContains('Global Marketing Excellence', $campaignNames);
         $this->assertContains('Enterprise Security & Compliance', $campaignNames);
@@ -277,7 +277,7 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $this->assertContains('Healthcare Technology Advancement', $campaignNames);
 
         // Verify campaign codes are set
-        $campaignCodes = array_map(fn($c) => $c->getCode(), $campaigns);
+        $campaignCodes = array_map(fn ($c) => $c->getCode(), $campaigns);
         $this->assertContains('DT2025', $campaignCodes);
         $this->assertContains('GME2024', $campaignCodes);
         $this->assertContains('ESC2024', $campaignCodes);
@@ -363,32 +363,32 @@ class LoadDemoDataCommandTest extends KernelTestCase
     public function testCommandIdempotency(): void
     {
         $this->clearExistingData();
-        
+
         // Run command first time
         $this->commandTester->execute([]);
-        
+
         // Count created entities
         $userCount1 = count($this->entityManager->getRepository(User::class)->findAll());
         $companyCount1 = count($this->entityManager->getRepository(Company::class)->findAll());
         $projectCount1 = count($this->entityManager->getRepository(Project::class)->findAll());
-        
+
         // Run command second time (should handle existing data gracefully)
         $this->commandTester->execute([]);
-        
+
         // Verify counts (depending on implementation, might be same or different)
         $userCount2 = count($this->entityManager->getRepository(User::class)->findAll());
         $companyCount2 = count($this->entityManager->getRepository(Company::class)->findAll());
         $projectCount2 = count($this->entityManager->getRepository(Project::class)->findAll());
-        
+
         // For this test, we expect the command to either:
         // 1. Skip existing data (same counts)
         // 2. Clear and reload (same counts)
         // 3. Add additional data (different counts but no errors)
-        
+
         $this->assertGreaterThan(0, $userCount2);
         $this->assertGreaterThan(0, $companyCount2);
         $this->assertGreaterThan(0, $projectCount2);
-        
+
         // The important thing is no exceptions were thrown
         $this->assertSame(0, $this->commandTester->getStatusCode());
     }
@@ -408,7 +408,7 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $this->entityManager->getConnection()->executeStatement('DELETE FROM user_group');
         $this->entityManager->getConnection()->executeStatement('DELETE FROM category');
         $this->entityManager->getConnection()->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
-        
+
         $this->entityManager->clear();
     }
 
@@ -418,25 +418,25 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $result = $this->entityManager->getConnection()->executeQuery(
             'SELECT COUNT(*) as count FROM user u LEFT JOIN company c ON u.company_id = c.id WHERE u.company_id IS NOT NULL AND c.id IS NULL'
         )->fetchAssociative();
-        $this->assertSame(0, (int)$result['count'], 'Found users with invalid company references');
+        $this->assertSame(0, (int) $result['count'], 'Found users with invalid company references');
 
         // Check that all project clients exist
         $result = $this->entityManager->getConnection()->executeQuery(
             'SELECT COUNT(*) as count FROM project p LEFT JOIN company c ON p.client_id = c.id WHERE c.id IS NULL'
         )->fetchAssociative();
-        $this->assertSame(0, (int)$result['count'], 'Found projects with invalid client references');
+        $this->assertSame(0, (int) $result['count'], 'Found projects with invalid client references');
 
         // Check that all project assignees exist
         $result = $this->entityManager->getConnection()->executeQuery(
             'SELECT COUNT(*) as count FROM project p LEFT JOIN user u ON p.assignee_id = u.id WHERE u.id IS NULL'
         )->fetchAssociative();
-        $this->assertSame(0, (int)$result['count'], 'Found projects with invalid assignee references');
+        $this->assertSame(0, (int) $result['count'], 'Found projects with invalid assignee references');
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         // Clean up is handled by clearExistingData() method
         // No additional cleanup needed as this is a functional test
     }

@@ -16,4 +16,8 @@ enum DomainEntityType: string
     case Thread = 'thread';
     case User = 'user';
     case UserGroup = 'user_group';
+    case Transaction = 'transaction';
+    case Offer = 'offer';
+    case Invoice = 'invoice';
+    case Document = 'document';
 }

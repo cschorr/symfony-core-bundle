@@ -45,7 +45,7 @@ class UserRepositoryIntegrationTest extends KernelTestCase
 
         // Refresh from database
         $this->entityManager->refresh($user);
-        
+
         $this->assertSame($newPassword, $user->getPassword());
         $this->assertNotSame($originalPassword, $user->getPassword());
     }
@@ -54,17 +54,17 @@ class UserRepositoryIntegrationTest extends KernelTestCase
     {
         $activeUser = $this->createTestUser('active@test.com');
         $activeUser->setActive(true);
-        
+
         $inactiveUser = $this->createTestUser('inactive@test.com');
         $inactiveUser->setActive(false);
-        
+
         $this->entityManager->flush();
 
         $activeUsers = $this->userRepository->findBy(['active' => true]);
         $inactiveUsers = $this->userRepository->findBy(['active' => false]);
 
-        $activeEmails = array_map(fn($u) => $u->getEmail(), $activeUsers);
-        $inactiveEmails = array_map(fn($u) => $u->getEmail(), $inactiveUsers);
+        $activeEmails = array_map(fn ($u) => $u->getEmail(), $activeUsers);
+        $inactiveEmails = array_map(fn ($u) => $u->getEmail(), $inactiveUsers);
 
         $this->assertContains('active@test.com', $activeEmails);
         $this->assertContains('inactive@test.com', $inactiveEmails);
@@ -76,13 +76,13 @@ class UserRepositoryIntegrationTest extends KernelTestCase
     {
         $adminUser = $this->createTestUser('admin@test.com');
         $adminUser->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        
+
         $editorUser = $this->createTestUser('editor@test.com');
         $editorUser->setRoles(['ROLE_EDITOR', 'ROLE_USER']);
-        
+
         $regularUser = $this->createTestUser('user@test.com');
         $regularUser->setRoles(['ROLE_USER']);
-        
+
         $this->entityManager->flush();
 
         // Find users with ROLE_ADMIN
@@ -128,7 +128,7 @@ class UserRepositoryIntegrationTest extends KernelTestCase
         $user = $this->createTestUser('relationships@test.com');
         $user->setNameFirst('John');
         $user->setNameLast('Doe');
-        
+
         $this->entityManager->flush();
 
         // Test custom query methods if they exist
@@ -140,14 +140,14 @@ class UserRepositoryIntegrationTest extends KernelTestCase
     public function testBulkOperations(): void
     {
         $users = [];
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $users[] = $this->createTestUser("bulk{$i}@test.com");
         }
-        
+
         $this->entityManager->flush();
 
         // Test bulk find
-        $emails = array_map(fn($u) => $u->getEmail(), $users);
+        $emails = array_map(fn ($u) => $u->getEmail(), $users);
         $qb = $this->userRepository->createQueryBuilder('u');
         $qb->where('u.email IN (:emails)')
            ->setParameter('emails', $emails);
@@ -169,8 +169,8 @@ class UserRepositoryIntegrationTest extends KernelTestCase
         // Verify update
         $this->entityManager->clear();
         $updatedUsers = $this->userRepository->findBy(['active' => false]);
-        $updatedEmails = array_map(fn($u) => $u->getEmail(), $updatedUsers);
-        
+        $updatedEmails = array_map(fn ($u) => $u->getEmail(), $updatedUsers);
+
         foreach ($emails as $email) {
             $this->assertContains($email, $updatedEmails);
         }
@@ -181,13 +181,13 @@ class UserRepositoryIntegrationTest extends KernelTestCase
         // Create users with different patterns
         $user1 = $this->createTestUser('complex1@test.com');
         $user1->setNameFirst('Alice')->setNameLast('Johnson')->setActive(true);
-        
+
         $user2 = $this->createTestUser('complex2@test.com');
         $user2->setNameFirst('Bob')->setNameLast('Smith')->setActive(false);
-        
+
         $user3 = $this->createTestUser('complex3@test.com');
         $user3->setNameFirst('Alice')->setNameLast('Brown')->setActive(true);
-        
+
         $this->entityManager->flush();
 
         // Find active users named Alice
@@ -197,9 +197,9 @@ class UserRepositoryIntegrationTest extends KernelTestCase
            ->setParameter('firstName', 'Alice')
            ->setParameter('active', true)
            ->orderBy('u.nameLast', 'ASC');
-        
+
         $aliceUsers = $qb->getQuery()->getResult();
-        
+
         $this->assertCount(2, $aliceUsers);
         $this->assertSame('Brown', $aliceUsers[0]->getNameLast());
         $this->assertSame('Johnson', $aliceUsers[1]->getNameLast());
@@ -208,25 +208,24 @@ class UserRepositoryIntegrationTest extends KernelTestCase
     public function testTransactionRollback(): void
     {
         $this->entityManager->beginTransaction();
-        
+
         try {
             $user = $this->createTestUser('transaction@test.com');
             $this->entityManager->flush();
-            
+
             // Verify user exists
             $foundUser = $this->userRepository->findOneBy(['email' => 'transaction@test.com']);
             $this->assertNotNull($foundUser);
-            
+
             // Rollback transaction
             $this->entityManager->rollback();
-            
+
             // Clear entity manager to force fresh query
             $this->entityManager->clear();
-            
+
             // Verify user no longer exists after rollback
             $foundUserAfterRollback = $this->userRepository->findOneBy(['email' => 'transaction@test.com']);
             $this->assertNull($foundUserAfterRollback);
-            
         } catch (\Exception $e) {
             $this->entityManager->rollback();
             throw $e;
@@ -238,27 +237,27 @@ class UserRepositoryIntegrationTest extends KernelTestCase
         $user = $this->createTestUser('concurrent@test.com');
         $user->setNameFirst('Original');
         $this->entityManager->flush();
-        
+
         // Simulate concurrent access by creating another entity manager
         $kernel = self::bootKernel();
         $em2 = $kernel->getContainer()->get(EntityManagerInterface::class);
         $repo2 = $em2->getRepository(User::class);
-        
+
         // Load same user in both entity managers
         $user1 = $this->userRepository->findOneBy(['email' => 'concurrent@test.com']);
         $user2 = $repo2->findOneBy(['email' => 'concurrent@test.com']);
-        
+
         // Modify in first EM
         $user1->setNameFirst('Modified1');
         $this->entityManager->flush();
-        
+
         // Modify in second EM
         $user2->setNameFirst('Modified2');
         $em2->flush();
-        
+
         // Refresh first user to see the latest state
         $this->entityManager->refresh($user1);
-        
+
         // The last write should win
         $this->assertSame('Modified2', $user1->getNameFirst());
     }
@@ -274,14 +273,14 @@ class UserRepositoryIntegrationTest extends KernelTestCase
             ->setActive(true);
 
         $this->entityManager->persist($user);
-        
+
         return $user;
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         // Clean up test data
         $this->entityManager->getConnection()->executeStatement('DELETE FROM user WHERE email LIKE "%@test.com"');
     }

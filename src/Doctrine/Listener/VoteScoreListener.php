@@ -7,8 +7,8 @@ namespace C3net\CoreBundle\Doctrine\Listener;
 use C3net\CoreBundle\Domain\CommentScoreUpdater;
 use C3net\CoreBundle\Entity\Vote;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 #[AsEntityListener(event: Events::postPersist, entity: Vote::class)]
