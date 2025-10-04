@@ -8,6 +8,9 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use C3net\CoreBundle\Repository\AuditLogsRepository;
 
+/**
+ * @implements ProviderInterface<array<int, string>>
+ */
 class AuditLogResourcesProvider implements ProviderInterface
 {
     public function __construct(

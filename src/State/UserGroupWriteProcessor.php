@@ -12,9 +12,14 @@ use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Handles UserGroup write operations to properly manage User relationships.
+ *
+ * @implements ProcessorInterface<UserGroup, UserGroup>
  */
 final readonly class UserGroupWriteProcessor implements ProcessorInterface
 {
+    /**
+     * @param ProcessorInterface<UserGroup, UserGroup> $persistProcessor
+     */
     public function __construct(
         private ProcessorInterface $persistProcessor,
         private EntityManagerInterface $entityManager,
@@ -23,7 +28,9 @@ final readonly class UserGroupWriteProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        if ($data instanceof UserGroup) {
+        // Process user relationships for UserGroup entities
+        // The instanceof check is kept for runtime safety even though PHPStan knows the type
+        if ($data instanceof UserGroup) { // @phpstan-ignore-line
             $this->processUserRelationships($data);
         }
 

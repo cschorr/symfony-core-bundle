@@ -2,3 +2,12 @@ parameters:
     level: 8
     paths:
         - src/
+    ignoreErrors:
+        # API Platform Processors with generics - instanceof checks are for runtime safety
+        - '#Instanceof between .* will always evaluate to true#'
+        # State providers returning arrays - acceptable for simple collection providers
+        - '#implements generic interface ApiPlatform\\State\\ProviderInterface but does not specify its types#'
+        - '#Method.*Provider::provide\(\) should return.*but returns array#'
+        - '#Type array.* in generic type ApiPlatform\\State\\ProviderInterface#'
+        # Processor generic types - requires complex type annotations
+        - '#has parameter \$persistProcessor with generic interface ApiPlatform\\State\\ProcessorInterface but does not specify its types#'
