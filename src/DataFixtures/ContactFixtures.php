@@ -84,6 +84,36 @@ class ContactFixtures extends Fixture implements DependentFixtureInterface
         }
 
         $manager->flush();
+
+        // Pass 3: Set up standin relationships (same company only)
+        $standinRelationships = [
+            // Cyberdyne Systems standins
+            'miles.dyson@cyberdyne.example' => 'kyle.reese@cyberdyne.example', // Miles Dyson's standin is Kyle Reese (both in Technology)
+            'kyle.reese@cyberdyne.example' => 'miles.dyson@cyberdyne.example', // Kyle Reese's standin is Miles Dyson (both in Technology)
+            'catherine.brewster@cyberdyne.example' => 'sarah.connor@cyberdyne.example', // Catherine's standin is Sarah (both in Operations hierarchy)
+            // Stark Industries standins
+            'bruce.banner@stark.example' => 'james.rhodes@stark.example', // Bruce Banner's standin is James Rhodes (both in R&D)
+            'james.rhodes@stark.example' => 'bruce.banner@stark.example', // James Rhodes' standin is Bruce Banner (both in R&D)
+            'happy.hogan@stark.example' => 'pepper.potts@stark.example', // Happy's standin is Pepper (both in Operations hierarchy)
+            // Wayne Enterprises standins
+            'barbara.gordon@wayne.example' => 'lucius.fox@wayne.example', // Barbara's standin is Lucius (both in Technology hierarchy)
+            'harvey.dent@wayne.example' => 'alfred.pennyworth@wayne.example', // Harvey's standin is Alfred (both report to executive level)
+        ];
+
+        foreach ($standinRelationships as $contactEmail => $standinEmail) {
+            if (isset($contacts[$contactEmail]) && isset($contacts[$standinEmail])) {
+                $contact = $contacts[$contactEmail];
+                $standin = $contacts[$standinEmail];
+
+                // Verify they're from the same company
+                if ($contact->getCompany() === $standin->getCompany()) {
+                    $contact->setStandin($standin);
+                    $manager->persist($contact);
+                }
+            }
+        }
+
+        $manager->flush();
     }
 
     public function getDependencies(): array
