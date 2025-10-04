@@ -1,0 +1,89 @@
+name: Claude Code
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read # Required for Claude to read CI results on PRs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # This is an optional setting that allows Claude to read CI results on PRs
+          additional_permissions: |
+            actions: read
+
+          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4.1)
+          # model: "claude-opus-4-1-20250805"
+
+          # Optional: Customize the trigger phrase (default: @claude)
+          # trigger_phrase: "/claude"
+
+          # Optional: Trigger when specific user is assigned to an issue
+          # assignee_trigger: "claude-bot"
+
+          # Allow Claude to run Symfony/PHP commands
+          allowed_tools: |
+            Bash(composer install)
+            Bash(composer update)
+            Bash(composer cs-check)
+            Bash(composer cs-fix)
+            Bash(composer phpstan)
+            Bash(composer phpcs)
+            Bash(composer rector-check)
+            Bash(composer rector-fix)
+            Bash(composer check-all)
+            Bash(composer fix-all)
+            Bash(bin/console *)
+            Bash(vendor/bin/phpunit *)
+            Bash(docker compose *)
+
+          # Custom instructions for Symfony/API Platform project
+          custom_instructions: |
+            This is a Symfony 7.2 project using API Platform 3.4 for building RESTful and GraphQL APIs.
+            Key architecture:
+            - Pure API backend (no admin interface)
+            - Entities extend AbstractEntity with UUID, timestamps, and soft delete
+            - Use State Providers for custom API operations, not controllers
+            - JWT authentication with refresh tokens
+            - Follow PSR-12 coding standards
+            - PHPStan level 8 for static analysis
+            - Always use proper Doctrine lifecycle callbacks
+            - Never commit migration files to git
+            - Use RelationshipSyncService for bidirectional relationships
+            - Test all API endpoints with PHPUnit
+            - Use proper API Platform filters and pagination
+
+          # Environment variables for Claude
+          claude_env: |
+            APP_ENV: dev
+            SYMFONY_VERSION: 7.2
+            API_PLATFORM_VERSION: 3.4
+            PHP_VERSION: 8.4
