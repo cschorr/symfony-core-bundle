@@ -27,7 +27,7 @@ class VoteWriteProcessorTest extends TestCase
     private VoteWriteProcessor $processor;
     private ProcessorInterface&MockObject $persistProcessor;
     private Security&MockObject $security;
-    private RateLimiterFactory&MockObject $rateLimiterFactory;
+    private RateLimiterFactory $rateLimiterFactory; // Not a mock - real instance
     private EntityManagerInterface&MockObject $entityManager;
     private VoteRepository&MockObject $voteRepository;
     private Operation&MockObject $operation;
