@@ -9,6 +9,7 @@ use C3net\CoreBundle\DataFixtures\CategoryFixtures;
 use C3net\CoreBundle\DataFixtures\CompanyFixtures;
 use C3net\CoreBundle\DataFixtures\CompanyGroupFixtures;
 use C3net\CoreBundle\DataFixtures\ContactFixtures;
+use C3net\CoreBundle\DataFixtures\DepartmentFixtures;
 use C3net\CoreBundle\DataFixtures\DocumentFixtures;
 use C3net\CoreBundle\DataFixtures\InvoiceFixtures;
 use C3net\CoreBundle\DataFixtures\OfferFixtures;
@@ -136,6 +137,7 @@ class LoadDemoDataCommand extends Command
                 new UserGroupFixtures(),
                 new CompanyGroupFixtures(),
                 new CompanyFixtures(),
+                new DepartmentFixtures(),
                 new UserFixtures($this->passwordHasher),
                 new ContactFixtures(),
                 new ProjectFixtures(),

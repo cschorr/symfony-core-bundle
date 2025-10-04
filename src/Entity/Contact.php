@@ -39,6 +39,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
     filterClass: SearchFilter::class,
     properties: [
         'company' => 'exact',
+        'department' => 'exact',
         'standin' => 'exact',
     ],
 )]
@@ -55,8 +56,8 @@ class Contact extends AbstractEntity
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $position = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $department = null;
+    #[ORM\ManyToOne(inversedBy: 'contacts')]
+    private ?Department $department = null;
 
     #[ORM\ManyToOne(targetEntity: Contact::class)]
     private ?Contact $standin = null;
@@ -104,12 +105,12 @@ class Contact extends AbstractEntity
         return $this;
     }
 
-    public function getDepartment(): ?string
+    public function getDepartment(): ?Department
     {
         return $this->department;
     }
 
-    public function setDepartment(?string $department): static
+    public function setDepartment(?Department $department): static
     {
         $this->department = $department;
 
