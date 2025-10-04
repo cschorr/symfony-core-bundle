@@ -1,0 +1,3 @@
+# Ignore all migration version files
+# Each environment should generate its own migrations
+Version*.php
