@@ -66,6 +66,7 @@ final class VoteWriteProcessor implements ProcessorInterface
         }
 
         // „POST wenn schon vorhanden" → als Update behandeln
+        /** @var Vote|null $existing */
         $existing = $this->votes->findOneBy(['comment' => $data->getComment(), 'voter' => $user]);
         if ($existing instanceof Vote && $existing !== $data) {
             $existing->setValue($data->getValue());
