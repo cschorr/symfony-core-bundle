@@ -91,6 +91,10 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
         foreach ($offersData as $index => $offerData) {
             $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $offerData['transaction']]);
 
+            if (!$transaction) {
+                throw new \RuntimeException(sprintf('Transaction "%s" not found for offer "%s"', $offerData['transaction'], $offerData['offerNumber']));
+            }
+
             $offer = (new Offer())
                 ->setOfferNumber($offerData['offerNumber'])
                 ->setStatus($offerData['status'])
