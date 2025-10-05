@@ -1248,9 +1248,11 @@ class AppFixtures extends Fixture
                 $contact->setPosition($contactData['position']);
             }
 
-            if (isset($contactData['department'])) {
-                $contact->setDepartment($contactData['department']);
-            }
+            // Department relationship - requires Department entities to be created first
+            // TODO: Implement Department fixtures and uncomment this code
+            // if (isset($contactData['department'])) {
+            //     $contact->setDepartment($contactData['department']);
+            // }
 
             $manager->persist($contact);
             $this->contacts['contact_' . $index] = $contact;
@@ -1624,7 +1626,7 @@ class AppFixtures extends Fixture
         $campaignsData = [
             [
                 'name' => 'Digital Transformation 2025',
-                'code' => 'DT2025',
+                'shortcode' => 'DT2025',
                 'description' => 'Comprehensive digital transformation initiative focusing on modernizing legacy systems and implementing cutting-edge technologies across multiple client organizations. This strategic campaign encompasses AI integration, cloud migration, and automation solutions.',
                 'category' => 'main1', // Technology
                 'startDate' => new \DateTimeImmutable('2024-01-15'),
@@ -1640,7 +1642,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Global Marketing Excellence',
-                'code' => 'GME2024',
+                'shortcode' => 'GME2024',
                 'description' => 'Multi-company marketing campaign focusing on brand management, digital marketing automation, and content creation strategies for international markets. Includes social media optimization, SEO enhancement, and customer engagement analytics.',
                 'category' => 'main3', // Marketing & Sales
                 'startDate' => new \DateTimeImmutable('2024-03-01'),
@@ -1655,7 +1657,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Enterprise Security & Compliance',
-                'code' => 'ESC2024',
+                'shortcode' => 'ESC2024',
                 'description' => 'Strategic initiative to enhance security infrastructure and ensure regulatory compliance across all client operations. Includes legal document management, corporate intelligence systems, and comprehensive audit trail implementation.',
                 'category' => 'main2', // Business Services
                 'startDate' => new \DateTimeImmutable('2024-02-01'),
@@ -1671,7 +1673,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Innovation Lab 2024',
-                'code' => 'INNO2024',
+                'shortcode' => 'INNO2024',
                 'description' => 'Research and development initiative focused on emerging technologies and innovative solutions. Exploring quantum computing, neural interfaces, blockchain integration, and advanced data analytics for next-generation applications.',
                 'category' => 'main1', // Technology
                 'startDate' => new \DateTimeImmutable('2024-01-01'),
@@ -1685,7 +1687,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Customer Experience Revolution',
-                'code' => 'CXR2024',
+                'shortcode' => 'CXR2024',
                 'description' => 'Comprehensive customer experience enhancement campaign focusing on user interface optimization, customer journey mapping, and personalization technologies. Aimed at increasing customer satisfaction and retention across all touchpoints.',
                 'category' => 'main3', // Marketing & Sales
                 'startDate' => new \DateTimeImmutable('2024-04-01'),
@@ -1748,13 +1750,9 @@ class AppFixtures extends Fixture
                 ->setCategory($category)
             ;
 
-            // Set start and end dates if provided
-            if (isset($campaignData['startDate'])) {
-                $campaign->setStartDate($campaignData['startDate']);
-            }
-            if (isset($campaignData['endDate'])) {
-                $campaign->setEndDate($campaignData['endDate']);
-            }
+            // Set start and end dates (always present in campaign data)
+            $campaign->setStartedAt($campaignData['startDate']);
+            $campaign->setEndedAt($campaignData['endDate']);
 
             // Assign projects to campaign
             foreach ($campaignData['projects'] as $projectKey) {
