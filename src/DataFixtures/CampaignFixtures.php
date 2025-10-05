@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Campaign;
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Project;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class CampaignFixtures extends Fixture implements DependentFixtureInterface
+class CampaignFixtures extends AbstractCategorizableFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -19,30 +18,29 @@ class CampaignFixtures extends Fixture implements DependentFixtureInterface
             [
                 'name' => 'Digital Transformation 2025',
                 'description' => 'Comprehensive digital transformation initiative focusing on modernizing legacy systems and implementing cutting-edge technologies across multiple client organizations.',
-                'category' => 'Technology',
+                'categories' => ['Technology', 'Software Solutions', 'AI & Machine Learning'],
                 'projects' => ['E-Commerce Platform', 'AI Security System', 'Mobile Banking App', 'Scientific Data Analysis', 'Quantum Computing Research'],
             ],
             [
                 'name' => 'Global Marketing Excellence',
                 'description' => 'Multi-company marketing campaign focusing on brand management, digital marketing automation, and content creation strategies for international markets.',
-                'category' => 'Marketing & Sales',
+                'categories' => ['Marketing & Sales', 'Digital Marketing', 'Content Creation'],
                 'projects' => ['Digital Marketing Campaign', 'Global Distribution Network'],
             ],
             [
                 'name' => 'Enterprise Security & Compliance',
                 'description' => 'Strategic initiative to enhance security infrastructure and ensure regulatory compliance across all client operations.',
-                'category' => 'Business Services',
+                'categories' => ['Business Services', 'Cybersecurity', 'Technology'],
                 'projects' => ['Automated Defense Network', 'Corporate Security Upgrade', 'Arc Reactor Monitoring'],
             ],
         ];
 
         foreach ($campaignsData as $index => $campaignData) {
-            $category = $manager->getRepository(Category::class)->findOneBy(['name' => $campaignData['category']]);
+            $categories = $this->findCategoriesByNames($manager, $campaignData['categories']);
 
             $campaign = (new Campaign())
                 ->setName($campaignData['name'])
                 ->setDescription($campaignData['description'])
-                ->setCategory($category)
             ;
 
             // Assign projects to campaign
@@ -53,10 +51,14 @@ class CampaignFixtures extends Fixture implements DependentFixtureInterface
                 }
             }
 
-            $manager->persist($campaign);
+            // Persist and flush to get ID
+            $this->persistAndFlush($manager, $campaign);
+
+            // Assign multiple categories
+            $this->assignCategories($manager, $campaign, $categories, DomainEntityType::Campaign);
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
     }
 
     public function getDependencies(): array

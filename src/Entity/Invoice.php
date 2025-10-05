@@ -9,6 +9,8 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\InvoiceStatus;
 use C3net\CoreBundle\Enum\InvoiceType;
 use C3net\CoreBundle\Enum\PaymentStatus;
@@ -46,6 +48,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class Invoice extends AbstractEntity
 {
+    use CategorizableTrait;
+
     #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
     #[Assert\NotBlank]
     private ?string $invoiceNumber = null;
@@ -450,5 +454,10 @@ class Invoice extends AbstractEntity
             $this->status = InvoiceStatus::OVERDUE;
             $this->paymentStatus = PaymentStatus::OVERDUE;
         }
+    }
+
+    protected function getCategorizableEntityType(): DomainEntityType
+    {
+        return DomainEntityType::Invoice;
     }
 }

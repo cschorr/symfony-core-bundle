@@ -8,10 +8,12 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetNamePersonTrait;
 use C3net\CoreBundle\Entity\Traits\Tree\NestedTreeTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Repository\ContactRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -49,6 +51,7 @@ class Contact extends AbstractEntity
     use SetCommunicationTrait;
     use SetAddressTrait;
     use NestedTreeTrait;
+    use CategorizableTrait;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]
     private ?Company $company = null;
@@ -154,5 +157,10 @@ class Contact extends AbstractEntity
         $this->standin = $standin;
 
         return $this;
+    }
+
+    protected function getCategorizableEntityType(): DomainEntityType
+    {
+        return DomainEntityType::Contact;
     }
 }

@@ -8,10 +8,12 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameExtensionTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -49,6 +51,7 @@ class Company extends AbstractEntity
     use StringNameExtensionTrait;
     use SetCommunicationTrait;
     use SetAddressTrait;
+    use CategorizableTrait;
 
     #[ORM\ManyToOne(inversedBy: 'companies')]
     private ?CompanyGroup $companyGroup = null;
@@ -76,9 +79,6 @@ class Company extends AbstractEntity
      */
     #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'company', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $departments;
-
-    #[ORM\ManyToOne(targetEntity: Category::class)]
-    private ?Category $category = null;
 
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     private ?string $imagePath = null;
@@ -170,16 +170,9 @@ class Company extends AbstractEntity
         return $this;
     }
 
-    public function getCategory(): ?Category
+    protected function getCategorizableEntityType(): DomainEntityType
     {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
+        return DomainEntityType::Company;
     }
 
     public function getImagePath(): ?string

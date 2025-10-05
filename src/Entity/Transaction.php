@@ -9,9 +9,11 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\TransactionStatus;
 use C3net\CoreBundle\Enum\TransactionType;
 use C3net\CoreBundle\Repository\TransactionRepository;
@@ -52,6 +54,7 @@ class Transaction extends AbstractEntity
     use StringNameTrait;
     use StringShortcodeTrait;
     use SetStartEndTrait;
+    use CategorizableTrait;
 
     #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
     #[Assert\NotBlank]
@@ -97,9 +100,6 @@ class Transaction extends AbstractEntity
 
     #[ORM\ManyToOne]
     private ?User $assignedTo = null;
-
-    #[ORM\ManyToOne]
-    private ?Category $category = null;
 
     /**
      * @var Collection<int, Offer>
@@ -311,16 +311,9 @@ class Transaction extends AbstractEntity
         return $this;
     }
 
-    public function getCategory(): ?Category
+    protected function getCategorizableEntityType(): DomainEntityType
     {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
+        return DomainEntityType::Transaction;
     }
 
     /**

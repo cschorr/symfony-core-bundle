@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\UserGroup;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use C3net\CoreBundle\Enum\DomainEntityType;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class UserGroupFixtures extends Fixture
+class UserGroupFixtures extends AbstractCategorizableFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -17,30 +18,37 @@ class UserGroupFixtures extends Fixture
                 'name' => 'External Users',
                 'roles' => ['ROLE_EXTERNAL'],
                 'active' => true,
+                'categories' => ['Consulting', 'Business Services'],
             ],
             'basic' => [
                 'name' => 'Editor',
                 'roles' => ['ROLE_EDITOR'],
                 'active' => true,
+                'categories' => ['Web Development', 'Content Creation', 'UI/UX Design'],
             ],
             'advanced' => [
                 'name' => 'Teamlead',
                 'roles' => ['ROLE_TEAMLEAD', 'ROLE_FINANCE', 'ROLE_QUALITY', 'ROLE_PROJECT_MANAGEMENT'],
                 'active' => true,
+                'categories' => ['Software Solutions', 'DevOps & Infrastructure', 'Management Consulting'],
             ],
             'manager' => [
                 'name' => 'Manager',
                 'roles' => ['ROLE_MANAGER'],
                 'active' => true,
+                'categories' => ['Marketing & Sales', 'Strategy Consulting', 'Business Services'],
             ],
             'admin' => [
                 'name' => 'Admin',
                 'roles' => ['ROLE_ADMIN'],
                 'active' => true,
+                'categories' => ['Business Services', 'IT Consulting', 'Management Consulting'],
             ],
         ];
 
         foreach ($userGroupsData as $key => $userData) {
+            $categories = $this->findCategoriesByNames($manager, $userData['categories']);
+
             $userGroup = new UserGroup();
             $userGroup
                 ->setName($userData['name'])
@@ -48,9 +56,20 @@ class UserGroupFixtures extends Fixture
                 ->setActive($userData['active'])
             ;
 
-            $manager->persist($userGroup);
+            // Persist and flush to get ID
+            $this->persistAndFlush($manager, $userGroup);
+
+            // Assign multiple categories
+            $this->assignCategories($manager, $userGroup, $categories, DomainEntityType::UserGroup);
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            CategoryFixtures::class,
+        ];
     }
 }

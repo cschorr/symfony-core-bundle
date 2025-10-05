@@ -8,11 +8,11 @@ use C3net\CoreBundle\Entity\Document;
 use C3net\CoreBundle\Entity\Project;
 use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Enum\DocumentType;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class DocumentFixtures extends Fixture implements DependentFixtureInterface
+class DocumentFixtures extends AbstractCategorizableFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -115,6 +115,17 @@ class DocumentFixtures extends Fixture implements DependentFixtureInterface
                 $project = $manager->getRepository(Project::class)->findOneBy(['name' => $documentData['project']]);
             }
 
+            // Assign categories based on document type
+            $categoryNames = match ($documentData['type']) {
+                DocumentType::BRIEF => ['Management Consulting', 'Strategy Consulting'],
+                DocumentType::CONTRACT => ['Legal Services', 'Business Services'],
+                DocumentType::OFFER => ['Marketing & Sales', 'Business Services'],
+                DocumentType::INVOICE => ['Financial Services', 'Business Services'],
+                DocumentType::DELIVERABLE => ['Software Solutions', 'Technology'],
+                default => ['Business Services'],
+            };
+            $categories = $this->findCategoriesByNames($manager, $categoryNames);
+
             $fileName = basename($documentData['filePath']);
 
             $document = (new Document())
@@ -128,15 +139,20 @@ class DocumentFixtures extends Fixture implements DependentFixtureInterface
                 $document->setProject($project);
             }
 
-            $manager->persist($document);
+            // Persist and flush to get ID
+            $this->persistAndFlush($manager, $document);
+
+            // Assign multiple categories
+            $this->assignCategories($manager, $document, $categories, DomainEntityType::Document);
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
     }
 
     public function getDependencies(): array
     {
         return [
+            CategoryFixtures::class,
             TransactionFixtures::class,
             ProjectFixtures::class,
         ];

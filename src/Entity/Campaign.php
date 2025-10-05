@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Repository\CampaignRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,6 +23,7 @@ class Campaign extends AbstractEntity
     use StringNameTrait;
     use StringShortcodeTrait;
     use SetStartEndTrait;
+    use CategorizableTrait;
 
     /**
      * @var Collection<int, Project>
@@ -30,9 +33,6 @@ class Campaign extends AbstractEntity
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
-
-    #[ORM\ManyToOne(inversedBy: 'campaigns')]
-    private ?Category $category = null;
 
     #[ORM\ManyToOne(inversedBy: 'campaigns')]
     private ?Transaction $transaction = null;
@@ -85,16 +85,9 @@ class Campaign extends AbstractEntity
         return $this;
     }
 
-    public function getCategory(): ?Category
+    protected function getCategorizableEntityType(): DomainEntityType
     {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
+        return DomainEntityType::Campaign;
     }
 
     public function getTransaction(): ?Transaction
