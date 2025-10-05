@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace C3net\CoreBundle\DataFixtures;
 
-use C3net\CoreBundle\Entity\Category;
-use C3net\CoreBundle\Entity\CategorizableEntity;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Contact;
 use C3net\CoreBundle\Entity\Project;
@@ -14,30 +12,29 @@ use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\TransactionStatus;
 use C3net\CoreBundle\Enum\TransactionType;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class TransactionFixtures extends Fixture implements DependentFixtureInterface
+class TransactionFixtures extends AbstractCategorizableFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
         $transactionsData = [
             // Complete workflow: DRAFT -> QUOTED -> ORDERED -> IN_PRODUCTION -> DELIVERED -> INVOICED -> PAID
-            ['number' => 'TXN-2025-0001', 'title' => 'E-Commerce Platform Development', 'description' => 'Full-stack e-commerce platform with payment gateway integration', 'status' => TransactionStatus::PAID, 'customer' => 'Cyberdyne Systems', 'contact' => 'john.doe@cyberdyne.example', 'assignedUser' => 'editor@example.com', 'category' => 'Web Development', 'currency' => 'USD', 'project' => 'E-Commerce Platform'],
-            ['number' => 'TXN-2025-0002', 'title' => 'Mobile Banking Application', 'description' => 'Secure mobile banking app with biometric authentication', 'status' => TransactionStatus::PAID, 'customer' => 'Stark Industries', 'contact' => 'jane.smith@stark.example', 'assignedUser' => 'teamlead@example.com', 'category' => 'Mobile Development', 'currency' => 'USD', 'project' => 'Mobile Banking App'],
-            ['number' => 'TXN-2025-0003', 'title' => 'Corporate Security Upgrade', 'description' => 'Enterprise-wide security system implementation', 'status' => TransactionStatus::IN_PRODUCTION, 'customer' => 'Wayne Enterprises', 'contact' => 'alice.johnson@wayne.example', 'assignedUser' => 'external@example.com', 'category' => 'Business Services', 'currency' => 'USD', 'project' => 'Corporate Security Upgrade'],
-            ['number' => 'TXN-2025-0004', 'title' => 'R&D Dashboard System', 'description' => 'Real-time analytics and reporting dashboard', 'status' => TransactionStatus::DELIVERED, 'customer' => 'Oscorp', 'contact' => 'emma.martinez@oscorp.example', 'assignedUser' => 'demo@example.com', 'category' => 'Software Solutions', 'currency' => 'USD', 'project' => 'R&D Dashboard'],
-            ['number' => 'TXN-2025-0005', 'title' => 'Digital Marketing Campaign', 'description' => 'Comprehensive digital marketing strategy', 'status' => TransactionStatus::INVOICED, 'customer' => 'Umbrella Corporation', 'contact' => null, 'assignedUser' => 'marketing@example.com', 'category' => 'Digital Marketing', 'currency' => 'EUR', 'project' => 'Digital Marketing Campaign'],
-            ['number' => 'TXN-2025-0006', 'title' => 'Mobile Commerce App', 'description' => 'Cross-platform mobile commerce application', 'status' => TransactionStatus::ORDERED, 'customer' => 'Parker Industries', 'contact' => null, 'assignedUser' => 'dev1@example.com', 'category' => 'Mobile Development', 'currency' => 'USD', 'project' => null],
-            ['number' => 'TXN-2025-0007', 'title' => 'Financial Analytics Platform', 'description' => 'Real-time financial data analytics and reporting', 'status' => TransactionStatus::QUOTED, 'customer' => 'Rand Corporation', 'contact' => null, 'assignedUser' => 'consultant1@example.com', 'category' => 'Financial Services', 'currency' => 'USD', 'project' => null],
-            ['number' => 'TXN-2025-0008', 'title' => 'Legal Compliance Platform', 'description' => 'Multi-jurisdictional legal compliance management', 'status' => TransactionStatus::DRAFT, 'customer' => 'Seegson Corporation', 'contact' => null, 'assignedUser' => 'external@example.com', 'category' => 'Legal Services', 'currency' => 'EUR', 'project' => null],
-            ['number' => 'TXN-2025-0009', 'title' => 'Pharmaceutical CRM System', 'description' => 'Customer relationship management for pharmaceutical industry', 'status' => TransactionStatus::PAID, 'customer' => 'Tricell Pharmaceuticals', 'contact' => null, 'assignedUser' => 'marketing1@example.com', 'category' => 'Digital Marketing', 'currency' => 'EUR', 'project' => null],
-            ['number' => 'TXN-2025-0010', 'title' => 'Quantum Computing Research', 'description' => 'Advanced quantum computing solutions development', 'status' => TransactionStatus::QUOTED, 'customer' => 'NeuralLink Systems', 'contact' => null, 'assignedUser' => 'admin@example.com', 'category' => 'Software Solutions', 'currency' => 'EUR', 'project' => 'Quantum Computing Research'],
+            ['number' => 'TXN-2025-0001', 'title' => 'E-Commerce Platform Development', 'description' => 'Full-stack e-commerce platform with payment gateway integration', 'status' => TransactionStatus::PAID, 'customer' => 'Cyberdyne Systems', 'contact' => 'john.doe@cyberdyne.example', 'assignedUser' => 'editor@example.com', 'categories' => ['Web Development', 'Technology', 'Software Solutions'], 'currency' => 'USD', 'project' => 'E-Commerce Platform'],
+            ['number' => 'TXN-2025-0002', 'title' => 'Mobile Banking Application', 'description' => 'Secure mobile banking app with biometric authentication', 'status' => TransactionStatus::PAID, 'customer' => 'Stark Industries', 'contact' => 'jane.smith@stark.example', 'assignedUser' => 'teamlead@example.com', 'categories' => ['Mobile Development', 'Technology', 'Financial Services'], 'currency' => 'USD', 'project' => 'Mobile Banking App'],
+            ['number' => 'TXN-2025-0003', 'title' => 'Corporate Security Upgrade', 'description' => 'Enterprise-wide security system implementation', 'status' => TransactionStatus::IN_PRODUCTION, 'customer' => 'Wayne Enterprises', 'contact' => 'alice.johnson@wayne.example', 'assignedUser' => 'external@example.com', 'categories' => ['Business Services', 'Technology', 'Cybersecurity'], 'currency' => 'USD', 'project' => 'Corporate Security Upgrade'],
+            ['number' => 'TXN-2025-0004', 'title' => 'R&D Dashboard System', 'description' => 'Real-time analytics and reporting dashboard', 'status' => TransactionStatus::DELIVERED, 'customer' => 'Oscorp', 'contact' => 'emma.martinez@oscorp.example', 'assignedUser' => 'demo@example.com', 'categories' => ['Software Solutions', 'Technology', 'Business Services'], 'currency' => 'USD', 'project' => 'R&D Dashboard'],
+            ['number' => 'TXN-2025-0005', 'title' => 'Digital Marketing Campaign', 'description' => 'Comprehensive digital marketing strategy', 'status' => TransactionStatus::INVOICED, 'customer' => 'Umbrella Corporation', 'contact' => null, 'assignedUser' => 'marketing@example.com', 'categories' => ['Digital Marketing', 'Marketing & Sales', 'Content Creation'], 'currency' => 'EUR', 'project' => 'Digital Marketing Campaign'],
+            ['number' => 'TXN-2025-0006', 'title' => 'Mobile Commerce App', 'description' => 'Cross-platform mobile commerce application', 'status' => TransactionStatus::ORDERED, 'customer' => 'Parker Industries', 'contact' => null, 'assignedUser' => 'dev1@example.com', 'categories' => ['Mobile Development', 'Technology', 'Marketing & Sales'], 'currency' => 'USD', 'project' => null],
+            ['number' => 'TXN-2025-0007', 'title' => 'Financial Analytics Platform', 'description' => 'Real-time financial data analytics and reporting', 'status' => TransactionStatus::QUOTED, 'customer' => 'Rand Corporation', 'contact' => null, 'assignedUser' => 'consultant1@example.com', 'categories' => ['Financial Services', 'Technology', 'Business Services'], 'currency' => 'USD', 'project' => null],
+            ['number' => 'TXN-2025-0008', 'title' => 'Legal Compliance Platform', 'description' => 'Multi-jurisdictional legal compliance management', 'status' => TransactionStatus::DRAFT, 'customer' => 'Seegson Corporation', 'contact' => null, 'assignedUser' => 'external@example.com', 'categories' => ['Legal Services', 'Business Services', 'Technology'], 'currency' => 'EUR', 'project' => null],
+            ['number' => 'TXN-2025-0009', 'title' => 'Pharmaceutical CRM System', 'description' => 'Customer relationship management for pharmaceutical industry', 'status' => TransactionStatus::PAID, 'customer' => 'Tricell Pharmaceuticals', 'contact' => null, 'assignedUser' => 'marketing1@example.com', 'categories' => ['Digital Marketing', 'Marketing & Sales', 'Software Solutions'], 'currency' => 'EUR', 'project' => null],
+            ['number' => 'TXN-2025-0010', 'title' => 'Quantum Computing Research', 'description' => 'Advanced quantum computing solutions development', 'status' => TransactionStatus::QUOTED, 'customer' => 'NeuralLink Systems', 'contact' => null, 'assignedUser' => 'admin@example.com', 'categories' => ['Software Solutions', 'Technology', 'AI & Machine Learning'], 'currency' => 'EUR', 'project' => 'Quantum Computing Research'],
         ];
 
         foreach ($transactionsData as $index => $data) {
-            $category = $manager->getRepository(Category::class)->findOneBy(['name' => $data['category']]);
+            $categories = $this->findCategoriesByNames($manager, $data['categories']);
 
             $transaction = (new Transaction())
                 ->setTransactionNumber($data['number'])
@@ -49,51 +46,28 @@ class TransactionFixtures extends Fixture implements DependentFixtureInterface
                 ->setAssignedTo($manager->getRepository(User::class)->findOneBy(['email' => $data['assignedUser']]))
                 ->setCurrency($data['currency']);
 
-            if (isset($data['contact']) && $data['contact']) {
+            if (isset($data['contact']) && null !== $data['contact']) {
                 $contact = $manager->getRepository(Contact::class)->findOneBy(['email' => $data['contact']]);
                 if ($contact) {
                     $transaction->setPrimaryContact($contact);
                 }
             }
 
-            if (isset($data['project']) && $data['project']) {
+            if (isset($data['project']) && null !== $data['project']) {
                 $project = $manager->getRepository(Project::class)->findOneBy(['name' => $data['project']]);
                 if ($project) {
                     $transaction->addProject($project);
                 }
             }
 
-            $manager->persist($transaction);
+            // Persist and flush to get ID
+            $this->persistAndFlush($manager, $transaction);
 
-            try {
-                $manager->flush(); // Flush to get ID for category assignment
-            } catch (\Exception $e) {
-                // Ignore Mercure failures during fixture loading
-                if (!str_contains($e->getMessage(), 'Failed to send an update') &&
-                    !str_contains($e->getMessage(), 'mercure')) {
-                    throw $e;
-                }
-            }
-
-            // Add category after entity is persisted
-            if ($category) {
-                $assignment = new CategorizableEntity();
-                $assignment->setCategory($category);
-                $assignment->setEntityType(DomainEntityType::Transaction);
-                $assignment->setEntityId($transaction->getId()->toString());
-                $manager->persist($assignment);
-            }
+            // Assign multiple categories
+            $this->assignCategories($manager, $transaction, $categories, DomainEntityType::Transaction);
         }
 
-        try {
-            $manager->flush();
-        } catch (\Exception $e) {
-            // Ignore Mercure failures during fixture loading
-            if (!str_contains($e->getMessage(), 'Failed to send an update') &&
-                !str_contains($e->getMessage(), 'mercure')) {
-                throw $e;
-            }
-        }
+        $this->flushSafely($manager);
     }
 
     public function getDependencies(): array
