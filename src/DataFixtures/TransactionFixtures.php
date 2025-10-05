@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Category;
+use C3net\CoreBundle\Entity\CategorizableEntity;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Contact;
 use C3net\CoreBundle\Entity\Project;
 use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Entity\User;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\TransactionStatus;
 use C3net\CoreBundle\Enum\TransactionType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -35,6 +37,8 @@ class TransactionFixtures extends Fixture implements DependentFixtureInterface
         ];
 
         foreach ($transactionsData as $index => $data) {
+            $category = $manager->getRepository(Category::class)->findOneBy(['name' => $data['category']]);
+
             $transaction = (new Transaction())
                 ->setTransactionNumber($data['number'])
                 ->setName($data['title'])
@@ -43,7 +47,6 @@ class TransactionFixtures extends Fixture implements DependentFixtureInterface
                 ->setStatus($data['status'])
                 ->setCustomer($manager->getRepository(Company::class)->findOneBy(['name' => $data['customer']]))
                 ->setAssignedTo($manager->getRepository(User::class)->findOneBy(['email' => $data['assignedUser']]))
-                ->setCategory($manager->getRepository(Category::class)->findOneBy(['name' => $data['category']]))
                 ->setCurrency($data['currency']);
 
             if (isset($data['contact']) && $data['contact']) {
@@ -61,9 +64,36 @@ class TransactionFixtures extends Fixture implements DependentFixtureInterface
             }
 
             $manager->persist($transaction);
+
+            try {
+                $manager->flush(); // Flush to get ID for category assignment
+            } catch (\Exception $e) {
+                // Ignore Mercure failures during fixture loading
+                if (!str_contains($e->getMessage(), 'Failed to send an update') &&
+                    !str_contains($e->getMessage(), 'mercure')) {
+                    throw $e;
+                }
+            }
+
+            // Add category after entity is persisted
+            if ($category) {
+                $assignment = new CategorizableEntity();
+                $assignment->setCategory($category);
+                $assignment->setEntityType(DomainEntityType::Transaction);
+                $assignment->setEntityId($transaction->getId()->toString());
+                $manager->persist($assignment);
+            }
         }
 
-        $manager->flush();
+        try {
+            $manager->flush();
+        } catch (\Exception $e) {
+            // Ignore Mercure failures during fixture loading
+            if (!str_contains($e->getMessage(), 'Failed to send an update') &&
+                !str_contains($e->getMessage(), 'mercure')) {
+                throw $e;
+            }
+        }
     }
 
     public function getDependencies(): array

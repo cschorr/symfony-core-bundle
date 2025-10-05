@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Category;
+use C3net\CoreBundle\Entity\CategorizableEntity;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Project;
 use C3net\CoreBundle\Entity\User;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -47,10 +49,19 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
                 ->setDescription($projectData['description'])
                 ->setClient($client)
                 ->setAssignee($assignee)
-                ->setCategory($category)
                 ->setDueDate($projectData['dueDate']);
 
             $manager->persist($project);
+            $manager->flush(); // Flush to get ID for category assignment
+
+            // Add category after entity is persisted
+            if ($category) {
+                $assignment = new CategorizableEntity();
+                $assignment->setCategory($category);
+                $assignment->setEntityType(DomainEntityType::Project);
+                $assignment->setEntityId($project->getId()->toString());
+                $manager->persist($assignment);
+            }
         }
 
         $manager->flush();

@@ -6,7 +6,9 @@ namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Campaign;
 use C3net\CoreBundle\Entity\Category;
+use C3net\CoreBundle\Entity\CategorizableEntity;
 use C3net\CoreBundle\Entity\Project;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -42,7 +44,6 @@ class CampaignFixtures extends Fixture implements DependentFixtureInterface
             $campaign = (new Campaign())
                 ->setName($campaignData['name'])
                 ->setDescription($campaignData['description'])
-                ->setCategory($category)
             ;
 
             // Assign projects to campaign
@@ -54,6 +55,16 @@ class CampaignFixtures extends Fixture implements DependentFixtureInterface
             }
 
             $manager->persist($campaign);
+            $manager->flush(); // Flush to get ID for category assignment
+
+            // Add category after entity is persisted
+            if ($category) {
+                $assignment = new CategorizableEntity();
+                $assignment->setCategory($category);
+                $assignment->setEntityType(DomainEntityType::Campaign);
+                $assignment->setEntityId($campaign->getId()->toString());
+                $manager->persist($assignment);
+            }
         }
 
         $manager->flush();

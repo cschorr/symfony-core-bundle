@@ -6,6 +6,7 @@ namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Campaign;
 use C3net\CoreBundle\Entity\Category;
+use C3net\CoreBundle\Entity\CategorizableEntity;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\CompanyGroup;
 use C3net\CoreBundle\Entity\Contact;
@@ -13,6 +14,7 @@ use C3net\CoreBundle\Entity\Department;
 use C3net\CoreBundle\Entity\Project;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Entity\UserGroup;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use C3net\CoreBundle\Repository\UserGroupRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -342,7 +344,6 @@ class AppFixtures extends Fixture
                 ->setNotes($userData['notes'])
                 ->setNameLast($userData['nameLast'])
                 ->setNameFirst($userData['nameFirst'])
-                ->setCategory($category)
                 ->setRoles($userData['roles'] ?? [])
             ;
 
@@ -355,6 +356,17 @@ class AppFixtures extends Fixture
             }
 
             $manager->persist($user);
+            $manager->flush(); // Flush to get ID for category assignment
+
+            // Add category after entity is persisted
+            if ($category) {
+                $assignment = new CategorizableEntity();
+                $assignment->setCategory($category);
+                $assignment->setEntityType(DomainEntityType::User);
+                $assignment->setEntityId($user->getId()->toString());
+                $manager->persist($assignment);
+            }
+
             $this->users[$key] = $user;
         }
 
@@ -653,7 +665,6 @@ class AppFixtures extends Fixture
                 ->setName($data['display'])
                 ->setEmail($data['email'])
                 ->setCountryCode($data['country'])
-                ->setCategory($category)
                 ->setPhone($data['phone'])
                 ->setUrl($data['url'])
                 ->setStreet($data['street'])
@@ -663,6 +674,17 @@ class AppFixtures extends Fixture
                 ->setImagePath($randomLogo);
 
             $manager->persist($company);
+            $manager->flush(); // Flush to get ID for category assignment
+
+            // Add category after entity is persisted
+            if ($category) {
+                $assignment = new CategorizableEntity();
+                $assignment->setCategory($category);
+                $assignment->setEntityType(DomainEntityType::Company);
+                $assignment->setEntityId($company->getId()->toString());
+                $manager->persist($assignment);
+            }
+
             $this->companies['company_' . $index] = $company;
         }
 
@@ -1709,10 +1731,20 @@ class AppFixtures extends Fixture
                 ->setDescription($projectData['description'])
                 ->setClient($client)
                 ->setAssignee($assignee)
-                ->setCategory($category)
                 ->setDueDate($projectData['dueDate']);
 
             $manager->persist($project);
+            $manager->flush(); // Flush to get ID for category assignment
+
+            // Add category after entity is persisted
+            if ($category) {
+                $assignment = new CategorizableEntity();
+                $assignment->setCategory($category);
+                $assignment->setEntityType(DomainEntityType::Project);
+                $assignment->setEntityId($project->getId()->toString());
+                $manager->persist($assignment);
+            }
+
             $this->projects['project_' . $index] = $project;
         }
 
@@ -1845,7 +1877,6 @@ class AppFixtures extends Fixture
                 ->setName($campaignData['name'])
                 ->setShortcode($campaignData['shortcode'])
                 ->setDescription($campaignData['description'])
-                ->setCategory($category)
             ;
 
             // Set start and end dates (always present in campaign data)
@@ -1861,6 +1892,17 @@ class AppFixtures extends Fixture
             }
 
             $manager->persist($campaign);
+            $manager->flush(); // Flush to get ID for category assignment
+
+            // Add category after entity is persisted
+            if ($category) {
+                $assignment = new CategorizableEntity();
+                $assignment->setCategory($category);
+                $assignment->setEntityType(DomainEntityType::Campaign);
+                $assignment->setEntityId($campaign->getId()->toString());
+                $manager->persist($assignment);
+            }
+
             $this->campaigns['campaign_' . $index] = $campaign;
         }
 

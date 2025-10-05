@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Category;
+use C3net\CoreBundle\Entity\CategorizableEntity;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\CompanyGroup;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -69,7 +71,6 @@ class CompanyFixtures extends Fixture implements DependentFixtureInterface
                 ->setName($data['display'])
                 ->setEmail($data['email'])
                 ->setCountryCode($data['country'])
-                ->setCategory($category)
                 ->setPhone($data['phone'])
                 ->setUrl($data['url'])
                 ->setStreet($data['street'])
@@ -79,6 +80,16 @@ class CompanyFixtures extends Fixture implements DependentFixtureInterface
                 ->setImagePath($randomLogo);
 
             $manager->persist($company);
+            $manager->flush(); // Flush to get ID for category assignment
+
+            // Add category after entity is persisted
+            if ($category) {
+                $assignment = new CategorizableEntity();
+                $assignment->setCategory($category);
+                $assignment->setEntityType(DomainEntityType::Company);
+                $assignment->setEntityId($company->getId()->toString());
+                $manager->persist($assignment);
+            }
         }
 
         $manager->flush();
