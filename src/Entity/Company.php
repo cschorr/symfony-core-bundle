@@ -188,7 +188,10 @@ class Company extends AbstractEntity
             return null;
         }
 
-        return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($this->imagePath, '/');
+        $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'https';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+        return $scheme . '://' . $host . '/' . ltrim($this->imagePath, '/');
     }
 
     public function setImagePath(?string $imagePath): static
