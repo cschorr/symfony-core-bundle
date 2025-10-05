@@ -79,7 +79,9 @@ class TransactionWorkflowService
         $marking = $this->getWorkflow($transaction)->getMarking($transaction);
         $places = array_keys($marking->getPlaces());
 
-        return reset($places) ?: 'draft';
+        $firstPlace = reset($places);
+
+        return \is_string($firstPlace) ? $firstPlace : 'draft';
     }
 
     /**
@@ -95,7 +97,10 @@ class TransactionWorkflowService
         $result = [];
         foreach ($enabledTransitions as $transition) {
             $targets = $transition->getTos();
-            $result[$transition->getName()] = reset($targets);
+            $firstTarget = reset($targets);
+            if (\is_string($firstTarget)) {
+                $result[$transition->getName()] = $firstTarget;
+            }
         }
 
         return $result;

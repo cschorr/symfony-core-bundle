@@ -86,6 +86,7 @@ class LoadDemoDataCommand extends Command
             $io->warning(sprintf('Database already contains %d users. Use --purge to clear existing data first.', $userCount));
 
             if (!$input->getOption('force')) {
+                /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
                 $helper = $this->getHelper('question');
                 $question = new ConfirmationQuestion(
                     'Do you want to continue and add demo data to existing data? (y/N) ',
@@ -104,6 +105,7 @@ class LoadDemoDataCommand extends Command
         if (!$input->getOption('force')) {
             $io->caution('This will load demo data into your database.');
 
+            /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion(
                 'Are you sure you want to continue? (y/N) ',
@@ -200,7 +202,11 @@ class LoadDemoDataCommand extends Command
                             }
 
                             $this->managerRegistry->resetManager();
-                            $this->entityManager = $this->managerRegistry->getManager();
+                            $manager = $this->managerRegistry->getManager();
+                            if (!$manager instanceof EntityManagerInterface) {
+                                throw new \RuntimeException('Manager must be an instance of EntityManagerInterface');
+                            }
+                            $this->entityManager = $manager;
 
                             if ($io->isVerbose()) {
                                 $io->text('[DEBUG] EntityManager reset successful, continuing fixture loading');
