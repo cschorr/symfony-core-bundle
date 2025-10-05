@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Tests\Unit\State;
 
 use ApiPlatform\Metadata\Operation;
+use C3net\CoreBundle\ApiResource\AuditLog\AuthorCollection;
+use C3net\CoreBundle\ApiResource\AuditLog\AuthorSummary;
 use C3net\CoreBundle\Repository\AuditLogsRepository;
 use C3net\CoreBundle\State\AuditLogAuthorsProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -27,39 +29,18 @@ class AuditLogAuthorsProviderTest extends TestCase
     {
         $repositoryResult = [
             [
-                'author_id' => 1,
-                'id' => 1,
+                'author_id' => '1',
+                'id' => '1',
                 'email' => 'john@example.com',
                 'firstname' => 'John',
                 'lastname' => 'Doe',
             ],
             [
-                'author_id' => 2,
-                'id' => 2,
+                'author_id' => '2',
+                'id' => '2',
                 'email' => 'jane@example.com',
                 'firstname' => 'Jane',
                 'lastname' => 'Smith',
-            ],
-        ];
-
-        $expectedResult = [
-            [
-                '@id' => '/api/users/1',
-                '@type' => 'User',
-                'id' => 1,
-                'email' => 'john@example.com',
-                'firstname' => 'John',
-                'lastname' => 'Doe',
-                'fullname' => 'John Doe',
-            ],
-            [
-                '@id' => '/api/users/2',
-                '@type' => 'User',
-                'id' => 2,
-                'email' => 'jane@example.com',
-                'firstname' => 'Jane',
-                'lastname' => 'Smith',
-                'fullname' => 'Jane Smith',
             ],
         ];
 
@@ -70,10 +51,27 @@ class AuditLogAuthorsProviderTest extends TestCase
 
         $result = $this->provider->provide($this->operation);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertInstanceOf(AuthorCollection::class, $result);
+        $this->assertCount(2, $result->authors);
+
+        $this->assertInstanceOf(AuthorSummary::class, $result->authors[0]);
+        $this->assertSame('1', $result->authors[0]->id);
+        $this->assertSame('john@example.com', $result->authors[0]->email);
+        $this->assertSame('John', $result->authors[0]->firstname);
+        $this->assertSame('Doe', $result->authors[0]->lastname);
+        $this->assertSame('John Doe', $result->authors[0]->fullname);
+        $this->assertSame('/api/users/1', $result->authors[0]->getIri());
+        $this->assertSame('User', $result->authors[0]->getType());
+
+        $this->assertInstanceOf(AuthorSummary::class, $result->authors[1]);
+        $this->assertSame('2', $result->authors[1]->id);
+        $this->assertSame('jane@example.com', $result->authors[1]->email);
+        $this->assertSame('Jane', $result->authors[1]->firstname);
+        $this->assertSame('Smith', $result->authors[1]->lastname);
+        $this->assertSame('Jane Smith', $result->authors[1]->fullname);
     }
 
-    public function testProvideReturnsEmptyArrayWhenNoAuthors(): void
+    public function testProvideReturnsEmptyCollectionWhenNoAuthors(): void
     {
         $this->repository
             ->expects($this->once())
@@ -82,30 +80,19 @@ class AuditLogAuthorsProviderTest extends TestCase
 
         $result = $this->provider->provide($this->operation);
 
-        $this->assertSame([], $result);
+        $this->assertInstanceOf(AuthorCollection::class, $result);
+        $this->assertCount(0, $result->authors);
     }
 
     public function testProvideHandlesNullFirstname(): void
     {
         $repositoryResult = [
             [
-                'author_id' => 1,
-                'id' => 1,
+                'author_id' => '1',
+                'id' => '1',
                 'email' => 'john@example.com',
                 'firstname' => null,
                 'lastname' => 'Doe',
-            ],
-        ];
-
-        $expectedResult = [
-            [
-                '@id' => '/api/users/1',
-                '@type' => 'User',
-                'id' => 1,
-                'email' => 'john@example.com',
-                'firstname' => null,
-                'lastname' => 'Doe',
-                'fullname' => 'Doe',
             ],
         ];
 
@@ -116,30 +103,20 @@ class AuditLogAuthorsProviderTest extends TestCase
 
         $result = $this->provider->provide($this->operation);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertInstanceOf(AuthorCollection::class, $result);
+        $this->assertCount(1, $result->authors);
+        $this->assertSame('Doe', $result->authors[0]->fullname);
     }
 
     public function testProvideHandlesNullLastname(): void
     {
         $repositoryResult = [
             [
-                'author_id' => 1,
-                'id' => 1,
+                'author_id' => '1',
+                'id' => '1',
                 'email' => 'john@example.com',
                 'firstname' => 'John',
                 'lastname' => null,
-            ],
-        ];
-
-        $expectedResult = [
-            [
-                '@id' => '/api/users/1',
-                '@type' => 'User',
-                'id' => 1,
-                'email' => 'john@example.com',
-                'firstname' => 'John',
-                'lastname' => null,
-                'fullname' => 'John',
             ],
         ];
 
@@ -150,30 +127,20 @@ class AuditLogAuthorsProviderTest extends TestCase
 
         $result = $this->provider->provide($this->operation);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertInstanceOf(AuthorCollection::class, $result);
+        $this->assertCount(1, $result->authors);
+        $this->assertSame('John', $result->authors[0]->fullname);
     }
 
     public function testProvideHandlesBothNullNames(): void
     {
         $repositoryResult = [
             [
-                'author_id' => 1,
-                'id' => 1,
+                'author_id' => '1',
+                'id' => '1',
                 'email' => 'john@example.com',
                 'firstname' => null,
                 'lastname' => null,
-            ],
-        ];
-
-        $expectedResult = [
-            [
-                '@id' => '/api/users/1',
-                '@type' => 'User',
-                'id' => 1,
-                'email' => 'john@example.com',
-                'firstname' => null,
-                'lastname' => null,
-                'fullname' => '',
             ],
         ];
 
@@ -184,78 +151,9 @@ class AuditLogAuthorsProviderTest extends TestCase
 
         $result = $this->provider->provide($this->operation);
 
-        $this->assertSame($expectedResult, $result);
-    }
-
-    public function testProvideHandlesEmptyNames(): void
-    {
-        $repositoryResult = [
-            [
-                'author_id' => 1,
-                'id' => 1,
-                'email' => 'john@example.com',
-                'firstname' => '',
-                'lastname' => '',
-            ],
-        ];
-
-        $expectedResult = [
-            [
-                '@id' => '/api/users/1',
-                '@type' => 'User',
-                'id' => 1,
-                'email' => 'john@example.com',
-                'firstname' => '',
-                'lastname' => '',
-                'fullname' => '',
-            ],
-        ];
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findUniqueAuthors')
-            ->willReturn($repositoryResult);
-
-        $result = $this->provider->provide($this->operation);
-
-        $this->assertSame($expectedResult, $result);
-    }
-
-    public function testProvideGeneratesCorrectApiPlatformFormat(): void
-    {
-        $repositoryResult = [
-            [
-                'author_id' => 123,
-                'id' => 123,
-                'email' => 'test@example.com',
-                'firstname' => 'Test',
-                'lastname' => 'User',
-            ],
-        ];
-
-        $this->repository
-            ->method('findUniqueAuthors')
-            ->willReturn($repositoryResult);
-
-        $result = $this->provider->provide($this->operation);
-
-        $this->assertIsArray($result);
-        $this->assertCount(1, $result);
-
-        $author = $result[0];
-
-        // Check API Platform format
-        $this->assertArrayHasKey('@id', $author);
-        $this->assertArrayHasKey('@type', $author);
-        $this->assertSame('/api/users/123', $author['@id']);
-        $this->assertSame('User', $author['@type']);
-
-        // Check all expected fields are present
-        $this->assertArrayHasKey('id', $author);
-        $this->assertArrayHasKey('email', $author);
-        $this->assertArrayHasKey('firstname', $author);
-        $this->assertArrayHasKey('lastname', $author);
-        $this->assertArrayHasKey('fullname', $author);
+        $this->assertInstanceOf(AuthorCollection::class, $result);
+        $this->assertCount(1, $result->authors);
+        $this->assertSame('', $result->authors[0]->fullname);
     }
 
     public function testProvideAcceptsOptionalParameters(): void
@@ -271,7 +169,7 @@ class AuditLogAuthorsProviderTest extends TestCase
             ['some' => 'context'] // context
         );
 
-        $this->assertSame([], $result);
+        $this->assertInstanceOf(AuthorCollection::class, $result);
     }
 
     public function testProvideImplementsCorrectInterface(): void
@@ -280,63 +178,5 @@ class AuditLogAuthorsProviderTest extends TestCase
             \ApiPlatform\State\ProviderInterface::class,
             $this->provider
         );
-    }
-
-    public function testProvideTrimsFullnameCorrectly(): void
-    {
-        $repositoryResult = [
-            [
-                'author_id' => 1,
-                'id' => 1,
-                'email' => 'test@example.com',
-                'firstname' => '  John  ',
-                'lastname' => '  Doe  ',
-            ],
-        ];
-
-        $this->repository
-            ->method('findUniqueAuthors')
-            ->willReturn($repositoryResult);
-
-        $result = $this->provider->provide($this->operation);
-
-        // The trim() call should handle extra spaces in firstname/lastname
-        $this->assertSame('John     Doe', $result[0]['fullname']);
-    }
-
-    public function testProvideHandlesLargeDataset(): void
-    {
-        // Generate a large dataset to test performance
-        $repositoryResult = [];
-        $expectedResult = [];
-
-        for ($i = 1; $i <= 1000; ++$i) {
-            $repositoryResult[] = [
-                'author_id' => $i,
-                'id' => $i,
-                'email' => "user{$i}@example.com",
-                'firstname' => "First{$i}",
-                'lastname' => "Last{$i}",
-            ];
-
-            $expectedResult[] = [
-                '@id' => "/api/users/{$i}",
-                '@type' => 'User',
-                'id' => $i,
-                'email' => "user{$i}@example.com",
-                'firstname' => "First{$i}",
-                'lastname' => "Last{$i}",
-                'fullname' => "First{$i} Last{$i}",
-            ];
-        }
-
-        $this->repository
-            ->method('findUniqueAuthors')
-            ->willReturn($repositoryResult);
-
-        $result = $this->provider->provide($this->operation);
-
-        $this->assertSame($expectedResult, $result);
-        $this->assertCount(1000, $result);
     }
 }

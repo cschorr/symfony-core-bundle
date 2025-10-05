@@ -349,15 +349,15 @@ class UserTest extends TestCase
 
     public function testCommunicationTraitMethods(): void
     {
-        // Test email from SetCommunicationTrait
-        $email = 'communication@example.com';
-        $this->user->setCommunicationEmail($email);
-        $this->assertSame($email, $this->user->getCommunicationEmail());
-
-        // Test phone
+        // Test phone from SetCommunicationTrait
         $phone = '+1234567890';
-        $this->user->setCommunicationPhone($phone);
-        $this->assertSame($phone, $this->user->getCommunicationPhone());
+        $this->user->setPhone($phone);
+        $this->assertSame($phone, $this->user->getPhone());
+
+        // Test cell
+        $cell = '+0987654321';
+        $this->user->setCell($cell);
+        $this->assertSame($cell, $this->user->getCell());
     }
 
     public function testCompleteUserWorkflow(): void

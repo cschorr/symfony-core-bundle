@@ -123,11 +123,11 @@ class ProjectTest extends TestCase
         $startDate = new \DateTimeImmutable('2025-01-01');
         $endDate = new \DateTimeImmutable('2025-12-31');
 
-        $this->project->setStartDate($startDate);
-        $this->project->setEndDate($endDate);
+        $this->project->setStartedAt($startDate);
+        $this->project->setEndedAt($endDate);
 
-        $this->assertSame($startDate, $this->project->getStartDate());
-        $this->assertSame($endDate, $this->project->getEndDate());
+        $this->assertSame($startDate, $this->project->getStartedAt());
+        $this->assertSame($endDate, $this->project->getEndedAt());
     }
 
     public function testAssigneeRelationship(): void
@@ -298,8 +298,8 @@ class ProjectTest extends TestCase
         $endDate = new \DateTimeImmutable('2025-12-31');
         $dueDate = new \DateTimeImmutable('2025-11-30');
 
-        $project->setStartDate($startDate)
-                ->setEndDate($endDate)
+        $project->setStartedAt($startDate)
+                ->setEndedAt($endDate)
                 ->setDueDate($dueDate);
 
         // Set relationships
@@ -324,8 +324,8 @@ class ProjectTest extends TestCase
         $this->assertSame('Complete Test Project', $project->getName());
         $this->assertSame('A comprehensive test project', $project->getDescription());
         $this->assertTrue($project->isInProgress());
-        $this->assertSame($startDate, $project->getStartDate());
-        $this->assertSame($endDate, $project->getEndDate());
+        $this->assertSame($startDate, $project->getStartedAt());
+        $this->assertSame($endDate, $project->getEndedAt());
         $this->assertSame($dueDate, $project->getDueDate());
         $this->assertSame($assignee, $project->getAssignee());
         $this->assertSame($client, $project->getClient());

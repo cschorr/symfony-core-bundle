@@ -9,6 +9,7 @@ use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\CompanyGroup;
 use C3net\CoreBundle\Entity\Contact;
+use C3net\CoreBundle\Entity\Department;
 use C3net\CoreBundle\Entity\Project;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Entity\UserGroup;
@@ -23,28 +24,31 @@ class AppFixtures extends Fixture
     private const string DEFAULT_PASSWORD = 'pass_1234';
 
     /** @var array<string, User> */
-    private array $users = [];
+    protected array $users = [];
 
     /** @var array<string, UserGroup> */
-    private array $userGroups = [];
+    protected array $userGroups = [];
 
     /** @var array<string, Category> */
-    private array $categories = [];
+    protected array $categories = [];
 
     /** @var array<string, Company> */
-    private array $companies = [];
+    protected array $companies = [];
+
+    /** @var array<string, Department> */
+    protected array $departments = [];
 
     /** @var array<string, Contact> */
-    private array $contacts = [];
+    protected array $contacts = [];
 
     /** @var array<string, CompanyGroup> */
-    private array $companyGroups = [];
+    protected array $companyGroups = [];
 
     /** @var array<string, Campaign> */
-    private array $campaigns = [];
+    protected array $campaigns = [];
 
     /** @var array<string, Project> */
-    private array $projects = [];
+    protected array $projects = [];
 
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
@@ -59,6 +63,7 @@ class AppFixtures extends Fixture
         $this->createUserGroupFixtures($manager);
         $this->createCompanyGroupFixtures($manager); // Create groups before companies
         $this->createCompanyFixtures($manager); // Create companies before users for proper assignment
+        $this->createDepartmentFixtures($manager); // Create departments after companies
         $this->createUserFixtures($manager);
         $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
@@ -360,17 +365,17 @@ class AppFixtures extends Fixture
     {
         // Themed groups from comics and motion pictures
         $groups = [
-            'skynet' => ['name' => 'Skynet Group', 'code' => 'SKYNET'],
-            'marvel' => ['name' => 'Marvel Group', 'code' => 'MARVEL'],
-            'dc' => ['name' => 'DC Group', 'code' => 'DC'],
-            'weyland' => ['name' => 'Weyland-Yutani Group', 'code' => 'WEYLAND'],
-            'umbrella' => ['name' => 'Umbrella Group', 'code' => 'UMBRELLA'],
+            'skynet' => ['name' => 'Skynet Group', 'shortcode' => 'SKYNET'],
+            'marvel' => ['name' => 'Marvel Group', 'shortcode' => 'MARVEL'],
+            'dc' => ['name' => 'DC Group', 'shortcode' => 'DC'],
+            'weyland' => ['name' => 'Weyland-Yutani Group', 'shortcode' => 'WEYLAND'],
+            'umbrella' => ['name' => 'Umbrella Group', 'shortcode' => 'UMBRELLA'],
         ];
 
         foreach ($groups as $key => $data) {
             $group = (new CompanyGroup())
                 ->setName($data['name'])
-                ->setCode($data['code']);
+                ->setShortcode($data['shortcode']);
             $manager->persist($group);
             $this->companyGroups[$key] = $group;
         }
@@ -659,6 +664,94 @@ class AppFixtures extends Fixture
 
             $manager->persist($company);
             $this->companies['company_' . $index] = $company;
+        }
+
+        $manager->flush();
+    }
+
+    private function createDepartmentFixtures(ObjectManager $manager): void
+    {
+        // Define departments for each company based on contact data
+        $departmentsData = [
+            // Cyberdyne Systems (company_0)
+            ['company' => 'company_0', 'name' => 'Technology', 'shortcode' => 'TECH'],
+            ['company' => 'company_0', 'name' => 'Engineering', 'shortcode' => 'ENG'],
+
+            // Stark Industries (company_1)
+            ['company' => 'company_1', 'name' => 'Engineering', 'shortcode' => 'ENG'],
+            ['company' => 'company_1', 'name' => 'Research & Development', 'shortcode' => 'RD'],
+
+            // Wayne Enterprises (company_2)
+            ['company' => 'company_2', 'name' => 'Research & Development', 'shortcode' => 'RD'],
+            ['company' => 'company_2', 'name' => 'Finance', 'shortcode' => 'FIN'],
+
+            // Oscorp Industries (company_3)
+            ['company' => 'company_3', 'name' => 'Product Management', 'shortcode' => 'PM'],
+
+            // Weyland-Yutani Corporation (company_4)
+            ['company' => 'company_4', 'name' => 'Sales', 'shortcode' => 'SALES'],
+
+            // Umbrella Corporation (company_5)
+            ['company' => 'company_5', 'name' => 'Marketing', 'shortcode' => 'MKT'],
+
+            // Tyrell Corporation (company_6)
+            ['company' => 'company_6', 'name' => 'IT Operations', 'shortcode' => 'IT'],
+
+            // Soylent Corporation (company_7)
+            ['company' => 'company_7', 'name' => 'Design', 'shortcode' => 'DESIGN'],
+
+            // Rekall Incorporated (company_8)
+            ['company' => 'company_8', 'name' => 'Quality Assurance', 'shortcode' => 'QA'],
+
+            // Initech (company_9)
+            ['company' => 'company_9', 'name' => 'Analytics', 'shortcode' => 'ANLYTCS'],
+
+            // Veridian Dynamics (company_10)
+            ['company' => 'company_10', 'name' => 'Business Development', 'shortcode' => 'BD'],
+
+            // Massive Dynamic (company_11)
+            ['company' => 'company_11', 'name' => 'Human Resources', 'shortcode' => 'HR'],
+
+            // Abstergo Industries (company_12)
+            ['company' => 'company_12', 'name' => 'Legal', 'shortcode' => 'LEGAL'],
+
+            // Aperture Science (company_13)
+            ['company' => 'company_13', 'name' => 'Project Management', 'shortcode' => 'PM'],
+
+            // Black Mesa (company_14)
+            ['company' => 'company_14', 'name' => 'Research & Development', 'shortcode' => 'RD'],
+
+            // Initrode (company_15)
+            ['company' => 'company_15', 'name' => 'Compliance', 'shortcode' => 'CMPLNC'],
+
+            // Globex Corporation (company_16)
+            ['company' => 'company_16', 'name' => 'Sales', 'shortcode' => 'SALES'],
+
+            // Hooli (company_17)
+            ['company' => 'company_17', 'name' => 'Marketing', 'shortcode' => 'MKT'],
+
+            // Pied Piper (company_18)
+            ['company' => 'company_18', 'name' => 'Creative', 'shortcode' => 'CRTV'],
+        ];
+
+        foreach ($departmentsData as $index => $data) {
+            $company = $this->companies[$data['company']] ?? null;
+
+            if (!$company) {
+                continue; // Skip if company doesn't exist
+            }
+
+            $department = new Department();
+            $department
+                ->setName($data['name'])
+                ->setShortcode($data['shortcode'])
+                ->setCompany($company);
+
+            $manager->persist($department);
+
+            // Create a unique key for departments: company_X_department_name
+            $key = $data['company'] . '_' . strtolower(str_replace([' ', '&'], ['_', 'and'], $data['name']));
+            $this->departments[$key] = $department;
         }
 
         $manager->flush();
@@ -1248,8 +1341,15 @@ class AppFixtures extends Fixture
                 $contact->setPosition($contactData['position']);
             }
 
-            if (isset($contactData['department'])) {
-                $contact->setDepartment($contactData['department']);
+            // Set department relationship if provided
+            if (isset($contactData['department']) && isset($contactData['company'])) {
+                // Build department key: company_X_department_name
+                $departmentKey = $contactData['company'] . '_' . strtolower(str_replace([' ', '&'], ['_', 'and'], $contactData['department']));
+                $department = $this->departments[$departmentKey] ?? null;
+
+                if ($department) {
+                    $contact->setDepartment($department);
+                }
             }
 
             $manager->persist($contact);
@@ -1624,7 +1724,7 @@ class AppFixtures extends Fixture
         $campaignsData = [
             [
                 'name' => 'Digital Transformation 2025',
-                'code' => 'DT2025',
+                'shortcode' => 'DT2025',
                 'description' => 'Comprehensive digital transformation initiative focusing on modernizing legacy systems and implementing cutting-edge technologies across multiple client organizations. This strategic campaign encompasses AI integration, cloud migration, and automation solutions.',
                 'category' => 'main1', // Technology
                 'startDate' => new \DateTimeImmutable('2024-01-15'),
@@ -1640,7 +1740,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Global Marketing Excellence',
-                'code' => 'GME2024',
+                'shortcode' => 'GME2024',
                 'description' => 'Multi-company marketing campaign focusing on brand management, digital marketing automation, and content creation strategies for international markets. Includes social media optimization, SEO enhancement, and customer engagement analytics.',
                 'category' => 'main3', // Marketing & Sales
                 'startDate' => new \DateTimeImmutable('2024-03-01'),
@@ -1655,7 +1755,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Enterprise Security & Compliance',
-                'code' => 'ESC2024',
+                'shortcode' => 'ESC2024',
                 'description' => 'Strategic initiative to enhance security infrastructure and ensure regulatory compliance across all client operations. Includes legal document management, corporate intelligence systems, and comprehensive audit trail implementation.',
                 'category' => 'main2', // Business Services
                 'startDate' => new \DateTimeImmutable('2024-02-01'),
@@ -1671,7 +1771,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Innovation Lab 2024',
-                'code' => 'INNO2024',
+                'shortcode' => 'INNO2024',
                 'description' => 'Research and development initiative focused on emerging technologies and innovative solutions. Exploring quantum computing, neural interfaces, blockchain integration, and advanced data analytics for next-generation applications.',
                 'category' => 'main1', // Technology
                 'startDate' => new \DateTimeImmutable('2024-01-01'),
@@ -1685,7 +1785,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Customer Experience Revolution',
-                'code' => 'CXR2024',
+                'shortcode' => 'CXR2024',
                 'description' => 'Comprehensive customer experience enhancement campaign focusing on user interface optimization, customer journey mapping, and personalization technologies. Aimed at increasing customer satisfaction and retention across all touchpoints.',
                 'category' => 'main3', // Marketing & Sales
                 'startDate' => new \DateTimeImmutable('2024-04-01'),
@@ -1699,7 +1799,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Sustainable Operations Initiative',
-                'code' => 'SOI2024',
+                'shortcode' => 'SOI2024',
                 'description' => 'Environmental sustainability and operational efficiency campaign focusing on green technologies, energy optimization, and sustainable business practices. Includes carbon footprint reduction and renewable energy integration projects.',
                 'category' => 'main4', // Consulting
                 'startDate' => new \DateTimeImmutable('2024-06-01'),
@@ -1712,7 +1812,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Financial Technology Modernization',
-                'code' => 'FINTECH2024',
+                'shortcode' => 'FINTECH2024',
                 'description' => 'Comprehensive financial technology upgrade campaign focusing on banking solutions, payment processing, and financial analytics. Includes blockchain integration, cryptocurrency support, and advanced fraud detection systems.',
                 'category' => 'sub4', // Financial Services
                 'startDate' => new \DateTimeImmutable('2024-05-01'),
@@ -1725,7 +1825,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name' => 'Healthcare Technology Advancement',
-                'code' => 'HEALTH2024',
+                'shortcode' => 'HEALTH2024',
                 'description' => 'Medical and healthcare technology enhancement initiative focusing on patient care optimization, medical data analytics, and telemedicine solutions. Includes clinical trial management and pharmaceutical research platforms.',
                 'category' => 'main2', // Business Services
                 'startDate' => new \DateTimeImmutable('2024-07-01'),
@@ -1743,18 +1843,14 @@ class AppFixtures extends Fixture
 
             $campaign = (new Campaign())
                 ->setName($campaignData['name'])
-                ->setCode($campaignData['code'])
+                ->setShortcode($campaignData['shortcode'])
                 ->setDescription($campaignData['description'])
                 ->setCategory($category)
             ;
 
-            // Set start and end dates if provided
-            if (isset($campaignData['startDate'])) {
-                $campaign->setStartDate($campaignData['startDate']);
-            }
-            if (isset($campaignData['endDate'])) {
-                $campaign->setEndDate($campaignData['endDate']);
-            }
+            // Set start and end dates (always present in campaign data)
+            $campaign->setStartedAt($campaignData['startDate']);
+            $campaign->setEndedAt($campaignData['endDate']);
 
             // Assign projects to campaign
             foreach ($campaignData['projects'] as $projectKey) {

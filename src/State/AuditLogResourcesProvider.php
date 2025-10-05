@@ -6,8 +6,12 @@ namespace C3net\CoreBundle\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use C3net\CoreBundle\ApiResource\AuditLog\ResourceCollection;
 use C3net\CoreBundle\Repository\AuditLogsRepository;
 
+/**
+ * @implements ProviderInterface<ResourceCollection>
+ */
 class AuditLogResourcesProvider implements ProviderInterface
 {
     public function __construct(
@@ -20,6 +24,8 @@ class AuditLogResourcesProvider implements ProviderInterface
         $resources = $this->auditLogsRepository->findUniqueResources();
 
         // Extract just the resource values
-        return array_map(fn ($item) => $item['resource'], $resources);
+        $resourceList = array_map(fn ($item) => $item['resource'], $resources);
+
+        return new ResourceCollection($resourceList);
     }
 }

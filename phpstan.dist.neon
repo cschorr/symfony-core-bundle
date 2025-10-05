@@ -1,0 +1,7 @@
+parameters:
+    level: 8
+    paths:
+        - src/
+    ignoreErrors:
+        # API Platform Processors with generics - instanceof checks are for runtime safety
+        - '#Instanceof between .* will always evaluate to true#'

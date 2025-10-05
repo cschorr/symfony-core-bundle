@@ -31,9 +31,9 @@ use Doctrine\ORM\Mapping as ORM;
         'companyGroup' => 'partial',
         'projects' => 'partial',
         'employees' => 'partial',
+        'departments' => 'exact',
         'name' => 'partial',
         'city' => 'partial',
-        'department' => 'partial',
     ]
 )]
 #[ApiFilter(
@@ -71,14 +71,17 @@ class Company extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'customer')]
     private Collection $transactions;
 
+    /**
+     * @var Collection<int, Department>
+     */
+    #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'company', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $departments;
+
     #[ORM\ManyToOne(targetEntity: Category::class)]
     private ?Category $category = null;
 
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     private ?string $imagePath = null;
-
-    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
-    private ?string $department = null;
 
     public function __construct()
     {
@@ -86,6 +89,7 @@ class Company extends AbstractEntity
         $this->projects = new ArrayCollection();
         $this->employees = new ArrayCollection();
         $this->transactions = new ArrayCollection();
+        $this->departments = new ArrayCollection();
     }
 
     #[\Override]
@@ -184,7 +188,10 @@ class Company extends AbstractEntity
             return null;
         }
 
-        return $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($this->imagePath, '/');
+        $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'https';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+        return $scheme . '://' . $host . '/' . ltrim($this->imagePath, '/');
     }
 
     public function setImagePath(?string $imagePath): static
@@ -194,14 +201,32 @@ class Company extends AbstractEntity
         return $this;
     }
 
-    public function getDepartment(): ?string
+    /**
+     * @return Collection<int, Department>
+     */
+    public function getDepartments(): Collection
     {
-        return $this->department;
+        return $this->departments;
     }
 
-    public function setDepartment(?string $department): static
+    public function addDepartment(Department $department): static
     {
-        $this->department = $department;
+        if (!$this->departments->contains($department)) {
+            $this->departments->add($department);
+            $department->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepartment(Department $department): static
+    {
+        if ($this->departments->removeElement($department)) {
+            // Set the owning side to null (unless already changed)
+            if ($department->getCompany() === $this) {
+                $department->setCompany(null);
+            }
+        }
 
         return $this;
     }

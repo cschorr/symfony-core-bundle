@@ -10,8 +10,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use C3net\CoreBundle\Entity\Traits\Single\StringCodeTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
+use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
 use C3net\CoreBundle\Repository\CompanyGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -30,7 +30,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CompanyGroup extends AbstractEntity
 {
     use StringNameTrait;
-    use StringCodeTrait;
+    use StringShortcodeTrait;
 
     /**
      * @var Collection<int, Company>

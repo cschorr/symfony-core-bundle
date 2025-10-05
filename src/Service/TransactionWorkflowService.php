@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Service;
 
 use C3net\CoreBundle\Entity\Transaction;
-use C3net\CoreBundle\Enum\TransactionStatus;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\StateMachine;
 use Symfony\Component\Workflow\TransitionBlockerList;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * Transaction Workflow Service
+ * Transaction Workflow Service.
  *
  * Provides helper methods for working with the transaction status workflow.
  * Centralizes workflow logic for easier testing and reusability.
@@ -27,7 +25,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Get the workflow/state machine for a transaction
+     * Get the workflow/state machine for a transaction.
      */
     private function getWorkflow(Transaction $transaction): WorkflowInterface
     {
@@ -35,7 +33,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Check if a transition can be applied
+     * Check if a transition can be applied.
      */
     public function can(Transaction $transaction, string $transitionName): bool
     {
@@ -43,7 +41,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Apply a transition to a transaction
+     * Apply a transition to a transaction.
      *
      * @throws \Symfony\Component\Workflow\Exception\LogicException if transition cannot be applied
      */
@@ -53,7 +51,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Get all available transitions for a transaction
+     * Get all available transitions for a transaction.
      *
      * @return string[]
      */
@@ -62,11 +60,11 @@ class TransactionWorkflowService
         $workflow = $this->getWorkflow($transaction);
         $enabledTransitions = $workflow->getEnabledTransitions($transaction);
 
-        return array_map(fn($transition) => $transition->getName(), $enabledTransitions);
+        return array_map(fn ($transition) => $transition->getName(), $enabledTransitions);
     }
 
     /**
-     * Get transition blockers (reasons why a transition cannot be applied)
+     * Get transition blockers (reasons why a transition cannot be applied).
      */
     public function getTransitionBlockers(Transaction $transaction, string $transitionName): TransitionBlockerList
     {
@@ -74,18 +72,20 @@ class TransactionWorkflowService
     }
 
     /**
-     * Get current marking (current place/status)
+     * Get current marking (current place/status).
      */
     public function getCurrentPlace(Transaction $transaction): string
     {
         $marking = $this->getWorkflow($transaction)->getMarking($transaction);
         $places = array_keys($marking->getPlaces());
 
-        return reset($places) ?: 'draft';
+        $firstPlace = reset($places);
+
+        return \is_string($firstPlace) ? $firstPlace : 'draft';
     }
 
     /**
-     * Get all available transitions with their target status
+     * Get all available transitions with their target status.
      *
      * @return array<string, string> Map of transition name => target status
      */
@@ -97,14 +97,17 @@ class TransactionWorkflowService
         $result = [];
         foreach ($enabledTransitions as $transition) {
             $targets = $transition->getTos();
-            $result[$transition->getName()] = reset($targets);
+            $firstTarget = reset($targets);
+            if (\is_string($firstTarget)) {
+                $result[$transition->getName()] = $firstTarget;
+            }
         }
 
         return $result;
     }
 
     /**
-     * Check if transaction can be quoted
+     * Check if transaction can be quoted.
      */
     public function canQuote(Transaction $transaction): bool
     {
@@ -112,7 +115,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Quote transaction
+     * Quote transaction.
      */
     public function quote(Transaction $transaction): void
     {
@@ -120,7 +123,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Check if transaction can be ordered
+     * Check if transaction can be ordered.
      */
     public function canOrder(Transaction $transaction): bool
     {
@@ -128,7 +131,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Order transaction
+     * Order transaction.
      */
     public function order(Transaction $transaction): void
     {
@@ -136,7 +139,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Check if transaction can start production
+     * Check if transaction can start production.
      */
     public function canStartProduction(Transaction $transaction): bool
     {
@@ -144,7 +147,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Start production for transaction
+     * Start production for transaction.
      */
     public function startProduction(Transaction $transaction): void
     {
@@ -152,7 +155,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Check if transaction can be delivered
+     * Check if transaction can be delivered.
      */
     public function canDeliver(Transaction $transaction): bool
     {
@@ -160,7 +163,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Deliver transaction
+     * Deliver transaction.
      */
     public function deliver(Transaction $transaction): void
     {
@@ -168,7 +171,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Check if transaction can be invoiced
+     * Check if transaction can be invoiced.
      */
     public function canInvoice(Transaction $transaction): bool
     {
@@ -176,7 +179,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Invoice transaction
+     * Invoice transaction.
      */
     public function invoice(Transaction $transaction): void
     {
@@ -184,7 +187,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Check if transaction can be marked as paid
+     * Check if transaction can be marked as paid.
      */
     public function canMarkPaid(Transaction $transaction): bool
     {
@@ -192,7 +195,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Mark transaction as paid
+     * Mark transaction as paid.
      */
     public function markPaid(Transaction $transaction): void
     {
@@ -200,7 +203,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Check if transaction can be cancelled
+     * Check if transaction can be cancelled.
      */
     public function canCancel(Transaction $transaction): bool
     {
@@ -208,7 +211,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Cancel transaction
+     * Cancel transaction.
      */
     public function cancel(Transaction $transaction): void
     {
@@ -216,7 +219,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Check if transaction can be reopened
+     * Check if transaction can be reopened.
      */
     public function canReopen(Transaction $transaction): bool
     {
@@ -224,7 +227,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Reopen transaction
+     * Reopen transaction.
      */
     public function reopen(Transaction $transaction): void
     {
@@ -232,7 +235,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Get a human-readable status label for the current status
+     * Get a human-readable status label for the current status.
      */
     public function getStatusLabel(Transaction $transaction): string
     {
@@ -240,7 +243,7 @@ class TransactionWorkflowService
     }
 
     /**
-     * Get badge CSS class for current status
+     * Get badge CSS class for current status.
      */
     public function getStatusBadgeClass(Transaction $transaction): string
     {

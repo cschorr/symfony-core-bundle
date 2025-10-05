@@ -6,7 +6,6 @@ namespace C3net\CoreBundle\Tests\Workflow;
 
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Transaction;
-use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Enum\TransactionStatus;
 use C3net\CoreBundle\Enum\TransactionType;
 use C3net\CoreBundle\Service\TransactionWorkflowService;

@@ -17,9 +17,6 @@
     </php>
 
     <testsuites>
-        <testsuite name="C3net Core Bundle Test Suite">
-            <directory>tests</directory>
-        </testsuite>
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
         </testsuite>

@@ -12,7 +12,7 @@ use Symfony\Component\Workflow\Event\EnteredEvent;
 use Symfony\Component\Workflow\Event\GuardEvent;
 
 /**
- * Transaction Workflow Event Subscriber
+ * Transaction Workflow Event Subscriber.
  *
  * Handles workflow transition events for Transaction entities.
  * Listens to guard, entered, and completed events to enforce business rules
@@ -40,7 +40,7 @@ class TransactionWorkflowListener implements EventSubscriberInterface
     }
 
     /**
-     * Guard event - validate if transition can be performed
+     * Guard event - validate if transition can be performed.
      */
     public function onGuard(GuardEvent $event): void
     {
@@ -61,7 +61,7 @@ class TransactionWorkflowListener implements EventSubscriberInterface
     }
 
     /**
-     * Guard for quote transition - ensure transaction has required data
+     * Guard for quote transition - ensure transaction has required data.
      */
     public function onGuardQuote(GuardEvent $event): void
     {
@@ -80,7 +80,7 @@ class TransactionWorkflowListener implements EventSubscriberInterface
     }
 
     /**
-     * Entered event - triggered when entering a new place
+     * Entered event - triggered when entering a new place.
      */
     public function onEntered(EnteredEvent $event): void
     {
@@ -98,7 +98,7 @@ class TransactionWorkflowListener implements EventSubscriberInterface
     }
 
     /**
-     * Completed event - triggered after transition is completed
+     * Completed event - triggered after transition is completed.
      */
     public function onCompleted(CompletedEvent $event): void
     {
@@ -116,7 +116,7 @@ class TransactionWorkflowListener implements EventSubscriberInterface
     }
 
     /**
-     * Handle mark_paid transition completion
+     * Handle mark_paid transition completion.
      */
     public function onCompletedMarkPaid(CompletedEvent $event): void
     {
@@ -134,7 +134,7 @@ class TransactionWorkflowListener implements EventSubscriberInterface
     }
 
     /**
-     * Handle cancel transition completion
+     * Handle cancel transition completion.
      */
     public function onCompletedCancel(CompletedEvent $event): void
     {

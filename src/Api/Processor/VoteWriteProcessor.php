@@ -21,11 +21,11 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
  */
 final class VoteWriteProcessor implements ProcessorInterface
 {
+    private VoteRepository $votes;
+
     /**
      * @param ProcessorInterface<Vote, Vote> $persistProcessor
      */
-    private VoteRepository $votes;
-
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private readonly ProcessorInterface $persistProcessor,
@@ -66,6 +66,7 @@ final class VoteWriteProcessor implements ProcessorInterface
         }
 
         // „POST wenn schon vorhanden" → als Update behandeln
+        /** @var Vote|null $existing */
         $existing = $this->votes->findOneBy(['comment' => $data->getComment(), 'voter' => $user]);
         if ($existing instanceof Vote && $existing !== $data) {
             $existing->setValue($data->getValue());

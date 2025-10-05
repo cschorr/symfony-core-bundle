@@ -81,10 +81,10 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
             // Calculate invoice amounts based on type
             $depositPercentage = $invoiceData['depositPercentage'] ?? 100;
 
-            if ($invoiceData['type'] === InvoiceType::DEPOSIT) {
-                $subtotal = \bcmul($offer->getSubtotal(), (string)($depositPercentage / 100), 2);
-            } elseif ($invoiceData['type'] === InvoiceType::FINAL) {
-                $subtotal = \bcmul($offer->getSubtotal(), (string)($depositPercentage / 100), 2);
+            if (InvoiceType::DEPOSIT === $invoiceData['type']) {
+                $subtotal = \bcmul($offer->getSubtotal(), (string) ($depositPercentage / 100), 2);
+            } elseif (InvoiceType::FINAL === $invoiceData['type']) {
+                $subtotal = \bcmul($offer->getSubtotal(), (string) ($depositPercentage / 100), 2);
             } else {
                 $subtotal = $offer->getSubtotal();
             }
@@ -103,8 +103,8 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
                 $unitPrice = $offerItem->getUnitPrice();
 
                 // Adjust quantity for deposit/final invoices
-                if ($invoiceData['type'] === InvoiceType::DEPOSIT || $invoiceData['type'] === InvoiceType::FINAL) {
-                    $quantity = \bcmul($quantity, (string)($depositPercentage / 100), 2);
+                if (InvoiceType::DEPOSIT === $invoiceData['type'] || InvoiceType::FINAL === $invoiceData['type']) {
+                    $quantity = \bcmul($quantity, (string) ($depositPercentage / 100), 2);
                 }
 
                 $totalPrice = \bcmul($quantity, $unitPrice, 2);
@@ -118,7 +118,7 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
                     ->setPosition($position++);
 
                 $invoice->addItem($invoiceItem);
-                $itemCount++;
+                ++$itemCount;
 
                 // Limit items to avoid too many in deposit invoices
                 if ($itemCount >= 5) {

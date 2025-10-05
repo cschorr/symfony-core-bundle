@@ -10,6 +10,9 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
 class C3netCoreBundle extends AbstractBundle
 {
+    /**
+     * @param array<string, mixed> $config
+     */
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         // Load services configuration

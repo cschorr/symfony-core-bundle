@@ -6,8 +6,12 @@ namespace C3net\CoreBundle\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use C3net\CoreBundle\ApiResource\AuditLog\ActionCollection;
 use C3net\CoreBundle\Repository\AuditLogsRepository;
 
+/**
+ * @implements ProviderInterface<ActionCollection>
+ */
 class AuditLogActionsProvider implements ProviderInterface
 {
     public function __construct(
@@ -20,6 +24,8 @@ class AuditLogActionsProvider implements ProviderInterface
         $actions = $this->auditLogsRepository->findUniqueActions();
 
         // Extract just the action values
-        return array_map(fn ($item) => $item['action'], $actions);
+        $actionList = array_map(fn ($item) => $item['action'], $actions);
+
+        return new ActionCollection($actionList);
     }
 }

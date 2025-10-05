@@ -6,8 +6,13 @@ namespace C3net\CoreBundle\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use C3net\CoreBundle\ApiResource\AuditLog\AuthorSummary;
+use C3net\CoreBundle\ApiResource\AuditLog\FilterOptions;
 use C3net\CoreBundle\Repository\AuditLogsRepository;
 
+/**
+ * @implements ProviderInterface<FilterOptions>
+ */
 class AuditLogFiltersProvider implements ProviderInterface
 {
     public function __construct(
@@ -21,27 +26,25 @@ class AuditLogFiltersProvider implements ProviderInterface
         $resources = $this->auditLogsRepository->findUniqueResources();
         $actions = $this->auditLogsRepository->findUniqueActions();
 
-        // Format authors
-        $formattedAuthors = array_map(function ($author) {
-            return [
-                '@id' => '/api/users/' . $author['id'],
-                '@type' => 'User',
-                'id' => $author['id'],
-                'email' => $author['email'],
-                'firstname' => $author['firstname'],
-                'lastname' => $author['lastname'],
-                'fullname' => trim(($author['firstname'] ?? '') . ' ' . ($author['lastname'] ?? '')),
-            ];
+        // Map authors to AuthorSummary value objects
+        $authorSummaries = array_map(function ($author) {
+            return new AuthorSummary(
+                id: (string) $author['id'],
+                email: $author['email'],
+                firstname: $author['firstname'],
+                lastname: $author['lastname'],
+                fullname: trim(($author['firstname'] ?? '') . ' ' . ($author['lastname'] ?? '')),
+            );
         }, $authors);
 
         // Extract resources and actions
         $resourceList = array_map(fn ($item) => $item['resource'], $resources);
         $actionList = array_map(fn ($item) => $item['action'], $actions);
 
-        return [
-            'authors' => $formattedAuthors,
-            'resources' => $resourceList,
-            'actions' => $actionList,
-        ];
+        return new FilterOptions(
+            authors: $authorSummaries,
+            resources: $resourceList,
+            actions: $actionList,
+        );
     }
 }
