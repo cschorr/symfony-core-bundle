@@ -24,31 +24,31 @@ class AppFixtures extends Fixture
     private const string DEFAULT_PASSWORD = 'pass_1234';
 
     /** @var array<string, User> */
-    private array $users = [];
+    protected array $users = [];
 
     /** @var array<string, UserGroup> */
-    private array $userGroups = [];
+    protected array $userGroups = [];
 
     /** @var array<string, Category> */
-    private array $categories = [];
+    protected array $categories = [];
 
     /** @var array<string, Company> */
-    private array $companies = [];
+    protected array $companies = [];
 
     /** @var array<string, Department> */
-    private array $departments = [];
+    protected array $departments = [];
 
     /** @var array<string, Contact> */
-    private array $contacts = [];
+    protected array $contacts = [];
 
     /** @var array<string, CompanyGroup> */
-    private array $companyGroups = [];
+    protected array $companyGroups = [];
 
     /** @var array<string, Campaign> */
-    private array $campaigns = [];
+    protected array $campaigns = [];
 
     /** @var array<string, Project> */
-    private array $projects = [];
+    protected array $projects = [];
 
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
