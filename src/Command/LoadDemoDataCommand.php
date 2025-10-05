@@ -286,15 +286,36 @@ class LoadDemoDataCommand extends Command
 
         // List of tables to purge (in reverse order of dependencies)
         $tables = [
+            // Document and invoice items (no foreign keys to other entities)
+            'document',
+            'invoice_items',
+            'offer_items',
+            // Invoices and offers (reference transactions)
+            'invoice',
+            'offer',
+            // Transaction relationships
+            'transaction_project',
+            'transaction',
+            // Campaign relationships and campaigns
             'campaign_project',
             'campaign',
+            // Projects
             'project',
+            // Contacts (may have self-referencing foreign key)
             'contact',
+            // Categorizable entity junction table
+            'categorizable_entity',
+            // User relationships
             'user_user_group',
             'user',
+            // Department
+            'department',
+            // Companies
             'company',
             'company_group',
+            // User groups
             'user_group',
+            // Categories (may have self-referencing foreign key for nested sets)
             'category',
         ];
 
