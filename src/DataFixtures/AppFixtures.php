@@ -17,11 +17,10 @@ use C3net\CoreBundle\Entity\UserGroup;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use C3net\CoreBundle\Repository\UserGroupRepository;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class AppFixtures extends Fixture
+class AppFixtures extends AbstractCategorizableFixture
 {
     private const string DEFAULT_PASSWORD = 'pass_1234';
 
@@ -355,8 +354,7 @@ class AppFixtures extends Fixture
                 $user->addUserGroup($userGroup);
             }
 
-            $manager->persist($user);
-            $manager->flush(); // Flush to get ID for category assignment
+            $this->persistAndFlush($manager, $user); // Persist and flush to get ID for category assignment
 
             // Add category after entity is persisted
             if ($category) {
@@ -370,7 +368,7 @@ class AppFixtures extends Fixture
             $this->users[$key] = $user;
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
     }
 
     private function createCompanyGroupFixtures(ObjectManager $manager): void
@@ -673,8 +671,7 @@ class AppFixtures extends Fixture
                 ->setCompanyGroup($group)
                 ->setImagePath($randomLogo);
 
-            $manager->persist($company);
-            $manager->flush(); // Flush to get ID for category assignment
+            $this->persistAndFlush($manager, $company); // Persist and flush to get ID for category assignment
 
             // Add category after entity is persisted
             if ($category) {
@@ -688,7 +685,7 @@ class AppFixtures extends Fixture
             $this->companies['company_' . $index] = $company;
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
     }
 
     private function createDepartmentFixtures(ObjectManager $manager): void
@@ -1733,8 +1730,7 @@ class AppFixtures extends Fixture
                 ->setAssignee($assignee)
                 ->setDueDate($projectData['dueDate']);
 
-            $manager->persist($project);
-            $manager->flush(); // Flush to get ID for category assignment
+            $this->persistAndFlush($manager, $project); // Persist and flush to get ID for category assignment
 
             // Add category after entity is persisted
             if ($category) {
@@ -1748,7 +1744,7 @@ class AppFixtures extends Fixture
             $this->projects['project_' . $index] = $project;
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
     }
 
     private function createCampaignFixtures(ObjectManager $manager): void
@@ -1891,8 +1887,7 @@ class AppFixtures extends Fixture
                 }
             }
 
-            $manager->persist($campaign);
-            $manager->flush(); // Flush to get ID for category assignment
+            $this->persistAndFlush($manager, $campaign); // Persist and flush to get ID for category assignment
 
             // Add category after entity is persisted
             if ($category) {
@@ -1906,6 +1901,6 @@ class AppFixtures extends Fixture
             $this->campaigns['campaign_' . $index] = $campaign;
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
     }
 }
