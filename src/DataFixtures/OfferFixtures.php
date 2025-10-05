@@ -7,12 +7,12 @@ namespace C3net\CoreBundle\DataFixtures;
 use C3net\CoreBundle\Entity\Offer;
 use C3net\CoreBundle\Entity\OfferItem;
 use C3net\CoreBundle\Entity\Transaction;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\OfferStatus;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class OfferFixtures extends Fixture implements DependentFixtureInterface
+class OfferFixtures extends AbstractCategorizableFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -95,6 +95,14 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
                 throw new \RuntimeException(sprintf('Transaction "%s" not found for offer "%s"', $offerData['transaction'], $offerData['offerNumber']));
             }
 
+            // Assign categories based on offer status
+            $categoryNames = match ($offerData['status']) {
+                OfferStatus::ACCEPTED => ['Marketing & Sales', 'Business Services'],
+                OfferStatus::REJECTED => ['Marketing & Sales', 'Strategy Consulting'],
+                default => ['Marketing & Sales', 'Digital Marketing'],
+            };
+            $categories = $this->findCategoriesByNames($manager, $categoryNames);
+
             $offer = (new Offer())
                 ->setOfferNumber($offerData['offerNumber'])
                 ->setStatus($offerData['status'])
@@ -125,15 +133,20 @@ class OfferFixtures extends Fixture implements DependentFixtureInterface
             $offer->setTaxAmount($taxAmount);
             $offer->setTotalAmount(\bcadd($subtotal, $taxAmount, 2));
 
-            $manager->persist($offer);
+            // Persist and flush to get ID
+            $this->persistAndFlush($manager, $offer);
+
+            // Assign multiple categories
+            $this->assignCategories($manager, $offer, $categories, DomainEntityType::Offer);
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
     }
 
     public function getDependencies(): array
     {
         return [
+            CategoryFixtures::class,
             TransactionFixtures::class,
         ];
     }

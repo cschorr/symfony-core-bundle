@@ -8,13 +8,13 @@ use C3net\CoreBundle\Entity\Invoice;
 use C3net\CoreBundle\Entity\InvoiceItem;
 use C3net\CoreBundle\Entity\Offer;
 use C3net\CoreBundle\Entity\Transaction;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\InvoiceType;
 use C3net\CoreBundle\Enum\PaymentStatus;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class InvoiceFixtures extends Fixture implements DependentFixtureInterface
+class InvoiceFixtures extends AbstractCategorizableFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -71,6 +71,14 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
             $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $invoiceData['transaction']]);
             $offer = $manager->getRepository(Offer::class)->findOneBy(['offerNumber' => $invoiceData['offer']]);
 
+            // Assign categories based on invoice type and payment status
+            $categoryNames = match ($invoiceData['type']) {
+                InvoiceType::DEPOSIT => ['Financial Services', 'Accounting & Tax'],
+                InvoiceType::FINAL => ['Financial Services', 'Accounting & Tax'],
+                default => ['Financial Services', 'Business Services'],
+            };
+            $categories = $this->findCategoriesByNames($manager, $categoryNames);
+
             $invoice = (new Invoice())
                 ->setInvoiceNumber($invoiceData['invoiceNumber'])
                 ->setInvoiceType($invoiceData['type'])
@@ -126,15 +134,20 @@ class InvoiceFixtures extends Fixture implements DependentFixtureInterface
                 }
             }
 
-            $manager->persist($invoice);
+            // Persist and flush to get ID
+            $this->persistAndFlush($manager, $invoice);
+
+            // Assign multiple categories
+            $this->assignCategories($manager, $invoice, $categories, DomainEntityType::Invoice);
         }
 
-        $manager->flush();
+        $this->flushSafely($manager);
     }
 
     public function getDependencies(): array
     {
         return [
+            CategoryFixtures::class,
             TransactionFixtures::class,
             OfferFixtures::class,
         ];
