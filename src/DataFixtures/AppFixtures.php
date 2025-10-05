@@ -9,6 +9,7 @@ use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\CompanyGroup;
 use C3net\CoreBundle\Entity\Contact;
+use C3net\CoreBundle\Entity\Department;
 use C3net\CoreBundle\Entity\Project;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Entity\UserGroup;
@@ -33,6 +34,9 @@ class AppFixtures extends Fixture
 
     /** @var array<string, Company> */
     private array $companies = [];
+
+    /** @var array<string, Department> */
+    private array $departments = [];
 
     /** @var array<string, Contact> */
     private array $contacts = [];
@@ -59,6 +63,7 @@ class AppFixtures extends Fixture
         $this->createUserGroupFixtures($manager);
         $this->createCompanyGroupFixtures($manager); // Create groups before companies
         $this->createCompanyFixtures($manager); // Create companies before users for proper assignment
+        $this->createDepartmentFixtures($manager); // Create departments after companies
         $this->createUserFixtures($manager);
         $this->createContactFixtures($manager);
         $this->createProjectFixtures($manager);
@@ -664,6 +669,94 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 
+    private function createDepartmentFixtures(ObjectManager $manager): void
+    {
+        // Define departments for each company based on contact data
+        $departmentsData = [
+            // Cyberdyne Systems (company_0)
+            ['company' => 'company_0', 'name' => 'Technology', 'shortcode' => 'TECH'],
+            ['company' => 'company_0', 'name' => 'Engineering', 'shortcode' => 'ENG'],
+
+            // Stark Industries (company_1)
+            ['company' => 'company_1', 'name' => 'Engineering', 'shortcode' => 'ENG'],
+            ['company' => 'company_1', 'name' => 'Research & Development', 'shortcode' => 'RD'],
+
+            // Wayne Enterprises (company_2)
+            ['company' => 'company_2', 'name' => 'Research & Development', 'shortcode' => 'RD'],
+            ['company' => 'company_2', 'name' => 'Finance', 'shortcode' => 'FIN'],
+
+            // Oscorp Industries (company_3)
+            ['company' => 'company_3', 'name' => 'Product Management', 'shortcode' => 'PM'],
+
+            // Weyland-Yutani Corporation (company_4)
+            ['company' => 'company_4', 'name' => 'Sales', 'shortcode' => 'SALES'],
+
+            // Umbrella Corporation (company_5)
+            ['company' => 'company_5', 'name' => 'Marketing', 'shortcode' => 'MKT'],
+
+            // Tyrell Corporation (company_6)
+            ['company' => 'company_6', 'name' => 'IT Operations', 'shortcode' => 'IT'],
+
+            // Soylent Corporation (company_7)
+            ['company' => 'company_7', 'name' => 'Design', 'shortcode' => 'DESIGN'],
+
+            // Rekall Incorporated (company_8)
+            ['company' => 'company_8', 'name' => 'Quality Assurance', 'shortcode' => 'QA'],
+
+            // Initech (company_9)
+            ['company' => 'company_9', 'name' => 'Analytics', 'shortcode' => 'ANLYTCS'],
+
+            // Veridian Dynamics (company_10)
+            ['company' => 'company_10', 'name' => 'Business Development', 'shortcode' => 'BD'],
+
+            // Massive Dynamic (company_11)
+            ['company' => 'company_11', 'name' => 'Human Resources', 'shortcode' => 'HR'],
+
+            // Abstergo Industries (company_12)
+            ['company' => 'company_12', 'name' => 'Legal', 'shortcode' => 'LEGAL'],
+
+            // Aperture Science (company_13)
+            ['company' => 'company_13', 'name' => 'Project Management', 'shortcode' => 'PM'],
+
+            // Black Mesa (company_14)
+            ['company' => 'company_14', 'name' => 'Research & Development', 'shortcode' => 'RD'],
+
+            // Initrode (company_15)
+            ['company' => 'company_15', 'name' => 'Compliance', 'shortcode' => 'CMPLNC'],
+
+            // Globex Corporation (company_16)
+            ['company' => 'company_16', 'name' => 'Sales', 'shortcode' => 'SALES'],
+
+            // Hooli (company_17)
+            ['company' => 'company_17', 'name' => 'Marketing', 'shortcode' => 'MKT'],
+
+            // Pied Piper (company_18)
+            ['company' => 'company_18', 'name' => 'Creative', 'shortcode' => 'CRTV'],
+        ];
+
+        foreach ($departmentsData as $index => $data) {
+            $company = $this->companies[$data['company']] ?? null;
+
+            if (!$company) {
+                continue; // Skip if company doesn't exist
+            }
+
+            $department = new Department();
+            $department
+                ->setName($data['name'])
+                ->setShortcode($data['shortcode'])
+                ->setCompany($company);
+
+            $manager->persist($department);
+
+            // Create a unique key for departments: company_X_department_name
+            $key = $data['company'] . '_' . strtolower(str_replace([' ', '&'], ['_', 'and'], $data['name']));
+            $this->departments[$key] = $department;
+        }
+
+        $manager->flush();
+    }
+
     private function createContactFixtures(ObjectManager $manager): void
     {
         $contactsData = [
@@ -1248,11 +1341,16 @@ class AppFixtures extends Fixture
                 $contact->setPosition($contactData['position']);
             }
 
-            // Department relationship - requires Department entities to be created first
-            // TODO: Implement Department fixtures and uncomment this code
-            // if (isset($contactData['department'])) {
-            //     $contact->setDepartment($contactData['department']);
-            // }
+            // Set department relationship if provided
+            if (isset($contactData['department']) && isset($contactData['company'])) {
+                // Build department key: company_X_department_name
+                $departmentKey = $contactData['company'] . '_' . strtolower(str_replace([' ', '&'], ['_', 'and'], $contactData['department']));
+                $department = $this->departments[$departmentKey] ?? null;
+
+                if ($department) {
+                    $contact->setDepartment($department);
+                }
+            }
 
             $manager->persist($contact);
             $this->contacts['contact_' . $index] = $contact;
