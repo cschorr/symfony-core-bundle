@@ -64,13 +64,13 @@ class CompanyTest extends TestCase
         $phone = '+1-555-123-4567';
         $website = 'https://acme.com';
 
-        $this->company->setCommunicationEmail($email);
-        $this->company->setCommunicationPhone($phone);
-        $this->company->setCommunicationWebsite($website);
+        $this->company->setEmail($email);
+        $this->company->setPhone($phone);
+        $this->company->setUrl($website);
 
-        $this->assertSame($email, $this->company->getCommunicationEmail());
-        $this->assertSame($phone, $this->company->getCommunicationPhone());
-        $this->assertSame($website, $this->company->getCommunicationWebsite());
+        $this->assertSame($email, $this->company->getEmail());
+        $this->assertSame($phone, $this->company->getPhone());
+        $this->assertSame($website, $this->company->getUrl());
     }
 
     public function testAddressTrait(): void
@@ -78,17 +78,17 @@ class CompanyTest extends TestCase
         $street = '123 Main Street';
         $city = 'New York';
         $zipCode = '10001';
-        $country = 'USA';
+        $country = 'US';
 
-        $this->company->setAddressStreet($street);
-        $this->company->setAddressCity($city);
-        $this->company->setAddressZipCode($zipCode);
-        $this->company->setAddressCountry($country);
+        $this->company->setStreet($street);
+        $this->company->setCity($city);
+        $this->company->setZip($zipCode);
+        $this->company->setCountryCode($country);
 
-        $this->assertSame($street, $this->company->getAddressStreet());
-        $this->assertSame($city, $this->company->getAddressCity());
-        $this->assertSame($zipCode, $this->company->getAddressZipCode());
-        $this->assertSame($country, $this->company->getAddressCountry());
+        $this->assertSame($street, $this->company->getStreet());
+        $this->assertSame($city, $this->company->getCity());
+        $this->assertSame($zipCode, $this->company->getZip());
+        $this->assertSame($country, $this->company->getCountryCode());
     }
 
     public function testCompanyGroupRelationship(): void
@@ -227,15 +227,15 @@ class CompanyTest extends TestCase
                 ->setNameExtension('Inc.');
 
         // Set communication info
-        $company->setCommunicationEmail('test@company.com')
-                ->setCommunicationPhone('+1-555-TEST')
-                ->setCommunicationWebsite('https://company.com');
+        $company->setEmail('test@company.com')
+                ->setPhone('+1-555-TEST')
+                ->setUrl('https://company.com');
 
         // Set address
-        $company->setAddressStreet('123 Business Ave')
-                ->setAddressCity('Business City')
-                ->setAddressZipCode('12345')
-                ->setAddressCountry('USA');
+        $company->setStreet('123 Business Ave')
+                ->setCity('Business City')
+                ->setZip('12345')
+                ->setCountryCode('US');
 
         // Set relationships
         $companyGroup = new CompanyGroup();
@@ -255,13 +255,13 @@ class CompanyTest extends TestCase
         // Verify complete setup
         $this->assertSame('Complete Test Corp', $company->getName());
         $this->assertSame('Inc.', $company->getNameExtension());
-        $this->assertSame('test@company.com', $company->getCommunicationEmail());
-        $this->assertSame('+1-555-TEST', $company->getCommunicationPhone());
-        $this->assertSame('https://company.com', $company->getCommunicationWebsite());
-        $this->assertSame('123 Business Ave', $company->getAddressStreet());
-        $this->assertSame('Business City', $company->getAddressCity());
-        $this->assertSame('12345', $company->getAddressZipCode());
-        $this->assertSame('USA', $company->getAddressCountry());
+        $this->assertSame('test@company.com', $company->getEmail());
+        $this->assertSame('+1-555-TEST', $company->getPhone());
+        $this->assertSame('https://company.com', $company->getUrl());
+        $this->assertSame('123 Business Ave', $company->getStreet());
+        $this->assertSame('Business City', $company->getCity());
+        $this->assertSame('12345', $company->getZip());
+        $this->assertSame('US', $company->getCountryCode());
         $this->assertSame($companyGroup, $company->getCompanyGroup());
         $this->assertSame($category, $company->getCategory());
         $this->assertStringContainsString('logos/company.png', $company->getImagePath());
