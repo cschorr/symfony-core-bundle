@@ -10,8 +10,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Repository\CompanyGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -31,6 +33,7 @@ class CompanyGroup extends AbstractEntity
 {
     use StringNameTrait;
     use StringShortcodeTrait;
+    use CategorizableTrait;
 
     /**
      * @var Collection<int, Company>
@@ -78,5 +81,10 @@ class CompanyGroup extends AbstractEntity
     public function __toString(): string
     {
         return $this->getName() ?: 'Unnamed Group';
+    }
+
+    protected function getCategorizableEntityType(): DomainEntityType
+    {
+        return DomainEntityType::CompanyGroup;
     }
 }

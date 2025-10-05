@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetNamePersonTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\UserRole;
 use C3net\CoreBundle\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,6 +29,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 {
     use SetCommunicationTrait;
     use SetNamePersonTrait;
+    use CategorizableTrait;
 
     #[ORM\Column(length: 180)]
     private ?string $email = null;
@@ -42,10 +45,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     #[ORM\ManyToOne(inversedBy: 'employees')]
     private ?Company $company = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
-    private ?Category $category = null;
 
     /**
      * @var Collection<int, UserGroup>
@@ -228,16 +227,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    public function getCategory(): ?Category
+    protected function getCategorizableEntityType(): DomainEntityType
     {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
+        return DomainEntityType::User;
     }
 
     /**

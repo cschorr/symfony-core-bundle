@@ -9,6 +9,8 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\OfferStatus;
 use C3net\CoreBundle\Repository\OfferRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -43,6 +45,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class Offer extends AbstractEntity
 {
+    use CategorizableTrait;
+
     #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
     #[Assert\NotBlank]
     private ?string $offerNumber = null;
@@ -363,5 +367,10 @@ class Offer extends AbstractEntity
         $this->subtotal = $subtotal;
         $this->taxAmount = \bcmul($subtotal, \bcdiv($this->taxRate, '100', 4), 2);
         $this->totalAmount = \bcadd($subtotal, $this->taxAmount, 2);
+    }
+
+    protected function getCategorizableEntityType(): DomainEntityType
+    {
+        return DomainEntityType::Offer;
     }
 }

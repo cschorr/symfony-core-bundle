@@ -9,9 +9,8 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Entity\Traits\Tree\NestedTreeTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Repository\CategoryRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -45,17 +44,10 @@ class Category extends AbstractEntity
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $icon = null;
 
-    /**
-     * @var Collection<int, Campaign>
-     */
-    #[ORM\OneToMany(targetEntity: Campaign::class, mappedBy: 'category')]
-    private Collection $campaigns;
-
     public function __construct()
     {
         parent::__construct();
         $this->initializeTreeCollections();
-        $this->campaigns = new ArrayCollection();
     }
 
     public function getColor(): ?string
@@ -83,32 +75,33 @@ class Category extends AbstractEntity
     }
 
     /**
-     * @return Collection<int, Campaign>
+     * Get all entity IDs of a specific type that have this category.
+     *
+     * @return array<int, string>
      */
-    public function getCampaigns(): Collection
+    public function getEntitiesByType(DomainEntityType $entityType): array
     {
-        return $this->campaigns;
+        $repository = $this->getCategorizableEntityRepository();
+
+        return $repository->findEntitiesByCategory($this, $entityType);
     }
 
-    public function addCampaign(Campaign $campaign): static
+    /**
+     * Get the CategorizableEntity repository.
+     *
+     * @phpstan-ignore-next-line
+     */
+    private function getCategorizableEntityRepository(): \C3net\CoreBundle\Repository\CategorizableEntityRepository
     {
-        if (!$this->campaigns->contains($campaign)) {
-            $this->campaigns->add($campaign);
-            $campaign->setCategory($this);
+        global $kernel;
+        if ($kernel instanceof \Symfony\Component\HttpKernel\KernelInterface) {
+            $container = $kernel->getContainer();
+            /** @var \Doctrine\Bundle\DoctrineBundle\Registry $doctrine */
+            $doctrine = $container->get('doctrine');
+
+            return $doctrine->getRepository(CategorizableEntity::class);
         }
 
-        return $this;
-    }
-
-    public function removeCampaign(Campaign $campaign): static
-    {
-        if ($this->campaigns->removeElement($campaign)) {
-            // set the owning side to null (unless already changed)
-            if ($campaign->getCategory() === $this) {
-                $campaign->setCategory(null);
-            }
-        }
-
-        return $this;
+        throw new \RuntimeException('Cannot access CategorizableEntityRepository: Symfony kernel not available');
     }
 }

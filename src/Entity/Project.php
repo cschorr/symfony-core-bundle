@@ -9,9 +9,11 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Enum\BillingStatus;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use C3net\CoreBundle\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -45,13 +47,13 @@ use Doctrine\ORM\Mapping as ORM;
         'client' => 'exact',
         'assignee' => 'exact',
         'status' => 'exact',
-        'category' => 'exact',
     ],
 )]
 class Project extends AbstractEntity
 {
     use StringNameTrait;
     use SetStartEndTrait;
+    use CategorizableTrait;
 
     #[ORM\Column(type: Types::STRING, length: 32, nullable: false, enumType: ProjectStatus::class)]
     #[ApiProperty(
@@ -102,9 +104,6 @@ class Project extends AbstractEntity
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
-
-    #[ORM\ManyToOne]
-    private ?Category $category = null;
 
     /**
      * @var Collection<int, Notification>
@@ -223,16 +222,9 @@ class Project extends AbstractEntity
         return $this->getName() ?: 'Unnamed Project';
     }
 
-    public function getCategory(): ?Category
+    protected function getCategorizableEntityType(): DomainEntityType
     {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
+        return DomainEntityType::Project;
     }
 
     /**

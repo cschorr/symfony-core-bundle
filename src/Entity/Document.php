@@ -8,8 +8,10 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Enum\DocumentType;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Repository\DocumentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -36,6 +38,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Document extends AbstractEntity
 {
     use StringNameTrait;
+    use CategorizableTrait;
 
     #[ORM\Column(type: Types::STRING, length: 32, nullable: false, enumType: DocumentType::class)]
     #[ApiProperty(
@@ -236,5 +239,10 @@ class Document extends AbstractEntity
         }
 
         return round($size, 2) . ' ' . $units[$unitIndex];
+    }
+
+    protected function getCategorizableEntityType(): DomainEntityType
+    {
+        return DomainEntityType::Document;
     }
 }

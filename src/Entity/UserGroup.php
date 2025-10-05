@@ -10,7 +10,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
+use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\UserRole;
 use C3net\CoreBundle\Repository\UserGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,6 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserGroup extends AbstractEntity
 {
     use StringNameTrait;
+    use CategorizableTrait;
 
     /**
      * Stored as list of strings in DB; use helper methods to work with enums.
@@ -42,10 +45,6 @@ class UserGroup extends AbstractEntity
     #[Assert\Choice(callback: [UserRole::class, 'values'], multiple: true)]
     #[Assert\Unique]
     private ?array $roles = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Category $category = null;
 
     /**
      * @var Collection<int, User>
@@ -117,16 +116,9 @@ class UserGroup extends AbstractEntity
         return $this;
     }
 
-    public function getCategory(): ?Category
+    protected function getCategorizableEntityType(): DomainEntityType
     {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
+        return DomainEntityType::UserGroup;
     }
 
     /**
