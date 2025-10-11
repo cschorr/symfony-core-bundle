@@ -252,8 +252,9 @@ class ProjectPriorityTest extends TestCase
     public function testPriorityOrdering(): void
     {
         // Test that priorities can be compared using sort order
-        $this->assertLessThan(ProjectPriority::HIGH->getSortOrder(), ProjectPriority::MEDIUM->getSortOrder());
-        $this->assertLessThan(ProjectPriority::URGENT->getSortOrder(), ProjectPriority::HIGH->getSortOrder());
-        $this->assertLessThan(ProjectPriority::CRITICAL->getSortOrder(), ProjectPriority::URGENT->getSortOrder());
+        // Lower priority should have lower sort order value (MEDIUM=2 < HIGH=3)
+        $this->assertLessThan(ProjectPriority::HIGH->getSortOrder(), ProjectPriority::MEDIUM->getSortOrder(), 'MEDIUM (2) should be less than HIGH (3)');
+        $this->assertLessThan(ProjectPriority::URGENT->getSortOrder(), ProjectPriority::HIGH->getSortOrder(), 'HIGH (3) should be less than URGENT (4)');
+        $this->assertLessThan(ProjectPriority::CRITICAL->getSortOrder(), ProjectPriority::URGENT->getSortOrder(), 'URGENT (4) should be less than CRITICAL (5)');
     }
 }
