@@ -29,7 +29,6 @@ use Doctrine\ORM\Mapping as ORM;
         'name' => 'partial',
         'shortcode' => 'partial',
         'company' => 'exact',
-        'contacts' => 'exact',
     ]
 )]
 #[ApiFilter(
@@ -48,16 +47,9 @@ class Department extends AbstractEntity
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
 
-    /**
-     * @var Collection<int, Contact>
-     */
-    #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'department')]
-    private Collection $contacts;
-
     public function __construct()
     {
         parent::__construct();
-        $this->contacts = new ArrayCollection();
     }
 
     #[\Override]
@@ -74,36 +66,6 @@ class Department extends AbstractEntity
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Contact>
-     */
-    public function getContacts(): Collection
-    {
-        return $this->contacts;
-    }
-
-    public function addContact(Contact $contact): static
-    {
-        if (!$this->contacts->contains($contact)) {
-            $this->contacts->add($contact);
-            $contact->setDepartment($this);
-        }
-
-        return $this;
-    }
-
-    public function removeContact(Contact $contact): static
-    {
-        if ($this->contacts->removeElement($contact)) {
-            // Set the owning side to null (unless already changed)
-            if ($contact->getDepartment() === $this) {
-                $contact->setDepartment(null);
-            }
-        }
 
         return $this;
     }

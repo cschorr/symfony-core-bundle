@@ -69,18 +69,6 @@ class ContactFixtures extends AbstractCategorizableFixture implements DependentF
                 $contact->setGender($contactData['gender']);
             }
 
-            if (isset($contactData['department']) && $contactData['department']) {
-                // Find department by shortcode within the contact's company
-                $department = $manager->getRepository(Department::class)->findOneBy([
-                    'shortcode' => $contactData['department'],
-                    'company' => $company,
-                ]);
-
-                if ($department) {
-                    $contact->setDepartment($department);
-                }
-            }
-
             // Persist and flush to get ID
             $this->persistAndFlush($manager, $contact);
 
