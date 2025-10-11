@@ -14,6 +14,7 @@ use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Enum\BillingStatus;
 use C3net\CoreBundle\Enum\DomainEntityType;
+use C3net\CoreBundle\Enum\ProjectPriority;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use C3net\CoreBundle\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -38,6 +39,7 @@ use Doctrine\ORM\Mapping as ORM;
         'name' => 'ASC',
         'dueDate' => 'DESC',
         'status' => 'ASC',
+        'priority' => 'DESC',
     ],
 )]
 #[ApiFilter(
@@ -47,6 +49,7 @@ use Doctrine\ORM\Mapping as ORM;
         'client' => 'exact',
         'assignee' => 'exact',
         'status' => 'exact',
+        'priority' => 'exact',
     ],
 )]
 class Project extends AbstractEntity
@@ -92,6 +95,27 @@ class Project extends AbstractEntity
         } else {
             $this->status = $status;
         }
+
+        return $this;
+    }
+
+    #[ORM\Column(type: Types::STRING, length: 32, nullable: true, enumType: ProjectPriority::class)]
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'enum' => ['low', 'medium', 'high', 'urgent', 'critical'],
+        ]
+    )]
+    private ?ProjectPriority $priority = null;
+
+    public function getPriority(): ?ProjectPriority
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(?ProjectPriority $priority): static
+    {
+        $this->priority = $priority;
 
         return $this;
     }
@@ -391,5 +415,31 @@ class Project extends AbstractEntity
     public function isBillingPaid(): bool
     {
         return BillingStatus::PAID === $this->billingStatus;
+    }
+
+    // Helper methods for priority
+    public function isLowPriority(): bool
+    {
+        return ProjectPriority::LOW === $this->priority;
+    }
+
+    public function isMediumPriority(): bool
+    {
+        return ProjectPriority::MEDIUM === $this->priority;
+    }
+
+    public function isHighPriority(): bool
+    {
+        return ProjectPriority::HIGH === $this->priority;
+    }
+
+    public function isUrgent(): bool
+    {
+        return ProjectPriority::URGENT === $this->priority;
+    }
+
+    public function isCritical(): bool
+    {
+        return ProjectPriority::CRITICAL === $this->priority;
     }
 }

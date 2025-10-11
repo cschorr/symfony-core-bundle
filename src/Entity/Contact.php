@@ -8,6 +8,7 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use App\Entity\VideoProject;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
@@ -71,11 +72,18 @@ class Contact extends AbstractEntity
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'contact')]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, VideoProject>
+     */
+    #[ORM\OneToMany(targetEntity: VideoProject::class, mappedBy: 'responsiblePerson')]
+    private Collection $videoProjects;
+
     public function __construct()
     {
         parent::__construct();
         $this->initializeTreeCollections();
         $this->projects = new ArrayCollection();
+        $this->videoProjects = new ArrayCollection();
     }
 
     #[\Override]
@@ -162,5 +170,35 @@ class Contact extends AbstractEntity
     protected function getCategorizableEntityType(): DomainEntityType
     {
         return DomainEntityType::Contact;
+    }
+
+    /**
+     * @return Collection<int, VideoProject>
+     */
+    public function getVideoProjects(): Collection
+    {
+        return $this->videoProjects;
+    }
+
+    public function addVideoProject(VideoProject $videoProject): static
+    {
+        if (!$this->videoProjects->contains($videoProject)) {
+            $this->videoProjects->add($videoProject);
+            $videoProject->setResponsiblePerson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVideoProject(VideoProject $videoProject): static
+    {
+        if ($this->videoProjects->removeElement($videoProject)) {
+            // set the owning side to null (unless already changed)
+            if ($videoProject->getResponsiblePerson() === $this) {
+                $videoProject->setResponsiblePerson(null);
+            }
+        }
+
+        return $this;
     }
 }
