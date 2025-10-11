@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Campaign;
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\CategorizableEntity;
+use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\CompanyGroup;
 use C3net\CoreBundle\Entity\Contact;

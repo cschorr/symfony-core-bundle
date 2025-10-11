@@ -12,7 +12,7 @@ if (file_exists(dirname(__DIR__).'/vendor/autoload.php')) {
     // Bundle as submodule in parent project
     require dirname(__DIR__, 3).'/vendor/autoload.php';
 } else {
-    throw new \RuntimeException('Could not find vendor/autoload.php');
+    throw new RuntimeException('Could not find vendor/autoload.php');
 }
 
 // Load .env file if it exists (bundle may not have one as submodule)

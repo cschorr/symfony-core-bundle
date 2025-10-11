@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace C3net\CoreBundle\Repository;
 
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\CategorizableEntity;
+use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -49,7 +49,7 @@ class CategorizableEntityRepository extends ServiceEntityRepository
     public function findByEntityAndCategory(
         string $entityId,
         DomainEntityType $entityType,
-        Category $category
+        Category $category,
     ): ?CategorizableEntity {
         return $this->createQueryBuilder('ce')
             ->where('ce.entityId = :entityId')

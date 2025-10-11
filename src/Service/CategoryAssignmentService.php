@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace C3net\CoreBundle\Service;
 
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\CategorizableEntity;
+use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Repository\CategorizableEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,23 +20,23 @@ class CategoryAssignmentService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly CategorizableEntityRepository $repository
+        private readonly CategorizableEntityRepository $repository,
     ) {
     }
 
     /**
      * Add a category to an entity.
      *
-     * @param string $entityId The UUID of the entity
+     * @param string           $entityId   The UUID of the entity
      * @param DomainEntityType $entityType The type of entity
-     * @param Category $category The category to assign
+     * @param Category         $category   The category to assign
      *
      * @throws \InvalidArgumentException If entityId is invalid
      */
     public function addCategory(
         string $entityId,
         DomainEntityType $entityType,
-        Category $category
+        Category $category,
     ): void {
         // Validate inputs
         if (empty($entityId)) {
@@ -72,16 +72,16 @@ class CategoryAssignmentService
     /**
      * Remove a category from an entity.
      *
-     * @param string $entityId The UUID of the entity
+     * @param string           $entityId   The UUID of the entity
      * @param DomainEntityType $entityType The type of entity
-     * @param Category $category The category to remove
+     * @param Category         $category   The category to remove
      *
      * @throws \InvalidArgumentException If entityId is invalid
      */
     public function removeCategory(
         string $entityId,
         DomainEntityType $entityType,
-        Category $category
+        Category $category,
     ): void {
         // Validate inputs
         if (empty($entityId)) {
@@ -107,7 +107,7 @@ class CategoryAssignmentService
     /**
      * Remove all categories from an entity.
      *
-     * @param string $entityId The UUID of the entity
+     * @param string           $entityId   The UUID of the entity
      * @param DomainEntityType $entityType The type of entity
      */
     public function removeAllCategories(string $entityId, DomainEntityType $entityType): void
