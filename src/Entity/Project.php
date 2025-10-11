@@ -186,11 +186,19 @@ class Project extends AbstractEntity
     #[ORM\ManyToMany(targetEntity: Contact::class, inversedBy: 'projects')]
     private Collection $contact;
 
+    /**
+     * @var Collection<int, ProjectDate>
+     */
+    #[ORM\OneToMany(targetEntity: ProjectDate::class, mappedBy: 'project', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['date' => 'ASC'])]
+    private Collection $projectDates;
+
     public function __construct()
     {
         parent::__construct();
         $this->notifications = new ArrayCollection();
         $this->contact = new ArrayCollection();
+        $this->projectDates = new ArrayCollection();
     }
 
     // Fixed status helper methods
@@ -456,5 +464,35 @@ class Project extends AbstractEntity
     public function isCritical(): bool
     {
         return ProjectPriority::CRITICAL === $this->priority;
+    }
+
+    /**
+     * @return Collection<int, ProjectDate>
+     */
+    public function getProjectDates(): Collection
+    {
+        return $this->projectDates;
+    }
+
+    public function addProjectDate(ProjectDate $projectDate): static
+    {
+        if (!$this->projectDates->contains($projectDate)) {
+            $this->projectDates->add($projectDate);
+            $projectDate->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectDate(ProjectDate $projectDate): static
+    {
+        if ($this->projectDates->removeElement($projectDate)) {
+            // Set the owning side to null (unless already changed)
+            if ($projectDate->getProject() === $this) {
+                $projectDate->setProject(null);
+            }
+        }
+
+        return $this;
     }
 }

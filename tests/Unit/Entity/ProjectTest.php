@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Tests\Unit\Entity;
 
 use C3net\CoreBundle\Entity\Campaign;
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Contact;
 use C3net\CoreBundle\Entity\Notification;
 use C3net\CoreBundle\Entity\Project;
+use C3net\CoreBundle\Entity\ProjectDate;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use PHPUnit\Framework\TestCase;
@@ -172,12 +172,12 @@ class ProjectTest extends TestCase
 
     public function testCategoryRelationship(): void
     {
-        $this->assertNull($this->project->getCategory());
+        // Project uses CategorizableTrait for many-to-many categories
+        // Categories are managed via CategoryAssignmentService, not direct setters
+        $categories = $this->project->getCategories();
 
-        $category = new Category();
-        $this->project->setCategory($category);
-
-        $this->assertSame($category, $this->project->getCategory());
+        $this->assertCount(0, $categories);
+        $this->assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $categories);
     }
 
     public function testCampaignRelationship(): void
@@ -305,12 +305,10 @@ class ProjectTest extends TestCase
         // Set relationships
         $assignee = new User();
         $client = new Company();
-        $category = new Category();
         $campaign = new Campaign();
 
         $project->setAssignee($assignee)
                 ->setClient($client)
-                ->setCategory($category)
                 ->setCampaign($campaign);
 
         // Add contacts and notifications
@@ -329,7 +327,6 @@ class ProjectTest extends TestCase
         $this->assertSame($dueDate, $project->getDueDate());
         $this->assertSame($assignee, $project->getAssignee());
         $this->assertSame($client, $project->getClient());
-        $this->assertSame($category, $project->getCategory());
         $this->assertSame($campaign, $project->getCampaign());
         $this->assertCount(1, $project->getContact());
         $this->assertCount(1, $project->getNotifications());
@@ -386,5 +383,105 @@ class ProjectTest extends TestCase
         $this->project->setNotes($notes);
 
         $this->assertSame($notes, $this->project->getNotes());
+    }
+
+    public function testProjectDatesCollection(): void
+    {
+        // Test that projectDates collection is initialized
+        $this->assertCount(0, $this->project->getProjectDates());
+    }
+
+    public function testAddProjectDate(): void
+    {
+        $projectDate = new ProjectDate();
+        $projectDate->setDate(new \DateTimeImmutable('2025-12-31'));
+        $projectDate->setLabel('Deadline');
+        $projectDate->setNotice('Final delivery date');
+
+        $this->project->addProjectDate($projectDate);
+
+        $this->assertCount(1, $this->project->getProjectDates());
+        $this->assertTrue($this->project->getProjectDates()->contains($projectDate));
+        $this->assertSame($this->project, $projectDate->getProject());
+    }
+
+    public function testAddMultipleProjectDates(): void
+    {
+        $date1 = new ProjectDate();
+        $date1->setDate(new \DateTimeImmutable('2025-01-15'));
+        $date1->setLabel('Kickoff');
+
+        $date2 = new ProjectDate();
+        $date2->setDate(new \DateTimeImmutable('2025-06-30'));
+        $date2->setLabel('Milestone 1');
+
+        $date3 = new ProjectDate();
+        $date3->setDate(new \DateTimeImmutable('2025-12-31'));
+        $date3->setLabel('Completion');
+
+        $this->project->addProjectDate($date1);
+        $this->project->addProjectDate($date2);
+        $this->project->addProjectDate($date3);
+
+        $this->assertCount(3, $this->project->getProjectDates());
+    }
+
+    public function testAddDuplicateProjectDate(): void
+    {
+        $projectDate = new ProjectDate();
+        $projectDate->setDate(new \DateTimeImmutable('2025-12-31'));
+
+        $this->project->addProjectDate($projectDate);
+        $this->project->addProjectDate($projectDate); // Try to add same date again
+
+        // Should still have only one date (no duplicates)
+        $this->assertCount(1, $this->project->getProjectDates());
+    }
+
+    public function testRemoveProjectDate(): void
+    {
+        $projectDate = new ProjectDate();
+        $projectDate->setDate(new \DateTimeImmutable('2025-12-31'));
+
+        $this->project->addProjectDate($projectDate);
+        $this->assertCount(1, $this->project->getProjectDates());
+
+        $this->project->removeProjectDate($projectDate);
+        $this->assertCount(0, $this->project->getProjectDates());
+        $this->assertNull($projectDate->getProject());
+    }
+
+    public function testProjectDatesWithCompleteData(): void
+    {
+        // Test realistic scenario with multiple dates and notices
+        $kickoff = new ProjectDate();
+        $kickoff->setDate(new \DateTimeImmutable('2025-01-10 09:00:00'));
+        $kickoff->setLabel('Project Kickoff');
+        $kickoff->setNotice('Initial team meeting and requirements gathering');
+
+        $review = new ProjectDate();
+        $review->setDate(new \DateTimeImmutable('2025-03-15 14:00:00'));
+        $review->setLabel('Design Review');
+        $review->setNotice('Client review of initial designs. Prepare presentation.');
+
+        $delivery = new ProjectDate();
+        $delivery->setDate(new \DateTimeImmutable('2025-06-30 17:00:00'));
+        $delivery->setLabel('Final Delivery');
+        $delivery->setNotice('Complete all deliverables. Final QA check required.');
+
+        $this->project->addProjectDate($kickoff);
+        $this->project->addProjectDate($review);
+        $this->project->addProjectDate($delivery);
+
+        $dates = $this->project->getProjectDates();
+        $this->assertCount(3, $dates);
+
+        // Verify each date is properly associated
+        foreach ($dates as $date) {
+            $this->assertSame($this->project, $date->getProject());
+            $this->assertInstanceOf(\DateTimeImmutable::class, $date->getDate());
+            $this->assertNotEmpty($date->getLabel());
+            $this->assertNotEmpty($date->getNotice());
+        }
     }
 }
