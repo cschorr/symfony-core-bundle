@@ -24,6 +24,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
+#[ORM\DiscriminatorMap([
+    'transaction' => Transaction::class,
+    'app_transaction' => 'App\\Entity\\Transaction',
+])]
 #[ApiResource(
     mercure: true,
     paginationClientEnabled: true,

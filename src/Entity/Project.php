@@ -14,6 +14,7 @@ use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Enum\BillingStatus;
 use C3net\CoreBundle\Enum\DomainEntityType;
+use C3net\CoreBundle\Enum\ProjectPriority;
 use C3net\CoreBundle\Enum\ProjectStatus;
 use C3net\CoreBundle\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -38,6 +39,7 @@ use Doctrine\ORM\Mapping as ORM;
         'name' => 'ASC',
         'dueDate' => 'DESC',
         'status' => 'ASC',
+        'priority' => 'DESC',
     ],
 )]
 #[ApiFilter(
@@ -47,6 +49,7 @@ use Doctrine\ORM\Mapping as ORM;
         'client' => 'exact',
         'assignee' => 'exact',
         'status' => 'exact',
+        'priority' => 'exact',
     ],
 )]
 class Project extends AbstractEntity
@@ -65,17 +68,25 @@ class Project extends AbstractEntity
     private ProjectStatus $status = ProjectStatus::PLANNING;
 
     /**
-     * Get status - returns string for workflow compatibility, enum for application code.
-     * The return type allows both for flexibility.
+     * Get status as string value.
+     *
+     * Returns the string representation of the status for workflow compatibility
+     * and API serialization. Use getStatusEnum() for type-safe access to the enum.
+     *
+     * @return string The status value (e.g., 'planning', 'in_progress', 'completed')
      */
-    public function getStatus(): ProjectStatus|string
+    public function getStatus(): string
     {
-        // Return string value for workflow compatibility
         return $this->status->value;
     }
 
     /**
-     * Get status enum for type-safe access.
+     * Get status as enum for type-safe operations.
+     *
+     * Use this method when you need the enum instance for type-safe comparisons
+     * or when working with status-specific logic.
+     *
+     * @return ProjectStatus The status enum instance
      */
     public function getStatusEnum(): ProjectStatus
     {
@@ -83,7 +94,14 @@ class Project extends AbstractEntity
     }
 
     /**
-     * Set status from enum or string (for Symfony Workflow).
+     * Set status from enum or string value.
+     *
+     * Accepts both enum instances (for type-safe code) and string values
+     * (for Symfony Workflow integration and API input).
+     *
+     * @param ProjectStatus|string $status Status enum or string value
+     *
+     * @throws \ValueError if string value is not a valid status
      */
     public function setStatus(ProjectStatus|string $status): static
     {
@@ -92,6 +110,27 @@ class Project extends AbstractEntity
         } else {
             $this->status = $status;
         }
+
+        return $this;
+    }
+
+    #[ORM\Column(type: Types::STRING, length: 32, nullable: true, enumType: ProjectPriority::class)]
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'enum' => ['low', 'medium', 'high', 'urgent', 'critical'],
+        ]
+    )]
+    private ?ProjectPriority $priority = null;
+
+    public function getPriority(): ?ProjectPriority
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(?ProjectPriority $priority): static
+    {
+        $this->priority = $priority;
 
         return $this;
     }
@@ -391,5 +430,31 @@ class Project extends AbstractEntity
     public function isBillingPaid(): bool
     {
         return BillingStatus::PAID === $this->billingStatus;
+    }
+
+    // Helper methods for priority
+    public function isLowPriority(): bool
+    {
+        return ProjectPriority::LOW === $this->priority;
+    }
+
+    public function isMediumPriority(): bool
+    {
+        return ProjectPriority::MEDIUM === $this->priority;
+    }
+
+    public function isHighPriority(): bool
+    {
+        return ProjectPriority::HIGH === $this->priority;
+    }
+
+    public function isUrgent(): bool
+    {
+        return ProjectPriority::URGENT === $this->priority;
+    }
+
+    public function isCritical(): bool
+    {
+        return ProjectPriority::CRITICAL === $this->priority;
     }
 }

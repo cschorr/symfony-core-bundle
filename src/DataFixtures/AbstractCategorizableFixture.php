@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\AbstractEntity;
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\CategorizableEntity;
+use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -61,21 +61,18 @@ abstract class AbstractCategorizableFixture extends Fixture
     /**
      * Assign a category to an entity using the CategorizableEntity junction table.
      *
-     * @param AbstractEntity $entity The entity to assign the category to (must have an ID)
-     * @param Category $category The category to assign
+     * @param AbstractEntity   $entity     The entity to assign the category to (must have an ID)
+     * @param Category         $category   The category to assign
      * @param DomainEntityType $entityType The domain entity type
      */
     protected function assignCategory(
         ObjectManager $manager,
         AbstractEntity $entity,
         Category $category,
-        DomainEntityType $entityType
+        DomainEntityType $entityType,
     ): void {
         if (null === $entity->getId()) {
-            throw new \RuntimeException(sprintf(
-                'Entity must be persisted and have an ID before assigning categories. Entity class: %s',
-                $entity::class
-            ));
+            throw new \RuntimeException(sprintf('Entity must be persisted and have an ID before assigning categories. Entity class: %s', $entity::class));
         }
 
         $assignment = new CategorizableEntity();
@@ -89,15 +86,15 @@ abstract class AbstractCategorizableFixture extends Fixture
     /**
      * Assign multiple categories to an entity.
      *
-     * @param AbstractEntity $entity The entity to assign categories to
-     * @param Category[] $categories Array of categories to assign
+     * @param AbstractEntity   $entity     The entity to assign categories to
+     * @param Category[]       $categories Array of categories to assign
      * @param DomainEntityType $entityType The domain entity type
      */
     protected function assignCategories(
         ObjectManager $manager,
         AbstractEntity $entity,
         array $categories,
-        DomainEntityType $entityType
+        DomainEntityType $entityType,
     ): void {
         foreach ($categories as $category) {
             $this->assignCategory($manager, $entity, $category, $entityType);
@@ -122,6 +119,7 @@ abstract class AbstractCategorizableFixture extends Fixture
      * Find multiple categories by names.
      *
      * @param string[] $names
+     *
      * @return Category[]
      */
     protected function findCategoriesByNames(ObjectManager $manager, array $names): array

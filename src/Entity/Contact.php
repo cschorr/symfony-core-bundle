@@ -14,6 +14,7 @@ use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetNamePersonTrait;
 use C3net\CoreBundle\Entity\Traits\Tree\NestedTreeTrait;
 use C3net\CoreBundle\Enum\DomainEntityType;
+use C3net\CoreBundle\Enum\Gender;
 use C3net\CoreBundle\Repository\ContactRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,6 +24,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\Table(name: 'contacts')]
 #[ORM\Entity(repositoryClass: ContactRepository::class)]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
+#[ORM\DiscriminatorMap([
+    'contact' => Contact::class,
+    'app_contact' => 'App\\Entity\\Contact',
+])]
 #[ApiResource(
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
@@ -43,6 +50,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
         'company' => 'exact',
         'department' => 'exact',
         'standin' => 'exact',
+        'gender' => 'exact',
     ],
 )]
 class Contact extends AbstractEntity
@@ -58,6 +66,9 @@ class Contact extends AbstractEntity
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $position = null;
+
+    #[ORM\Column(type: 'string', length: 32, nullable: true, enumType: Gender::class)]
+    private ?Gender $gender = null;
 
     #[ORM\ManyToOne(inversedBy: 'contacts')]
     private ?Department $department = null;
@@ -104,6 +115,18 @@ class Contact extends AbstractEntity
     public function setPosition(?string $position): static
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getGender(): ?Gender
+    {
+        return $this->gender;
+    }
+
+    public function setGender(?Gender $gender): static
+    {
+        $this->gender = $gender;
 
         return $this;
     }
