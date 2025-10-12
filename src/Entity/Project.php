@@ -123,14 +123,51 @@ class Project extends AbstractEntity
     )]
     private ?ProjectPriority $priority = null;
 
-    public function getPriority(): ?ProjectPriority
+    /**
+     * Get priority as string value.
+     *
+     * Returns the string representation of the priority for API serialization.
+     * Use getPriorityEnum() for type-safe access to the enum.
+     *
+     * @return string|null The priority value (e.g., 'low', 'medium', 'high')
+     */
+    public function getPriority(): ?string
+    {
+        return $this->priority?->value;
+    }
+
+    /**
+     * Get priority as enum for type-safe operations.
+     *
+     * Use this method when you need the enum instance for type-safe comparisons
+     * or when working with priority-specific logic.
+     *
+     * @return ProjectPriority|null The priority enum instance
+     */
+    public function getPriorityEnum(): ?ProjectPriority
     {
         return $this->priority;
     }
 
-    public function setPriority(?ProjectPriority $priority): static
+    /**
+     * Set priority from enum or string value.
+     *
+     * Accepts both enum instances (for type-safe code) and string values
+     * (for API input).
+     *
+     * @param ProjectPriority|string|null $priority Priority enum or string value
+     *
+     * @throws \ValueError if string value is not a valid priority
+     */
+    public function setPriority(ProjectPriority|string|null $priority): static
     {
-        $this->priority = $priority;
+        if ($priority === null) {
+            $this->priority = null;
+        } elseif (is_string($priority)) {
+            $this->priority = ProjectPriority::from($priority);
+        } else {
+            $this->priority = $priority;
+        }
 
         return $this;
     }
@@ -435,26 +472,26 @@ class Project extends AbstractEntity
     // Helper methods for priority
     public function isLowPriority(): bool
     {
-        return ProjectPriority::LOW === $this->priority;
+        return ProjectPriority::LOW === $this->getPriorityEnum();
     }
 
     public function isMediumPriority(): bool
     {
-        return ProjectPriority::MEDIUM === $this->priority;
+        return ProjectPriority::MEDIUM === $this->getPriorityEnum();
     }
 
     public function isHighPriority(): bool
     {
-        return ProjectPriority::HIGH === $this->priority;
+        return ProjectPriority::HIGH === $this->getPriorityEnum();
     }
 
     public function isUrgent(): bool
     {
-        return ProjectPriority::URGENT === $this->priority;
+        return ProjectPriority::URGENT === $this->getPriorityEnum();
     }
 
     public function isCritical(): bool
     {
-        return ProjectPriority::CRITICAL === $this->priority;
+        return ProjectPriority::CRITICAL === $this->getPriorityEnum();
     }
 }
