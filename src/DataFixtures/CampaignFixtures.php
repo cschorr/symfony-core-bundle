@@ -53,6 +53,9 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
                     ->findOneBy(['transactionNumber' => $campaignData['transaction']]);
                 if ($transaction) {
                     $campaign->setTransaction($transaction);
+                } else {
+                    // Transaction not found - this should not happen if fixtures are loaded correctly
+                    error_log("Warning: Transaction {$campaignData['transaction']} not found for campaign {$campaignData['name']}");
                 }
             }
 
