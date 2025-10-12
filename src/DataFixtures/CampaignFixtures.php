@@ -6,6 +6,7 @@ namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Campaign;
 use C3net\CoreBundle\Entity\Project;
+use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -20,18 +21,21 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
                 'description' => 'Comprehensive digital transformation initiative focusing on modernizing legacy systems and implementing cutting-edge technologies across multiple client organizations.',
                 'categories' => ['Technology', 'Software Solutions', 'AI & Machine Learning'],
                 'projects' => ['E-Commerce Platform', 'AI Security System', 'Mobile Banking App', 'Scientific Data Analysis', 'Quantum Computing Research'],
+                'transaction' => 'TXN-2025-0001', // E-Commerce Platform Development
             ],
             [
                 'name' => 'Global Marketing Excellence',
                 'description' => 'Multi-company marketing campaign focusing on brand management, digital marketing automation, and content creation strategies for international markets.',
                 'categories' => ['Marketing & Sales', 'Digital Marketing', 'Content Creation'],
                 'projects' => ['Digital Marketing Campaign', 'Global Distribution Network'],
+                'transaction' => 'TXN-2025-0005', // Digital Marketing Campaign
             ],
             [
                 'name' => 'Enterprise Security & Compliance',
                 'description' => 'Strategic initiative to enhance security infrastructure and ensure regulatory compliance across all client operations.',
                 'categories' => ['Business Services', 'Cybersecurity', 'Technology'],
                 'projects' => ['Automated Defense Network', 'Corporate Security Upgrade', 'Arc Reactor Monitoring'],
+                'transaction' => 'TXN-2025-0003', // Corporate Security Upgrade
             ],
         ];
 
@@ -42,6 +46,15 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
                 ->setName($campaignData['name'])
                 ->setDescription($campaignData['description'])
             ;
+
+            // Assign transaction to campaign if specified
+            if (isset($campaignData['transaction']) && null !== $campaignData['transaction']) {
+                $transaction = $manager->getRepository(Transaction::class)
+                    ->findOneBy(['transactionNumber' => $campaignData['transaction']]);
+                if ($transaction) {
+                    $campaign->setTransaction($transaction);
+                }
+            }
 
             // Assign projects to campaign
             foreach ($campaignData['projects'] as $projectName) {
@@ -66,6 +79,7 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
         return [
             CategoryFixtures::class,
             ProjectFixtures::class,
+            TransactionFixtures::class,
         ];
     }
 }
