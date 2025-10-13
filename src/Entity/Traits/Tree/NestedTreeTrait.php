@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
  * Trait for implementing Gedmo Nested Tree behavior.
@@ -17,25 +18,32 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * that need to be organized in a nested tree structure using the
  * Doctrine Extensions Tree behavior.
  *
+ * Internal tree structure fields (lft, lvl, rgt, root) are excluded from
+ * API serialization as they are implementation details not needed by clients.
+ *
  * @see https://github.com/doctrine-extensions/DoctrineExtensions/blob/main/doc/tree.md
  */
 trait NestedTreeTrait
 {
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', type: Types::INTEGER)]
+    #[Ignore]
     private ?int $lft = null;
 
     #[Gedmo\TreeLevel]
     #[ORM\Column(name: 'lvl', type: Types::INTEGER)]
+    #[Ignore]
     private ?int $lvl = null;
 
     #[Gedmo\TreeRight]
     #[ORM\Column(name: 'rgt', type: Types::INTEGER)]
+    #[Ignore]
     private ?int $rgt = null;
 
     #[Gedmo\TreeRoot]
     #[ORM\ManyToOne(targetEntity: self::class)]
     #[ORM\JoinColumn(name: 'tree_root', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Ignore]
     private ?self $root = null;
 
     #[Gedmo\TreeParent]
