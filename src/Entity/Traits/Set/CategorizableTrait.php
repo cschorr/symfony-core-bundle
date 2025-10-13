@@ -68,11 +68,17 @@ trait CategorizableTrait
     /**
      * Set categories collection (for external loading by services/data providers).
      *
-     * @param Collection<int, Category> $categories
+     * Accepts both Collection and array for API Platform compatibility.
+     *
+     * @param Collection<int, Category>|array<int, Category> $categories
      */
-    public function setCategories(Collection $categories): void
+    public function setCategories(Collection|array $categories): void
     {
-        $this->categoriesCache = $categories;
+        if (is_array($categories)) {
+            $this->categoriesCache = new ArrayCollection($categories);
+        } else {
+            $this->categoriesCache = $categories;
+        }
     }
 
     /**
