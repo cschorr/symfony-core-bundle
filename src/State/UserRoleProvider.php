@@ -16,15 +16,15 @@ class UserRoleProvider implements ProviderInterface
 {
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $roles = [];
+        $items = [];
 
         foreach (UserRole::cases() as $role) {
-            $roles[] = [
+            $items[] = [
                 'name' => $role->name,
                 'value' => $role->value,
             ];
         }
 
-        return new UserRoleCollection($roles);
+        return new UserRoleCollection($items);
     }
 }

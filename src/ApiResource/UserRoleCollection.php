@@ -25,21 +25,21 @@ class UserRoleCollection
     public readonly int $total;
 
     /**
-     * @param array<int, array{name: string, value: string}> $roles
+     * @param array<int, array{name: string, value: string}> $items
      */
     public function __construct(
-        public readonly array $roles = [],
+        public readonly array $items = [],
     ) {
-        $this->total = count($this->roles);
+        $this->total = count($this->items);
     }
 
     /**
      * @return array<int, array{name: string, value: string}>
      */
     #[Groups(['user_role:read'])]
-    public function getRoles(): array
+    public function getItems(): array
     {
-        return $this->roles;
+        return $this->items;
     }
 
     #[Groups(['user_role:read'])]

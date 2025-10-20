@@ -161,7 +161,7 @@ class Project extends AbstractEntity
      */
     public function setPriority(ProjectPriority|string|null $priority): static
     {
-        if ($priority === null) {
+        if (null === $priority) {
             $this->priority = null;
         } elseif (is_string($priority)) {
             $this->priority = ProjectPriority::from($priority);
