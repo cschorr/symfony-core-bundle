@@ -9,6 +9,7 @@ security:
             entity:
                 class: C3net\CoreBundle\Entity\User
                 property: email
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -16,6 +17,7 @@ security:
         api_auth:
             pattern: ^/api/auth
             stateless: true
+            user_checker: C3net\CoreBundle\Security\UserChecker
             json_login:
                 check_path: /api/auth
                 username_path: email
@@ -27,11 +29,13 @@ security:
             pattern: ^/api
             stateless: true
             entry_point: jwt
+            user_checker: C3net\CoreBundle\Security\UserChecker
             jwt: ~
 
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: C3net\CoreBundle\Security\UserChecker
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -53,7 +57,8 @@ security:
         # API routes - öffentliche Endpunkte
         - { path: ^/api/graphql/(graphiql|playground), roles: PUBLIC_ACCESS, methods: [ GET ] }
         - { path: ^/api/(index\.(jsonld|json|html|yaml|jsonopenapi|yamlopenapi))?$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/(docs|contexts)/, roles: PUBLIC_ACCESS }
+        - { path: '^/api/docs\.', roles: PUBLIC_ACCESS }
+        - { path: '^/api/contexts/', roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth, roles: PUBLIC_ACCESS, methods: [ POST ] }
         # Alle anderen API-Routen erfordern Authentifizierung
