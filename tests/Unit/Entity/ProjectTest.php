@@ -170,16 +170,6 @@ class ProjectTest extends TestCase
         $this->assertGreaterThan(1000, strlen($this->project->getDescription()));
     }
 
-    public function testCategoryRelationship(): void
-    {
-        $this->assertNull($this->project->getCategory());
-
-        $category = new Category();
-        $this->project->setCategory($category);
-
-        $this->assertSame($category, $this->project->getCategory());
-    }
-
     public function testCampaignRelationship(): void
     {
         $this->assertNull($this->project->getCampaign());
@@ -305,12 +295,10 @@ class ProjectTest extends TestCase
         // Set relationships
         $assignee = new User();
         $client = new Company();
-        $category = new Category();
         $campaign = new Campaign();
 
         $project->setAssignee($assignee)
                 ->setClient($client)
-                ->setCategory($category)
                 ->setCampaign($campaign);
 
         // Add contacts and notifications
@@ -329,7 +317,6 @@ class ProjectTest extends TestCase
         $this->assertSame($dueDate, $project->getDueDate());
         $this->assertSame($assignee, $project->getAssignee());
         $this->assertSame($client, $project->getClient());
-        $this->assertSame($category, $project->getCategory());
         $this->assertSame($campaign, $project->getCampaign());
         $this->assertCount(1, $project->getContact());
         $this->assertCount(1, $project->getNotifications());

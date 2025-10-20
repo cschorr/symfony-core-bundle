@@ -171,16 +171,6 @@ class UserTest extends TestCase
         $this->assertSame($company, $this->user->getCompany());
     }
 
-    public function testCategoryRelationship(): void
-    {
-        $this->assertNull($this->user->getCategory());
-
-        $category = new Category();
-        $this->user->setCategory($category);
-
-        $this->assertSame($category, $this->user->getCategory());
-    }
-
     public function testProjectsRelationship(): void
     {
         $project1 = new Project();
@@ -374,11 +364,9 @@ class UserTest extends TestCase
         // Set roles
         $user->setRolesFromEnums([UserRole::ROLE_ADMIN]);
 
-        // Add to company and category
+        // Add to company
         $company = new Company();
-        $category = new Category();
-        $user->setCompany($company)
-             ->setCategory($category);
+        $user->setCompany($company);
 
         // Add to groups
         $group = new UserGroup();
@@ -396,7 +384,6 @@ class UserTest extends TestCase
         $this->assertSame('Doe', $user->getLastName());
         $this->assertFalse($user->isLocked());
         $this->assertSame($company, $user->getCompany());
-        $this->assertSame($category, $user->getCategory());
         $this->assertCount(1, $user->getUserGroups());
         $this->assertCount(1, $user->getProjects());
 

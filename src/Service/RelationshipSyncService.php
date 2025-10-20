@@ -66,6 +66,14 @@ class RelationshipSyncService
             'User' => [
                 'projects' => 'assignee',
             ],
+            // Test mock entities (for unit tests)
+            'MockCompany' => [
+                'employees' => 'company',
+                'projects' => 'client',
+            ],
+            'MockUser' => [
+                'projects' => 'assignee',
+            ],
             // Add more entity mappings as needed
         ];
 

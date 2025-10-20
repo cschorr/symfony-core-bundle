@@ -101,16 +101,6 @@ class CompanyTest extends TestCase
         $this->assertSame($companyGroup, $this->company->getCompanyGroup());
     }
 
-    public function testCategoryRelationship(): void
-    {
-        $this->assertNull($this->company->getCategory());
-
-        $category = new Category();
-        $this->company->setCategory($category);
-
-        $this->assertSame($category, $this->company->getCategory());
-    }
-
     public function testImagePathProperty(): void
     {
         $this->assertNull($this->company->getImagePath());
@@ -239,9 +229,7 @@ class CompanyTest extends TestCase
 
         // Set relationships
         $companyGroup = new CompanyGroup();
-        $category = new Category();
-        $company->setCompanyGroup($companyGroup)
-                ->setCategory($category);
+        $company->setCompanyGroup($companyGroup);
 
         // Set image
         $company->setImagePath('logos/company.png');
@@ -263,7 +251,6 @@ class CompanyTest extends TestCase
         $this->assertSame('12345', $company->getZip());
         $this->assertSame('US', $company->getCountryCode());
         $this->assertSame($companyGroup, $company->getCompanyGroup());
-        $this->assertSame($category, $company->getCategory());
         $this->assertStringContainsString('logos/company.png', $company->getImagePath());
         $this->assertCount(1, $company->getEmployees());
         $this->assertCount(1, $company->getProjects());
