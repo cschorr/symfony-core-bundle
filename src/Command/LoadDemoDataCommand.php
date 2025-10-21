@@ -23,7 +23,6 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -40,9 +39,9 @@ class LoadDemoDataCommand
     }
 
     public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'force', shortcut: 'f', mode: InputOption::VALUE_NONE, description: 'Skip confirmation prompt and force loading of demo data')]
-    bool $force = false, #[\Symfony\Component\Console\Attribute\Option(name: 'purge', shortcut: 'p', mode: InputOption::VALUE_NONE, description: 'Purge existing data before loading demo data (use with caution!)')]
-    bool $purge = false, #[\Symfony\Component\Console\Attribute\Option(name: 'drop-create-schema', shortcut: 'd', mode: InputOption::VALUE_NONE, description: 'Drop and recreate database schema before loading demo data')]
-    bool $dropCreateSchema = false, ?OutputInterface $output = null, ?\Symfony\Component\Console\Style\SymfonyStyle $io = null): int
+        bool $force = false, #[\Symfony\Component\Console\Attribute\Option(name: 'purge', shortcut: 'p', mode: InputOption::VALUE_NONE, description: 'Purge existing data before loading demo data (use with caution!)')]
+        bool $purge = false, #[\Symfony\Component\Console\Attribute\Option(name: 'drop-create-schema', shortcut: 'd', mode: InputOption::VALUE_NONE, description: 'Drop and recreate database schema before loading demo data')]
+        bool $dropCreateSchema = false, ?OutputInterface $output = null, ?SymfonyStyle $io = null): int
     {
         $io->title('C3net Core Bundle Demo Data Loader');
 

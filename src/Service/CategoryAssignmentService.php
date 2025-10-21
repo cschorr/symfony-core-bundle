@@ -39,7 +39,7 @@ class CategoryAssignmentService
         Category $category,
     ): void {
         // Validate inputs
-        if ($entityId === '' || $entityId === '0') {
+        if ('' === $entityId || '0' === $entityId) {
             throw new \InvalidArgumentException('Entity ID cannot be empty');
         }
 
@@ -84,7 +84,7 @@ class CategoryAssignmentService
         Category $category,
     ): void {
         // Validate inputs
-        if ($entityId === '' || $entityId === '0') {
+        if ('' === $entityId || '0' === $entityId) {
             throw new \InvalidArgumentException('Entity ID cannot be empty');
         }
 
