@@ -22,6 +22,7 @@ class LocalePatternCompilerPass implements CompilerPassInterface
         if (!is_array($locales)) {
             return;
         }
+
         $pattern = implode('|', $locales);
 
         // Set the generated pattern as a parameter

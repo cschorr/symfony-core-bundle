@@ -18,3 +18,4 @@
 /.php-cs-fixer.cache
 /.php-cs-fixer.php
 ###< friendsofphp/php-cs-fixer ###
+.phpcs-cache

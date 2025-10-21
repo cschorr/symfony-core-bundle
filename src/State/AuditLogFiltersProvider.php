@@ -27,15 +27,13 @@ class AuditLogFiltersProvider implements ProviderInterface
         $actions = $this->auditLogsRepository->findUniqueActions();
 
         // Map authors to AuthorSummary value objects
-        $authorSummaries = array_map(function ($author) {
-            return new AuthorSummary(
-                id: (string) $author['id'],
-                email: $author['email'],
-                firstname: $author['firstname'],
-                lastname: $author['lastname'],
-                fullname: trim(($author['firstname'] ?? '') . ' ' . ($author['lastname'] ?? '')),
-            );
-        }, $authors);
+        $authorSummaries = array_map(fn($author) => new AuthorSummary(
+            id: (string) $author['id'],
+            email: $author['email'],
+            firstname: $author['firstname'],
+            lastname: $author['lastname'],
+            fullname: trim(($author['firstname'] ?? '') . ' ' . ($author['lastname'] ?? '')),
+        ), $authors);
 
         // Extract resources and actions
         $resourceList = array_map(fn ($item) => $item['resource'], $resources);

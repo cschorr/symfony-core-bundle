@@ -67,7 +67,7 @@ class Contact extends AbstractEntity
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $position = null;
 
-    #[ORM\Column(type: 'string', length: 32, nullable: true, enumType: Gender::class)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 32, nullable: true, enumType: Gender::class)]
     private ?Gender $gender = null;
 
     #[ORM\ManyToOne(inversedBy: 'contacts')]

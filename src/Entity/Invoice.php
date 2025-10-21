@@ -139,6 +139,7 @@ class Invoice extends AbstractEntity
         $this->invoiceDate = new \DateTimeImmutable();
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->invoiceNumber ?? 'Unnamed Invoice';

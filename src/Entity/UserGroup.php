@@ -26,8 +26,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(uriTemplate: '/user-groups/{id}'),
         new GetCollection(uriTemplate: '/user-groups'),
-        new Post(uriTemplate: '/user-groups', processor: 'C3net\CoreBundle\State\UserGroupWriteProcessor'),
-        new Put(uriTemplate: '/user-groups/{id}', processor: 'C3net\CoreBundle\State\UserGroupWriteProcessor'),
+        new Post(uriTemplate: '/user-groups', processor: \C3net\CoreBundle\State\UserGroupWriteProcessor::class),
+        new Put(uriTemplate: '/user-groups/{id}', processor: \C3net\CoreBundle\State\UserGroupWriteProcessor::class),
         new Delete(uriTemplate: '/user-groups/{id}'),
     ]
 )]

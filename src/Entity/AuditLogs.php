@@ -24,22 +24,22 @@ use Doctrine\ORM\Mapping as ORM;
         new GetCollection(uriTemplate: '/audit-logs'),
         new GetCollection(
             uriTemplate: '/audit-logs/authors',
-            provider: 'C3net\CoreBundle\State\AuditLogAuthorsProvider',
+            provider: \C3net\CoreBundle\State\AuditLogAuthorsProvider::class,
             name: 'audit_logs_get_authors',
         ),
         new GetCollection(
             uriTemplate: '/audit-logs/resources',
-            provider: 'C3net\CoreBundle\State\AuditLogResourcesProvider',
+            provider: \C3net\CoreBundle\State\AuditLogResourcesProvider::class,
             name: 'audit_logs_get_resources',
         ),
         new GetCollection(
             uriTemplate: '/audit-logs/actions',
-            provider: 'C3net\CoreBundle\State\AuditLogActionsProvider',
+            provider: \C3net\CoreBundle\State\AuditLogActionsProvider::class,
             name: 'audit_logs_get_actions',
         ),
         new GetCollection(
             uriTemplate: '/audit-logs/filters',
-            provider: 'C3net\CoreBundle\State\AuditLogFiltersProvider',
+            provider: \C3net\CoreBundle\State\AuditLogFiltersProvider::class,
             name: 'audit_logs_get_filters',
         ),
         new Post(uriTemplate: '/audit-logs'),
@@ -79,7 +79,7 @@ class AuditLogs extends AbstractEntity
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $resource = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     private ?string $meta = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -88,10 +88,10 @@ class AuditLogs extends AbstractEntity
     #[ORM\ManyToOne(inversedBy: 'auditLogs')]
     private ?User $author = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     private ?string $data = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     private ?string $previousData = null;
 
     public function getResource(): ?string

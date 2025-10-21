@@ -295,7 +295,7 @@ class Project extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->getName() ?: 'Unnamed Project';
+        return !in_array($this->getName(), ['', '0'], true) ? $this->getName() : 'Unnamed Project';
     }
 
     protected function getCategorizableEntityType(): DomainEntityType

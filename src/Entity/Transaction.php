@@ -155,6 +155,7 @@ class Transaction extends AbstractEntity
         $this->documents = new ArrayCollection();
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->transactionNumber ?? $this->getName() ?? 'Unnamed Transaction';

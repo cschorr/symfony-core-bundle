@@ -82,6 +82,7 @@ class Document extends AbstractEntity
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
     private int $version = 1;
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->fileName ?? $this->getName() ?? 'Unnamed Document';
