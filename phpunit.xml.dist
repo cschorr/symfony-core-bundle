@@ -6,14 +6,24 @@
          executionOrder="depends,defects"
          beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
-         failOnWarning="true">
+         failOnWarning="true"
+         defaultTestSuite="Unit Tests">
     <testsuites>
         <testsuite name="Unit Tests">
             <directory>tests/Unit</directory>
         </testsuite>
         <!-- Functional, Integration, and Workflow tests require a full Symfony application kernel.
-             These tests should be run in the context of a complete Symfony application,
-             not in the bundle's isolated test suite. -->
+             These testsuites are defined for completeness but should be run in the context of
+             a complete Symfony application, not in the bundle's isolated CI environment. -->
+        <testsuite name="functional">
+            <directory>tests/Functional</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="workflow">
+            <directory>tests/Workflow</directory>
+        </testsuite>
     </testsuites>
 
     <source>

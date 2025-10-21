@@ -97,8 +97,10 @@ class Category extends AbstractEntity
             /** @var \Doctrine\Bundle\DoctrineBundle\Registry $doctrine */
             $doctrine = $container->get('doctrine');
 
-            /* @var \C3net\CoreBundle\Repository\CategorizableEntityRepository */
-            return $doctrine->getRepository(CategorizableEntity::class);
+            $repository = $doctrine->getRepository(CategorizableEntity::class);
+            assert($repository instanceof \C3net\CoreBundle\Repository\CategorizableEntityRepository);
+
+            return $repository;
         }
 
         throw new \RuntimeException('Cannot access CategorizableEntityRepository: Symfony kernel not available');
