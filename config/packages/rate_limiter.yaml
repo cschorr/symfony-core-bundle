@@ -10,3 +10,8 @@ framework:
             limit: 60
             rate: { interval: '600 seconds', amount: 60 }
             cache_pool: cache.rate_limiter
+        password_change:
+            policy: 'sliding_window'
+            limit: 3
+            interval: '1 hour'
+            cache_pool: cache.rate_limiter
