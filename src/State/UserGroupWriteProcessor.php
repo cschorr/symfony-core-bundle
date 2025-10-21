@@ -46,10 +46,12 @@ final readonly class UserGroupWriteProcessor implements ProcessorInterface
             if ($this->entityManager->contains($user)) {
                 continue;
             }
+
             // If the user has an ID, merge it to get the managed entity
             if (null === $user->getId()) {
                 continue;
             }
+
             $managedUser = $this->entityManager->find(User::class, $user->getId());
             if (null !== $managedUser) {
                 // Replace the user in the collection with the managed entity
