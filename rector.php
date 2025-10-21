@@ -11,10 +11,10 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/config',
         __DIR__ . '/src',
-        __DIR__ . '/tests',
     ])
     ->withSkip([
         __DIR__ . '/src/DataFixtures',
+        __DIR__ . '/tests',
     ])
     ->withPreparedSets(
         codingStyle: true,
