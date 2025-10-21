@@ -32,7 +32,7 @@ final class VoteWriteProcessor implements ProcessorInterface
         private readonly Security $security,
         #[Autowire(service: 'limiter.votes_per_10m')]
         private readonly RateLimiterFactory $votesLimiter,
-        private readonly EntityManagerInterface $entityManager,
+        EntityManagerInterface $entityManager,
     ) {
         /** @var VoteRepository $votes */
         $votes = $entityManager->getRepository(Vote::class);

@@ -84,7 +84,7 @@ class Document extends AbstractEntity
 
     public function __toString(): string
     {
-        return $this->fileName ?? $this->getName() ?? 'Unnamed Document';
+        return $this->fileName ?? $this->getName() ?: 'Unnamed Document';
     }
 
     // Getters and Setters

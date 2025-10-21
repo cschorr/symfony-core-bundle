@@ -2,6 +2,12 @@ parameters:
     level: 8
     paths:
         - src/
+    excludePaths:
+        - src/DataFixtures/
     ignoreErrors:
         # API Platform Processors with generics - instanceof checks are for runtime safety
         - '#Instanceof between .* will always evaluate to true#'
+        # Traits are analyzed when used in entities, not in isolation
+        - '#Trait .* is used zero times and is not analysed#'
+        # BCMath functions accept regular strings at runtime, numeric-string is overly strict
+        - '#Parameter \#\d+ \$num\d+ of function bc(add|sub|mul|div|comp) expects numeric-string, string given#'
