@@ -14,6 +14,7 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         __DIR__ . '/src/DataFixtures',
+        __DIR__ . '/src/Command',
         __DIR__ . '/tests',
     ])
     ->withPreparedSets(
