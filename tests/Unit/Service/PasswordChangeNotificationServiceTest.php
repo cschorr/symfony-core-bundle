@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Twig\Environment;
 
@@ -56,7 +55,7 @@ class PasswordChangeNotificationServiceTest extends TestCase
                 '@C3netCore/emails/password_changed.html.twig',
                 $this->callback(function (array $data) use ($user, $context) {
                     return $data['user'] === $user
-                        && $data['locale'] === 'en'
+                        && 'en' === $data['locale']
                         && $data['timestamp'] === $context->timestamp
                         && $data['ip_address'] === $context->ipAddress
                         && $data['user_agent'] === $context->userAgent
@@ -73,12 +72,12 @@ class PasswordChangeNotificationServiceTest extends TestCase
                 $to = $email->getTo();
                 $from = $email->getFrom();
 
-                return count($to) === 1
+                return 1 === count($to)
                     && $to[0]->getAddress() === $user->getEmail()
-                    && count($from) === 1
+                    && 1 === count($from)
                     && $from[0]->getAddress() === $this->fromEmail
                     && str_contains(strtolower($email->getSubject()), 'password')
-                    && $email->getHtmlBody() === '<html>Password changed email</html>';
+                    && '<html>Password changed email</html>' === $email->getHtmlBody();
             }));
 
         $this->logger
@@ -86,7 +85,7 @@ class PasswordChangeNotificationServiceTest extends TestCase
             ->method('info')
             ->with(
                 'Password change notification email sent successfully',
-                $this->callback(function (array $logContext) use ($user) {
+                $this->callback(function (array $logContext) {
                     return isset($logContext['user_id'])
                         && isset($logContext['user_email']);
                 })
@@ -107,7 +106,7 @@ class PasswordChangeNotificationServiceTest extends TestCase
                 '@C3netCore/emails/password_changed.html.twig',
                 $this->callback(function (array $data) {
                     // Service currently hardcodes 'en'
-                    return $data['locale'] === 'en';
+                    return 'en' === $data['locale'];
                 })
             )
             ->willReturn('<html>Password changed email</html>');
@@ -131,7 +130,7 @@ class PasswordChangeNotificationServiceTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->callback(function (array $data) use ($admin) {
-                    return $data['changed_by_self'] === false
+                    return false === $data['changed_by_self']
                         && $data['changed_by_user'] === $admin;
                 })
             )
@@ -194,10 +193,10 @@ class PasswordChangeNotificationServiceTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->callback(function (array $data) use ($timestamp) {
-                    return $data['ip_address'] === '192.168.1.100'
-                        && $data['user_agent'] === 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                    return '192.168.1.100' === $data['ip_address']
+                        && 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' === $data['user_agent']
                         && $data['timestamp'] === $timestamp
-                        && $data['changed_by_self'] === true;
+                        && true === $data['changed_by_self'];
                 })
             )
             ->willReturn('<html>Email with security details</html>');
@@ -265,6 +264,7 @@ class PasswordChangeNotificationServiceTest extends TestCase
             ->method('send')
             ->with($this->callback(function (Email $email) use ($customFromEmail) {
                 $from = $email->getFrom();
+
                 return $from[0]->getAddress() === $customFromEmail;
             }));
 
@@ -285,6 +285,7 @@ class PasswordChangeNotificationServiceTest extends TestCase
             ->method('send')
             ->with($this->callback(function (Email $email) {
                 $subject = strtolower($email->getSubject());
+
                 return str_contains($subject, 'password');
             }));
 

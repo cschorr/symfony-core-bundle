@@ -7,7 +7,6 @@ namespace C3net\CoreBundle\Tests\Integration\Security;
 use C3net\CoreBundle\Entity\PasswordHistory;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Repository\PasswordHistoryRepository;
-use C3net\CoreBundle\Service\PasswordChangeAuditService;
 use C3net\CoreBundle\Service\PasswordHistoryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -123,7 +122,7 @@ class PasswordChangeWorkflowTest extends WebTestCase
         $user = $this->createTestUser('history-limit@test.com', 'InitialPassword!');
 
         // Create 15 password history entries (limit is 10)
-        for ($i = 1; $i <= 15; $i++) {
+        for ($i = 1; $i <= 15; ++$i) {
             $hash = $this->passwordHasher->hashPassword($user, "Password{$i}!");
             $this->passwordHistoryService->storePasswordHash($user, $hash);
         }
@@ -138,7 +137,7 @@ class PasswordChangeWorkflowTest extends WebTestCase
         $user = $this->createTestUser('cleanup-test@test.com', 'Password123!');
 
         // Create some password history entries
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 5; ++$i) {
             $hash = $this->passwordHasher->hashPassword($user, "Password{$i}!");
             $this->passwordHistoryService->storePasswordHash($user, $hash);
         }

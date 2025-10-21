@@ -38,6 +38,8 @@ services:
 
     # Password Change Notification Service needs explicit from email configuration
     C3net\CoreBundle\Service\PasswordChangeNotificationService:
+        autowire: true
+        autoconfigure: true
         arguments:
             $mailFrom: 'noreply@example.com'
 
@@ -113,3 +115,25 @@ services:
 
     # Repository services are handled automatically by Doctrine
     # No need to manually define them as services
+
+when@test:
+    services:
+        # Make services public for testing with explicit dependencies
+        C3net\CoreBundle\Service\PasswordChangeNotificationService:
+            public: true
+            autowire: true
+            autoconfigure: true
+            arguments:
+                $mailFrom: 'noreply@example.com'
+
+        C3net\CoreBundle\Service\PasswordHistoryService:
+            public: true
+            autowire: true
+            autoconfigure: true
+            arguments:
+                $entityManager: '@doctrine.orm.entity_manager'
+
+        C3net\CoreBundle\Service\PasswordChangeAuditService:
+            public: true
+            autowire: true
+            autoconfigure: true
