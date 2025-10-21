@@ -10,12 +10,12 @@ return RectorConfig::configure()
     ->withPhpVersion(80300)
     ->withPhpSets(php83: true)
     ->withPaths([
-        __DIR__ . '/assets',
         __DIR__ . '/config',
-        __DIR__ . '/docs',
-        __DIR__ . '/public',
         __DIR__ . '/src',
         __DIR__ . '/tests',
+    ])
+    ->withSkip([
+        __DIR__ . '/src/DataFixtures',
     ])
     ->withPreparedSets(
         codingStyle: true,
