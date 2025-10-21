@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Tests\Unit\Entity;
 
 use C3net\CoreBundle\Entity\Campaign;
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Contact;
 use C3net\CoreBundle\Entity\Document;
