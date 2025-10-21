@@ -43,16 +43,20 @@ final readonly class UserGroupWriteProcessor implements ProcessorInterface
 
         foreach ($currentUsers as $user) {
             // Ensure the user exists in the EntityManager
-            if (!$this->entityManager->contains($user)) {
-                // If the user has an ID, merge it to get the managed entity
-                if (null !== $user->getId()) {
-                    $managedUser = $this->entityManager->find(User::class, $user->getId());
-                    if (null !== $managedUser) {
-                        // Replace the user in the collection with the managed entity
-                        $userGroup->removeUser($user);
-                        $userGroup->addUser($managedUser);
-                    }
-                }
+            if ($this->entityManager->contains($user)) {
+                continue;
+            }
+
+            // If the user has an ID, merge it to get the managed entity
+            if (null === $user->getId()) {
+                continue;
+            }
+
+            $managedUser = $this->entityManager->find(User::class, $user->getId());
+            if (null !== $managedUser) {
+                // Replace the user in the collection with the managed entity
+                $userGroup->removeUser($user);
+                $userGroup->addUser($managedUser);
             }
         }
     }

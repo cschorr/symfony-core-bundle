@@ -88,8 +88,6 @@ class Category extends AbstractEntity
 
     /**
      * Get the CategorizableEntity repository.
-     *
-     * @phpstan-ignore-next-line
      */
     private function getCategorizableEntityRepository(): \C3net\CoreBundle\Repository\CategorizableEntityRepository
     {
@@ -99,7 +97,10 @@ class Category extends AbstractEntity
             /** @var \Doctrine\Bundle\DoctrineBundle\Registry $doctrine */
             $doctrine = $container->get('doctrine');
 
-            return $doctrine->getRepository(CategorizableEntity::class);
+            $repository = $doctrine->getRepository(CategorizableEntity::class);
+            assert($repository instanceof \C3net\CoreBundle\Repository\CategorizableEntityRepository);
+
+            return $repository;
         }
 
         throw new \RuntimeException('Cannot access CategorizableEntityRepository: Symfony kernel not available');

@@ -44,6 +44,7 @@ class InvoiceItem extends AbstractEntity
     #[ORM\ManyToOne]
     private ?Project $project = null;
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->description ?? 'Unnamed Item';

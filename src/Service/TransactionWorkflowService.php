@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
  */
 class TransactionWorkflowService
 {
-    private const WORKFLOW_NAME = 'transaction_status';
+    private const string WORKFLOW_NAME = 'transaction_status';
 
     public function __construct(
         private readonly Registry $workflowRegistry,

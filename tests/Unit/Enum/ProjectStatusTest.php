@@ -91,7 +91,8 @@ class ProjectStatusTest extends TestCase
 
             $this->assertIsString($label);
             $this->assertNotEmpty($label);
-            $this->assertMatchesRegularExpression('/^[A-Z][a-z\s]*$/', $label, "Label '{$label}' should be properly formatted");
+            // Labels should be title case (e.g., "In Progress", "Completed")
+            $this->assertMatchesRegularExpression('/^[A-Z][a-zA-Z\s]*$/', $label, "Label '{$label}' should be properly formatted");
         }
     }
 
@@ -220,14 +221,14 @@ class ProjectStatusTest extends TestCase
     {
         // Test complete project status workflow
         $statuses = [
-            ProjectStatus::PLANNING => ['Planning', 'secondary'],
-            ProjectStatus::IN_PROGRESS => ['In Progress', 'primary'],
-            ProjectStatus::ON_HOLD => ['On Hold', 'warning'],
-            ProjectStatus::COMPLETED => ['Completed', 'success'],
-            ProjectStatus::CANCELLED => ['Cancelled', 'danger'],
+            [ProjectStatus::PLANNING, 'Planning', 'secondary'],
+            [ProjectStatus::IN_PROGRESS, 'In Progress', 'primary'],
+            [ProjectStatus::ON_HOLD, 'On Hold', 'warning'],
+            [ProjectStatus::COMPLETED, 'Completed', 'success'],
+            [ProjectStatus::CANCELLED, 'Cancelled', 'danger'],
         ];
 
-        foreach ($statuses as $status => [$expectedLabel, $expectedBadgeClass]) {
+        foreach ($statuses as [$status, $expectedLabel, $expectedBadgeClass]) {
             $this->assertSame($expectedLabel, $status->getLabel());
             $this->assertSame($expectedBadgeClass, $status->getBadgeClass());
         }

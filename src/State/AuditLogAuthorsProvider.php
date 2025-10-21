@@ -25,15 +25,13 @@ class AuditLogAuthorsProvider implements ProviderInterface
         $authors = $this->auditLogsRepository->findUniqueAuthors();
 
         // Map to AuthorSummary value objects
-        $authorSummaries = array_map(function ($author) {
-            return new AuthorSummary(
-                id: (string) $author['id'],
-                email: $author['email'],
-                firstname: $author['firstname'],
-                lastname: $author['lastname'],
-                fullname: trim(($author['firstname'] ?? '') . ' ' . ($author['lastname'] ?? '')),
-            );
-        }, $authors);
+        $authorSummaries = array_map(fn ($author) => new AuthorSummary(
+            id: (string) $author['id'],
+            email: $author['email'],
+            firstname: $author['firstname'],
+            lastname: $author['lastname'],
+            fullname: trim(($author['firstname'] ?? '') . ' ' . ($author['lastname'] ?? '')),
+        ), $authors);
 
         return new AuthorCollection($authorSummaries);
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Tests\Unit\Entity;
 
 use C3net\CoreBundle\Entity\AuditLogs;
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Project;
 use C3net\CoreBundle\Entity\User;
@@ -169,16 +168,6 @@ class UserTest extends TestCase
         $this->user->setCompany($company);
 
         $this->assertSame($company, $this->user->getCompany());
-    }
-
-    public function testCategoryRelationship(): void
-    {
-        $this->assertNull($this->user->getCategory());
-
-        $category = new Category();
-        $this->user->setCategory($category);
-
-        $this->assertSame($category, $this->user->getCategory());
     }
 
     public function testProjectsRelationship(): void
@@ -374,11 +363,9 @@ class UserTest extends TestCase
         // Set roles
         $user->setRolesFromEnums([UserRole::ROLE_ADMIN]);
 
-        // Add to company and category
+        // Add to company
         $company = new Company();
-        $category = new Category();
-        $user->setCompany($company)
-             ->setCategory($category);
+        $user->setCompany($company);
 
         // Add to groups
         $group = new UserGroup();
@@ -396,7 +383,6 @@ class UserTest extends TestCase
         $this->assertSame('Doe', $user->getLastName());
         $this->assertFalse($user->isLocked());
         $this->assertSame($company, $user->getCompany());
-        $this->assertSame($category, $user->getCategory());
         $this->assertCount(1, $user->getUserGroups());
         $this->assertCount(1, $user->getProjects());
 

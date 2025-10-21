@@ -49,7 +49,7 @@ final readonly class InvoiceWriteProcessor implements ProcessorInterface
             $data->setPaidAt(new \DateTimeImmutable());
 
             $transaction = $data->getTransaction();
-            if ($transaction) {
+            if (null !== $transaction) {
                 // Check if all invoices for this transaction are paid
                 $allPaid = true;
                 foreach ($transaction->getInvoices() as $invoice) {

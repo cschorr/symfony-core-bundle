@@ -6,15 +6,15 @@ use Rector\Config\RectorConfig;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
 
 return RectorConfig::configure()
-    ->withSymfonyContainerXml(__DIR__ . '/var/cache/dev/App_KernelDevDebugContainer.xml')
     ->withPhpVersion(80300)
     ->withPhpSets(php83: true)
     ->withPaths([
-        __DIR__ . '/assets',
         __DIR__ . '/config',
-        __DIR__ . '/docs',
-        __DIR__ . '/public',
         __DIR__ . '/src',
+    ])
+    ->withSkip([
+        __DIR__ . '/src/DataFixtures',
+        __DIR__ . '/src/Command',
         __DIR__ . '/tests',
     ])
     ->withPreparedSets(

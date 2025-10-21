@@ -7,6 +7,7 @@ namespace C3net\CoreBundle\EventListener;
 use C3net\CoreBundle\Entity\Offer;
 use C3net\CoreBundle\Entity\OfferItem;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
@@ -23,6 +24,8 @@ class OfferTotalCalculator
 {
     /**
      * Recalculate offer totals when an item changes.
+     *
+     * @param LifecycleEventArgs<EntityManagerInterface> $event
      */
     public function recalculate(OfferItem $item, LifecycleEventArgs $event): void
     {

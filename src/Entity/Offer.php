@@ -114,6 +114,7 @@ class Offer extends AbstractEntity
         $this->items = new ArrayCollection();
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->offerNumber ?? 'Unnamed Offer';

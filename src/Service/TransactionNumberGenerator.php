@@ -12,8 +12,9 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 class TransactionNumberGenerator
 {
-    private const PREFIX = 'TRX';
-    private const MAX_RETRIES = 10;
+    private const string PREFIX = 'TRX';
+
+    private const int MAX_RETRIES = 10;
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,

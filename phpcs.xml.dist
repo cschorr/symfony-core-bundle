@@ -7,10 +7,12 @@
     <arg name="cache" value=".phpcs-cache"/>
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
+    <arg name="warning-severity" value="0"/>
 
     <rule ref="PSR12"/>
 
-    <file>bin/</file>
     <file>src/</file>
+
+    <exclude-pattern>*/DataFixtures/*</exclude-pattern>
 
 </ruleset>

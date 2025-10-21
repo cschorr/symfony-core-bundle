@@ -105,10 +105,11 @@ class TransactionWorkflowListener implements EventSubscriberInterface
         /** @var Transaction $transaction */
         $transaction = $event->getSubject();
 
+        $transition = $event->getTransition();
         $this->logger->info('Transaction workflow transition completed', [
             'transaction_id' => $transaction->getId(),
             'transaction_number' => $transaction->getTransactionNumber(),
-            'transition' => $event->getTransition()->getName(),
+            'transition' => $transition?->getName(),
             'from' => $event->getMarking()->getPlaces(),
         ]);
 

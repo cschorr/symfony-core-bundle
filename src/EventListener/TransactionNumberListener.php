@@ -7,6 +7,7 @@ namespace C3net\CoreBundle\EventListener;
 use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Service\TransactionNumberGenerator;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
@@ -23,6 +24,8 @@ class TransactionNumberListener
 
     /**
      * Generate transaction number before persisting if not already set.
+     *
+     * @param LifecycleEventArgs<EntityManagerInterface> $event
      */
     public function prePersist(Transaction $transaction, LifecycleEventArgs $event): void
     {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Tests\Unit\Entity;
 
 use C3net\CoreBundle\Entity\Campaign;
-use C3net\CoreBundle\Entity\Category;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Contact;
 use C3net\CoreBundle\Entity\Document;
@@ -40,7 +39,7 @@ class TransactionTest extends TestCase
         $this->assertCount(0, $transaction->getDocuments());
 
         // Test default values
-        $this->assertSame(TransactionStatus::DRAFT, $transaction->getStatus());
+        $this->assertSame(TransactionStatus::DRAFT, $transaction->getStatusEnum());
         $this->assertSame(TransactionType::ORDER, $transaction->getTransactionType());
         $this->assertSame('EUR', $transaction->getCurrency());
         $this->assertTrue($transaction->isDraft());
@@ -92,29 +91,29 @@ class TransactionTest extends TestCase
     public function testStatusProperty(): void
     {
         // Test default status
-        $this->assertSame(TransactionStatus::DRAFT, $this->transaction->getStatus());
+        $this->assertSame(TransactionStatus::DRAFT, $this->transaction->getStatusEnum());
 
         // Test setting different statuses
         $this->transaction->setStatus(TransactionStatus::QUOTED);
-        $this->assertSame(TransactionStatus::QUOTED, $this->transaction->getStatus());
+        $this->assertSame(TransactionStatus::QUOTED, $this->transaction->getStatusEnum());
 
         $this->transaction->setStatus(TransactionStatus::ORDERED);
-        $this->assertSame(TransactionStatus::ORDERED, $this->transaction->getStatus());
+        $this->assertSame(TransactionStatus::ORDERED, $this->transaction->getStatusEnum());
 
         $this->transaction->setStatus(TransactionStatus::IN_PRODUCTION);
-        $this->assertSame(TransactionStatus::IN_PRODUCTION, $this->transaction->getStatus());
+        $this->assertSame(TransactionStatus::IN_PRODUCTION, $this->transaction->getStatusEnum());
 
         $this->transaction->setStatus(TransactionStatus::DELIVERED);
-        $this->assertSame(TransactionStatus::DELIVERED, $this->transaction->getStatus());
+        $this->assertSame(TransactionStatus::DELIVERED, $this->transaction->getStatusEnum());
 
         $this->transaction->setStatus(TransactionStatus::INVOICED);
-        $this->assertSame(TransactionStatus::INVOICED, $this->transaction->getStatus());
+        $this->assertSame(TransactionStatus::INVOICED, $this->transaction->getStatusEnum());
 
         $this->transaction->setStatus(TransactionStatus::PAID);
-        $this->assertSame(TransactionStatus::PAID, $this->transaction->getStatus());
+        $this->assertSame(TransactionStatus::PAID, $this->transaction->getStatusEnum());
 
         $this->transaction->setStatus(TransactionStatus::CANCELLED);
-        $this->assertSame(TransactionStatus::CANCELLED, $this->transaction->getStatus());
+        $this->assertSame(TransactionStatus::CANCELLED, $this->transaction->getStatusEnum());
     }
 
     public function testStatusHelperMethods(): void
@@ -277,16 +276,6 @@ class TransactionTest extends TestCase
         $this->transaction->setAssignedTo($user);
 
         $this->assertSame($user, $this->transaction->getAssignedTo());
-    }
-
-    public function testCategoryRelationship(): void
-    {
-        $this->assertNull($this->transaction->getCategory());
-
-        $category = new Category();
-        $this->transaction->setCategory($category);
-
-        $this->assertSame($category, $this->transaction->getCategory());
     }
 
     public function testOffersRelationship(): void
@@ -515,12 +504,10 @@ class TransactionTest extends TestCase
         $customer = new Company();
         $primaryContact = new Contact();
         $assignedTo = new User();
-        $category = new Category();
 
         $transaction->setCustomer($customer)
                     ->setPrimaryContact($primaryContact)
-                    ->setAssignedTo($assignedTo)
-                    ->setCategory($category);
+                    ->setAssignedTo($assignedTo);
 
         // Add related entities
         $offer = new Offer();
@@ -551,7 +538,6 @@ class TransactionTest extends TestCase
         $this->assertSame($customer, $transaction->getCustomer());
         $this->assertSame($primaryContact, $transaction->getPrimaryContact());
         $this->assertSame($assignedTo, $transaction->getAssignedTo());
-        $this->assertSame($category, $transaction->getCategory());
         $this->assertCount(1, $transaction->getOffers());
         $this->assertCount(1, $transaction->getInvoices());
         $this->assertCount(1, $transaction->getCampaigns());
