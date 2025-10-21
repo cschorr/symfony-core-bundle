@@ -50,12 +50,11 @@ class PasswordChangedEventListener
         }
 
         $passwordChange = $changeSet['password'];
-        if (!\is_array($passwordChange) || 2 !== \count($passwordChange)) {
+        if (!\is_array($passwordChange)) {
             return; // Invalid password change set
         }
 
-        $oldHash = $passwordChange[0];
-        $newHash = $passwordChange[1];
+        [$oldHash, $newHash] = $passwordChange;
 
         if ($oldHash === $newHash) {
             return; // Password unchanged

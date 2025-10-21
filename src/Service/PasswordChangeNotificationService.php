@@ -65,12 +65,10 @@ class PasswordChangeNotificationService
 
     private function createEmail(User $user, PasswordChangeContext $context): Email
     {
-        // Determine user's locale preference (default to English)
-        $locale = 'en'; // TODO: Get from user preferences when implemented
-
-        $subject = 'en' === $locale
-            ? 'Your password was changed'
-            : 'Ihr Passwort wurde geändert';
+        // TODO: Determine user's locale preference and localize subject/content
+        // For now, always use English
+        $locale = 'en';
+        $subject = 'Your password was changed';
 
         $body = $this->twig->render(self::EMAIL_TEMPLATE, [
             'user' => $user,

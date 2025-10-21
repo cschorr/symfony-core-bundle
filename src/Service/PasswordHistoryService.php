@@ -20,10 +20,15 @@ class PasswordHistoryService
     ) {
     }
 
+    /**
+     * @return PasswordHistoryRepository
+     */
     private function getRepository(): PasswordHistoryRepository
     {
-        /* @var PasswordHistoryRepository */
-        return $this->entityManager->getRepository(PasswordHistory::class);
+        $repository = $this->entityManager->getRepository(PasswordHistory::class);
+        assert($repository instanceof PasswordHistoryRepository);
+
+        return $repository;
     }
 
     /**
