@@ -88,8 +88,6 @@ class Category extends AbstractEntity
 
     /**
      * Get the CategorizableEntity repository.
-     *
-     * @return \C3net\CoreBundle\Repository\CategorizableEntityRepository
      */
     private function getCategorizableEntityRepository(): \C3net\CoreBundle\Repository\CategorizableEntityRepository
     {
@@ -99,7 +97,7 @@ class Category extends AbstractEntity
             /** @var \Doctrine\Bundle\DoctrineBundle\Registry $doctrine */
             $doctrine = $container->get('doctrine');
 
-            /** @var \C3net\CoreBundle\Repository\CategorizableEntityRepository */
+            /* @var \C3net\CoreBundle\Repository\CategorizableEntityRepository */
             return $doctrine->getRepository(CategorizableEntity::class);
         }
 
