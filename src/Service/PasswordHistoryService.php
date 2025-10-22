@@ -20,9 +20,6 @@ class PasswordHistoryService
     ) {
     }
 
-    /**
-     * @return PasswordHistoryRepository
-     */
     private function getRepository(): PasswordHistoryRepository
     {
         $repository = $this->entityManager->getRepository(PasswordHistory::class);
