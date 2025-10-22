@@ -63,9 +63,9 @@ class Company extends AbstractEntity
     private Collection $projects;
 
     /**
-     * @var Collection<int, User>
+     * @var Collection<int, Contact>
      */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'company')]
+    #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'company')]
     private Collection $employees;
 
     /**
@@ -141,14 +141,14 @@ class Company extends AbstractEntity
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Contact>
      */
     public function getEmployees(): Collection
     {
         return $this->employees;
     }
 
-    public function addEmployee(User $employee): static
+    public function addEmployee(Contact $employee): static
     {
         if (!$this->employees->contains($employee)) {
             $this->employees->add($employee);
@@ -158,7 +158,7 @@ class Company extends AbstractEntity
         return $this;
     }
 
-    public function removeEmployee(User $employee): static
+    public function removeEmployee(Contact $employee): static
     {
         if ($this->employees->removeElement($employee)) {
             // set the owning side to null (unless already changed)
