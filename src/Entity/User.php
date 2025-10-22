@@ -64,6 +64,12 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $passwordResetTokenExpiresAt = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $passwordChangedAt = null;
+
+    // Transient field to store old password hash for change detection
+    private ?string $oldPasswordHash = null;
+
     // Stored as list of strings in DB; use helper methods to work with UserRole enums.
     /** @var list<string>|null */
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::JSON, nullable: true)]
@@ -307,6 +313,30 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setPasswordResetTokenExpiresAt(?\DateTimeImmutable $passwordResetTokenExpiresAt): static
     {
         $this->passwordResetTokenExpiresAt = $passwordResetTokenExpiresAt;
+
+        return $this;
+    }
+
+    public function getPasswordChangedAt(): ?\DateTimeImmutable
+    {
+        return $this->passwordChangedAt;
+    }
+
+    public function setPasswordChangedAt(?\DateTimeImmutable $passwordChangedAt): static
+    {
+        $this->passwordChangedAt = $passwordChangedAt;
+
+        return $this;
+    }
+
+    public function getOldPasswordHash(): ?string
+    {
+        return $this->oldPasswordHash;
+    }
+
+    public function setOldPasswordHash(?string $oldPasswordHash): static
+    {
+        $this->oldPasswordHash = $oldPasswordHash;
 
         return $this;
     }

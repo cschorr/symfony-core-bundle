@@ -36,6 +36,13 @@ services:
     C3net\CoreBundle\Service\:
         resource: '../src/Service/'
 
+    # Password Change Notification Service needs explicit from email configuration
+    C3net\CoreBundle\Service\PasswordChangeNotificationService:
+        autowire: true
+        autoconfigure: true
+        arguments:
+            $mailFrom: 'noreply@example.com'
+
     # Data Fixtures - temporarily disabled due to repository dependency issues
     # C3net\CoreBundle\DataFixtures\:
     #     resource: '../src/DataFixtures/'
@@ -70,11 +77,63 @@ services:
             - { name: 'api_platform.openapi.factory.decorator', priority: 10 }
 
     # State Processors
-    C3net\CoreBundle\State\UserGroupWriteProcessor:
+    # First, UserWriteProcessor decorates the persist processor to hash passwords
+    C3net\CoreBundle\State\UserWriteProcessor:
         decorates: 'api_platform.doctrine.orm.state.persist_processor'
+        decoration_priority: 2
+        arguments:
+            - '@.inner'
+            - '@Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface'
+            - '@C3net\CoreBundle\Service\PasswordHistoryService'
+            - '@limiter.password_change'
+            - '@doctrine.orm.entity_manager'
+
+    # Then, UserGroupWriteProcessor decorates UserWriteProcessor to handle relationships
+    C3net\CoreBundle\State\UserGroupWriteProcessor:
+        decorates: 'C3net\CoreBundle\State\UserWriteProcessor'
+        decoration_priority: 1
         arguments:
             - '@.inner'
             - '@doctrine.orm.entity_manager'
 
+    # Rate Limiter Storage for password changes
+    limiter.password_change.storage:
+        class: Symfony\Component\RateLimiter\Storage\CacheStorage
+        arguments:
+            - '@cache.rate_limiter'
+
+    # Rate Limiter Factory for password changes
+    limiter.password_change:
+        class: Symfony\Component\RateLimiter\RateLimiterFactory
+        arguments:
+            $config:
+                id: 'password_change'
+                policy: 'sliding_window'
+                limit: 3
+                interval: '1 hour'
+            $storage: '@limiter.password_change.storage'
+
     # Repository services are handled automatically by Doctrine
     # No need to manually define them as services
+
+when@test:
+    services:
+        # Make services public for testing with explicit dependencies
+        C3net\CoreBundle\Service\PasswordChangeNotificationService:
+            public: true
+            autowire: true
+            autoconfigure: true
+            arguments:
+                $mailFrom: 'noreply@example.com'
+
+        C3net\CoreBundle\Service\PasswordHistoryService:
+            public: true
+            autowire: true
+            autoconfigure: true
+            arguments:
+                $entityManager: '@doctrine.orm.entity_manager'
+
+        C3net\CoreBundle\Service\PasswordChangeAuditService:
+            public: true
+            autowire: true
+            autoconfigure: true
