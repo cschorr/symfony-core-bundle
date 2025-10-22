@@ -61,7 +61,7 @@ final readonly class UserWriteProcessor implements ProcessorInterface
         }
 
         // RATE LIMITING - Check before processing password change
-        if ($user->getId()) { // Only for existing users (password changes)
+        if ($user->getId() !== null) { // Only for existing users (password changes)
             $limiter = $this->passwordChangeRateLimiter->create($user->getEmail() ?? 'unknown');
             if (!$limiter->consume(1)->isAccepted()) {
                 throw new TooManyRequestsHttpException('Too many password change attempts. Please try again later.');
@@ -69,17 +69,17 @@ final readonly class UserWriteProcessor implements ProcessorInterface
         }
 
         // PASSWORD HISTORY - Check for password reuse
-        if ($user->getId()) { // Only for existing users (password changes)
+        if ($user->getId() !== null) { // Only for existing users (password changes)
             try {
                 $this->passwordHistoryService->validatePasswordNotReused($user, $password);
-            } catch (PasswordReusedException $e) {
+            } catch (PasswordReusedException) {
                 throw new BadRequestHttpException('This password was used recently. Please choose a different password.');
             }
         }
 
         // Store old password hash for change detection by event listener
         // Get the current hash from database
-        if ($user->getId()) {
+        if ($user->getId() !== null) {
             $freshUser = $this->entityManager->find(User::class, $user->getId());
             if ($freshUser instanceof User) {
                 $user->setOldPasswordHash($freshUser->getPassword());

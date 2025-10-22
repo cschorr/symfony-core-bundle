@@ -15,6 +15,7 @@ use Twig\Environment;
 class PasswordChangeNotificationService
 {
     private const string EMAIL_TEMPLATE = '@C3netCore/emails/password_changed.html.twig';
+
     private const int MAX_RETRY_ATTEMPTS = 1;
 
     public function __construct(
@@ -32,13 +33,13 @@ class PasswordChangeNotificationService
     {
         try {
             $this->sendEmailWithRetry($user, $context);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $throwable) {
             // Log the error but don't block the password change
             $this->logger->error('Failed to send password change notification email', [
                 'user_id' => $user->getId()?->toString(),
                 'user_email' => $user->getEmail(),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error' => $throwable->getMessage(),
+                'trace' => $throwable->getTraceAsString(),
             ]);
         }
     }
@@ -53,12 +54,12 @@ class PasswordChangeNotificationService
                 'user_id' => $user->getId()?->toString(),
                 'user_email' => $user->getEmail(),
             ]);
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface $transportException) {
             if ($attempt < self::MAX_RETRY_ATTEMPTS) {
                 sleep(5); // Wait 5 seconds before retry
                 $this->sendEmailWithRetry($user, $context, $attempt + 1);
             } else {
-                throw $e;
+                throw $transportException;
             }
         }
     }

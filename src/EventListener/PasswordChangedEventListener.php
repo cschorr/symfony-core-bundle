@@ -117,6 +117,7 @@ class PasswordChangedEventListener
 
         // 7. Create audit log
         $this->logger->debug('Step 7: About to create audit log');
+
         $this->auditService->logPasswordChange($user, $context, true);
         $this->logger->debug('Step 7: Audit log created');
 

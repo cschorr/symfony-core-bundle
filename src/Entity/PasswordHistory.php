@@ -24,10 +24,10 @@ class PasswordHistory
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     private string $passwordHash;
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
     public function __construct()

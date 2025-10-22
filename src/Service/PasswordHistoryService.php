@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class PasswordHistoryService
 {
     private const int PASSWORD_HISTORY_LIMIT = 10;
+
     private const int PASSWORD_HISTORY_MAX_AGE_DAYS = 365;
 
     public function __construct(
