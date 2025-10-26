@@ -6,8 +6,8 @@ namespace C3net\CoreBundle\Tests\Unit\Entity;
 
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\CompanyGroup;
+use C3net\CoreBundle\Entity\Contact;
 use C3net\CoreBundle\Entity\Project;
-use C3net\CoreBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 
 class CompanyTest extends TestCase
@@ -155,8 +155,8 @@ class CompanyTest extends TestCase
 
     public function testEmployeesRelationship(): void
     {
-        $employee1 = new User();
-        $employee2 = new User();
+        $employee1 = new Contact();
+        $employee2 = new Contact();
 
         // Add employees
         $this->company->addEmployee($employee1);
@@ -178,7 +178,7 @@ class CompanyTest extends TestCase
 
     public function testEmployeesNoDuplicates(): void
     {
-        $employee = new User();
+        $employee = new Contact();
 
         $this->company->addEmployee($employee);
         $this->company->addEmployee($employee); // Add same employee again
@@ -234,7 +234,7 @@ class CompanyTest extends TestCase
         $company->setImagePath('logos/company.png');
 
         // Add employees and projects
-        $employee = new User();
+        $employee = new Contact();
         $project = new Project();
         $company->addEmployee($employee)
                 ->addProject($project);
@@ -278,7 +278,7 @@ class CompanyTest extends TestCase
 
     public function testBidirectionalRelationships(): void
     {
-        $employee = new User();
+        $employee = new Contact();
         $project = new Project();
 
         // Test bidirectional employee relationship
