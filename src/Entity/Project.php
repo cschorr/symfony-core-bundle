@@ -275,6 +275,19 @@ class Project extends AbstractEntity
         return $this->transaction?->getCustomer();
     }
 
+    /**
+     * Get the customer company name from the associated transaction.
+     * This is a virtual property for API responses - not stored in database.
+     * Computed on-the-fly from the transaction's customer relationship.
+     *
+     * @return string|null The customer company name, or null if no transaction/customer is associated
+     */
+    #[ApiProperty(readable: true, writable: false)]
+    public function getCustomerName(): ?string
+    {
+        return $this->getCustomer()?->getName();
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;

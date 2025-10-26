@@ -31,7 +31,6 @@ use Doctrine\ORM\Mapping as ORM;
     filterClass: SearchFilter::class,
     properties: [
         'companyGroup' => 'partial',
-        'projects' => 'partial',
         'employees' => 'partial',
         'departments' => 'exact',
         'name' => 'partial',
@@ -57,12 +56,6 @@ class Company extends AbstractEntity
     private ?CompanyGroup $companyGroup = null;
 
     /**
-     * @var Collection<int, Project>
-     */
-    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'client')]
-    private Collection $projects;
-
-    /**
      * @var Collection<int, User>
      */
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'company')]
@@ -86,7 +79,6 @@ class Company extends AbstractEntity
     public function __construct()
     {
         parent::__construct();
-        $this->projects = new ArrayCollection();
         $this->employees = new ArrayCollection();
         $this->transactions = new ArrayCollection();
         $this->departments = new ArrayCollection();
@@ -106,36 +98,6 @@ class Company extends AbstractEntity
     public function setCompanyGroup(?CompanyGroup $companyGroup): static
     {
         $this->companyGroup = $companyGroup;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Project>
-     */
-    public function getProjects(): Collection
-    {
-        return $this->projects;
-    }
-
-    public function addProject(Project $project): static
-    {
-        if (!$this->projects->contains($project)) {
-            $this->projects->add($project);
-            $project->setClient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProject(Project $project): static
-    {
-        if ($this->projects->removeElement($project)) {
-            // set the owning side to null (unless already changed)
-            if ($project->getClient() === $this) {
-                $project->setClient(null);
-            }
-        }
 
         return $this;
     }
