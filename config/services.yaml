@@ -76,6 +76,11 @@ services:
         tags:
             - { name: 'api_platform.openapi.factory.decorator', priority: 10 }
 
+    # Decimal Normalizer - handles numeric to string conversion for DECIMAL columns
+    C3net\CoreBundle\Serializer\DecimalNormalizer:
+        tags:
+            - { name: 'serializer.normalizer', priority: 64 }
+
     # State Processors
     # First, UserWriteProcessor decorates the persist processor to hash passwords
     C3net\CoreBundle\State\UserWriteProcessor:

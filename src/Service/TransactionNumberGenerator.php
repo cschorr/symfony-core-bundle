@@ -22,8 +22,8 @@ class TransactionNumberGenerator
     }
 
     /**
-     * Generate a unique transaction number with format: TRX-YYYY-XXXXXX
-     * Where XXXXXX is a sequential number with additional entropy to prevent collisions.
+     * Generate a unique transaction number with format: TRX-YYYY-NNNN
+     * Where NNNN is a 4-digit sequential number that resets each year.
      *
      * @throws \RuntimeException if unable to generate unique number after retries
      */
@@ -36,15 +36,11 @@ class TransactionNumberGenerator
             // Get the count of transactions for this year to generate sequential number
             $sequentialNumber = $this->getNextSequentialNumber($year);
 
-            // Add random suffix for collision prevention in high-concurrency scenarios
-            $randomSuffix = str_pad((string) random_int(0, 99), 2, '0', STR_PAD_LEFT);
-
             $transactionNumber = sprintf(
-                '%s-%s-%s%s',
+                '%s-%s-%s',
                 self::PREFIX,
                 $year,
-                str_pad((string) $sequentialNumber, 4, '0', STR_PAD_LEFT),
-                $randomSuffix
+                str_pad((string) $sequentialNumber, 4, '0', STR_PAD_LEFT)
             );
 
             // Check uniqueness

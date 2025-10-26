@@ -236,9 +236,14 @@ class Invoice extends AbstractEntity
         return $this->subtotal;
     }
 
-    public function setSubtotal(string $subtotal): static
+    public function setSubtotal(int|float|string $subtotal): static
     {
-        $this->subtotal = $subtotal;
+        if (is_string($subtotal)) {
+            $this->subtotal = $subtotal;
+        } else {
+            // Convert int/float to string with 2 decimal places for DECIMAL column
+            $this->subtotal = number_format((float) $subtotal, 2, '.', '');
+        }
 
         return $this;
     }
@@ -248,9 +253,14 @@ class Invoice extends AbstractEntity
         return $this->taxRate;
     }
 
-    public function setTaxRate(string $taxRate): static
+    public function setTaxRate(int|float|string $taxRate): static
     {
-        $this->taxRate = $taxRate;
+        if (is_string($taxRate)) {
+            $this->taxRate = $taxRate;
+        } else {
+            // Convert int/float to string with 2 decimal places for DECIMAL column
+            $this->taxRate = number_format((float) $taxRate, 2, '.', '');
+        }
 
         return $this;
     }
@@ -260,9 +270,14 @@ class Invoice extends AbstractEntity
         return $this->taxAmount;
     }
 
-    public function setTaxAmount(string $taxAmount): static
+    public function setTaxAmount(int|float|string $taxAmount): static
     {
-        $this->taxAmount = $taxAmount;
+        if (is_string($taxAmount)) {
+            $this->taxAmount = $taxAmount;
+        } else {
+            // Convert int/float to string with 2 decimal places for DECIMAL column
+            $this->taxAmount = number_format((float) $taxAmount, 2, '.', '');
+        }
 
         return $this;
     }
@@ -272,9 +287,14 @@ class Invoice extends AbstractEntity
         return $this->totalAmount;
     }
 
-    public function setTotalAmount(string $totalAmount): static
+    public function setTotalAmount(int|float|string $totalAmount): static
     {
-        $this->totalAmount = $totalAmount;
+        if (is_string($totalAmount)) {
+            $this->totalAmount = $totalAmount;
+        } else {
+            // Convert int/float to string with 2 decimal places for DECIMAL column
+            $this->totalAmount = number_format((float) $totalAmount, 2, '.', '');
+        }
 
         return $this;
     }
@@ -284,9 +304,14 @@ class Invoice extends AbstractEntity
         return $this->paidAmount;
     }
 
-    public function setPaidAmount(string $paidAmount): static
+    public function setPaidAmount(int|float|string $paidAmount): static
     {
-        $this->paidAmount = $paidAmount;
+        if (is_string($paidAmount)) {
+            $this->paidAmount = $paidAmount;
+        } else {
+            // Convert int/float to string with 2 decimal places for DECIMAL column
+            $this->paidAmount = number_format((float) $paidAmount, 2, '.', '');
+        }
         $this->updatePaymentStatus();
 
         return $this;
