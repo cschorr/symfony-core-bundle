@@ -189,9 +189,6 @@ class Project extends AbstractEntity
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?Transaction $transaction = null;
 
-    #[ORM\ManyToOne(inversedBy: 'projects')]
-    private ?Company $client = null;
-
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dueDate = null;
 
@@ -289,18 +286,6 @@ class Project extends AbstractEntity
     public function getCustomerName(): ?string
     {
         return $this->getCustomer()?->getName();
-    }
-
-    public function getClient(): ?Company
-    {
-        return $this->client;
-    }
-
-    public function setClient(?Company $client): static
-    {
-        $this->client = $client;
-
-        return $this;
     }
 
     public function getDescription(): ?string

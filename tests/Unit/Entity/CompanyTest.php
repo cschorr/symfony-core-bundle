@@ -7,7 +7,6 @@ namespace C3net\CoreBundle\Tests\Unit\Entity;
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\CompanyGroup;
 use C3net\CoreBundle\Entity\Contact;
-use C3net\CoreBundle\Entity\Project;
 use PHPUnit\Framework\TestCase;
 
 class CompanyTest extends TestCase
@@ -24,7 +23,6 @@ class CompanyTest extends TestCase
         $company = new Company();
 
         // Test that collections are initialized
-        $this->assertCount(0, $company->getProjects());
         $this->assertCount(0, $company->getEmployees());
 
         // Test inherited AbstractEntity properties
@@ -120,39 +118,6 @@ class CompanyTest extends TestCase
         $this->assertNull($this->company->getImagePath());
     }
 
-    public function testProjectsRelationship(): void
-    {
-        $project1 = new Project();
-        $project2 = new Project();
-
-        // Add projects
-        $this->company->addProject($project1);
-        $this->company->addProject($project2);
-
-        $this->assertCount(2, $this->company->getProjects());
-        $this->assertTrue($this->company->getProjects()->contains($project1));
-        $this->assertTrue($this->company->getProjects()->contains($project2));
-        $this->assertSame($this->company, $project1->getClient());
-        $this->assertSame($this->company, $project2->getClient());
-
-        // Remove project
-        $this->company->removeProject($project1);
-
-        $this->assertCount(1, $this->company->getProjects());
-        $this->assertFalse($this->company->getProjects()->contains($project1));
-        $this->assertNull($project1->getClient());
-    }
-
-    public function testProjectsNoDuplicates(): void
-    {
-        $project = new Project();
-
-        $this->company->addProject($project);
-        $this->company->addProject($project); // Add same project again
-
-        $this->assertCount(1, $this->company->getProjects());
-    }
-
     public function testEmployeesRelationship(): void
     {
         $employee1 = new Contact();
@@ -233,11 +198,9 @@ class CompanyTest extends TestCase
         // Set image
         $company->setImagePath('logos/company.png');
 
-        // Add employees and projects
+        // Add employees
         $employee = new Contact();
-        $project = new Project();
-        $company->addEmployee($employee)
-                ->addProject($project);
+        $company->addEmployee($employee);
 
         // Verify complete setup
         $this->assertSame('Complete Test Corp', $company->getName());
@@ -252,7 +215,6 @@ class CompanyTest extends TestCase
         $this->assertSame($companyGroup, $company->getCompanyGroup());
         $this->assertStringContainsString('logos/company.png', $company->getImagePath());
         $this->assertCount(1, $company->getEmployees());
-        $this->assertCount(1, $company->getProjects());
         $this->assertSame('Complete Test Corp', (string) $company);
     }
 
@@ -279,7 +241,6 @@ class CompanyTest extends TestCase
     public function testBidirectionalRelationships(): void
     {
         $employee = new Contact();
-        $project = new Project();
 
         // Test bidirectional employee relationship
         $this->company->addEmployee($employee);
@@ -287,13 +248,6 @@ class CompanyTest extends TestCase
 
         $this->company->removeEmployee($employee);
         $this->assertNull($employee->getCompany());
-
-        // Test bidirectional project relationship
-        $this->company->addProject($project);
-        $this->assertSame($this->company, $project->getClient());
-
-        $this->company->removeProject($project);
-        $this->assertNull($project->getClient());
     }
 
     public function testInheritedProperties(): void

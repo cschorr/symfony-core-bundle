@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Tests\Unit\Entity;
 
 use C3net\CoreBundle\Entity\Campaign;
-use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Contact;
 use C3net\CoreBundle\Entity\Notification;
 use C3net\CoreBundle\Entity\Project;
@@ -137,16 +136,6 @@ class ProjectTest extends TestCase
         $this->project->setAssignee($user);
 
         $this->assertSame($user, $this->project->getAssignee());
-    }
-
-    public function testClientRelationship(): void
-    {
-        $this->assertNull($this->project->getClient());
-
-        $company = new Company();
-        $this->project->setClient($company);
-
-        $this->assertSame($company, $this->project->getClient());
     }
 
     public function testDescriptionProperty(): void
@@ -293,11 +282,9 @@ class ProjectTest extends TestCase
 
         // Set relationships
         $assignee = new User();
-        $client = new Company();
         $campaign = new Campaign();
 
         $project->setAssignee($assignee)
-                ->setClient($client)
                 ->setCampaign($campaign);
 
         // Add contacts and notifications
@@ -315,7 +302,6 @@ class ProjectTest extends TestCase
         $this->assertSame($endDate, $project->getEndedAt());
         $this->assertSame($dueDate, $project->getDueDate());
         $this->assertSame($assignee, $project->getAssignee());
-        $this->assertSame($client, $project->getClient());
         $this->assertSame($campaign, $project->getCampaign());
         $this->assertCount(1, $project->getContact());
         $this->assertCount(1, $project->getNotifications());
