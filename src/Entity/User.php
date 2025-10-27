@@ -43,7 +43,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'assignee')]
     private Collection $projects;
 
-    #[ORM\ManyToOne(inversedBy: 'employees')]
+    #[ORM\ManyToOne]
     private ?Company $company = null;
 
     /**

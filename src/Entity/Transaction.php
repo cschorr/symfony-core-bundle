@@ -89,7 +89,7 @@ class Transaction extends AbstractEntity
     private ?Company $customer = null;
 
     #[ORM\ManyToOne]
-    private ?Contact $primaryContact = null;
+    private ?Contact $customerContact = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $totalValue = null;
@@ -245,14 +245,14 @@ class Transaction extends AbstractEntity
         return $this;
     }
 
-    public function getPrimaryContact(): ?Contact
+    public function getCustomerContact(): ?Contact
     {
-        return $this->primaryContact;
+        return $this->customerContact;
     }
 
-    public function setPrimaryContact(?Contact $primaryContact): static
+    public function setCustomerContact(?Contact $customerContact): static
     {
-        $this->primaryContact = $primaryContact;
+        $this->customerContact = $customerContact;
 
         return $this;
     }

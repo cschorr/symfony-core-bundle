@@ -52,7 +52,7 @@ class TransactionFixtures extends AbstractCategorizableFixture implements Depend
             if (isset($data['contact']) && null !== $data['contact']) {
                 $contact = $manager->getRepository(Contact::class)->findOneBy(['email' => $data['contact']]);
                 if ($contact) {
-                    $transaction->setPrimaryContact($contact);
+                    $transaction->setCustomerContact($contact);
                 }
             }
 

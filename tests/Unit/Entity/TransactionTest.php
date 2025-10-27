@@ -217,14 +217,14 @@ class TransactionTest extends TestCase
         $this->assertSame($company, $this->transaction->getCustomer());
     }
 
-    public function testPrimaryContactRelationship(): void
+    public function testCustomerContactRelationship(): void
     {
-        $this->assertNull($this->transaction->getPrimaryContact());
+        $this->assertNull($this->transaction->getCustomerContact());
 
         $contact = new Contact();
-        $this->transaction->setPrimaryContact($contact);
+        $this->transaction->setCustomerContact($contact);
 
-        $this->assertSame($contact, $this->transaction->getPrimaryContact());
+        $this->assertSame($contact, $this->transaction->getCustomerContact());
     }
 
     public function testTotalValueProperty(): void
@@ -502,11 +502,11 @@ class TransactionTest extends TestCase
 
         // Set relationships
         $customer = new Company();
-        $primaryContact = new Contact();
+        $customerContact = new Contact();
         $assignedTo = new User();
 
         $transaction->setCustomer($customer)
-                    ->setPrimaryContact($primaryContact)
+                    ->setCustomerContact($customerContact)
                     ->setAssignedTo($assignedTo);
 
         // Add related entities
@@ -536,7 +536,7 @@ class TransactionTest extends TestCase
         $this->assertSame($startDate, $transaction->getStartedAt());
         $this->assertSame($endDate, $transaction->getEndedAt());
         $this->assertSame($customer, $transaction->getCustomer());
-        $this->assertSame($primaryContact, $transaction->getPrimaryContact());
+        $this->assertSame($customerContact, $transaction->getCustomerContact());
         $this->assertSame($assignedTo, $transaction->getAssignedTo());
         $this->assertCount(1, $transaction->getOffers());
         $this->assertCount(1, $transaction->getInvoices());

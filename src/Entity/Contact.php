@@ -60,7 +60,7 @@ class Contact extends AbstractEntity
     use NestedTreeTrait;
     use CategorizableTrait;
 
-    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'employees')]
     private ?Company $company = null;
 
     #[ORM\Column(length: 255, nullable: true)]
