@@ -38,7 +38,7 @@ class CompanyGroup extends AbstractEntity
     /**
      * @var Collection<int, Company>
      */
-    #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'companyGroup')]
+    #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'companyGroup', cascade: ['persist'])]
     private Collection $companies;
 
     public function __construct()
