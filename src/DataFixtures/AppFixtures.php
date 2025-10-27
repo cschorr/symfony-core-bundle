@@ -12,10 +12,12 @@ use C3net\CoreBundle\Entity\CompanyGroup;
 use C3net\CoreBundle\Entity\Contact;
 use C3net\CoreBundle\Entity\Department;
 use C3net\CoreBundle\Entity\Project;
+use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Entity\UserGroup;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\ProjectStatus;
+use C3net\CoreBundle\Enum\TransactionType;
 use C3net\CoreBundle\Repository\UserGroupRepository;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -1722,11 +1724,20 @@ class AppFixtures extends AbstractCategorizableFixture
             $assignee = $this->users[$projectData['assignee']] ?? null;
             $category = $this->categories[$projectData['category']] ?? null;
 
+            // Create transaction for the project
+            $transaction = (new Transaction())
+                ->setName('Transaction for ' . $projectData['name'])
+                ->setCustomer($client)
+                ->setAssignedTo($assignee)
+                ->setTransactionType(TransactionType::PROJECT);
+
+            $manager->persist($transaction);
+
             $project = (new Project())
                 ->setName($projectData['name'])
                 ->setStatus($projectData['status'])
                 ->setDescription($projectData['description'])
-                ->setClient($client)
+                ->setTransaction($transaction)
                 ->setAssignee($assignee)
                 ->setDueDate($projectData['dueDate']);
 

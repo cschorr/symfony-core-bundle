@@ -31,7 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     'app_transaction' => 'App\\Entity\\Transaction',
 ])]
 #[ApiResource(
-    mercure: true,
+    mercure: false,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
     paginationEnabled: true,
@@ -63,7 +63,6 @@ class Transaction extends AbstractEntity
     use CategorizableTrait;
 
     #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
-    #[Assert\NotBlank]
     private ?string $transactionNumber = null;
 
     #[ORM\Column(type: Types::STRING, length: 32, nullable: false, enumType: TransactionType::class)]
@@ -263,9 +262,16 @@ class Transaction extends AbstractEntity
         return $this->totalValue;
     }
 
-    public function setTotalValue(?string $totalValue): static
+    public function setTotalValue(int|float|string|null $totalValue): static
     {
-        $this->totalValue = $totalValue;
+        if (null === $totalValue) {
+            $this->totalValue = null;
+        } elseif (is_string($totalValue)) {
+            $this->totalValue = $totalValue;
+        } else {
+            // Convert int/float to string with 2 decimal places for DECIMAL column
+            $this->totalValue = number_format((float) $totalValue, 2, '.', '');
+        }
 
         return $this;
     }

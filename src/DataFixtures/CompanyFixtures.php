@@ -55,6 +55,7 @@ class CompanyFixtures extends AbstractCategorizableFixture implements DependentF
             ['display' => 'Tricell Pharmaceuticals', 'email' => 'info@tricell.example', 'country' => 'ZA', 'categories' => ['Healthcare', 'Medical Technology'], 'phone' => '+27 11 555 1200', 'url' => 'https://tricell.example', 'street' => '15 Kijuju Business Park', 'city' => 'Johannesburg', 'zipCode' => '2000', 'group' => 'Umbrella Group'],
             ['display' => 'TerraSave International', 'email' => 'hello@terrasave.example', 'country' => 'AU', 'categories' => ['Content Creation', 'Marketing & Sales'], 'phone' => '+61 2 5555 1300', 'url' => 'https://terrasave.example', 'street' => '88 Resident Way', 'city' => 'Sydney', 'zipCode' => '2000', 'group' => 'Umbrella Group'],
             ['display' => 'Blue Umbrella Ltd', 'email' => 'contact@blueumbrella.example', 'country' => 'GB', 'categories' => ['Marketing & Sales', 'Digital Marketing'], 'phone' => '+44 20 7555 1400', 'url' => 'https://blueumbrella.example', 'street' => '10 Downing Street', 'city' => 'London', 'zipCode' => 'SW1A 2AA', 'group' => 'Umbrella Group'],
+            ['display' => 'Themyscira Corp', 'email' => 'info@themyscira.example', 'country' => 'GR', 'categories' => ['Business Services', 'Strategy Consulting', 'Management Consulting'], 'phone' => '+30 210 555 1500', 'url' => 'https://themyscira.example', 'street' => '1 Paradise Island', 'city' => 'Athens', 'zipCode' => '10557', 'group' => 'DC Group'],
         ];
 
         foreach ($companiesData as $index => $data) {

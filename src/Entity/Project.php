@@ -46,7 +46,6 @@ use Doctrine\ORM\Mapping as ORM;
     filterClass: SearchFilter::class,
     properties: [
         'name' => 'partial',
-        'client' => 'exact',
         'assignee' => 'exact',
         'status' => 'exact',
         'priority' => 'exact',
@@ -175,9 +174,6 @@ class Project extends AbstractEntity
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?User $assignee = null;
 
-    #[ORM\ManyToOne(inversedBy: 'projects')]
-    private ?Company $client = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
@@ -268,16 +264,28 @@ class Project extends AbstractEntity
         return $this;
     }
 
-    public function getClient(): ?Company
+    /**
+     * Get the customer company from the associated transaction.
+     * This is a convenience method that accesses the customer through the transaction relationship.
+     *
+     * @return Company|null The customer company, or null if no transaction is associated
+     */
+    public function getCustomer(): ?Company
     {
-        return $this->client;
+        return $this->transaction?->getCustomer();
     }
 
-    public function setClient(?Company $client): static
+    /**
+     * Get the customer company name from the associated transaction.
+     * This is a virtual property for API responses - not stored in database.
+     * Computed on-the-fly from the transaction's customer relationship.
+     *
+     * @return string|null The customer company name, or null if no transaction/customer is associated
+     */
+    #[ApiProperty(readable: true, writable: false)]
+    public function getCustomerName(): ?string
     {
-        $this->client = $client;
-
-        return $this;
+        return $this->getCustomer()?->getName();
     }
 
     public function getDescription(): ?string

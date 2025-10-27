@@ -60,7 +60,7 @@ class TransactionTest extends TestCase
     {
         $this->assertNull($this->transaction->getTransactionNumber());
 
-        $transactionNumber = 'TRX-2025-001';
+        $transactionNumber = 'TRX-2025-0001';
         $this->transaction->setTransactionNumber($transactionNumber);
 
         $this->assertSame($transactionNumber, $this->transaction->getTransactionNumber());
@@ -445,7 +445,7 @@ class TransactionTest extends TestCase
 
     public function testToStringWithTransactionNumber(): void
     {
-        $transactionNumber = 'TRX-2025-001';
+        $transactionNumber = 'TRX-2025-0001';
         $this->transaction->setTransactionNumber($transactionNumber);
 
         $this->assertSame($transactionNumber, (string) $this->transaction);
@@ -461,7 +461,7 @@ class TransactionTest extends TestCase
 
     public function testToStringWithTransactionNumberAndName(): void
     {
-        $transactionNumber = 'TRX-2025-001';
+        $transactionNumber = 'TRX-2025-0001';
         $name = 'Test Transaction';
 
         $this->transaction->setTransactionNumber($transactionNumber);
@@ -484,7 +484,7 @@ class TransactionTest extends TestCase
         $transaction = new Transaction();
 
         // Set up complete transaction
-        $transaction->setTransactionNumber('TRX-2025-001')
+        $transaction->setTransactionNumber('TRX-2025-0001')
                     ->setName('Complete Test Transaction')
                     ->setDescription('A comprehensive test transaction')
                     ->setStatus(TransactionStatus::IN_PRODUCTION)
@@ -525,7 +525,7 @@ class TransactionTest extends TestCase
                     ->addDocument($document);
 
         // Verify complete setup
-        $this->assertSame('TRX-2025-001', $transaction->getTransactionNumber());
+        $this->assertSame('TRX-2025-0001', $transaction->getTransactionNumber());
         $this->assertSame('Complete Test Transaction', $transaction->getName());
         $this->assertSame('A comprehensive test transaction', $transaction->getDescription());
         $this->assertTrue($transaction->isInProduction());
@@ -544,7 +544,7 @@ class TransactionTest extends TestCase
         $this->assertCount(1, $transaction->getProjects());
         $this->assertCount(1, $transaction->getContacts());
         $this->assertCount(1, $transaction->getDocuments());
-        $this->assertSame('TRX-2025-001', (string) $transaction);
+        $this->assertSame('TRX-2025-0001', (string) $transaction);
     }
 
     public function testTransactionStatusTransitions(): void

@@ -6,10 +6,12 @@ namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Company;
 use C3net\CoreBundle\Entity\Project;
+use C3net\CoreBundle\Entity\Transaction;
 use C3net\CoreBundle\Entity\User;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\ProjectPriority;
 use C3net\CoreBundle\Enum\ProjectStatus;
+use C3net\CoreBundle\Enum\TransactionType;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
@@ -41,12 +43,21 @@ class ProjectFixtures extends AbstractCategorizableFixture implements DependentF
             $assignee = $manager->getRepository(User::class)->findOneBy(['email' => $projectData['assignee']]);
             $categories = $this->findCategoriesByNames($manager, $projectData['categories']);
 
+            // Create transaction for the project
+            $transaction = (new Transaction())
+                ->setName('Transaction for ' . $projectData['name'])
+                ->setCustomer($client)
+                ->setAssignedTo($assignee)
+                ->setTransactionType(TransactionType::PROJECT);
+
+            $manager->persist($transaction);
+
             $project = (new Project())
                 ->setName($projectData['name'])
                 ->setStatus($projectData['status'])
                 ->setPriority($projectData['priority'])
                 ->setDescription($projectData['description'])
-                ->setClient($client)
+                ->setTransaction($transaction)
                 ->setAssignee($assignee)
                 ->setDueDate($projectData['dueDate']);
 
