@@ -28,7 +28,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
 #[ORM\DiscriminatorMap([
     'contact' => Contact::class,
-    'app_contact' => 'App\\Entity\\Contact',
 ])]
 #[ApiResource(
     paginationClientEnabled: true,
