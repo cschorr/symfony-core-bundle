@@ -52,7 +52,7 @@ class Company extends AbstractEntity
     use SetAddressTrait;
     use CategorizableTrait;
 
-    #[ORM\ManyToOne(inversedBy: 'companies', cascade: ['persist'])]
+    #[ORM\ManyToOne(inversedBy: 'companies')]
     private ?CompanyGroup $companyGroup = null;
 
     /**
