@@ -312,6 +312,7 @@ class Invoice extends AbstractEntity
             // Convert int/float to string with 2 decimal places for DECIMAL column
             $this->paidAmount = number_format((float) $paidAmount, 2, '.', '');
         }
+
         $this->updatePaymentStatus();
 
         return $this;

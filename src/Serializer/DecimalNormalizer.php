@@ -18,7 +18,7 @@ final class DecimalNormalizer implements DenormalizerInterface, DenormalizerAwar
 {
     use DenormalizerAwareTrait;
 
-    private const DECIMAL_PROPERTIES = [
+    private const array DECIMAL_PROPERTIES = [
         'totalValue',
         'subtotal',
         'taxRate',
@@ -27,8 +27,11 @@ final class DecimalNormalizer implements DenormalizerInterface, DenormalizerAwar
         'paidAmount',
     ];
 
-    private const ALREADY_CALLED = 'DECIMAL_NORMALIZER_ALREADY_CALLED';
+    private const string ALREADY_CALLED = 'DECIMAL_NORMALIZER_ALREADY_CALLED';
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         // Convert numeric values to strings for DECIMAL properties
@@ -47,6 +50,9 @@ final class DecimalNormalizer implements DenormalizerInterface, DenormalizerAwar
         return $this->denormalizer->denormalize($data, $type, $format, $context);
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         // Avoid infinite recursion
