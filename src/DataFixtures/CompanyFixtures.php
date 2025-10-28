@@ -36,9 +36,9 @@ class CompanyFixtures extends AbstractCategorizableFixture implements DependentF
 
         // Companies themed from comics/movies and additional diverse demo companies
         $companiesData = [
-            ['display' => 'Cyberdyne Systems', 'email' => 'contact@cyberdyne.example', 'country' => 'US', 'categories' => ['Technology', 'AI & Machine Learning', 'Cybersecurity'], 'phone' => '+1 555 0100', 'url' => 'https://cyberdyne.example', 'street' => '101 Skynet Blvd', 'city' => 'Los Angeles', 'zipCode' => '90001', 'group' => 'Skynet Group'],
-            ['display' => 'Stark Industries', 'email' => 'info@stark.example', 'country' => 'US', 'categories' => ['Software Solutions', 'DevOps & Infrastructure'], 'phone' => '+1 555 0101', 'url' => 'https://stark.example', 'street' => '1 Avengers Tower', 'city' => 'New York', 'zipCode' => '10001', 'group' => 'Marvel Group'],
-            ['display' => 'Wayne Enterprises', 'email' => 'hello@wayne.example', 'country' => 'US', 'categories' => ['Business Services', 'Consulting', 'Financial Services'], 'phone' => '+1 555 0102', 'url' => 'https://wayne.example', 'street' => '1007 Mountain Drive', 'city' => 'Gotham', 'zipCode' => '07001', 'group' => 'DC Group'],
+            ['display' => 'Cyberdyne Systems', 'nameExtension' => 'Corporation', 'email' => 'contact@cyberdyne.example', 'country' => 'US', 'categories' => ['Technology', 'AI & Machine Learning', 'Cybersecurity'], 'phone' => '+1 555 0100', 'url' => 'https://cyberdyne.example', 'street' => '101 Skynet Blvd', 'city' => 'Los Angeles', 'zipCode' => '90001', 'group' => 'Skynet Group'],
+            ['display' => 'Stark Industries', 'nameExtension' => 'Inc.', 'email' => 'info@stark.example', 'country' => 'US', 'categories' => ['Software Solutions', 'DevOps & Infrastructure'], 'phone' => '+1 555 0101', 'url' => 'https://stark.example', 'street' => '1 Avengers Tower', 'city' => 'New York', 'zipCode' => '10001', 'group' => 'Marvel Group'],
+            ['display' => 'Wayne Enterprises', 'nameExtension' => 'Holdings', 'email' => 'hello@wayne.example', 'country' => 'US', 'categories' => ['Business Services', 'Consulting', 'Financial Services'], 'phone' => '+1 555 0102', 'url' => 'https://wayne.example', 'street' => '1007 Mountain Drive', 'city' => 'Gotham', 'zipCode' => '07001', 'group' => 'DC Group'],
             ['display' => 'Oscorp', 'email' => 'contact@oscorp.example', 'country' => 'US', 'categories' => ['Web Development', 'Software Solutions'], 'phone' => '+1 555 0103', 'url' => 'https://oscorp.example', 'street' => '500 Spider Ave', 'city' => 'New York', 'zipCode' => '10002', 'group' => 'Marvel Group'],
             ['display' => 'Weyland-Yutani', 'email' => 'corp@weyland.example', 'country' => 'UK', 'categories' => ['Consulting', 'Strategy Consulting'], 'phone' => '+44 20 7946 0000', 'url' => 'https://weyland.example', 'street' => '1 Offworld Park', 'city' => 'London', 'zipCode' => 'SW1A 1AA', 'group' => 'Weyland-Yutani Group'],
             ['display' => 'Umbrella Corporation', 'email' => 'hq@umbrella.example', 'country' => 'DE', 'categories' => ['Marketing & Sales', 'Digital Marketing', 'Brand Strategy'], 'phone' => '+49 30 123456', 'url' => 'https://umbrella.example', 'street' => '13 Hive Str.', 'city' => 'Raccoon City', 'zipCode' => '10117', 'group' => 'Umbrella Group'],
@@ -67,6 +67,7 @@ class CompanyFixtures extends AbstractCategorizableFixture implements DependentF
 
             $company = (new Company())
                 ->setName($data['display'])
+                ->setNameExtension($data['nameExtension'] ?? null)
                 ->setEmail($data['email'])
                 ->setCountryCode($data['country'])
                 ->setPhone($data['phone'])
