@@ -117,7 +117,7 @@ class Project extends AbstractEntity
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'enum' => ['low', 'medium', 'high', 'urgent', 'critical'],
+            'enum' => ['medium', 'high', 'critical'],
         ]
     )]
     private ?ProjectPriority $priority = null;
@@ -279,13 +279,26 @@ class Project extends AbstractEntity
      * Get the customer company name from the associated transaction.
      * This is a virtual property for API responses - not stored in database.
      * Computed on-the-fly from the transaction's customer relationship.
+     * Concatenates company name and nameExtension with a space.
      *
-     * @return string|null The customer company name, or null if no transaction/customer is associated
+     * @return string|null The customer company name (name + nameExtension), or null if no transaction/customer is associated
      */
     #[ApiProperty(readable: true, writable: false)]
     public function getCustomerName(): ?string
     {
-        return $this->getCustomer()?->getName();
+        $customer = $this->getCustomer();
+        if (!$customer) {
+            return null;
+        }
+
+        $name = $customer->getName();
+        $extension = $customer->getNameExtension();
+
+        if ($extension) {
+            return $name.' '.$extension;
+        }
+
+        return $name;
     }
 
     public function getDescription(): ?string
@@ -478,11 +491,6 @@ class Project extends AbstractEntity
     }
 
     // Helper methods for priority
-    public function isLowPriority(): bool
-    {
-        return ProjectPriority::LOW === $this->getPriorityEnum();
-    }
-
     public function isMediumPriority(): bool
     {
         return ProjectPriority::MEDIUM === $this->getPriorityEnum();
@@ -491,11 +499,6 @@ class Project extends AbstractEntity
     public function isHighPriority(): bool
     {
         return ProjectPriority::HIGH === $this->getPriorityEnum();
-    }
-
-    public function isUrgent(): bool
-    {
-        return ProjectPriority::URGENT === $this->getPriorityEnum();
     }
 
     public function isCritical(): bool
