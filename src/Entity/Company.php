@@ -87,7 +87,18 @@ class Company extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return !in_array($this->getName(), ['', '0'], true) ? $this->getName() : 'Unnamed Company';
+        $name = trim($this->getName() ?? '');
+        $nameExtension = trim($this->getNameExtension() ?? '');
+
+        if ('' === $name || '0' === $name) {
+            return 'Unnamed Company';
+        }
+
+        if ('' !== $nameExtension && '0' !== $nameExtension) {
+            return $name . ' ' . $nameExtension;
+        }
+
+        return $name;
     }
 
     public function getCompanyGroup(): ?CompanyGroup
