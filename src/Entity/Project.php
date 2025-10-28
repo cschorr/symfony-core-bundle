@@ -117,7 +117,7 @@ class Project extends AbstractEntity
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'enum' => ['low', 'medium', 'high', 'urgent', 'critical'],
+            'enum' => ['medium', 'high', 'critical'],
         ]
     )]
     private ?ProjectPriority $priority = null;
@@ -491,11 +491,6 @@ class Project extends AbstractEntity
     }
 
     // Helper methods for priority
-    public function isLowPriority(): bool
-    {
-        return ProjectPriority::LOW === $this->getPriorityEnum();
-    }
-
     public function isMediumPriority(): bool
     {
         return ProjectPriority::MEDIUM === $this->getPriorityEnum();
@@ -504,11 +499,6 @@ class Project extends AbstractEntity
     public function isHighPriority(): bool
     {
         return ProjectPriority::HIGH === $this->getPriorityEnum();
-    }
-
-    public function isUrgent(): bool
-    {
-        return ProjectPriority::URGENT === $this->getPriorityEnum();
     }
 
     public function isCritical(): bool
