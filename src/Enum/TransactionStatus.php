@@ -14,6 +14,8 @@ enum TransactionStatus: string
     case INVOICED = 'invoiced';
     case PAID = 'paid';
     case CANCELLED = 'cancelled';
+    case DECLINED = 'declined';
+    case ARCHIVED = 'archived';
 
     public function getLabel(): string
     {
@@ -26,6 +28,8 @@ enum TransactionStatus: string
             self::INVOICED => 'Invoiced',
             self::PAID => 'Paid',
             self::CANCELLED => 'Cancelled',
+            self::DECLINED => 'Declined',
+            self::ARCHIVED => 'Archived',
         };
     }
 
@@ -40,6 +44,8 @@ enum TransactionStatus: string
             self::INVOICED => 'info',
             self::PAID => 'success',
             self::CANCELLED => 'danger',
+            self::DECLINED => 'danger',
+            self::ARCHIVED => 'secondary',
         };
     }
 }

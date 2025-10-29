@@ -79,7 +79,7 @@ class Transaction extends AbstractEntity
     #[ApiProperty(
         openapiContext: [
             'type' => 'string',
-            'enum' => ['draft', 'quoted', 'ordered', 'in_production', 'delivered', 'invoiced', 'paid', 'cancelled'],
+            'enum' => ['draft', 'quoted', 'ordered', 'in_production', 'delivered', 'invoiced', 'paid', 'cancelled', 'declined', 'archived'],
         ]
     )]
     private TransactionStatus $status = TransactionStatus::DRAFT;
@@ -539,5 +539,15 @@ class Transaction extends AbstractEntity
     public function isCancelled(): bool
     {
         return TransactionStatus::CANCELLED === $this->status;
+    }
+
+    public function isDeclined(): bool
+    {
+        return TransactionStatus::DECLINED === $this->status;
+    }
+
+    public function isArchived(): bool
+    {
+        return TransactionStatus::ARCHIVED === $this->status;
     }
 }
