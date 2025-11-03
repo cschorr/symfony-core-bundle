@@ -43,6 +43,14 @@ services:
         arguments:
             $mailFrom: 'noreply@example.com'
 
+    # Password Reset Email Service configuration
+    C3net\CoreBundle\Service\PasswordResetEmailService:
+        autowire: true
+        autoconfigure: true
+        arguments:
+            $mailFrom: '%env(MAILER_FROM_EMAIL)%'
+            $frontendUrl: '%env(FRONTEND_URL)%'
+
     # Data Fixtures - temporarily disabled due to repository dependency issues
     # C3net\CoreBundle\DataFixtures\:
     #     resource: '../src/DataFixtures/'
