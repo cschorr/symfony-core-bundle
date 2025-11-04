@@ -15,14 +15,16 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
     name: 'app:test-password-change',
     description: 'Test password change notification by changing admin password',
 )]
-class TestPasswordChangeCommand
+class TestPasswordChangeCommand extends Command
 {
     public function __construct(private readonly EntityManagerInterface $entityManager, private readonly UserPasswordHasherInterface $passwordHasher)
     {
+        parent::__construct();
     }
 
-    public function __invoke(SymfonyStyle $io): int
+    protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
         $io->title('Testing Password Change Notification');
         // Find admin user
         $userRepository = $this->entityManager->getRepository(User::class);

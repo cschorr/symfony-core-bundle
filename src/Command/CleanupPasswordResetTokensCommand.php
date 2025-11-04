@@ -7,6 +7,7 @@ namespace C3net\CoreBundle\Command;
 use C3net\CoreBundle\Service\PasswordResetService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -15,16 +16,22 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'app:cleanup-password-reset-tokens',
     description: 'Remove expired and used password reset tokens from the database',
 )]
-class CleanupPasswordResetTokensCommand
+class CleanupPasswordResetTokensCommand extends Command
 {
     public function __construct(private readonly PasswordResetService $passwordResetService)
     {
+        parent::__construct();
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', mode: InputOption::VALUE_NONE, description: 'Show which tokens would be deleted without actually deleting them')]
-        bool $dryRun = false, ?OutputInterface $output = null, ?SymfonyStyle $io = null): int
+    protected function configure(): void
     {
-        $isDryRun = $dry_run;
+        $this->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show which tokens would be deleted without actually deleting them');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $isDryRun = $input->getOption('dry-run');
 
         $io->title('Password Reset Tokens Cleanup');
 
