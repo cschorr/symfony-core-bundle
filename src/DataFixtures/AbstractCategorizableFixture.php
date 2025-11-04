@@ -108,7 +108,7 @@ abstract class AbstractCategorizableFixture extends Fixture
     {
         $category = $manager->getRepository(Category::class)->findOneBy(['name' => $name]);
 
-        if ($category === null) {
+        if (null === $category) {
             throw new \RuntimeException(sprintf('Category "%s" not found', $name));
         }
 

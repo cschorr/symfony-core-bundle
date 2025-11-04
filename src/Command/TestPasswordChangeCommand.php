@@ -8,8 +8,6 @@ use C3net\CoreBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -23,13 +21,13 @@ class TestPasswordChangeCommand
     {
     }
 
-    public function __invoke(\Symfony\Component\Console\Style\SymfonyStyle $io): int
+    public function __invoke(SymfonyStyle $io): int
     {
         $io->title('Testing Password Change Notification');
         // Find admin user
         $userRepository = $this->entityManager->getRepository(User::class);
         $user = $userRepository->findOneBy(['email' => 'admin@example.com']);
-        if ($user === null) {
+        if (null === $user) {
             $io->error('Admin user not found');
 
             return Command::FAILURE;
@@ -46,6 +44,7 @@ class TestPasswordChangeCommand
         $io->success('Password changed successfully!');
         $io->info('Check Mailpit at http://localhost:8025 for the notification email');
         $io->info('Check logs for debug output from PasswordChangedEventListener');
+
         return Command::SUCCESS;
     }
 }

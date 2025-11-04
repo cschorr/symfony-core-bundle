@@ -68,7 +68,7 @@ class DepartmentFixtures extends Fixture implements DependentFixtureInterface
             $company = $manager->getRepository(Company::class)
                 ->findOneBy(['name' => $data['company']]);
 
-            if ($company === null) {
+            if (null === $company) {
                 continue;
             }
 

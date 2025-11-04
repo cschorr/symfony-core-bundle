@@ -57,7 +57,7 @@ class UserFixtures extends AbstractCategorizableFixture implements DependentFixt
                 ->setRoles($userData['roles'] ?? [])
             ;
 
-            if ($company !== null) {
+            if (null !== $company) {
                 $user->setCompany($company);
             }
 

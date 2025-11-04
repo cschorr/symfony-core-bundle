@@ -16,7 +16,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class PasswordResetService
 {
     private const int TOKEN_LENGTH = 32;
-     // 32 bytes = 64 characters when hex-encoded
+    // 32 bytes = 64 characters when hex-encoded
     private const int TOKEN_LIFETIME_MINUTES = 30;
 
     private const int MAX_REQUESTS_PER_HOUR = 3;

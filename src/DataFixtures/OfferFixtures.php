@@ -91,7 +91,7 @@ class OfferFixtures extends AbstractCategorizableFixture implements DependentFix
         foreach ($offersData as $offerData) {
             $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $offerData['transaction']]);
 
-            if ($transaction === null) {
+            if (null === $transaction) {
                 throw new \RuntimeException(sprintf('Transaction "%s" not found for offer "%s"', $offerData['transaction'], $offerData['offerNumber']));
             }
 

@@ -52,7 +52,7 @@ class TransactionFixtures extends AbstractCategorizableFixture implements Depend
             // @phpstan-ignore-next-line notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($data['contact']) && null !== $data['contact']) {
                 $contact = $manager->getRepository(Contact::class)->findOneBy(['email' => $data['contact']]);
-                if ($contact !== null) {
+                if (null !== $contact) {
                     $transaction->setCustomerContact($contact);
                 }
             }
@@ -60,7 +60,7 @@ class TransactionFixtures extends AbstractCategorizableFixture implements Depend
             // @phpstan-ignore-next-line isset.offset, booleanAnd.alwaysTrue, notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($data['project']) && null !== $data['project']) {
                 $project = $manager->getRepository(Project::class)->findOneBy(['name' => $data['project']]);
-                if ($project !== null) {
+                if (null !== $project) {
                     $transaction->addProject($project);
                 }
             }

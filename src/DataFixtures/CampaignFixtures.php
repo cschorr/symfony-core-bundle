@@ -52,7 +52,7 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
             if (isset($campaignData['transaction']) && null !== $campaignData['transaction']) {
                 $transaction = $manager->getRepository(Transaction::class)
                     ->findOneBy(['transactionNumber' => $campaignData['transaction']]);
-                if ($transaction !== null) {
+                if (null !== $transaction) {
                     $campaign->setTransaction($transaction);
                 } else {
                     // Transaction not found - this should not happen if fixtures are loaded correctly
@@ -63,7 +63,7 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
             // Assign projects to campaign
             foreach ($campaignData['projects'] as $projectName) {
                 $project = $manager->getRepository(Project::class)->findOneBy(['name' => $projectName]);
-                if ($project !== null) {
+                if (null !== $project) {
                     $campaign->addProject($project);
                 }
             }

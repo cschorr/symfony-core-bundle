@@ -287,14 +287,14 @@ class Project extends AbstractEntity
     public function getCustomerName(): ?string
     {
         $customer = $this->getCustomer();
-        if ($customer === null) {
+        if (null === $customer) {
             return null;
         }
 
         $name = $customer->getName();
         $extension = $customer->getNameExtension();
 
-        if ($extension !== null && $extension !== '' && $extension !== '0') {
+        if (null !== $extension && '' !== $extension && '0' !== $extension) {
             return $name . ' ' . $extension;
         }
 

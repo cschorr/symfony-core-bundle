@@ -98,7 +98,7 @@ class ContactFixtures extends AbstractCategorizableFixture implements DependentF
                     'company' => $company,
                 ]);
 
-                if ($department !== null) {
+                if (null !== $department) {
                     $contact->setDepartment($department);
                 }
             }

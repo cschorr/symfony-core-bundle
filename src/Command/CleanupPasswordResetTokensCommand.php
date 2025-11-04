@@ -7,7 +7,6 @@ namespace C3net\CoreBundle\Command;
 use C3net\CoreBundle\Service\PasswordResetService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -23,7 +22,7 @@ class CleanupPasswordResetTokensCommand
     }
 
     public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', mode: InputOption::VALUE_NONE, description: 'Show which tokens would be deleted without actually deleting them')]
-    bool $dryRun = false, ?OutputInterface $output = null, ?\Symfony\Component\Console\Style\SymfonyStyle $io = null): int
+        bool $dryRun = false, ?OutputInterface $output = null, ?SymfonyStyle $io = null): int
     {
         $isDryRun = $dry_run;
 

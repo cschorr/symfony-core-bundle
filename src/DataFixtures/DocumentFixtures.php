@@ -137,7 +137,7 @@ class DocumentFixtures extends AbstractCategorizableFixture implements Dependent
                 ->setFilePath($documentData['filePath'])
                 ->setTransaction($transaction);
 
-            if ($project !== null) {
+            if (null !== $project) {
                 $document->setProject($project);
             }
 

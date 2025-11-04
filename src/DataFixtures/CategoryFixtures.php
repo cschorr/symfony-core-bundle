@@ -280,7 +280,7 @@ class CategoryFixtures extends Fixture
         foreach ($subCategoriesData as $data) {
             $parent = $manager->getRepository(Category::class)->findOneBy(['name' => $data['parent']]);
 
-            if ($parent === null) {
+            if (null === $parent) {
                 throw new \RuntimeException(sprintf('Parent category "%s" not found for subcategory "%s"', $data['parent'], $data['name']));
             }
 
