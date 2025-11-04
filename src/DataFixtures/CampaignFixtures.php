@@ -48,6 +48,7 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
             ;
 
             // Assign transaction to campaign if specified
+            // @phpstan-ignore-next-line isset.offset, booleanAnd.alwaysTrue, notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($campaignData['transaction']) && null !== $campaignData['transaction']) {
                 $transaction = $manager->getRepository(Transaction::class)
                     ->findOneBy(['transactionNumber' => $campaignData['transaction']]);

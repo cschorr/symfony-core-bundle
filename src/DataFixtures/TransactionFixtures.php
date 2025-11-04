@@ -49,6 +49,7 @@ class TransactionFixtures extends AbstractCategorizableFixture implements Depend
                 ->setAssignedTo($manager->getRepository(User::class)->findOneBy(['email' => $data['assignedUser']]))
                 ->setCurrency($data['currency']);
 
+            // @phpstan-ignore-next-line notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($data['contact']) && null !== $data['contact']) {
                 $contact = $manager->getRepository(Contact::class)->findOneBy(['email' => $data['contact']]);
                 if ($contact) {
@@ -56,6 +57,7 @@ class TransactionFixtures extends AbstractCategorizableFixture implements Depend
                 }
             }
 
+            // @phpstan-ignore-next-line isset.offset, booleanAnd.alwaysTrue, notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($data['project']) && null !== $data['project']) {
                 $project = $manager->getRepository(Project::class)->findOneBy(['name' => $data['project']]);
                 if ($project) {

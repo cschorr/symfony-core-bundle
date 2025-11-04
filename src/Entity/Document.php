@@ -85,7 +85,7 @@ class Document extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->fileName ?? $this->getName() ?? 'Unnamed Document';
+        return $this->fileName ?? $this->getName();
     }
 
     // Getters and Setters

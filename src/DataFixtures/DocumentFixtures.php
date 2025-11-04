@@ -111,6 +111,7 @@ class DocumentFixtures extends AbstractCategorizableFixture implements Dependent
         foreach ($documentsData as $index => $documentData) {
             $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $documentData['transaction']]);
             $project = null;
+            // @phpstan-ignore-next-line booleanAnd.rightAlwaysTrue (Defensive check for fixture data integrity)
             if (isset($documentData['project']) && $documentData['project']) {
                 $project = $manager->getRepository(Project::class)->findOneBy(['name' => $documentData['project']]);
             }
@@ -121,6 +122,7 @@ class DocumentFixtures extends AbstractCategorizableFixture implements Dependent
                 DocumentType::CONTRACT => ['Legal Services', 'Business Services'],
                 DocumentType::OFFER => ['Marketing & Sales', 'Business Services'],
                 DocumentType::INVOICE => ['Financial Services', 'Business Services'],
+                // @phpstan-ignore-next-line match.alwaysTrue (All cases are intentional for fixture completeness)
                 DocumentType::DELIVERABLE => ['Software Solutions', 'Technology'],
                 default => ['Business Services'],
             };

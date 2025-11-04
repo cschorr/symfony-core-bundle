@@ -42,6 +42,7 @@ class UserFixtures extends AbstractCategorizableFixture implements DependentFixt
             $company = null;
 
             // Get company if specified
+            // @phpstan-ignore-next-line notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($userData['company']) && null !== $userData['company']) {
                 $company = $manager->getRepository(Company::class)->findOneBy(['name' => $userData['company']]);
             }
