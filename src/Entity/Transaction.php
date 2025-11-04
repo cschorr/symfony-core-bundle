@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
 #[ORM\DiscriminatorMap([
     'transaction' => Transaction::class,
-    'app_transaction' => 'App\\Entity\\Transaction',
+    'app_transaction' => \App\Entity\Transaction::class,
 ])]
 #[ApiResource(
     mercure: false,

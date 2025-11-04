@@ -14,6 +14,7 @@ use Twig\Environment;
 class PasswordResetEmailService
 {
     private const string TEMPLATE_RESET_REQUEST = '@C3netCore/emails/password_reset_request.html.twig';
+
     private const string TEMPLATE_RESET_SUCCESS = '@C3netCore/emails/password_reset_success.html.twig';
 
     private const int MAX_RETRY_ATTEMPTS = 1;

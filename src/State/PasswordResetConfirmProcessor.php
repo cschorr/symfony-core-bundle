@@ -38,7 +38,7 @@ final readonly class PasswordResetConfirmProcessor implements ProcessorInterface
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (!$request) {
+        if ($request === null) {
             throw new \RuntimeException('No request available');
         }
 
@@ -76,10 +76,10 @@ final readonly class PasswordResetConfirmProcessor implements ProcessorInterface
             return [
                 'message' => 'Password reset successful. You can now log in with your new password.',
             ];
-        } catch (\Throwable $e) {
+        } catch (\Throwable $throwable) {
             $this->logger->error('Failed to reset password', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error' => $throwable->getMessage(),
+                'trace' => $throwable->getTraceAsString(),
             ]);
 
             throw new HttpException(500, 'Failed to reset password. Please try again or contact support.');

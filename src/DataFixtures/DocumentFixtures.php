@@ -108,7 +108,7 @@ class DocumentFixtures extends AbstractCategorizableFixture implements Dependent
             ],
         ];
 
-        foreach ($documentsData as $index => $documentData) {
+        foreach ($documentsData as $documentData) {
             $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $documentData['transaction']]);
             $project = null;
             // @phpstan-ignore-next-line booleanAnd.rightAlwaysTrue (Defensive check for fixture data integrity)
@@ -137,7 +137,7 @@ class DocumentFixtures extends AbstractCategorizableFixture implements Dependent
                 ->setFilePath($documentData['filePath'])
                 ->setTransaction($transaction);
 
-            if ($project) {
+            if ($project !== null) {
                 $document->setProject($project);
             }
 

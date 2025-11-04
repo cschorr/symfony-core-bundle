@@ -38,7 +38,7 @@ class ProjectFixtures extends AbstractCategorizableFixture implements DependentF
             ['name' => 'Quantum Computing Research', 'status' => ProjectStatus::IN_PROGRESS, 'priority' => ProjectPriority::CRITICAL, 'description' => 'Research and development of quantum computing solutions', 'client' => 'NeuralLink Systems', 'assignee' => 'admin@example.com', 'categories' => ['Software Solutions', 'Technology', 'AI & Machine Learning'], 'dueDate' => new \DateTimeImmutable('Tuesday next week 10:20')],
         ];
 
-        foreach ($projectsData as $index => $projectData) {
+        foreach ($projectsData as $projectData) {
             $client = $manager->getRepository(Company::class)->findOneBy(['name' => $projectData['client']]);
             $assignee = $manager->getRepository(User::class)->findOneBy(['email' => $projectData['assignee']]);
             $categories = $this->findCategoriesByNames($manager, $projectData['categories']);

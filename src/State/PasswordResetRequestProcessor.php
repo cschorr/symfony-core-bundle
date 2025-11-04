@@ -37,7 +37,7 @@ final readonly class PasswordResetRequestProcessor implements ProcessorInterface
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (!$request) {
+        if ($request === null) {
             throw new \RuntimeException('No request available');
         }
 

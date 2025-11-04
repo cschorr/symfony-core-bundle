@@ -36,7 +36,7 @@ class UserFixtures extends AbstractCategorizableFixture implements DependentFixt
             'marketing1' => ['email' => 'marketing1@example.com', 'active' => true, 'notes' => 'Digital marketing strategist and content creator', 'categories' => ['Digital Marketing', 'Content Creation', 'SEO & SEM'], 'nameLast' => 'Williams', 'nameFirst' => 'David', 'userGroups' => ['Manager'], 'company' => 'Seegson Corporation'],
         ];
 
-        foreach ($usersData as $key => $userData) {
+        foreach ($usersData as $userData) {
             $categories = $this->findCategoriesByNames($manager, $userData['categories']);
             $userGroups = $manager->getRepository(UserGroup::class)->findBy(['name' => $userData['userGroups']]);
             $company = null;
@@ -57,7 +57,7 @@ class UserFixtures extends AbstractCategorizableFixture implements DependentFixt
                 ->setRoles($userData['roles'] ?? [])
             ;
 
-            if ($company) {
+            if ($company !== null) {
                 $user->setCompany($company);
             }
 

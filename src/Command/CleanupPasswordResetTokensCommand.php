@@ -16,29 +16,16 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'app:cleanup-password-reset-tokens',
     description: 'Remove expired and used password reset tokens from the database',
 )]
-class CleanupPasswordResetTokensCommand extends Command
+class CleanupPasswordResetTokensCommand
 {
-    public function __construct(
-        private readonly PasswordResetService $passwordResetService,
-    ) {
-        parent::__construct();
+    public function __construct(private readonly PasswordResetService $passwordResetService)
+    {
     }
 
-    protected function configure(): void
+    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'dry-run', mode: InputOption::VALUE_NONE, description: 'Show which tokens would be deleted without actually deleting them')]
+    bool $dryRun = false, ?OutputInterface $output = null, ?\Symfony\Component\Console\Style\SymfonyStyle $io = null): int
     {
-        $this
-            ->addOption(
-                'dry-run',
-                null,
-                InputOption::VALUE_NONE,
-                'Show which tokens would be deleted without actually deleting them'
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $io = new SymfonyStyle($input, $output);
-        $isDryRun = $input->getOption('dry-run');
+        $isDryRun = $dry_run;
 
         $io->title('Password Reset Tokens Cleanup');
 
@@ -79,12 +66,12 @@ class CleanupPasswordResetTokensCommand extends Command
             }
 
             return Command::SUCCESS;
-        } catch (\Throwable $e) {
+        } catch (\Throwable $throwable) {
             $io->error('Failed to cleanup password reset tokens');
-            $io->error($e->getMessage());
+            $io->error($throwable->getMessage());
 
             if ($output->isVerbose()) {
-                $io->block($e->getTraceAsString(), 'TRACE', 'fg=white;bg=red', ' ', true);
+                $io->block($throwable->getTraceAsString(), 'TRACE', 'fg=white;bg=red', ' ', true);
             }
 
             return Command::FAILURE;

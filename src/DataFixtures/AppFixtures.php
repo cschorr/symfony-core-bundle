@@ -763,7 +763,7 @@ class AppFixtures extends AbstractCategorizableFixture
             ['company' => 'company_18', 'name' => 'Creative', 'shortcode' => 'CRTV'],
         ];
 
-        foreach ($departmentsData as $index => $data) {
+        foreach ($departmentsData as $data) {
             $company = $this->companies[$data['company']] ?? null;
 
             if (!$company) {

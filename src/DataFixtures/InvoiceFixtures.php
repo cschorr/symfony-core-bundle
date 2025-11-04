@@ -67,7 +67,7 @@ class InvoiceFixtures extends AbstractCategorizableFixture implements DependentF
             ],
         ];
 
-        foreach ($invoicesData as $index => $invoiceData) {
+        foreach ($invoicesData as $invoiceData) {
             $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $invoiceData['transaction']]);
             $offer = $manager->getRepository(Offer::class)->findOneBy(['offerNumber' => $invoiceData['offer']]);
 

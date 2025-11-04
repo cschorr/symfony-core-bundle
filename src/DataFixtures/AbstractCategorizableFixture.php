@@ -33,10 +33,10 @@ abstract class AbstractCategorizableFixture extends Fixture
 
         try {
             $manager->flush();
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             // Ignore Mercure failures during fixture loading
-            if (!$this->isMercureError($e)) {
-                throw $e;
+            if (!$this->isMercureError($exception)) {
+                throw $exception;
             }
         }
     }
@@ -50,10 +50,10 @@ abstract class AbstractCategorizableFixture extends Fixture
     {
         try {
             $manager->flush();
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             // Ignore Mercure failures during fixture loading
-            if (!$this->isMercureError($e)) {
-                throw $e;
+            if (!$this->isMercureError($exception)) {
+                throw $exception;
             }
         }
     }
@@ -108,7 +108,7 @@ abstract class AbstractCategorizableFixture extends Fixture
     {
         $category = $manager->getRepository(Category::class)->findOneBy(['name' => $name]);
 
-        if (!$category) {
+        if ($category === null) {
             throw new \RuntimeException(sprintf('Category "%s" not found', $name));
         }
 
