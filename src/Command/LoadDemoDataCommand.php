@@ -23,6 +23,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -32,22 +33,29 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[AsCommand(name: 'c3net:load-demo-data', description: 'Load demo data fixtures from C3net Core Bundle', aliases: ['c3net:fixtures:load'], help: <<<'TXT'
 This command loads demo data from the C3net Core Bundle including users, companies, projects, and more.
 TXT)]
-class LoadDemoDataCommand
+class LoadDemoDataCommand extends Command
 {
     public function __construct(private EntityManagerInterface $entityManager, private readonly ManagerRegistry $managerRegistry, private readonly UserPasswordHasherInterface $passwordHasher)
     {
+        parent::__construct();
     }
 
-    public function __invoke(#[\Symfony\Component\Console\Attribute\Option(name: 'force', shortcut: 'f', mode: InputOption::VALUE_NONE, description: 'Skip confirmation prompt and force loading of demo data')]
-        bool $force = false, #[\Symfony\Component\Console\Attribute\Option(name: 'purge', shortcut: 'p', mode: InputOption::VALUE_NONE, description: 'Purge existing data before loading demo data (use with caution!)')]
-        bool $purge = false, #[\Symfony\Component\Console\Attribute\Option(name: 'drop-create-schema', shortcut: 'd', mode: InputOption::VALUE_NONE, description: 'Drop and recreate database schema before loading demo data')]
-        bool $dropCreateSchema = false, ?OutputInterface $output = null, ?SymfonyStyle $io = null): int
+    protected function configure(): void
     {
+        $this
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Skip confirmation prompt and force loading of demo data')
+            ->addOption('purge', 'p', InputOption::VALUE_NONE, 'Purge existing data before loading demo data (use with caution!)')
+            ->addOption('drop-create-schema', 'd', InputOption::VALUE_NONE, 'Drop and recreate database schema before loading demo data');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
         $io->title('C3net Core Bundle Demo Data Loader');
 
         // Check if we should purge existing data or drop/create schema
-        $shouldPurge = $purge;
-        $shouldDropCreateSchema = $drop_create_schema;
+        $shouldPurge = $input->getOption('purge');
+        $shouldDropCreateSchema = $input->getOption('drop-create-schema');
 
         // Check for existing data
         $userCount = $this->entityManager->getRepository(\C3net\CoreBundle\Entity\User::class)->count([]);
@@ -55,7 +63,7 @@ class LoadDemoDataCommand
         if ($userCount > 0 && !$shouldPurge) {
             $io->warning(sprintf('Database already contains %d users. Use --purge to clear existing data first.', $userCount));
 
-            if (!$force) {
+            if (!$input->getOption('force')) {
                 /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
                 $helper = $this->getHelper('question');
                 $question = new ConfirmationQuestion(
@@ -72,7 +80,7 @@ class LoadDemoDataCommand
         }
 
         // Confirmation prompt
-        if (!$force) {
+        if (!$input->getOption('force')) {
             $io->caution('This will load demo data into your database.');
 
             /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
