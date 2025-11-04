@@ -215,7 +215,7 @@ class CompanyTest extends TestCase
         $this->assertSame($companyGroup, $company->getCompanyGroup());
         $this->assertStringContainsString('logos/company.png', $company->getImagePath());
         $this->assertCount(1, $company->getEmployees());
-        $this->assertSame('Complete Test Corp', (string) $company);
+        $this->assertSame('Complete Test Corp Inc.', (string) $company);
     }
 
     public function testImagePathUrlGeneration(): void
