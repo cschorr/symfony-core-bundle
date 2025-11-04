@@ -13,7 +13,6 @@
         <exclude name="Generic.Files.LineLength"/>
     </rule>
 
-    <file>bin/</file>
     <file>src/</file>
 
     <exclude-pattern>*/DataFixtures/*</exclude-pattern>
