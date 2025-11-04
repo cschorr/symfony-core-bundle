@@ -67,7 +67,7 @@ class ContactFixtures extends AbstractCategorizableFixture implements DependentF
         // Create contacts in two passes to support hierarchy
         // Pass 1: Create all contacts without parent relationships
         $contacts = [];
-        foreach ($contactsData as $index => $contactData) {
+        foreach ($contactsData as $contactData) {
             $company = $manager->getRepository(Company::class)->findOneBy(['name' => $contactData['company']]);
             $categories = $this->findCategoriesByNames($manager, $contactData['categories']);
 
@@ -98,7 +98,7 @@ class ContactFixtures extends AbstractCategorizableFixture implements DependentF
                     'company' => $company,
                 ]);
 
-                if ($department) {
+                if (null !== $department) {
                     $contact->setDepartment($department);
                 }
             }

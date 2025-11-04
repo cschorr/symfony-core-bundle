@@ -358,14 +358,17 @@ class AppFixtures extends AbstractCategorizableFixture
 
             $this->persistAndFlush($manager, $user); // Persist and flush to get ID for category assignment
 
-            // Add category after entity is persisted
-            if ($category) {
-                $assignment = new CategorizableEntity();
-                $assignment->setCategory($category);
-                $assignment->setEntityType(DomainEntityType::User);
-                $assignment->setEntityId($user->getId()->toString());
-                $manager->persist($assignment);
+            // Add category after entity is persisted (category is guaranteed non-null by check above)
+            $userId = $user->getId();
+            if (null === $userId) {
+                throw new \LogicException('User ID should not be null after persist and flush');
             }
+
+            $assignment = new CategorizableEntity();
+            $assignment->setCategory($category);
+            $assignment->setEntityType(DomainEntityType::User);
+            $assignment->setEntityId($userId->toString());
+            $manager->persist($assignment);
 
             $this->users[$key] = $user;
         }
@@ -677,10 +680,15 @@ class AppFixtures extends AbstractCategorizableFixture
 
             // Add category after entity is persisted
             if ($category) {
+                $companyId = $company->getId();
+                if (null === $companyId) {
+                    throw new \LogicException('Company ID should not be null after persist and flush');
+                }
+
                 $assignment = new CategorizableEntity();
                 $assignment->setCategory($category);
                 $assignment->setEntityType(DomainEntityType::Company);
-                $assignment->setEntityId($company->getId()->toString());
+                $assignment->setEntityId($companyId->toString());
                 $manager->persist($assignment);
             }
 
@@ -755,7 +763,7 @@ class AppFixtures extends AbstractCategorizableFixture
             ['company' => 'company_18', 'name' => 'Creative', 'shortcode' => 'CRTV'],
         ];
 
-        foreach ($departmentsData as $index => $data) {
+        foreach ($departmentsData as $data) {
             $company = $this->companies[$data['company']] ?? null;
 
             if (!$company) {
@@ -1745,10 +1753,15 @@ class AppFixtures extends AbstractCategorizableFixture
 
             // Add category after entity is persisted
             if ($category) {
+                $projectId = $project->getId();
+                if (null === $projectId) {
+                    throw new \LogicException('Project ID should not be null after persist and flush');
+                }
+
                 $assignment = new CategorizableEntity();
                 $assignment->setCategory($category);
                 $assignment->setEntityType(DomainEntityType::Project);
-                $assignment->setEntityId($project->getId()->toString());
+                $assignment->setEntityId($projectId->toString());
                 $manager->persist($assignment);
             }
 
@@ -1902,10 +1915,15 @@ class AppFixtures extends AbstractCategorizableFixture
 
             // Add category after entity is persisted
             if ($category) {
+                $campaignId = $campaign->getId();
+                if (null === $campaignId) {
+                    throw new \LogicException('Campaign ID should not be null after persist and flush');
+                }
+
                 $assignment = new CategorizableEntity();
                 $assignment->setCategory($category);
                 $assignment->setEntityType(DomainEntityType::Campaign);
-                $assignment->setEntityId($campaign->getId()->toString());
+                $assignment->setEntityId($campaignId->toString());
                 $manager->persist($assignment);
             }
 

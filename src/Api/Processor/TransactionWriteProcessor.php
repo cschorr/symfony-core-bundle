@@ -30,6 +30,7 @@ final readonly class TransactionWriteProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
+        // @phpstan-ignore-next-line instanceof.alwaysTrue (Runtime safety check needed despite generic type hint)
         if (!$data instanceof Transaction) {
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }

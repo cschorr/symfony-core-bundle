@@ -58,7 +58,7 @@ class CompanyFixtures extends AbstractCategorizableFixture implements DependentF
             ['display' => 'Themyscira Corp', 'email' => 'info@themyscira.example', 'country' => 'GR', 'categories' => ['Business Services', 'Strategy Consulting', 'Management Consulting'], 'phone' => '+30 210 555 1500', 'url' => 'https://themyscira.example', 'street' => '1 Paradise Island', 'city' => 'Athens', 'zipCode' => '10557', 'group' => 'DC Group'],
         ];
 
-        foreach ($companiesData as $index => $data) {
+        foreach ($companiesData as $data) {
             $categories = $this->findCategoriesByNames($manager, $data['categories']);
             $group = $manager->getRepository(CompanyGroup::class)->findOneBy(['name' => $data['group']]);
 

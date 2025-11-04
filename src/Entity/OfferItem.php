@@ -28,6 +28,7 @@ class OfferItem extends AbstractEntity
     #[Assert\NotBlank]
     private ?string $description = null;
 
+    /** @var numeric-string */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     #[Assert\GreaterThan(0)]
     private string $quantity = '1.00';
@@ -35,9 +36,11 @@ class OfferItem extends AbstractEntity
     #[ORM\Column(type: Types::STRING, length: 50, nullable: false)]
     private string $unit = 'piece';
 
+    /** @var numeric-string */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     private string $unitPrice = '0.00';
 
+    /** @var numeric-string */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     private string $totalPrice = '0.00';
 
@@ -88,13 +91,20 @@ class OfferItem extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return numeric-string
+     */
     public function getQuantity(): string
     {
         return $this->quantity;
     }
 
+    /**
+     * @param numeric-string $quantity
+     */
     public function setQuantity(string $quantity): static
     {
+        /* @var numeric-string $quantity */
         $this->quantity = $quantity;
         $this->calculateTotalPrice();
 
@@ -113,26 +123,40 @@ class OfferItem extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return numeric-string
+     */
     public function getUnitPrice(): string
     {
         return $this->unitPrice;
     }
 
+    /**
+     * @param numeric-string $unitPrice
+     */
     public function setUnitPrice(string $unitPrice): static
     {
+        /* @var numeric-string $unitPrice */
         $this->unitPrice = $unitPrice;
         $this->calculateTotalPrice();
 
         return $this;
     }
 
+    /**
+     * @return numeric-string
+     */
     public function getTotalPrice(): string
     {
         return $this->totalPrice;
     }
 
+    /**
+     * @param numeric-string $totalPrice
+     */
     public function setTotalPrice(string $totalPrice): static
     {
+        /* @var numeric-string $totalPrice */
         $this->totalPrice = $totalPrice;
 
         return $this;

@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
 #[ORM\DiscriminatorMap([
     'transaction' => Transaction::class,
-    'app_transaction' => 'App\\Entity\\Transaction',
+    'app_transaction' => \App\Entity\Transaction::class,
 ])]
 #[ApiResource(
     mercure: false,
@@ -158,7 +158,7 @@ class Transaction extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->transactionNumber ?? $this->getName() ?? 'Unnamed Transaction';
+        return $this->transactionNumber ?? $this->getName();
     }
 
     // Getters and Setters

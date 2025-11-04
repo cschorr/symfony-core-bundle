@@ -36,7 +36,7 @@ class TransactionFixtures extends AbstractCategorizableFixture implements Depend
             ['number' => 'TXN-2025-0013', 'title' => 'Music Production Services', 'description' => 'Original music composition for promotional video', 'status' => TransactionStatus::DRAFT, 'customer' => 'Umbrella Corporation', 'contact' => null, 'assignedUser' => 'marketing@example.com', 'categories' => ['Content Creation', 'Digital Marketing', 'Media & Production'], 'currency' => 'EUR', 'project' => 'Music Production - Umbrella Corporation'],
         ];
 
-        foreach ($transactionsData as $index => $data) {
+        foreach ($transactionsData as $data) {
             $categories = $this->findCategoriesByNames($manager, $data['categories']);
 
             $transaction = (new Transaction())
@@ -49,16 +49,18 @@ class TransactionFixtures extends AbstractCategorizableFixture implements Depend
                 ->setAssignedTo($manager->getRepository(User::class)->findOneBy(['email' => $data['assignedUser']]))
                 ->setCurrency($data['currency']);
 
+            // @phpstan-ignore-next-line notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($data['contact']) && null !== $data['contact']) {
                 $contact = $manager->getRepository(Contact::class)->findOneBy(['email' => $data['contact']]);
-                if ($contact) {
+                if (null !== $contact) {
                     $transaction->setCustomerContact($contact);
                 }
             }
 
+            // @phpstan-ignore-next-line isset.offset, booleanAnd.alwaysTrue, notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($data['project']) && null !== $data['project']) {
                 $project = $manager->getRepository(Project::class)->findOneBy(['name' => $data['project']]);
-                if ($project) {
+                if (null !== $project) {
                     $transaction->addProject($project);
                 }
             }

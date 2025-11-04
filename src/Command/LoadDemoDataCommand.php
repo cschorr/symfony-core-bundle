@@ -30,49 +30,27 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[AsCommand(
-    name: 'c3net:load-demo-data',
-    description: 'Load demo data fixtures from C3net Core Bundle',
-    aliases: ['c3net:fixtures:load']
-)]
+#[AsCommand(name: 'c3net:load-demo-data', description: 'Load demo data fixtures from C3net Core Bundle', aliases: ['c3net:fixtures:load'], help: <<<'TXT'
+This command loads demo data from the C3net Core Bundle including users, companies, projects, and more.
+TXT)]
 class LoadDemoDataCommand extends Command
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        private readonly ManagerRegistry $managerRegistry,
-        private readonly UserPasswordHasherInterface $passwordHasher,
-    ) {
+    public function __construct(private EntityManagerInterface $entityManager, private readonly ManagerRegistry $managerRegistry, private readonly UserPasswordHasherInterface $passwordHasher)
+    {
         parent::__construct();
     }
 
     protected function configure(): void
     {
         $this
-            ->setHelp('This command loads demo data from the C3net Core Bundle including users, companies, projects, and more.')
-            ->addOption(
-                'force',
-                'f',
-                InputOption::VALUE_NONE,
-                'Skip confirmation prompt and force loading of demo data'
-            )
-            ->addOption(
-                'purge',
-                'p',
-                InputOption::VALUE_NONE,
-                'Purge existing data before loading demo data (use with caution!)'
-            )
-            ->addOption(
-                'drop-create-schema',
-                'd',
-                InputOption::VALUE_NONE,
-                'Drop and recreate database schema before loading demo data'
-            );
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Skip confirmation prompt and force loading of demo data')
+            ->addOption('purge', 'p', InputOption::VALUE_NONE, 'Purge existing data before loading demo data (use with caution!)')
+            ->addOption('drop-create-schema', 'd', InputOption::VALUE_NONE, 'Drop and recreate database schema before loading demo data');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
         $io->title('C3net Core Bundle Demo Data Loader');
 
         // Check if we should purge existing data or drop/create schema
@@ -206,6 +184,7 @@ class LoadDemoDataCommand extends Command
                             if (!$manager instanceof EntityManagerInterface) {
                                 throw new \RuntimeException('Manager must be an instance of EntityManagerInterface');
                             }
+
                             $this->entityManager = $manager;
 
                             if ($io->isVerbose()) {
@@ -218,6 +197,7 @@ class LoadDemoDataCommand extends Command
                             $io->text(sprintf('[DEBUG] Error details: %s', $errorMessage));
                             $io->text(sprintf('[DEBUG] Error occurred in: %s', $fixtureClass));
                         }
+
                     // Continue loading next fixture since Mercure failures during fixture loading are not critical
                     } else {
                         // Re-throw non-Mercure/non-EntityManager related exceptions
@@ -261,15 +241,15 @@ class LoadDemoDataCommand extends Command
             ]);
 
             return Command::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $io->error([
                 'An error occurred while loading demo data:',
-                $e->getMessage(),
+                $exception->getMessage(),
             ]);
 
             if ($output->isVerbose()) {
                 $io->section('Stack trace:');
-                $io->text($e->getTraceAsString());
+                $io->text($exception->getTraceAsString());
             }
 
             return Command::FAILURE;
@@ -356,8 +336,8 @@ class LoadDemoDataCommand extends Command
 
             $io->text('');
             $io->success('Database schema has been recreated.');
-        } catch (Exception $e) {
-            throw new \RuntimeException(sprintf('Failed to drop/create schema: %s', $e->getMessage()), 0, $e);
+        } catch (Exception $exception) {
+            throw new \RuntimeException(sprintf('Failed to drop/create schema: %s', $exception->getMessage()), 0, $exception);
         }
     }
 }

@@ -88,15 +88,16 @@ class OfferFixtures extends AbstractCategorizableFixture implements DependentFix
             ],
         ];
 
-        foreach ($offersData as $index => $offerData) {
+        foreach ($offersData as $offerData) {
             $transaction = $manager->getRepository(Transaction::class)->findOneBy(['transactionNumber' => $offerData['transaction']]);
 
-            if (!$transaction) {
+            if (null === $transaction) {
                 throw new \RuntimeException(sprintf('Transaction "%s" not found for offer "%s"', $offerData['transaction'], $offerData['offerNumber']));
             }
 
             // Assign categories based on offer status
             $categoryNames = match ($offerData['status']) {
+                // @phpstan-ignore-next-line match.alwaysTrue (All cases are intentional for fixture completeness)
                 OfferStatus::ACCEPTED => ['Marketing & Sales', 'Business Services'],
                 OfferStatus::REJECTED => ['Marketing & Sales', 'Strategy Consulting'],
                 default => ['Marketing & Sales', 'Digital Marketing'],

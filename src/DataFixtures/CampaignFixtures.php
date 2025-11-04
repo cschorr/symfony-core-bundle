@@ -39,7 +39,7 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
             ],
         ];
 
-        foreach ($campaignsData as $index => $campaignData) {
+        foreach ($campaignsData as $campaignData) {
             $categories = $this->findCategoriesByNames($manager, $campaignData['categories']);
 
             $campaign = (new Campaign())
@@ -48,21 +48,22 @@ class CampaignFixtures extends AbstractCategorizableFixture implements Dependent
             ;
 
             // Assign transaction to campaign if specified
+            // @phpstan-ignore-next-line isset.offset, booleanAnd.alwaysTrue, notIdentical.alwaysTrue (Defensive check for fixture data integrity)
             if (isset($campaignData['transaction']) && null !== $campaignData['transaction']) {
                 $transaction = $manager->getRepository(Transaction::class)
                     ->findOneBy(['transactionNumber' => $campaignData['transaction']]);
-                if ($transaction) {
+                if (null !== $transaction) {
                     $campaign->setTransaction($transaction);
                 } else {
                     // Transaction not found - this should not happen if fixtures are loaded correctly
-                    error_log("Warning: Transaction {$campaignData['transaction']} not found for campaign {$campaignData['name']}");
+                    error_log(sprintf('Warning: Transaction %s not found for campaign %s', $campaignData['transaction'], $campaignData['name']));
                 }
             }
 
             // Assign projects to campaign
             foreach ($campaignData['projects'] as $projectName) {
                 $project = $manager->getRepository(Project::class)->findOneBy(['name' => $projectName]);
-                if ($project) {
+                if (null !== $project) {
                     $campaign->addProject($project);
                 }
             }

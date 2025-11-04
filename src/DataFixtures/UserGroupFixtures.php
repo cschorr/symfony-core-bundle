@@ -46,7 +46,7 @@ class UserGroupFixtures extends AbstractCategorizableFixture implements Dependen
             ],
         ];
 
-        foreach ($userGroupsData as $key => $userData) {
+        foreach ($userGroupsData as $userData) {
             $categories = $this->findCategoriesByNames($manager, $userData['categories']);
 
             $userGroup = new UserGroup();

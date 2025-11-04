@@ -13,7 +13,7 @@ framework:
                     max_retries: 3
                     multiplier: 2
             failed: 'doctrine://default?queue_name=failed'
-            # sync: 'sync://'
+            sync: 'sync://'
 
         default_bus: messenger.bus.default
 
@@ -21,9 +21,24 @@ framework:
             messenger.bus.default: []
 
         routing:
+            # Email delivery - async by default (production), overridden to sync in dev/test
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
+
+# Development: Use sync transport for immediate email delivery
+when@dev:
+    framework:
+        messenger:
+            routing:
+                Symfony\Component\Mailer\Messenger\SendEmailMessage: sync
+
+# Testing: Use sync transport for immediate email delivery
+when@test:
+    framework:
+        messenger:
+            routing:
+                Symfony\Component\Mailer\Messenger\SendEmailMessage: sync

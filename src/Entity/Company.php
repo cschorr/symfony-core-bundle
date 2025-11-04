@@ -87,7 +87,7 @@ class Company extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        $name = trim($this->getName() ?? '');
+        $name = trim($this->getName());
         $nameExtension = trim($this->getNameExtension() ?? '');
 
         if ('' === $name || '0' === $name) {

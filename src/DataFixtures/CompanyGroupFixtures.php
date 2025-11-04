@@ -42,7 +42,7 @@ class CompanyGroupFixtures extends AbstractCategorizableFixture implements Depen
             ],
         ];
 
-        foreach ($groups as $key => $data) {
+        foreach ($groups as $data) {
             $categories = $this->findCategoriesByNames($manager, $data['categories']);
 
             $group = (new CompanyGroup())
