@@ -250,7 +250,7 @@ class Invoice extends AbstractEntity
     public function setSubtotal(int|float|string $subtotal): static
     {
         if (is_string($subtotal)) {
-            /** @var numeric-string $subtotal */
+            /* @var numeric-string $subtotal */
             $this->subtotal = $subtotal;
         } else {
             // Convert int/float to string with 2 decimal places for DECIMAL column
@@ -274,7 +274,7 @@ class Invoice extends AbstractEntity
     public function setTaxRate(int|float|string $taxRate): static
     {
         if (is_string($taxRate)) {
-            /** @var numeric-string $taxRate */
+            /* @var numeric-string $taxRate */
             $this->taxRate = $taxRate;
         } else {
             $this->taxRate = number_format((float) $taxRate, 2, '.', '');
@@ -297,7 +297,7 @@ class Invoice extends AbstractEntity
     public function setTaxAmount(int|float|string $taxAmount): static
     {
         if (is_string($taxAmount)) {
-            /** @var numeric-string $taxAmount */
+            /* @var numeric-string $taxAmount */
             $this->taxAmount = $taxAmount;
         } else {
             $this->taxAmount = number_format((float) $taxAmount, 2, '.', '');
@@ -320,7 +320,7 @@ class Invoice extends AbstractEntity
     public function setTotalAmount(int|float|string $totalAmount): static
     {
         if (is_string($totalAmount)) {
-            /** @var numeric-string $totalAmount */
+            /* @var numeric-string $totalAmount */
             $this->totalAmount = $totalAmount;
         } else {
             $this->totalAmount = number_format((float) $totalAmount, 2, '.', '');
@@ -343,7 +343,7 @@ class Invoice extends AbstractEntity
     public function setPaidAmount(int|float|string $paidAmount): static
     {
         if (is_string($paidAmount)) {
-            /** @var numeric-string $paidAmount */
+            /* @var numeric-string $paidAmount */
             $this->paidAmount = $paidAmount;
         } else {
             $this->paidAmount = number_format((float) $paidAmount, 2, '.', '');

@@ -104,7 +104,7 @@ class OfferItem extends AbstractEntity
      */
     public function setQuantity(string $quantity): static
     {
-        /** @var numeric-string $quantity */
+        /* @var numeric-string $quantity */
         $this->quantity = $quantity;
         $this->calculateTotalPrice();
 
@@ -136,7 +136,7 @@ class OfferItem extends AbstractEntity
      */
     public function setUnitPrice(string $unitPrice): static
     {
-        /** @var numeric-string $unitPrice */
+        /* @var numeric-string $unitPrice */
         $this->unitPrice = $unitPrice;
         $this->calculateTotalPrice();
 
@@ -156,7 +156,7 @@ class OfferItem extends AbstractEntity
      */
     public function setTotalPrice(string $totalPrice): static
     {
-        /** @var numeric-string $totalPrice */
+        /* @var numeric-string $totalPrice */
         $this->totalPrice = $totalPrice;
 
         return $this;
