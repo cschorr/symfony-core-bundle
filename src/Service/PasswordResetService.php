@@ -83,7 +83,7 @@ class PasswordResetService
 
         if (null === $token) {
             $this->logger->warning('Invalid or expired password reset token attempt', [
-                'token_hash_prefix' => substr($tokenHash, 0, 10).'...',
+                'token_hash_prefix' => substr($tokenHash, 0, 10) . '...',
             ]);
 
             return null;
