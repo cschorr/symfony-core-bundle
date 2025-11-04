@@ -6,6 +6,9 @@ namespace C3net\CoreBundle\Entity\Traits\Single;
 
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @phpstan-ignore-next-line trait.unused (Reusable trait available for entities)
+ */
 trait StringCodeTrait
 {
     #[ORM\Column(length: 255, nullable: true)]

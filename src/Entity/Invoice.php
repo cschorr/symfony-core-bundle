@@ -92,18 +92,23 @@ class Invoice extends AbstractEntity
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $dueDate = null;
 
+    /** @var numeric-string */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     private string $subtotal = '0.00';
 
+    /** @var numeric-string */
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: false)]
     private string $taxRate = '19.00';
 
+    /** @var numeric-string */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     private string $taxAmount = '0.00';
 
+    /** @var numeric-string */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     private string $totalAmount = '0.00';
 
+    /** @var numeric-string */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: false)]
     private string $paidAmount = '0.00';
 
@@ -231,14 +236,21 @@ class Invoice extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return numeric-string
+     */
     public function getSubtotal(): string
     {
         return $this->subtotal;
     }
 
+    /**
+     * @param numeric-string|int|float $subtotal
+     */
     public function setSubtotal(int|float|string $subtotal): static
     {
         if (is_string($subtotal)) {
+            /** @var numeric-string $subtotal */
             $this->subtotal = $subtotal;
         } else {
             // Convert int/float to string with 2 decimal places for DECIMAL column
@@ -248,68 +260,92 @@ class Invoice extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return numeric-string
+     */
     public function getTaxRate(): string
     {
         return $this->taxRate;
     }
 
+    /**
+     * @param numeric-string|int|float $taxRate
+     */
     public function setTaxRate(int|float|string $taxRate): static
     {
         if (is_string($taxRate)) {
+            /** @var numeric-string $taxRate */
             $this->taxRate = $taxRate;
         } else {
-            // Convert int/float to string with 2 decimal places for DECIMAL column
             $this->taxRate = number_format((float) $taxRate, 2, '.', '');
         }
 
         return $this;
     }
 
+    /**
+     * @return numeric-string
+     */
     public function getTaxAmount(): string
     {
         return $this->taxAmount;
     }
 
+    /**
+     * @param numeric-string|int|float $taxAmount
+     */
     public function setTaxAmount(int|float|string $taxAmount): static
     {
         if (is_string($taxAmount)) {
+            /** @var numeric-string $taxAmount */
             $this->taxAmount = $taxAmount;
         } else {
-            // Convert int/float to string with 2 decimal places for DECIMAL column
             $this->taxAmount = number_format((float) $taxAmount, 2, '.', '');
         }
 
         return $this;
     }
 
+    /**
+     * @return numeric-string
+     */
     public function getTotalAmount(): string
     {
         return $this->totalAmount;
     }
 
+    /**
+     * @param numeric-string|int|float $totalAmount
+     */
     public function setTotalAmount(int|float|string $totalAmount): static
     {
         if (is_string($totalAmount)) {
+            /** @var numeric-string $totalAmount */
             $this->totalAmount = $totalAmount;
         } else {
-            // Convert int/float to string with 2 decimal places for DECIMAL column
             $this->totalAmount = number_format((float) $totalAmount, 2, '.', '');
         }
 
         return $this;
     }
 
+    /**
+     * @return numeric-string
+     */
     public function getPaidAmount(): string
     {
         return $this->paidAmount;
     }
 
+    /**
+     * @param numeric-string|int|float $paidAmount
+     */
     public function setPaidAmount(int|float|string $paidAmount): static
     {
         if (is_string($paidAmount)) {
+            /** @var numeric-string $paidAmount */
             $this->paidAmount = $paidAmount;
         } else {
-            // Convert int/float to string with 2 decimal places for DECIMAL column
             $this->paidAmount = number_format((float) $paidAmount, 2, '.', '');
         }
 

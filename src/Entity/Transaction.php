@@ -158,7 +158,7 @@ class Transaction extends AbstractEntity
     #[\Override]
     public function __toString(): string
     {
-        return $this->transactionNumber ?? $this->getName() ?? 'Unnamed Transaction';
+        return $this->transactionNumber ?? $this->getName();
     }
 
     // Getters and Setters

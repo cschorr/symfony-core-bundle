@@ -42,10 +42,15 @@ class PasswordResetService
         $tokenHash = hash('sha256', $plainToken);
 
         // Create token entity
+        $userEmail = $user->getEmail();
+        if (null === $userEmail) {
+            throw new \LogicException('User must have an email address for password reset');
+        }
+
         $resetToken = new PasswordResetToken();
         $resetToken->setTokenHash($tokenHash);
         $resetToken->setUser($user);
-        $resetToken->setEmail($user->getEmail());
+        $resetToken->setEmail($userEmail);
         $resetToken->setExpiresAt(new \DateTimeImmutable(sprintf('+%d minutes', self::TOKEN_LIFETIME_MINUTES)));
         $resetToken->setIpAddress($request->getClientIp() ?? 'unknown');
         $resetToken->setUserAgent($request->headers->get('User-Agent'));

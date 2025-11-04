@@ -295,7 +295,7 @@ class Project extends AbstractEntity
         $extension = $customer->getNameExtension();
 
         if ($extension) {
-            return $name.' '.$extension;
+            return $name . ' ' . $extension;
         }
 
         return $name;

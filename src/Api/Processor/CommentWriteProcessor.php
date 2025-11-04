@@ -32,8 +32,7 @@ final readonly class CommentWriteProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        // Remove the redundant instanceof check - $data is already typed as Comment via generics
-        // If $data is not a Comment, we pass it through to the persist processor
+        // @phpstan-ignore-next-line instanceof.alwaysTrue (Runtime safety check needed despite generic type hint)
         if (!$data instanceof Comment) {
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }
