@@ -61,6 +61,9 @@ security:
         - { path: '^/api/contexts/', roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth, roles: PUBLIC_ACCESS, methods: [ POST ] }
+        - { path: ^/api/password-reset/request, roles: PUBLIC_ACCESS, methods: [ POST ] }
+        - { path: ^/api/password-reset/validate-token, roles: PUBLIC_ACCESS }
+        - { path: ^/api/password-reset/reset, roles: PUBLIC_ACCESS, methods: [ POST ] }
         # Alle anderen API-Routen erfordern Authentifizierung
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
         # Admin und Profil-Bereiche
