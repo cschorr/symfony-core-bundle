@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace C3net\CoreBundle\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
@@ -34,23 +39,30 @@ use Gedmo\Mapping\Annotation as Gedmo;
     paginationClientItemsPerPage: true,
     paginationEnabled: true,
     paginationItemsPerPage: 30,
-    paginationMaximumItemsPerPage: 100
-)]
-#[ApiFilter(
-    filterClass: OrderFilter::class,
-    properties: [
-        'title' => 'ASC',
-        'year' => 'DESC',
-    ],
-)]
-#[ApiFilter(
-    filterClass: SearchFilter::class,
-    properties: [
-        'company' => 'exact',
-        'department' => 'exact',
-        'standin' => 'exact',
-        'gender' => 'exact',
-    ],
+    paginationMaximumItemsPerPage: 100,
+    operations: [
+        new Get(),
+        new GetCollection(
+            parameters: [
+                'company' => new QueryParameter(
+                    filter: SearchFilter::class . ':company'
+                ),
+                'department' => new QueryParameter(
+                    filter: SearchFilter::class . ':department'
+                ),
+                'standin' => new QueryParameter(
+                    filter: SearchFilter::class . ':standin'
+                ),
+                'gender' => new QueryParameter(
+                    filter: SearchFilter::class . ':gender'
+                ),
+            ]
+        ),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ]
 )]
 class Contact extends AbstractEntity
 {
