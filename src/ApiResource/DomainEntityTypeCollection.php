@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\DomainEntityTypeProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'DomainEntityTypes',
+    shortName: 'Permission',
     operations: [
         new Get(
-            uriTemplate: '/domain-entity-types',
-            provider: DomainEntityTypeProvider::class
+            uriTemplate: '/permissions/entity-types',
+            provider: DomainEntityTypeProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Permission']]]
         ),
     ],
     normalizationContext: ['groups' => ['domain_entity_type:read']],

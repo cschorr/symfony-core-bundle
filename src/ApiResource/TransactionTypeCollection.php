@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\TransactionTypeProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'TransactionTypes',
+    shortName: 'Transaction',
     operations: [
         new Get(
-            uriTemplate: '/transaction-types',
-            provider: TransactionTypeProvider::class
+            uriTemplate: '/transactions/types',
+            provider: TransactionTypeProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Transaction']]]
         ),
     ],
     normalizationContext: ['groups' => ['transaction_type:read']],

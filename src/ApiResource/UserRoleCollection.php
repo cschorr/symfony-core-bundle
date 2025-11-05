@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\UserRoleProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'UserRoles',
+    shortName: 'Permission',
     operations: [
         new Get(
             uriTemplate: '/permissions/roles',
-            provider: UserRoleProvider::class
+            provider: UserRoleProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Permission']]]
         ),
     ],
     normalizationContext: ['groups' => ['user_role:read']],

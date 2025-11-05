@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\PaymentStatusProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'PaymentStatuses',
+    shortName: 'Payment',
     operations: [
         new Get(
-            uriTemplate: '/payment-statuses',
-            provider: PaymentStatusProvider::class
+            uriTemplate: '/payments/statuses',
+            provider: PaymentStatusProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Payment']]]
         ),
     ],
     normalizationContext: ['groups' => ['payment_status:read']],

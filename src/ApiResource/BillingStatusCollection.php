@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\BillingStatusProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'BillingStatuses',
+    shortName: 'Billing',
     operations: [
         new Get(
-            uriTemplate: '/billing-statuses',
-            provider: BillingStatusProvider::class
+            uriTemplate: '/billing/statuses',
+            provider: BillingStatusProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Billing']]]
         ),
     ],
     normalizationContext: ['groups' => ['billing_status:read']],

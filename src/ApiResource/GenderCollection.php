@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\GenderProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'Genders',
+    shortName: 'Contact',
     operations: [
         new Get(
-            uriTemplate: '/genders',
-            provider: GenderProvider::class
+            uriTemplate: '/contacts/genders',
+            provider: GenderProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Contact']]]
         ),
     ],
     normalizationContext: ['groups' => ['gender:read']],
