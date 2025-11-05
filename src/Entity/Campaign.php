@@ -5,6 +5,13 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
@@ -17,7 +24,39 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CampaignRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    uriTemplate: '/transactions/{transactionId}/campaigns',
+    uriVariables: [
+        'transactionId' => new Link(
+            fromClass: Transaction::class,
+            toProperty: 'transaction'
+        ),
+    ],
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ],
+    paginationEnabled: true,
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiResource(
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationEnabled: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100,
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ]
+)]
 class Campaign extends AbstractEntity
 {
     use StringNameTrait;

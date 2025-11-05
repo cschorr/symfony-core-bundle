@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -34,6 +35,42 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\DiscriminatorMap([
     'contact' => Contact::class,
 ])]
+#[ApiResource(
+    uriTemplate: '/companies/{companyId}/employees',
+    uriVariables: [
+        'companyId' => new Link(
+            fromClass: Company::class,
+            toProperty: 'company'
+        ),
+    ],
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ],
+    paginationEnabled: true,
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiResource(
+    uriTemplate: '/departments/{departmentId}/contacts',
+    uriVariables: [
+        'departmentId' => new Link(
+            fromClass: Department::class,
+            toProperty: 'department'
+        ),
+    ],
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ],
+    paginationEnabled: true,
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
 #[ApiResource(
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
