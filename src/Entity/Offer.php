@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 namespace C3net\CoreBundle\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\OfferStatus;
@@ -21,12 +30,60 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OfferRepository::class)]
 #[ApiResource(
+    uriTemplate: '/transactions/{transactionId}/offers',
+    uriVariables: [
+        'transactionId' => new Link(
+            fromClass: Transaction::class,
+            toProperty: 'transaction'
+        ),
+    ],
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ],
+    mercure: true,
+    paginationEnabled: true,
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiResource(
     mercure: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
     paginationEnabled: true,
     paginationItemsPerPage: 30,
     paginationMaximumItemsPerPage: 100,
+    operations: [
+        new Get(),
+        new GetCollection(
+            parameters: [
+                'offerNumber' => new QueryParameter(
+                    filter: SearchFilter::class . ':offerNumber:partial'
+                ),
+                'status' => new QueryParameter(
+                    filter: SearchFilter::class . ':status'
+                ),
+                'company' => new QueryParameter(
+                    filter: SearchFilter::class . ':company'
+                ),
+                'project' => new QueryParameter(
+                    filter: SearchFilter::class . ':project'
+                ),
+                'issueDate' => new QueryParameter(
+                    filter: DateFilter::class . ':issueDate'
+                ),
+                'validUntil' => new QueryParameter(
+                    filter: DateFilter::class . ':validUntil'
+                ),
+            ]
+        ),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ]
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
@@ -34,13 +91,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         'offerNumber' => 'ASC',
         'createdAt' => 'DESC',
         'version' => 'DESC',
-    ],
-)]
-#[ApiFilter(
-    filterClass: SearchFilter::class,
-    properties: [
-        'transaction' => 'exact',
-        'status' => 'exact',
     ],
 )]
 class Offer extends AbstractEntity

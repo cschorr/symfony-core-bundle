@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\ProjectStatusProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'ProjectStatuses',
+    shortName: 'Project',
     operations: [
         new Get(
-            uriTemplate: '/project-statuses',
-            provider: ProjectStatusProvider::class
+            uriTemplate: '/projects/statuses',
+            provider: ProjectStatusProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Project']]]
         ),
     ],
     normalizationContext: ['groups' => ['project_status:read']],

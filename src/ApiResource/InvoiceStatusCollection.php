@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\InvoiceStatusProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'InvoiceStatuses',
+    shortName: 'Invoice',
     operations: [
         new Get(
-            uriTemplate: '/invoice-statuses',
-            provider: InvoiceStatusProvider::class
+            uriTemplate: '/invoices/statuses',
+            provider: InvoiceStatusProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Invoice']]]
         ),
     ],
     normalizationContext: ['groups' => ['invoice_status:read']],

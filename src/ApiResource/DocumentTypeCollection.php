@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\DocumentTypeProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'DocumentTypes',
+    shortName: 'Document',
     operations: [
         new Get(
-            uriTemplate: '/document-types',
-            provider: DocumentTypeProvider::class
+            uriTemplate: '/documents/types',
+            provider: DocumentTypeProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Document']]]
         ),
     ],
     normalizationContext: ['groups' => ['document_type:read']],

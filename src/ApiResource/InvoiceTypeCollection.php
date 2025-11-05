@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\InvoiceTypeProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'InvoiceTypes',
+    shortName: 'Invoice',
     operations: [
         new Get(
-            uriTemplate: '/invoice-types',
-            provider: InvoiceTypeProvider::class
+            uriTemplate: '/invoices/types',
+            provider: InvoiceTypeProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Invoice']]]
         ),
     ],
     normalizationContext: ['groups' => ['invoice_type:read']],

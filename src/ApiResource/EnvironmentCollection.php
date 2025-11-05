@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\EnvironmentProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'Environments',
+    shortName: 'System',
     operations: [
         new Get(
-            uriTemplate: '/environments',
-            provider: EnvironmentProvider::class
+            uriTemplate: '/system/environments',
+            provider: EnvironmentProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['System']]]
         ),
     ],
     normalizationContext: ['groups' => ['environment:read']],

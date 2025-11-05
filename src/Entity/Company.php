@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace C3net\CoreBundle\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
@@ -25,24 +30,33 @@ use Doctrine\ORM\Mapping as ORM;
     paginationClientItemsPerPage: true,
     paginationEnabled: true,
     paginationItemsPerPage: 30,
-    paginationMaximumItemsPerPage: 100
-)]
-#[ApiFilter(
-    filterClass: SearchFilter::class,
-    properties: [
-        'companyGroup' => 'partial',
-        'employees' => 'partial',
-        'departments' => 'exact',
-        'name' => 'partial',
-        'city' => 'partial',
+    paginationMaximumItemsPerPage: 100,
+    operations: [
+        new Get(),
+        new GetCollection(
+            parameters: [
+                'companyGroup' => new QueryParameter(
+                    filter: SearchFilter::class . ':companyGroup:partial'
+                ),
+                'employees' => new QueryParameter(
+                    filter: SearchFilter::class . ':employees:partial'
+                ),
+                'departments' => new QueryParameter(
+                    filter: SearchFilter::class . ':departments'
+                ),
+                'name' => new QueryParameter(
+                    filter: SearchFilter::class . ':name:partial'
+                ),
+                'city' => new QueryParameter(
+                    filter: SearchFilter::class . ':city:partial'
+                ),
+            ]
+        ),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
     ]
-)]
-#[ApiFilter(
-    filterClass: OrderFilter::class,
-    properties: [
-        'title' => 'ASC',
-        'year' => 'DESC',
-    ],
 )]
 class Company extends AbstractEntity
 {

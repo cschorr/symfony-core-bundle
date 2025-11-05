@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\OfferStatusProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'OfferStatuses',
+    shortName: 'Offer',
     operations: [
         new Get(
-            uriTemplate: '/offer-statuses',
-            provider: OfferStatusProvider::class
+            uriTemplate: '/offers/statuses',
+            provider: OfferStatusProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Offer']]]
         ),
     ],
     normalizationContext: ['groups' => ['offer_status:read']],

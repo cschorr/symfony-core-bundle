@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\TransactionStatusProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'TransactionStatuses',
+    shortName: 'Transaction',
     operations: [
         new Get(
-            uriTemplate: '/transaction-statuses',
-            provider: TransactionStatusProvider::class
+            uriTemplate: '/transactions/statuses',
+            provider: TransactionStatusProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Transaction']]]
         ),
     ],
     normalizationContext: ['groups' => ['transaction_status:read']],

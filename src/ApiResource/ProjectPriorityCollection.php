@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\ProjectPriorityProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'ProjectPriorities',
+    shortName: 'Project',
     operations: [
         new Get(
-            uriTemplate: '/project-priorities',
-            provider: ProjectPriorityProvider::class
+            uriTemplate: '/projects/priorities',
+            provider: ProjectPriorityProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Project']]]
         ),
     ],
     normalizationContext: ['groups' => ['project_priority:read']],

@@ -10,11 +10,12 @@ use C3net\CoreBundle\State\PermissionProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    shortName: 'Permissions',
+    shortName: 'Permission',
     operations: [
         new Get(
             uriTemplate: '/permissions/types',
-            provider: PermissionProvider::class
+            provider: PermissionProvider::class,
+            extraProperties: ['openapi_context' => ['tags' => ['Permission']]]
         ),
     ],
     normalizationContext: ['groups' => ['permission:read']],
