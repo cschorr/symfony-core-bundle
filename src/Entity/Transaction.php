@@ -9,6 +9,8 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
@@ -31,6 +33,23 @@ use Symfony\Component\Validator\Constraints as Assert;
     'transaction' => Transaction::class,
     'app_transaction' => \App\Entity\Transaction::class,
 ])]
+#[ApiResource(
+    uriTemplate: '/companies/{companyId}/transactions',
+    uriVariables: [
+        'companyId' => new Link(
+            fromClass: Company::class,
+            toProperty: 'customer'
+        ),
+    ],
+    operations: [
+        new GetCollection(),
+    ],
+    paginationEnabled: true,
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
 #[ApiResource(
     mercure: false,
     paginationClientEnabled: true,

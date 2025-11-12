@@ -45,7 +45,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
     ],
     operations: [
         new GetCollection(),
-        new Get(),
     ],
     paginationEnabled: true,
     paginationClientEnabled: true,
@@ -63,7 +62,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
     ],
     operations: [
         new GetCollection(),
-        new Get(),
     ],
     paginationEnabled: true,
     paginationClientEnabled: true,

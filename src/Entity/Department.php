@@ -34,7 +34,6 @@ use Doctrine\ORM\Mapping as ORM;
     ],
     operations: [
         new GetCollection(),
-        new Get(),
     ],
     paginationEnabled: true,
     paginationClientEnabled: true,

@@ -35,6 +35,24 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'project_type', type: 'string')]
 #[ApiResource(
+    uriTemplate: '/companies/{companyId}/projects',
+    uriVariables: [
+        'companyId' => new Link(
+            fromClass: Company::class,
+            toProperty: 'customer'
+        ),
+    ],
+    operations: [
+        new GetCollection(),
+    ],
+    mercure: true,
+    paginationEnabled: true,
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiResource(
     uriTemplate: '/transactions/{transactionId}/projects',
     uriVariables: [
         'transactionId' => new Link(
@@ -44,7 +62,6 @@ use Doctrine\ORM\Mapping as ORM;
     ],
     operations: [
         new GetCollection(),
-        new Get(),
     ],
     mercure: true,
     paginationEnabled: true,

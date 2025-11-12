@@ -39,7 +39,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     operations: [
         new GetCollection(),
-        new Get(),
     ],
     mercure: true,
     paginationEnabled: true,
