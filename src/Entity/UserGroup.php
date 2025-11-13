@@ -101,7 +101,7 @@ class UserGroup extends AbstractEntity
         $stored = $this->roles ?? [];
 
         // No need for array_values since $stored is already a list
-        return array_map(static fn (string $r) => UserRole::from($r), $stored);
+        return array_map(UserRole::from(...), $stored);
     }
 
     /**

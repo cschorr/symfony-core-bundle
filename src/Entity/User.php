@@ -158,7 +158,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         $stored = $this->roles ?? [];
 
-        return array_map(static fn (string $r) => UserRole::from($r), $stored);
+        return array_map(UserRole::from(...), $stored);
     }
 
     /**
