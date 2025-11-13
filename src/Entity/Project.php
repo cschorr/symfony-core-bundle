@@ -45,6 +45,7 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new GetCollection(),
     ],
+    extraProperties: ['openapi_context' => ['tags' => ['Company']]],
     mercure: true,
     paginationEnabled: true,
     paginationClientEnabled: true,
@@ -63,6 +64,7 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new GetCollection(),
     ],
+    extraProperties: ['openapi_context' => ['tags' => ['Transaction']]],
     mercure: true,
     paginationEnabled: true,
     paginationClientEnabled: true,

@@ -42,6 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(),
     ],
+    extraProperties: ['openapi_context' => ['tags' => ['Transaction']]],
     mercure: true,
     paginationEnabled: true,
     paginationClientEnabled: true,

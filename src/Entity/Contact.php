@@ -46,6 +46,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
     operations: [
         new GetCollection(),
     ],
+    extraProperties: ['openapi_context' => ['tags' => ['Company']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
@@ -63,6 +64,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
     operations: [
         new GetCollection(),
     ],
+    extraProperties: ['openapi_context' => ['tags' => ['Department']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,

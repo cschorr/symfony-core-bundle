@@ -37,6 +37,7 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new GetCollection(),
     ],
+    extraProperties: ['openapi_context' => ['tags' => ['Company']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
