@@ -21,6 +21,7 @@ use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
 use C3net\CoreBundle\Repository\DepartmentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
@@ -83,6 +84,9 @@ class Department extends AbstractEntity
     use StringNameTrait;
     use StringShortcodeTrait;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
     #[ORM\ManyToOne(inversedBy: 'departments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
@@ -103,6 +107,18 @@ class Department extends AbstractEntity
     public function __toString(): string
     {
         return $this->name ?? 'Unnamed Department';
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
     }
 
     public function getCompany(): ?Company
