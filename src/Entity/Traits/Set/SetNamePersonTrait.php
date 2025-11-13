@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\Entity\Traits\Set;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 trait SetNamePersonTrait
 {
@@ -45,6 +46,7 @@ trait SetNamePersonTrait
         return $this->lastName . ', ' . $this->firstName;
     }
 
+    #[Groups(['user:read', 'contact:read'])]
     public function getLastName(): ?string
     {
         return $this->lastName;
@@ -57,6 +59,7 @@ trait SetNamePersonTrait
         return $this;
     }
 
+    #[Groups(['user:read', 'contact:read'])]
     public function getFirstName(): ?string
     {
         return $this->firstName;

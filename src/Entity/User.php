@@ -391,18 +391,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     #[Groups(['user:read'])]
-    public function getFirstName(): ?string
-    {
-        return $this->getNameFirst();
-    }
-
-    #[Groups(['user:read'])]
-    public function getLastName(): ?string
-    {
-        return $this->getNameLast();
-    }
-
-    #[Groups(['user:read'])]
     public function getUsername(): string
     {
         return $this->getUserIdentifier();
