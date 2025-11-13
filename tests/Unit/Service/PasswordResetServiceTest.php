@@ -226,8 +226,8 @@ class PasswordResetServiceTest extends TestCase
     {
         $user = new User();
         $user->setEmail($email);
-        $user->setNameFirst('Test');
-        $user->setNameLast('User');
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setPassword('old_hashed_password');
 
         return $user;

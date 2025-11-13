@@ -93,7 +93,7 @@ class UserApiTest extends ApiTestCase
         // Verify user was created in database
         $createdUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => 'newuser@test.com']);
         $this->assertNotNull($createdUser);
-        $this->assertSame('New', $createdUser->getNameFirst());
+        $this->assertSame('New', $createdUser->getFirstName());
     }
 
     public function testUpdateUser(): void
@@ -121,8 +121,8 @@ class UserApiTest extends ApiTestCase
 
         // Verify changes in database
         $this->entityManager->refresh($testUser);
-        $this->assertSame('Updated', $testUser->getNameFirst());
-        $this->assertSame('Name', $testUser->getNameLast());
+        $this->assertSame('Updated', $testUser->getFirstName());
+        $this->assertSame('Name', $testUser->getLastName());
     }
 
     public function testDeleteUser(): void
@@ -256,8 +256,8 @@ class UserApiTest extends ApiTestCase
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst($firstName)
-            ->setNameLast($lastName)
+            ->setFirstName($firstName)
+            ->setLastName($lastName)
             ->setPassword($this->passwordHasher->hashPassword($user, 'password123'))
             ->setRoles($roles)
             ->setActive(true);

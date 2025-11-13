@@ -199,8 +199,8 @@ class UserInfoControllerTest extends WebTestCase
     public function testUserInfoResponseFormat(): void
     {
         $user = $this->createTestUser('format@test.com');
-        $user->setNameFirst('John');
-        $user->setNameLast('Doe');
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
         $this->entityManager->flush();
 
         $token = $this->generateValidToken($user);
@@ -240,8 +240,8 @@ class UserInfoControllerTest extends WebTestCase
     public function testUserInfoWithNullNames(): void
     {
         $user = $this->createTestUser('nullnames@test.com');
-        $user->setNameFirst(null);
-        $user->setNameLast(null);
+        $user->setFirstName(null);
+        $user->setLastName(null);
         $this->entityManager->flush();
 
         $token = $this->generateValidToken($user);
@@ -341,8 +341,8 @@ class UserInfoControllerTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst('Test')
-            ->setNameLast('User')
+            ->setFirstName('Test')
+            ->setLastName('User')
             ->setPassword($this->passwordHasher->hashPassword($user, 'password123'))
             ->setRoles($roles)
             ->setActive(true);

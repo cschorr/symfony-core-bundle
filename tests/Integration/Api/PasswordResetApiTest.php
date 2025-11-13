@@ -260,8 +260,8 @@ class PasswordResetApiTest extends ApiTestCase
     {
         $user = new User();
         $user->setEmail($email);
-        $user->setNameFirst('Test');
-        $user->setNameLast('User');
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setActive(true);
         $user->setRoles([UserRole::ROLE_USER->value]);
 

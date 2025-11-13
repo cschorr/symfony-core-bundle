@@ -313,8 +313,8 @@ class AuditLogApiTest extends ApiTestCase
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst($firstName)
-            ->setNameLast($lastName)
+            ->setFirstName($firstName)
+            ->setLastName($lastName)
             ->setPassword($this->passwordHasher->hashPassword($user, 'password123'))
             ->setRoles($roles)
             ->setActive(true);

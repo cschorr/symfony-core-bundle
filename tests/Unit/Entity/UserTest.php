@@ -324,8 +324,8 @@ class UserTest extends TestCase
         $this->assertTrue($this->user->getIsLocked());
 
         // Test name methods
-        $this->user->setNameFirst('John');
-        $this->user->setNameLast('Doe');
+        $this->user->setFirstName('John');
+        $this->user->setLastName('Doe');
 
         $this->assertSame('John', $this->user->getFirstName());
         $this->assertSame('Doe', $this->user->getLastName());
@@ -356,8 +356,8 @@ class UserTest extends TestCase
         // Set basic info
         $user->setEmail('workflow@example.com')
              ->setPassword('hashedPassword')
-             ->setNameFirst('John')
-             ->setNameLast('Doe')
+             ->setFirstName('John')
+             ->setLastName('Doe')
              ->setLocked(false);
 
         // Set roles

@@ -126,8 +126,8 @@ class UserRepositoryIntegrationTest extends KernelTestCase
     public function testUserWithRelationships(): void
     {
         $user = $this->createTestUser('relationships@test.com');
-        $user->setNameFirst('John');
-        $user->setNameLast('Doe');
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
 
         $this->entityManager->flush();
 
@@ -180,13 +180,13 @@ class UserRepositoryIntegrationTest extends KernelTestCase
     {
         // Create users with different patterns
         $user1 = $this->createTestUser('complex1@test.com');
-        $user1->setNameFirst('Alice')->setNameLast('Johnson')->setActive(true);
+        $user1->setFirstName('Alice')->setLastName('Johnson')->setActive(true);
 
         $user2 = $this->createTestUser('complex2@test.com');
-        $user2->setNameFirst('Bob')->setNameLast('Smith')->setActive(false);
+        $user2->setFirstName('Bob')->setLastName('Smith')->setActive(false);
 
         $user3 = $this->createTestUser('complex3@test.com');
-        $user3->setNameFirst('Alice')->setNameLast('Brown')->setActive(true);
+        $user3->setFirstName('Alice')->setLastName('Brown')->setActive(true);
 
         $this->entityManager->flush();
 
@@ -201,8 +201,8 @@ class UserRepositoryIntegrationTest extends KernelTestCase
         $aliceUsers = $qb->getQuery()->getResult();
 
         $this->assertCount(2, $aliceUsers);
-        $this->assertSame('Brown', $aliceUsers[0]->getNameLast());
-        $this->assertSame('Johnson', $aliceUsers[1]->getNameLast());
+        $this->assertSame('Brown', $aliceUsers[0]->getLastName());
+        $this->assertSame('Johnson', $aliceUsers[1]->getLastName());
     }
 
     public function testTransactionRollback(): void
@@ -235,7 +235,7 @@ class UserRepositoryIntegrationTest extends KernelTestCase
     public function testConcurrentAccess(): void
     {
         $user = $this->createTestUser('concurrent@test.com');
-        $user->setNameFirst('Original');
+        $user->setFirstName('Original');
         $this->entityManager->flush();
 
         // Simulate concurrent access by creating another entity manager
@@ -248,26 +248,26 @@ class UserRepositoryIntegrationTest extends KernelTestCase
         $user2 = $repo2->findOneBy(['email' => 'concurrent@test.com']);
 
         // Modify in first EM
-        $user1->setNameFirst('Modified1');
+        $user1->setFirstName('Modified1');
         $this->entityManager->flush();
 
         // Modify in second EM
-        $user2->setNameFirst('Modified2');
+        $user2->setFirstName('Modified2');
         $em2->flush();
 
         // Refresh first user to see the latest state
         $this->entityManager->refresh($user1);
 
         // The last write should win
-        $this->assertSame('Modified2', $user1->getNameFirst());
+        $this->assertSame('Modified2', $user1->getFirstName());
     }
 
     private function createTestUser(string $email, string $password = 'password123'): User
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst('Test')
-            ->setNameLast('User')
+            ->setFirstName('Test')
+            ->setLastName('User')
             ->setPassword($this->passwordHasher->hashPassword($user, $password))
             ->setRoles(['ROLE_USER'])
             ->setActive(true);

@@ -85,7 +85,7 @@ class UserWorkflowTest extends ApiTestCase
 
         // Verify update
         $this->entityManager->refresh($createdUser);
-        $this->assertSame('John Updated', $createdUser->getNameFirst());
+        $this->assertSame('John Updated', $createdUser->getFirstName());
         $this->assertSame('Updated during lifecycle test', $createdUser->getNotes());
         $this->assertContains(UserRole::ROLE_MANAGER->value, $createdUser->getRoles());
 
@@ -480,8 +480,8 @@ class UserWorkflowTest extends ApiTestCase
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst('Test')
-            ->setNameLast('User')
+            ->setFirstName('Test')
+            ->setLastName('User')
             ->setPassword($this->passwordHasher->hashPassword($user, 'password123'))
             ->setRoles($roles)
             ->setActive(true);
