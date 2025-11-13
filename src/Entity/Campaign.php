@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
@@ -25,6 +26,25 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CampaignRepository::class)]
 #[ApiResource(
+    uriTemplate: '/companies/{companyId}/campaigns',
+    uriVariables: [
+        'companyId' => new Link(
+            fromClass: Company::class,
+            toProperty: 'customer'
+        ),
+    ],
+    operations: [
+        new GetCollection(
+            openapi: new Operation(tags: ['Company'])
+        ),
+    ],
+    paginationEnabled: true,
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiResource(
     uriTemplate: '/transactions/{transactionId}/campaigns',
     uriVariables: [
         'transactionId' => new Link(
@@ -33,8 +53,9 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     ],
     operations: [
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Transaction'])
+        ),
     ],
     paginationEnabled: true,
     paginationClientEnabled: true,
@@ -139,5 +160,16 @@ class Campaign extends AbstractEntity
         $this->transaction = $transaction;
 
         return $this;
+    }
+
+    /**
+     * Get the customer company from the associated transaction.
+     * This is a convenience method that accesses the customer through the transaction relationship.
+     *
+     * @return Company|null The customer company, or null if no transaction is associated
+     */
+    public function getCustomer(): ?Company
+    {
+        return $this->transaction?->getCustomer();
     }
 }

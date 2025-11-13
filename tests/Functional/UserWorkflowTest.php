@@ -45,8 +45,8 @@ class UserWorkflowTest extends ApiTestCase
             ],
             'json' => [
                 'email' => 'lifecycle@workflow.test',
-                'nameFirst' => 'John',
-                'nameLast' => 'Lifecycle',
+                'firstName' => 'John',
+                'lastName' => 'Lifecycle',
                 'password' => 'secure_password_123',
                 'active' => true,
                 'roles' => [UserRole::ROLE_EDITOR->value],
@@ -75,7 +75,7 @@ class UserWorkflowTest extends ApiTestCase
                 'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
-                'nameFirst' => 'John Updated',
+                'firstName' => 'John Updated',
                 'notes' => 'Updated during lifecycle test',
                 'roles' => [UserRole::ROLE_EDITOR->value, UserRole::ROLE_MANAGER->value],
             ],
@@ -85,7 +85,7 @@ class UserWorkflowTest extends ApiTestCase
 
         // Verify update
         $this->entityManager->refresh($createdUser);
-        $this->assertSame('John Updated', $createdUser->getNameFirst());
+        $this->assertSame('John Updated', $createdUser->getFirstName());
         $this->assertSame('Updated during lifecycle test', $createdUser->getNotes());
         $this->assertContains(UserRole::ROLE_MANAGER->value, $createdUser->getRoles());
 
@@ -166,8 +166,8 @@ class UserWorkflowTest extends ApiTestCase
             ],
             'json' => [
                 'email' => 'groupmember@workflow.test',
-                'nameFirst' => 'Group',
-                'nameLast' => 'Member',
+                'firstName' => 'Group',
+                'lastName' => 'Member',
                 'password' => 'password123',
                 'active' => true,
                 'userGroups' => ['/api/user_groups/' . $editorGroup->getId()],
@@ -238,8 +238,8 @@ class UserWorkflowTest extends ApiTestCase
             ],
             'json' => [
                 'email' => 'escalation@workflow.test',
-                'nameFirst' => 'Permission',
-                'nameLast' => 'Test',
+                'firstName' => 'Permission',
+                'lastName' => 'Test',
                 'password' => 'password123',
                 'active' => true,
                 'roles' => [UserRole::ROLE_USER->value],
@@ -323,8 +323,8 @@ class UserWorkflowTest extends ApiTestCase
             ],
             'json' => [
                 'email' => 'nowauthorized@workflow.test',
-                'nameFirst' => 'Now',
-                'nameLast' => 'Authorized',
+                'firstName' => 'Now',
+                'lastName' => 'Authorized',
                 'password' => 'password123',
                 'active' => true,
             ],
@@ -354,8 +354,8 @@ class UserWorkflowTest extends ApiTestCase
                 ],
                 'json' => [
                     'email' => $email,
-                    'nameFirst' => "Bulk{$i}",
-                    'nameLast' => 'User',
+                    'firstName' => "Bulk{$i}",
+                    'lastName' => 'User',
                     'password' => 'password123',
                     'active' => true,
                     'roles' => [UserRole::ROLE_USER->value],
@@ -480,8 +480,8 @@ class UserWorkflowTest extends ApiTestCase
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst('Test')
-            ->setNameLast('User')
+            ->setFirstName('Test')
+            ->setLastName('User')
             ->setPassword($this->passwordHasher->hashPassword($user, 'password123'))
             ->setRoles($roles)
             ->setActive(true);

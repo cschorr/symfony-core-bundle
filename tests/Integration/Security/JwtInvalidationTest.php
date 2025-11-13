@@ -176,8 +176,8 @@ class JwtInvalidationTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst('Test')
-            ->setNameLast('User')
+            ->setFirstName('Test')
+            ->setLastName('User')
             ->setPassword($this->passwordHasher->hashPassword($user, $password))
             ->setActive(true)
             ->setLocked(false);

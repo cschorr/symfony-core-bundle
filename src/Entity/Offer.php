@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Operation;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Enum\OfferStatus;
@@ -38,8 +39,9 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ],
     operations: [
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Transaction'])
+        ),
     ],
     mercure: true,
     paginationEnabled: true,

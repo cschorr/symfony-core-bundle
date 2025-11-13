@@ -158,7 +158,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         $stored = $this->roles ?? [];
 
-        return array_map(static fn (string $r) => UserRole::from($r), $stored);
+        return array_map(UserRole::from(...), $stored);
     }
 
     /**
@@ -388,18 +388,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function getIsLocked(): bool
     {
         return $this->isLocked();
-    }
-
-    #[Groups(['user:read'])]
-    public function getFirstName(): ?string
-    {
-        return $this->getNameFirst();
-    }
-
-    #[Groups(['user:read'])]
-    public function getLastName(): ?string
-    {
-        return $this->getNameLast();
     }
 
     #[Groups(['user:read'])]

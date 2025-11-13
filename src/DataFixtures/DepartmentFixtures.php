@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace C3net\CoreBundle\DataFixtures;
 
 use C3net\CoreBundle\Entity\Company;
+use C3net\CoreBundle\Entity\CompanyGroup;
 use C3net\CoreBundle\Entity\Department;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,52 +16,75 @@ class DepartmentFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $departmentsData = [
-            // Cyberdyne Systems Departments
+            // Cyberdyne Systems Departments (Skynet Group)
             [
                 'name' => 'Research & Development',
                 'shortcode' => 'RND',
-                'notes' => 'Advanced AI and robotics research',
+                'description' => 'Advanced AI and robotics research division focused on cutting-edge technology development',
+                'email' => 'rnd@cyberdyne.example',
+                'phone' => '+1-555-0101',
                 'company' => 'Cyberdyne Systems',
+                'companyGroup' => 'Skynet Group',
             ],
             [
                 'name' => 'Marketing',
                 'shortcode' => 'MKT',
-                'notes' => 'Product marketing and brand management',
+                'description' => 'Product marketing and brand management team responsible for market strategy',
+                'email' => 'marketing@cyberdyne.example',
+                'phone' => '+1-555-0102',
                 'company' => 'Cyberdyne Systems',
+                'companyGroup' => 'Skynet Group',
             ],
             [
                 'name' => 'Engineering',
                 'shortcode' => 'ENG',
-                'notes' => 'Systems engineering and product development',
+                'description' => 'Systems engineering and product development department',
+                'email' => 'engineering@cyberdyne.example',
+                'phone' => '+1-555-0103',
                 'company' => 'Cyberdyne Systems',
+                'companyGroup' => 'Skynet Group',
             ],
 
-            // Stark Industries Departments
+            // Stark Industries Departments (Marvel Group)
             [
                 'name' => 'Advanced Technology',
                 'shortcode' => 'ADVTECH',
-                'notes' => 'Next-generation technology development',
+                'description' => 'Next-generation technology development and innovation lab',
+                'email' => 'advtech@stark.example',
+                'phone' => '+1-555-0201',
+                'cell' => '+1-555-0202',
                 'company' => 'Stark Industries',
+                'companyGroup' => 'Marvel Group',
             ],
             [
                 'name' => 'Public Relations',
                 'shortcode' => 'PR',
-                'notes' => 'Media relations and corporate communications',
+                'description' => 'Media relations and corporate communications department',
+                'email' => 'pr@stark.example',
+                'phone' => '+1-555-0203',
+                'url' => 'https://stark.example/pr',
                 'company' => 'Stark Industries',
+                'companyGroup' => 'Marvel Group',
             ],
 
-            // Wayne Enterprises Departments
+            // Wayne Enterprises Departments (DC Group)
             [
                 'name' => 'Applied Sciences',
                 'shortcode' => 'SCI',
-                'notes' => 'Scientific research and development',
+                'description' => 'Scientific research and development division specializing in experimental technology',
+                'email' => 'sciences@wayne.example',
+                'phone' => '+1-555-0301',
                 'company' => 'Wayne Enterprises',
+                'companyGroup' => 'DC Group',
             ],
             [
                 'name' => 'Corporate',
                 'shortcode' => 'CORP',
-                'notes' => 'Corporate management and strategy',
+                'description' => 'Corporate management and strategic planning department',
+                'email' => 'corporate@wayne.example',
+                'phone' => '+1-555-0302',
                 'company' => 'Wayne Enterprises',
+                'companyGroup' => 'DC Group',
             ],
         ];
 
@@ -72,11 +96,37 @@ class DepartmentFixtures extends Fixture implements DependentFixtureInterface
                 continue;
             }
 
+            // Find company group if specified
+            $companyGroup = null;
+            if (isset($data['companyGroup'])) {
+                $companyGroup = $manager->getRepository(CompanyGroup::class)
+                    ->findOneBy(['name' => $data['companyGroup']]);
+            }
+
             $department = new Department();
             $department->setName($data['name']);
             $department->setShortcode($data['shortcode']);
-            $department->setNotes($data['notes']);
+            $department->setDescription($data['description']);
             $department->setCompany($company);
+
+            // Set communication fields
+            if (isset($data['email'])) {
+                $department->setEmail($data['email']);
+            }
+            if (isset($data['phone'])) {
+                $department->setPhone($data['phone']);
+            }
+            if (isset($data['cell'])) {
+                $department->setCell($data['cell']);
+            }
+            if (isset($data['url'])) {
+                $department->setUrl($data['url']);
+            }
+
+            // Set company group if found
+            if (null !== $companyGroup) {
+                $department->setCompanyGroup($companyGroup);
+            }
 
             $manager->persist($department);
         }
@@ -88,6 +138,7 @@ class DepartmentFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             CompanyFixtures::class,
+            CompanyGroupFixtures::class,
         ];
     }
 }

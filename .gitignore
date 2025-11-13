@@ -19,3 +19,6 @@
 /.php-cs-fixer.php
 ###< friendsofphp/php-cs-fixer ###
 .phpcs-cache
+
+# Bundles should never commit composer.lock (only applications should)
+composer.lock

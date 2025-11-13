@@ -235,14 +235,14 @@ class PasswordChangeWorkflowTest extends WebTestCase
         $user = $this->createTestUser('attributes-test@test.com', 'Password123!');
 
         // Set various attributes
-        $user->setNameFirst('John');
-        $user->setNameLast('Doe');
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
         $user->setActive(true);
         $user->setLocked(false);
         $this->entityManager->flush();
 
-        $originalFirstName = $user->getNameFirst();
-        $originalLastName = $user->getNameLast();
+        $originalFirstName = $user->getFirstName();
+        $originalLastName = $user->getLastName();
         $originalActive = $user->isActive();
         $originalLocked = $user->isLocked();
 
@@ -251,8 +251,8 @@ class PasswordChangeWorkflowTest extends WebTestCase
         $this->entityManager->flush();
 
         // Verify other attributes unchanged
-        $this->assertSame($originalFirstName, $user->getNameFirst());
-        $this->assertSame($originalLastName, $user->getNameLast());
+        $this->assertSame($originalFirstName, $user->getFirstName());
+        $this->assertSame($originalLastName, $user->getLastName());
         $this->assertSame($originalActive, $user->isActive());
         $this->assertSame($originalLocked, $user->isLocked());
     }
@@ -297,8 +297,8 @@ class PasswordChangeWorkflowTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst('Test')
-            ->setNameLast('User')
+            ->setFirstName('Test')
+            ->setLastName('User')
             ->setPassword($this->passwordHasher->hashPassword($user, $password))
             ->setActive(true)
             ->setLocked(false);

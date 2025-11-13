@@ -164,8 +164,8 @@ class UserCheckerTest extends TestCase
         $user->setEmail('test@example.com');
         $user->setActive(true);
         $user->setLocked(false);
-        $user->setNameFirst('John');
-        $user->setNameLast('Doe');
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
 
         $this->userChecker->checkPreAuth($user);
 
@@ -173,7 +173,7 @@ class UserCheckerTest extends TestCase
         $this->assertSame('test@example.com', $user->getEmail());
         $this->assertTrue($user->isActive());
         $this->assertFalse($user->isLocked());
-        $this->assertSame('John', $user->getNameFirst());
-        $this->assertSame('Doe', $user->getNameLast());
+        $this->assertSame('John', $user->getFirstName());
+        $this->assertSame('Doe', $user->getLastName());
     }
 }

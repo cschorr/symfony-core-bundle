@@ -167,8 +167,8 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $adminUser = $this->entityManager->getRepository(User::class)
             ->findOneBy(['email' => 'admin@example.com']);
         $this->assertNotNull($adminUser);
-        $this->assertSame('System', $adminUser->getNameFirst());
-        $this->assertSame('Admin', $adminUser->getNameLast());
+        $this->assertSame('System', $adminUser->getFirstName());
+        $this->assertSame('Admin', $adminUser->getLastName());
         $this->assertTrue($adminUser->isActive());
         $this->assertNotNull($adminUser->getCategory());
 
@@ -201,8 +201,8 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $johnDoe = $this->entityManager->getRepository(Contact::class)
             ->findOneBy(['email' => 'john.doe@example.com']);
         $this->assertNotNull($johnDoe);
-        $this->assertSame('John', $johnDoe->getNameFirst());
-        $this->assertSame('Doe', $johnDoe->getNameLast());
+        $this->assertSame('John', $johnDoe->getFirstName());
+        $this->assertSame('Doe', $johnDoe->getLastName());
         $this->assertNotNull($johnDoe->getCompany());
         $this->assertNotEmpty($johnDoe->getPhone());
         $this->assertNotEmpty($johnDoe->getCell());
@@ -332,8 +332,8 @@ class LoadDemoDataCommandTest extends KernelTestCase
         $users = $this->entityManager->getRepository(User::class)->findAll();
         foreach ($users as $user) {
             $this->assertMatchesRegularExpression('/^[^\s@]+@[^\s@]+\.[^\s@]+$/', $user->getEmail());
-            $this->assertNotEmpty($user->getNameFirst());
-            $this->assertNotEmpty($user->getNameLast());
+            $this->assertNotEmpty($user->getFirstName());
+            $this->assertNotEmpty($user->getLastName());
         }
 
         // Test that all companies have valid data

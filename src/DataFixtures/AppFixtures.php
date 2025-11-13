@@ -225,8 +225,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Administrator user with full access',
                 'category' => 'main2',
-                'nameLast' => 'Admin',
-                'nameFirst' => 'System',
+                'lastName' => 'Admin',
+                'firstName' => 'System',
                 'userGroups' => ['Admin'],
                 'company' => null, // Admin not assigned to specific company
             ],
@@ -235,8 +235,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Web developer working on e-commerce projects',
                 'category' => 'sub1',
-                'nameLast' => 'Wilson',
-                'nameFirst' => 'Sarah',
+                'lastName' => 'Wilson',
+                'firstName' => 'Sarah',
                 'userGroups' => ['Editor'],
                 'company' => 'company_0', // Cyberdyne Systems
             ],
@@ -245,8 +245,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Senior developer specializing in mobile apps',
                 'category' => 'sub2',
-                'nameLast' => 'Johnson',
-                'nameFirst' => 'Michael',
+                'lastName' => 'Johnson',
+                'firstName' => 'Michael',
                 'userGroups' => ['Teamlead'],
                 'roles' => ['ROLE_QUALITY'],
                 'company' => 'company_1', // Stark Industries
@@ -256,8 +256,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Marketing specialist for digital campaigns',
                 'category' => 'sub6',
-                'nameLast' => 'Davis',
-                'nameFirst' => 'Emma',
+                'lastName' => 'Davis',
+                'firstName' => 'Emma',
                 'userGroups' => ['Manager'],
                 'company' => 'company_5', // Umbrella Corporation
             ],
@@ -266,8 +266,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Business consultant for process optimization',
                 'category' => 'main4',
-                'nameLast' => 'Thompson',
-                'nameFirst' => 'Robert',
+                'lastName' => 'Thompson',
+                'firstName' => 'Robert',
                 'userGroups' => ['External Users'],
                 'company' => 'company_2', // Wayne Enterprises
             ],
@@ -276,8 +276,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Full-stack developer with React and PHP expertise',
                 'category' => 'sub1',
-                'nameLast' => 'Anderson',
-                'nameFirst' => 'Alex',
+                'lastName' => 'Anderson',
+                'firstName' => 'Alex',
                 'userGroups' => ['Editor'],
                 'company' => 'company_3', // Oscorp
             ],
@@ -287,8 +287,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Frontend specialist focusing on React and Vue.js',
                 'category' => 'sub1',
-                'nameLast' => 'Brown',
-                'nameFirst' => 'Jessica',
+                'lastName' => 'Brown',
+                'firstName' => 'Jessica',
                 'userGroups' => ['Editor'],
                 'company' => 'company_7', // Parker Industries
             ],
@@ -297,8 +297,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Mobile app developer with iOS and Android experience',
                 'category' => 'sub2',
-                'nameLast' => 'Garcia',
-                'nameFirst' => 'Carlos',
+                'lastName' => 'Garcia',
+                'firstName' => 'Carlos',
                 'userGroups' => ['Teamlead'],
                 'company' => 'company_8', // Pym Technologies
             ],
@@ -307,8 +307,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Business process optimization specialist',
                 'category' => 'main4',
-                'nameLast' => 'Miller',
-                'nameFirst' => 'Amanda',
+                'lastName' => 'Miller',
+                'firstName' => 'Amanda',
                 'userGroups' => ['Manager'],
                 'company' => 'company_10', // Queen Industries
             ],
@@ -317,8 +317,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 'active' => true,
                 'notes' => 'Digital marketing strategist and content creator',
                 'category' => 'sub6',
-                'nameLast' => 'Williams',
-                'nameFirst' => 'David',
+                'lastName' => 'Williams',
+                'firstName' => 'David',
                 'userGroups' => ['Manager'],
                 'company' => 'company_15', // Tricell Pharmaceuticals
             ],
@@ -343,8 +343,8 @@ class AppFixtures extends AbstractCategorizableFixture
                 ->setPassword($this->hasher->hashPassword($user, self::DEFAULT_PASSWORD))
                 ->setActive($userData['active'])
                 ->setNotes($userData['notes'])
-                ->setNameLast($userData['nameLast'])
-                ->setNameFirst($userData['nameFirst'])
+                ->setLastName($userData['lastName'])
+                ->setFirstName($userData['firstName'])
                 ->setRoles($userData['roles'] ?? [])
             ;
 
@@ -1355,8 +1355,8 @@ class AppFixtures extends AbstractCategorizableFixture
             $company = $this->companies[$contactData['company']] ?? null;
 
             $contact = (new Contact())
-                ->setNameFirst($contactData['firstName'])
-                ->setNameLast($contactData['lastName'])
+                ->setFirstName($contactData['firstName'])
+                ->setLastName($contactData['lastName'])
                 ->setEmail($contactData['email'])
                 ->setPhone($contactData['phone'])
                 ->setCell($contactData['cell'])

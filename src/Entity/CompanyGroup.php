@@ -41,10 +41,17 @@ class CompanyGroup extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'companyGroup')]
     private Collection $companies;
 
+    /**
+     * @var Collection<int, Department>
+     */
+    #[ORM\OneToMany(targetEntity: Department::class, mappedBy: 'companyGroup')]
+    private Collection $departments;
+
     public function __construct()
     {
         parent::__construct();
         $this->companies = new ArrayCollection();
+        $this->departments = new ArrayCollection();
     }
 
     /**
@@ -71,6 +78,36 @@ class CompanyGroup extends AbstractEntity
             // set the owning side to null (unless already changed)
             if ($company->getCompanyGroup() === $this) {
                 $company->setCompanyGroup(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Department>
+     */
+    public function getDepartments(): Collection
+    {
+        return $this->departments;
+    }
+
+    public function addDepartment(Department $department): static
+    {
+        if (!$this->departments->contains($department)) {
+            $this->departments->add($department);
+            $department->setCompanyGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepartment(Department $department): static
+    {
+        if ($this->departments->removeElement($department)) {
+            // set the owning side to null (unless already changed)
+            if ($department->getCompanyGroup() === $this) {
+                $department->setCompanyGroup(null);
             }
         }
 

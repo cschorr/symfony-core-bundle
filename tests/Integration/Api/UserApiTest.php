@@ -72,8 +72,8 @@ class UserApiTest extends ApiTestCase
             ],
             'json' => [
                 'email' => 'newuser@test.com',
-                'nameFirst' => 'New',
-                'nameLast' => 'User',
+                'firstName' => 'New',
+                'lastName' => 'User',
                 'password' => 'password123',
                 'active' => true,
                 'roles' => [UserRole::ROLE_USER->value],
@@ -85,15 +85,15 @@ class UserApiTest extends ApiTestCase
             '@context' => '/api/contexts/User',
             '@type' => 'User',
             'email' => 'newuser@test.com',
-            'nameFirst' => 'New',
-            'nameLast' => 'User',
+            'firstName' => 'New',
+            'lastName' => 'User',
             'active' => true,
         ]);
 
         // Verify user was created in database
         $createdUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => 'newuser@test.com']);
         $this->assertNotNull($createdUser);
-        $this->assertSame('New', $createdUser->getNameFirst());
+        $this->assertSame('New', $createdUser->getFirstName());
     }
 
     public function testUpdateUser(): void
@@ -108,21 +108,21 @@ class UserApiTest extends ApiTestCase
                 'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
-                'nameFirst' => 'Updated',
-                'nameLast' => 'Name',
+                'firstName' => 'Updated',
+                'lastName' => 'Name',
             ],
         ]);
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
-            'nameFirst' => 'Updated',
-            'nameLast' => 'Name',
+            'firstName' => 'Updated',
+            'lastName' => 'Name',
         ]);
 
         // Verify changes in database
         $this->entityManager->refresh($testUser);
-        $this->assertSame('Updated', $testUser->getNameFirst());
-        $this->assertSame('Name', $testUser->getNameLast());
+        $this->assertSame('Updated', $testUser->getFirstName());
+        $this->assertSame('Name', $testUser->getLastName());
     }
 
     public function testDeleteUser(): void
@@ -209,8 +209,8 @@ class UserApiTest extends ApiTestCase
             ],
             'json' => [
                 'email' => 'groupuser@test.com',
-                'nameFirst' => 'Group',
-                'nameLast' => 'User',
+                'firstName' => 'Group',
+                'lastName' => 'User',
                 'password' => 'password123',
                 'active' => true,
                 'userGroups' => ['/api/user_groups/' . $userGroup->getId()],
@@ -256,8 +256,8 @@ class UserApiTest extends ApiTestCase
     {
         $user = new User();
         $user->setEmail($email)
-            ->setNameFirst($firstName)
-            ->setNameLast($lastName)
+            ->setFirstName($firstName)
+            ->setLastName($lastName)
             ->setPassword($this->passwordHasher->hashPassword($user, 'password123'))
             ->setRoles($roles)
             ->setActive(true);

@@ -16,11 +16,14 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Operation;
+use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
 use C3net\CoreBundle\Repository\DepartmentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
@@ -33,8 +36,9 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     ],
     operations: [
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Company'])
+        ),
     ],
     paginationEnabled: true,
     paginationClientEnabled: true,
@@ -83,10 +87,18 @@ class Department extends AbstractEntity
 {
     use StringNameTrait;
     use StringShortcodeTrait;
+    use SetCommunicationTrait;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'departments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
+
+    #[ORM\ManyToOne(inversedBy: 'departments')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?CompanyGroup $companyGroup = null;
 
     /**
      * @var Collection<int, Contact>
@@ -94,16 +106,35 @@ class Department extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'department')]
     private Collection $contacts;
 
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'department')]
+    private Collection $projects;
+
     public function __construct()
     {
         parent::__construct();
         $this->contacts = new ArrayCollection();
+        $this->projects = new ArrayCollection();
     }
 
     #[\Override]
     public function __toString(): string
     {
         return $this->name ?? 'Unnamed Department';
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
     }
 
     public function getCompany(): ?Company
@@ -114,6 +145,18 @@ class Department extends AbstractEntity
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getCompanyGroup(): ?CompanyGroup
+    {
+        return $this->companyGroup;
+    }
+
+    public function setCompanyGroup(?CompanyGroup $companyGroup): static
+    {
+        $this->companyGroup = $companyGroup;
 
         return $this;
     }
@@ -142,6 +185,36 @@ class Department extends AbstractEntity
             // Set the owning side to null (unless already changed)
             if ($contact->getDepartment() === $this) {
                 $contact->setDepartment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): static
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
+            $project->setDepartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): static
+    {
+        if ($this->projects->removeElement($project)) {
+            // Set the owning side to null (unless already changed)
+            if ($project->getDepartment() === $this) {
+                $project->setDepartment(null);
             }
         }
 

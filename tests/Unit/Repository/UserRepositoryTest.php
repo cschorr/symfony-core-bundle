@@ -231,8 +231,8 @@ class UserRepositoryTest extends TestCase
         $user->setPassword('existingPassword');
 
         // Simulate an existing user with existing data
-        $user->setNameFirst('John');
-        $user->setNameLast('Doe');
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
         $user->setActive(true);
 
         $newPassword = 'upgradedPassword789';
@@ -250,8 +250,8 @@ class UserRepositoryTest extends TestCase
 
         // Verify only password changed, other data intact
         $this->assertSame($newPassword, $user->getPassword());
-        $this->assertSame('John', $user->getNameFirst());
-        $this->assertSame('Doe', $user->getNameLast());
+        $this->assertSame('John', $user->getFirstName());
+        $this->assertSame('Doe', $user->getLastName());
         $this->assertTrue($user->isActive());
     }
 

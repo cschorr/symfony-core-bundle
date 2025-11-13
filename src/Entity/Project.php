@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Operation;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
@@ -35,6 +36,26 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'project_type', type: 'string')]
 #[ApiResource(
+    uriTemplate: '/companies/{companyId}/projects',
+    uriVariables: [
+        'companyId' => new Link(
+            fromClass: Company::class,
+            toProperty: 'customer'
+        ),
+    ],
+    operations: [
+        new GetCollection(
+            openapi: new Operation(tags: ['Company'])
+        ),
+    ],
+    mercure: true,
+    paginationEnabled: true,
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100
+)]
+#[ApiResource(
     uriTemplate: '/transactions/{transactionId}/projects',
     uriVariables: [
         'transactionId' => new Link(
@@ -43,8 +64,9 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     ],
     operations: [
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Transaction'])
+        ),
     ],
     mercure: true,
     paginationEnabled: true,
@@ -81,6 +103,9 @@ use Doctrine\ORM\Mapping as ORM;
                 ),
                 'endDate' => new QueryParameter(
                     filter: DateFilter::class . ':endDate'
+                ),
+                'department' => new QueryParameter(
+                    filter: SearchFilter::class . ':department'
                 ),
             ]
         ),
@@ -236,6 +261,9 @@ class Project extends AbstractEntity
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?Transaction $transaction = null;
+
+    #[ORM\ManyToOne(inversedBy: 'projects')]
+    private ?Department $department = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dueDate = null;
@@ -458,6 +486,18 @@ class Project extends AbstractEntity
     public function setTransaction(?Transaction $transaction): static
     {
         $this->transaction = $transaction;
+
+        return $this;
+    }
+
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): static
+    {
+        $this->department = $department;
 
         return $this;
     }
