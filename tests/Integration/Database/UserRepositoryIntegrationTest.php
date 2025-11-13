@@ -132,7 +132,7 @@ class UserRepositoryIntegrationTest extends KernelTestCase
         $this->entityManager->flush();
 
         // Test custom query methods if they exist
-        $users = $this->userRepository->findBy(['nameFirst' => 'John']);
+        $users = $this->userRepository->findBy(['firstName' => 'John']);
         $this->assertCount(1, $users);
         $this->assertSame('relationships@test.com', $users[0]->getEmail());
     }
@@ -192,11 +192,11 @@ class UserRepositoryIntegrationTest extends KernelTestCase
 
         // Find active users named Alice
         $qb = $this->userRepository->createQueryBuilder('u');
-        $qb->where('u.nameFirst = :firstName')
+        $qb->where('u.firstName = :firstName')
            ->andWhere('u.active = :active')
            ->setParameter('firstName', 'Alice')
            ->setParameter('active', true)
-           ->orderBy('u.nameLast', 'ASC');
+           ->orderBy('u.lastName', 'ASC');
 
         $aliceUsers = $qb->getQuery()->getResult();
 

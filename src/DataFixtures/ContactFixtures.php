@@ -72,8 +72,8 @@ class ContactFixtures extends AbstractCategorizableFixture implements DependentF
             $categories = $this->findCategoriesByNames($manager, $contactData['categories']);
 
             $contact = (new Contact())
-                ->setNameFirst($contactData['firstName'])
-                ->setNameLast($contactData['lastName'])
+                ->setFirstName($contactData['firstName'])
+                ->setLastName($contactData['lastName'])
                 ->setEmail($contactData['email'])
                 ->setPhone($contactData['phone'])
                 ->setCell($contactData['cell'])

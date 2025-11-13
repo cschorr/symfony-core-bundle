@@ -9,10 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 trait SetNamePersonTrait
 {
     #[ORM\Column(length: 255)]
-    private ?string $nameLast = null;
+    private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $nameFirst = null;
+    private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $academicTitle = null;
@@ -21,50 +21,50 @@ trait SetNamePersonTrait
     public function getFullName(): ?string
     {
         if ($this->academicTitle) {
-            return $this->academicTitle . ' ' . $this->nameFirst . ' ' . $this->nameLast;
+            return $this->academicTitle . ' ' . $this->firstName . ' ' . $this->lastName;
         }
 
-        return $this->nameFirst . ' ' . $this->nameLast;
+        return $this->firstName . ' ' . $this->lastName;
     }
 
     public function getName(): ?string
     {
         if ($this->academicTitle) {
-            return $this->academicTitle . ' ' . $this->nameFirst . ' ' . $this->nameLast;
+            return $this->academicTitle . ' ' . $this->firstName . ' ' . $this->lastName;
         }
 
-        return $this->nameFirst . ' ' . $this->nameLast;
+        return $this->firstName . ' ' . $this->lastName;
     }
 
     public function getFormalFullName(): ?string
     {
         if ($this->academicTitle) {
-            return $this->academicTitle . ' ' . $this->nameLast . ', ' . $this->nameFirst;
+            return $this->academicTitle . ' ' . $this->lastName . ', ' . $this->firstName;
         }
 
-        return $this->nameLast . ', ' . $this->nameFirst;
+        return $this->lastName . ', ' . $this->firstName;
     }
 
-    public function getNameLast(): ?string
+    public function getLastName(): ?string
     {
-        return $this->nameLast;
+        return $this->lastName;
     }
 
-    public function setNameLast(string $nameLast): static
+    public function setLastName(string $lastName): static
     {
-        $this->nameLast = $nameLast;
+        $this->lastName = $lastName;
 
         return $this;
     }
 
-    public function getNameFirst(): ?string
+    public function getFirstName(): ?string
     {
-        return $this->nameFirst;
+        return $this->firstName;
     }
 
-    public function setNameFirst(string $nameFirst): static
+    public function setFirstName(string $firstName): static
     {
-        $this->nameFirst = $nameFirst;
+        $this->firstName = $firstName;
 
         return $this;
     }
