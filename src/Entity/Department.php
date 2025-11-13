@@ -103,10 +103,17 @@ class Department extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'department')]
     private Collection $contacts;
 
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'department')]
+    private Collection $projects;
+
     public function __construct()
     {
         parent::__construct();
         $this->contacts = new ArrayCollection();
+        $this->projects = new ArrayCollection();
     }
 
     #[\Override]
@@ -175,6 +182,36 @@ class Department extends AbstractEntity
             // Set the owning side to null (unless already changed)
             if ($contact->getDepartment() === $this) {
                 $contact->setDepartment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): static
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
+            $project->setDepartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): static
+    {
+        if ($this->projects->removeElement($project)) {
+            // Set the owning side to null (unless already changed)
+            if ($project->getDepartment() === $this) {
+                $project->setDepartment(null);
             }
         }
 

@@ -99,6 +99,9 @@ use Doctrine\ORM\Mapping as ORM;
                 'endDate' => new QueryParameter(
                     filter: DateFilter::class . ':endDate'
                 ),
+                'department' => new QueryParameter(
+                    filter: SearchFilter::class . ':department'
+                ),
             ]
         ),
         new Post(),
@@ -253,6 +256,9 @@ class Project extends AbstractEntity
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?Transaction $transaction = null;
+
+    #[ORM\ManyToOne(inversedBy: 'projects')]
+    private ?Department $department = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dueDate = null;
@@ -475,6 +481,18 @@ class Project extends AbstractEntity
     public function setTransaction(?Transaction $transaction): static
     {
         $this->transaction = $transaction;
+
+        return $this;
+    }
+
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): static
+    {
+        $this->department = $department;
 
         return $this;
     }
