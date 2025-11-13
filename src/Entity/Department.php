@@ -93,6 +93,10 @@ class Department extends AbstractEntity
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
 
+    #[ORM\ManyToOne(inversedBy: 'departments')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?CompanyGroup $companyGroup = null;
+
     /**
      * @var Collection<int, Contact>
      */
@@ -131,6 +135,18 @@ class Department extends AbstractEntity
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getCompanyGroup(): ?CompanyGroup
+    {
+        return $this->companyGroup;
+    }
+
+    public function setCompanyGroup(?CompanyGroup $companyGroup): static
+    {
+        $this->companyGroup = $companyGroup;
 
         return $this;
     }
