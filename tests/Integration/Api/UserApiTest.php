@@ -72,8 +72,8 @@ class UserApiTest extends ApiTestCase
             ],
             'json' => [
                 'email' => 'newuser@test.com',
-                'firstName' =>'New',
-                'lastName' =>'User',
+                'firstName' => 'New',
+                'lastName' => 'User',
                 'password' => 'password123',
                 'active' => true,
                 'roles' => [UserRole::ROLE_USER->value],
@@ -85,8 +85,8 @@ class UserApiTest extends ApiTestCase
             '@context' => '/api/contexts/User',
             '@type' => 'User',
             'email' => 'newuser@test.com',
-            'firstName' =>'New',
-            'lastName' =>'User',
+            'firstName' => 'New',
+            'lastName' => 'User',
             'active' => true,
         ]);
 
@@ -108,15 +108,15 @@ class UserApiTest extends ApiTestCase
                 'Content-Type' => 'application/merge-patch+json',
             ],
             'json' => [
-                'firstName' =>'Updated',
-                'lastName' =>'Name',
+                'firstName' => 'Updated',
+                'lastName' => 'Name',
             ],
         ]);
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
-            'firstName' =>'Updated',
-            'lastName' =>'Name',
+            'firstName' => 'Updated',
+            'lastName' => 'Name',
         ]);
 
         // Verify changes in database
@@ -209,8 +209,8 @@ class UserApiTest extends ApiTestCase
             ],
             'json' => [
                 'email' => 'groupuser@test.com',
-                'firstName' =>'Group',
-                'lastName' =>'User',
+                'firstName' => 'Group',
+                'lastName' => 'User',
                 'password' => 'password123',
                 'active' => true,
                 'userGroups' => ['/api/user_groups/' . $userGroup->getId()],
