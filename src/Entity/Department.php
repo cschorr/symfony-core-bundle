@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Operation;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
@@ -35,9 +36,10 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     ],
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Company'])
+        ),
     ],
-    extraProperties: ['openapi_context' => ['tags' => ['Company']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,

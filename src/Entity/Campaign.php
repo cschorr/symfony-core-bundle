@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
@@ -33,9 +34,10 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     ],
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Company'])
+        ),
     ],
-    extraProperties: ['openapi_context' => ['tags' => ['Company']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
@@ -51,9 +53,10 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     ],
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Transaction'])
+        ),
     ],
-    extraProperties: ['openapi_context' => ['tags' => ['Transaction']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,

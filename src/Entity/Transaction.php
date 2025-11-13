@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\OpenApi\Model\Operation;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetStartEndTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
@@ -42,9 +43,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ],
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Company'])
+        ),
     ],
-    extraProperties: ['openapi_context' => ['tags' => ['Company']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,

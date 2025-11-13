@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Operation;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetAddressTrait;
 use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
@@ -44,9 +45,10 @@ use Gedmo\Mapping\Annotation as Gedmo;
         ),
     ],
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Company'])
+        ),
     ],
-    extraProperties: ['openapi_context' => ['tags' => ['Company']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
@@ -62,9 +64,10 @@ use Gedmo\Mapping\Annotation as Gedmo;
         ),
     ],
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            openapi: new Operation(tags: ['Department'])
+        ),
     ],
-    extraProperties: ['openapi_context' => ['tags' => ['Department']]],
     paginationEnabled: true,
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
