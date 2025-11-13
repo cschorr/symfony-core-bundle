@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use C3net\CoreBundle\Entity\Traits\Set\SetCommunicationTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
 use C3net\CoreBundle\Repository\DepartmentRepository;
@@ -83,6 +84,7 @@ class Department extends AbstractEntity
 {
     use StringNameTrait;
     use StringShortcodeTrait;
+    use SetCommunicationTrait;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
