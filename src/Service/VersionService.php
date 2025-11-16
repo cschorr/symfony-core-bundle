@@ -13,6 +13,9 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class VersionService
 {
+    /**
+     * @var array{version: string, commitHash: string, buildDate: string, environment: string, phpVersion: string, symfonyVersion: string}|null
+     */
     private ?array $versionData = null;
 
     public function __construct(
@@ -69,9 +72,12 @@ class VersionService
         // Priority 3: Composer.json version
         $composerFile = $this->projectDir . '/composer.json';
         if (file_exists($composerFile)) {
-            $composerData = json_decode(file_get_contents($composerFile), true);
-            if (isset($composerData['version'])) {
-                return $composerData['version'];
+            $composerContent = file_get_contents($composerFile);
+            if (false !== $composerContent) {
+                $composerData = json_decode($composerContent, true);
+                if (isset($composerData['version'])) {
+                    return $composerData['version'];
+                }
             }
         }
 
