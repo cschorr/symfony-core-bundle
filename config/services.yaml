@@ -3,6 +3,10 @@ services:
         autowire: true
         autoconfigure: true
         public: false
+        bind:
+            # Bind scalar values for constructor injection
+            $projectDir: '%kernel.project_dir%'
+            $environment: '%kernel.environment%'
 
     # Auto-register all services in the bundle
     C3net\CoreBundle\:
