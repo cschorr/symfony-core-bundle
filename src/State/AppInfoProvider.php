@@ -15,7 +15,7 @@ use C3net\CoreBundle\Service\VersionService;
 class AppInfoProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly VersionService $versionService
+        private readonly VersionService $versionService,
     ) {
     }
 
