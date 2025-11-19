@@ -21,6 +21,10 @@ class JwtCreatedListener
 
         $payload = $event->getData();
 
+        // Add userId claim to JWT payload
+        // Required by frontend for user identification
+        $payload['userId'] = (string) $user->getId();
+
         // Add password_changed_at claim to JWT payload
         // This timestamp is used to invalidate tokens created before password change
         $payload['password_changed_at'] = $user->getPasswordChangedAt()

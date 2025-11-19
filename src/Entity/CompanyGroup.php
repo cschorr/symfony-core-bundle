@@ -10,11 +10,13 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use C3net\CoreBundle\DTO\CompanyGroupInput;
 use C3net\CoreBundle\Entity\Traits\Set\CategorizableTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringNameTrait;
 use C3net\CoreBundle\Entity\Traits\Single\StringShortcodeTrait;
 use C3net\CoreBundle\Enum\DomainEntityType;
 use C3net\CoreBundle\Repository\CompanyGroupRepository;
+use C3net\CoreBundle\State\CompanyGroupWriteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,8 +26,16 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new Get(uriTemplate: '/company-groups/{id}'),
         new GetCollection(uriTemplate: '/company-groups'),
-        new Post(uriTemplate: '/company-groups'),
-        new Put(uriTemplate: '/company-groups/{id}'),
+        new Post(
+            uriTemplate: '/company-groups',
+            input: CompanyGroupInput::class,
+            processor: CompanyGroupWriteProcessor::class
+        ),
+        new Put(
+            uriTemplate: '/company-groups/{id}',
+            input: CompanyGroupInput::class,
+            processor: CompanyGroupWriteProcessor::class
+        ),
         new Delete(uriTemplate: '/company-groups/{id}'),
     ],
 )]
